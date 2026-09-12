@@ -3,7 +3,7 @@
 [Run the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download a version](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
 An executable example connecting data preparation, CPUE analysis and stock assessment.
-All observations are synthetic and the models are illustrative.
+All observations are synthetic and the models are illustrative. The data describe increasing then easing catches, a decline and partial recovery in abundance, and changing vessel composition. These trends make the workflow visible; they are not findings about a real stock.
 
 Open **index.html** from a downloaded release. Python and SQLite run inside the
 browser; no login, installation or internet connection is required. Each visitor
@@ -40,7 +40,7 @@ The container uses a fixed image. CI runs the checks in that image when code
 changes. Browser execution uses the preserved Pyodide runtime; both execute
 `workflow/`. Their software versions are recorded with the results.
 
-`workflow/spec.py` defines jobs and dependencies; `workflow/models.py` contains
+`scripts/generate-data.py` creates the fixed illustrative data. `workflow/spec.py` defines jobs and dependencies; `workflow/models.py` contains
 the calculations; `app/` contains the interface. See [ADAPT.md](ADAPT.md) to use
 this structure for another analysis and [THIRD_PARTY.md](THIRD_PARTY.md) for sources.
 

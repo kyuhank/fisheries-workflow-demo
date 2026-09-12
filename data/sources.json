@@ -22,17 +22,18 @@
   },
   {
     "file": "data/fishery.sqlite",
-    "sha256": "a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf",
-    "origin": "https://github.com/kyuhank/cpue-actions-demo",
-    "commit": "5c04eaf748de200cc8f5b60bee7901514f5b1e6a",
-    "original_path": "data/toy-fishery.sqlite"
+    "sha256": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
+    "origin": "Generated within this repository",
+    "generator": "scripts/generate-data.py",
+    "scenario": "data/scenario.json",
+    "seed": 20260913
   },
   {
     "file": "data/submission.json",
-    "sha256": "b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6",
-    "origin": "https://github.com/kyuhank/cpue-actions-demo",
-    "commit": "5c04eaf748de200cc8f5b60bee7901514f5b1e6a",
-    "original_path": "supabase/functions/workshop-api/batches.json",
-    "selection": "2024"
+    "sha256": "96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5",
+    "origin": "Generated within this repository",
+    "generator": "scripts/generate-data.py",
+    "scenario": "data/scenario.json",
+    "seed": 20260913
   }
 ]
