@@ -73,6 +73,13 @@ class WorkflowTest(unittest.TestCase):
         self.assertIn('cpue_a', result['run'])
         self.assertTrue(runner.valid('cpue_a'))
 
+    def test_mortality_change_retains_other_fits(self):
+        runner = self.clone()
+        runner.configure({'mortality_2': 0.35})
+        result = asyncio.run(runner.run('assessment_report'))
+        self.assertEqual(result['run'], ['assessment_a2','assessment_b2','assessment_summary','assessment_report'])
+        self.assertEqual(runner.records['assessment_a1']['run_id'], 'Run 001')
+
     def test_data_versions_do_not_accumulate(self):
         runner = self.clone()
         runner.configure({'last_year': 2024})

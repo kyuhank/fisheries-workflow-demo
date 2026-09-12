@@ -1,6 +1,7 @@
 """Readable HTML outputs, with small native SVG plots and recorded inputs."""
 import html
 import json
+import math
 
 STYLE = '''body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}summary{cursor:pointer;font-weight:600}'''
 
@@ -23,13 +24,19 @@ def plot(series, value, label, points=()):
     xs = [r['year'] for r in all_rows]; ys = [r[value] for r in all_rows]
     xmin, xmax = min(xs), max(xs)
     ymin, ymax = min(0, min(ys) * 1.1), max(0, max(ys) * 1.1)
-    span = max(ymax - ymin, 1e-12)
+    scale = 10 ** math.floor(math.log10(max(ymax - ymin, 1e-12) / 4))
+    step = next(size * scale for size in [1, 2, 2.5, 5, 10] if size * scale >= (ymax-ymin) / 4)
+    ymin, ymax = math.floor(ymin / step) * step, math.ceil(ymax / step) * step
+    span = max(ymax - ymin, step)
     x = lambda year: 65 + (year - xmin) / max(1, xmax - xmin) * 660
     y = lambda number: 280 - (number - ymin) / span * 225
     out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" aria-label="' + esc(label) + '">']
-    for i in range(5):
-        v = ymin + span * i / 4
-        out.append(f'<path d="M65 {y(v):.1f}H730" stroke="#e1e8ee"/><text x="54" y="{y(v)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{v:.2f}</text>')
+    for i in range(round(span / step) + 1):
+        v = ymin + step * i
+        if abs(v) < step * 1e-8:
+            v = 0.0
+        stroke = '#9cafba' if v == 0 and ymin < 0 else '#e1e8ee'
+        out.append(f'<path d="M65 {y(v):.1f}H730" stroke="{stroke}"/><text x="54" y="{y(v)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{v:g}</text>')
     for year in [xmin, (xmin+xmax)//2, xmax]:
         out.append(f'<text x="{x(year):.1f}" y="304" text-anchor="middle" fill="#607080" font-size="12">{year}</text>')
     for i, (name, rows) in enumerate(series.items()):

@@ -13,7 +13,7 @@ for folder in ['workflow','data','app','scripts','tests','vendor']:
     for path in (ROOT/folder).rglob('*'):
         if path.is_file() and '__pycache__' not in path.parts:
             files[str(path.relative_to(ROOT))] = path.read_bytes()
-for name in ['run.py','verify.py','Makefile','Dockerfile','.dockerignore','README.md','ADAPT.md','LICENSE','THIRD_PARTY.md','build-info.json']:
+for name in ['run.py','verify.py','Makefile','Dockerfile','.dockerignore','README.md','ADAPT.md','LICENSE','THIRD_PARTY.md','CITATION.cff','build-info.json']:
     files[name] = (ROOT/name).read_bytes()
 files['index.html'] = (ROOT/'docs/index.html').read_bytes()
 for path in (ROOT/'docs/example').rglob('*'):
