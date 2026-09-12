@@ -5,6 +5,8 @@ const pending = new Map();
 let sequence = 0, planVersion = 0, jobs = payload.jobs, records = {}, states = {}, plan = null;
 let selected = 'submission', busy = false, ready = false, currentOutput = null, latestRun = '', selectedTask = '';
 let mode = 'live', liveState = null;
+let correctionPending = false;
+let waitingTransfer = null;
 const byKey = Object.fromEntries(jobs.map(job => [job.key, job]));
 const messages = [];
 
@@ -28,14 +30,19 @@ function status(kind, title, message) {
   $('status-icon').textContent = kind === 'running' ? '' : kind === 'failed' ? '!' : kind === 'complete' ? '✓' : '·';
 }
 
+function affectedByChange(key) {
+  return plan?.changed.includes(key) || byKey[key].parents.some(affectedByChange);
+}
+
 function stageStatus(key) {
+  if (!busy && mode === 'live' && records[key] && affectedByChange(key)) return 'outdated';
   if (states[key]) return states[key];
   if (!records[key]) return 'waiting';
   return records[key].run_id === latestRun ? 'complete' : 'retained';
 }
 
-const labels = {waiting: 'Waiting', running: 'Running', complete: 'Complete', retained: 'Retained', failed: 'Failed', returned: 'Correction'};
-const symbols = {waiting: '○', complete: '✓', retained: '↶', failed: '!', returned: '↶'};
+const labels = {waiting:'Waiting', running:'Running', complete:'Complete', retained:'Retained', failed:'Failed', returned:'Correction', handover:'Awaiting file', received:'Received', outdated:'Needs update'};
+const symbols = {waiting:'○', complete:'✓', retained:'↶', failed:'!', returned:'↶', handover:'○', received:'✓', outdated:'↻'};
 
 function badge(key) {
   const state = stageStatus(key), span = document.createElement('span');
@@ -55,16 +62,16 @@ function selectJob(key) {
   else render();
 }
 
-function jobCard(key) {
+function jobCard(key, layout) {
   const job = byKey[key], card = document.createElement('div'), state = stageStatus(key);
-  card.className = 'job ' + state + (selected === key ? ' selected' : '') + (plan?.run.includes(key) ? ' in-path' : '');
+  card.className = 'job ' + state + (selected === key ? ' selected' : '') + (plan?.run.includes(key) ? ' in-path' : ' outside-path') + (layout ? ' diagram-job' : '') + (key === 'database' ? ' database-job' : '');
   card.dataset.job = key; card.tabIndex = 0; card.setAttribute('role', 'button');
   card.setAttribute('aria-label', job.title + ': ' + (labels[state] || state) + '. Select starting job.');
   card.onclick = () => selectJob(key);
   card.onkeydown = event => {if (event.key === 'Enter' || event.key === ' ') {event.preventDefault(); selectJob(key);}};
-  const title = document.createElement('h3'); title.textContent = job.title;
+  const title = document.createElement('h3'); title.textContent = layout?.title || job.title;
   const origin = document.createElement('div'); origin.className = 'origin';
-  origin.textContent = state === 'retained' && records[key] ? records[key].run_id + ' · unchanged' : '';
+  origin.textContent = state === 'retained' && records[key] ? records[key].run_id + ' · saved' : layout?.subtitle || '';
   const view = document.createElement('button'); view.className = 'view'; view.textContent = 'View ›';
   view.disabled = !records[key]; view.setAttribute('aria-label', 'View ' + job.title + ' output');
   view.onclick = event => {event.stopPropagation(); openOutput(key);};
@@ -73,30 +80,94 @@ function jobCard(key) {
   return card;
 }
 
-function render() {
-  $('workflow-view').replaceChildren();
-  const groups = [
-    ['data', 'Data management', ['submission','qc','database','extract']],
-    ['cpue', 'CPUE analysis', [['cpue_a','cpue_b'],'cpue_summary','cpue_report']],
-    ['assessment', 'Stock assessment', [['prepare_a','prepare_b'],['assessment_a1','assessment_a2'],['assessment_b1','assessment_b2'],'assessment_summary','assessment_report']]
-  ];
-  groups.forEach(([module, title, entries], i) => {
-    const panel = document.createElement('article'); panel.className = 'module ' + module;
-    const header = document.createElement('header'), number = document.createElement('span'), heading = document.createElement('h2');
-    number.className = 'number'; number.textContent = i + 1; heading.textContent = title; header.append(number, heading); panel.append(header);
-    for (const entry of entries) {
-      if (Array.isArray(entry)) {const pair = document.createElement('div'); pair.className = 'pair'; pair.append(...entry.map(jobCard)); panel.append(pair);}
-      else panel.append(jobCard(entry));
+function svgElement(tag, attributes = {}) {
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
+  return element;
+}
+
+function roundedRoute(points) {
+  let path = `M ${points[0].join(' ')}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const a = points[i - 1], b = points[i], c = points[i + 1];
+    const before = Math.hypot(b[0] - a[0], b[1] - a[1]), after = Math.hypot(c[0] - b[0], c[1] - b[1]);
+    const radius = Math.min(9, before / 2, after / 2);
+    const entry = b.map((value, axis) => value - (b[axis] - a[axis]) / before * radius);
+    const leave = b.map((value, axis) => value + (c[axis] - b[axis]) / after * radius);
+    path += ` L ${entry.join(' ')} Q ${b.join(' ')} ${leave.join(' ')}`;
+  }
+  return path + ` L ${points.at(-1).join(' ')}`;
+}
+
+function renderDiagram() {
+  const layout = payload.diagram;
+  const svg = svgElement('svg', {viewBox: `0 0 ${layout.width} ${layout.height}`, class: 'workflow-diagram', 'aria-label': 'Data management, CPUE analysis and stock assessment jobs'});
+  const defs = svgElement('defs');
+  for (const [name, colour] of Object.entries({muted:'#bac9d0', selected:'#1779a0', running:'#bb821f', saved:'#548c81', failed:'#b95139'})) {
+    const marker = svgElement('marker', {id: 'arrow-' + name, markerWidth:8, markerHeight:8, refX:7, refY:4, orient:'auto', markerUnits:'userSpaceOnUse'});
+    marker.append(svgElement('path', {d:'M 0 0 L 8 4 L 0 8 Z', fill:colour})); defs.append(marker);
+  }
+  svg.append(defs);
+  for (const group of layout.groups) {
+    svg.append(svgElement('rect', {x:group.x, y:42, width:group.width, height:580, rx:16, fill:group.fill, stroke:group.colour, 'stroke-opacity':.22}));
+    const title = svgElement('text', {x:group.x+14, y:24, fill:group.colour, class:'module-title'}); title.textContent = group.title; svg.append(title);
+  }
+  for (const edge of layout.edges) {
+    const inPath = plan?.run.includes(edge.from) && plan?.run.includes(edge.to);
+    const receiving = busy && stageStatus(edge.to) === 'running';
+    const retained = plan?.retained.includes(edge.from) && plan?.run.includes(edge.to);
+    const awaiting = waitingTransfer && ((waitingTransfer.boundary === 'data' && edge.from === 'extract' && edge.to.startsWith('cpue_')) || (waitingTransfer.boundary === 'cpue' && edge.from.startsWith('cpue_') && edge.to.startsWith('prepare_')));
+    const kind = awaiting ? 'failed' : receiving ? (retained ? 'saved' : 'running') : !busy && inPath && mode === 'live' ? 'selected' : 'muted';
+    svg.append(svgElement('path', {d:roundedRoute(edge.points), class:`connection ${kind} ${edge.kind}`, 'data-from':edge.from, 'data-to':edge.to, 'marker-end':`url(#arrow-${kind})`}));
+  }
+  const loop = svgElement('path', {d:roundedRoute(layout.return.points), class:'connection return-path ' + (correctionPending ? 'failed active' : 'muted'), 'marker-end':'url(#arrow-' + (correctionPending ? 'failed' : 'muted') + ')'});
+  svg.append(loop);
+  if (correctionPending) {
+    const text = svgElement('text', {x:218,y:287,class:'return-label'});
+    for (const [i,line] of ['Correct +','resubmit'].entries()) {const part=svgElement('tspan',{x:218,dy:i?18:0});part.textContent=line;text.append(part);}
+    svg.append(text);
+  }
+  for (const label of layout.labels) {const text=svgElement('text',{x:label.x,y:label.y,class:'edge-label'});text.textContent=label.text;svg.append(text);}
+  for (const node of layout.nodes) {
+    const group = layout.groups.find(group => group.key === byKey[node.key].module);
+    const foreign = svgElement('foreignObject', {x:node.x,y:node.y,width:node.width,height:node.height,overflow:'visible'});
+    const card = jobCard(node.key, node); card.style.setProperty('--accent',group.colour);
+    if (node.key === 'database') {
+      const state = stageStatus(node.key), inPath = plan?.run.includes(node.key);
+      const cylinder = svgElement('g', {class:'database-shape ' + state + (inPath ? ' in-path' : ' outside-path') + (selected === node.key ? ' selected' : '')});
+      const {x,y,width:w,height:h}=node;
+      cylinder.append(svgElement('path',{d:`M ${x} ${y+13} A ${w/2} 13 0 0 1 ${x+w} ${y+13} V ${y+h-13} A ${w/2} 13 0 0 1 ${x} ${y+h-13} Z`}));
+      cylinder.append(svgElement('ellipse',{cx:x+w/2,cy:y+13,rx:w/2,ry:13}));svg.append(cylinder);
     }
-    $('workflow-view').append(panel);
-  });
+    foreign.append(card); svg.append(foreign);
+  }
+  if ($('handover').value === 'manual' && mode === 'live') {
+    for (const [boundary,x] of [['data',383],['cpue',846]]) {
+      const active = waitingTransfer?.boundary === boundary;
+      const group = svgElement('g',{class:'handover-marker'+(active?' active':''), transform:`translate(${x} 175)`});
+      group.append(svgElement('circle',{r:15}),svgElement('circle',{cx:0,cy:-4,r:3.5}),svgElement('path',{d:'M -7 7 Q -7 0 0 0 Q 7 0 7 7'}));
+      const title=svgElement('title');title.textContent=boundary==='data'?'Pass selected records to the CPUE analyst':'Pass CPUE outputs to the assessment analyst';group.append(title);svg.append(group);
+    }
+  }
+  $('workflow-view').classList.toggle('is-running',busy);
+  $('workflow-view').replaceChildren(svg);
+}
+
+function render() {
+  renderDiagram();
+  const groups = [
+    ['data', 'Data management'],
+    ['cpue', 'CPUE analysis'],
+    ['assessment', 'Stock assessment']
+  ];
   $('job-table-body').replaceChildren();
   $('tasks').replaceChildren();
   for (const [module, title] of groups) {
     const members = jobs.filter(job => job.module === module), active = members.filter(job => stageStatus(job.key) === 'running');
-    const button = document.createElement('button'); button.className = 'task ' + module + (active.length ? ' running' : '') + (selectedTask === module ? ' active' : '');
+    const awaiting = members.find(job => stageStatus(job.key) === 'handover');
+    const button = document.createElement('button'); button.className = 'task ' + module + (active.length ? ' running' : awaiting ? ' awaiting' : '') + (selectedTask === module ? ' active' : '');
     const name = document.createElement('strong'); name.textContent = title;
-    const summary = document.createElement('span'); summary.textContent = active.length ? 'Running · ' + active.map(job => job.title).join(', ') : members.filter(job => records[job.key]).length + ' / ' + members.length + ' outputs available';
+    const summary = document.createElement('span'); summary.textContent = active.length ? 'Running · ' + active.map(job => job.title).join(', ') : awaiting ? 'Awaiting file · ' + awaiting.title : members.filter(job => records[job.key]).length + ' / ' + members.length + ' outputs available';
     button.append(name, summary); button.onclick = () => {selectedTask = module; $('task-title').textContent = title; render();}; $('tasks').append(button);
   }
   for (const job of jobs) {
@@ -116,6 +187,10 @@ function render() {
   $('download').disabled = busy || !Object.keys(records).length;
   $('reset').disabled = busy || !ready || mode === 'saved';
   $('mode').disabled = busy;
+  $('handover').disabled = busy || mode === 'saved';
+  $('handover-note').hidden = mode !== 'live' || $('handover').value !== 'manual';
+  $('revise-cpue').hidden = busy || !records.cpue_a;
+  $('handover-panel').hidden = !waitingTransfer;
   for (const id of ['snapshot','filter','mortality']) $(id).disabled = busy || mode === 'saved';
   if (mode === 'saved') {
     $('completion').textContent = '16 saved outputs';
@@ -153,13 +228,21 @@ worker.onmessage = ({data}) => {
   if (data.type === 'event') {
     const event = data.event;
     if (event.state === 'plan') {
+      correctionPending = false;
+      waitingTransfer = null;
       plan = event; latestRun = event.run_id; $('run-id').textContent = latestRun;
       states = Object.fromEntries(jobs.map(job => [job.key, plan.run.includes(job.key) ? 'waiting' : 'retained']));
     } else {
+      if (event.state === 'handover') {
+        waitingTransfer = event;
+        $('handover-title').textContent = event.boundary === 'data' ? 'Data manager → CPUE analyst' : 'CPUE analyst → Assessment analyst';
+      } else if (event.state === 'received') waitingTransfer = null;
+      if (event.job === 'qc' && event.state === 'failed') correctionPending = true;
+      if (event.job === 'qc' && event.state === 'complete') correctionPending = false;
       states[event.job] = event.state;
       if (event.record) records[event.job] = event.record;
       log(event);
-      status(event.state === 'failed' ? 'failed' : 'running', byKey[event.job].title, event.message);
+      status(event.state === 'failed' ? 'failed' : event.state === 'handover' ? 'handover' : 'running', event.state === 'handover' ? 'Waiting for the next analyst' : byKey[event.job].title, event.message);
     }
     render(); return;
   }
@@ -175,7 +258,7 @@ $('run').onclick = async () => {
   busy = true; messages.length = 0; $('execution-log').textContent = '';
   status('running', 'Starting the selected work', 'Checking saved inputs and the selected settings.'); render();
   try {
-    const result = await call('run', {start: selected, settings: settings()});
+    const result = await call('run', {start: selected, settings: settings(), handover: $('handover').value});
     records = result.records; busy = false; latestRun = result.run_id;
     status('complete', 'Results are ready', `${result.run.length} jobs completed · ${result.retained.length} retained unchanged. Open a job to inspect its output.`);
     $('completion').textContent = `${result.run.length} completed · ${result.retained.length} retained`;
@@ -183,6 +266,26 @@ $('run').onclick = async () => {
   } catch (error) {showError(error); await refreshPlan();}
 };
 for (const id of ['snapshot','filter','mortality']) $(id).onchange = refreshPlan;
+$('handover').onchange = () => {
+  status('', 'Connection mode selected', $('handover').value === 'manual' ? 'Calculations pause where inputs must pass to the next analyst.' : 'Recorded inputs pass directly to the dependent jobs.');
+  render();
+};
+$('revise-cpue').onclick = () => {
+  $('filter').value = $('filter').value === '0' ? '1200' : '0';
+  status('', 'CPUE A needs an update', 'The effort filter has changed. The existing assessment still contains the earlier result. Run the revision to follow the handover.');
+  selectJob('cpue_a');
+};
+async function transferFiles(connect = false) {
+  $('transfer-files').disabled = true; $('connect-workflow').disabled = true;
+  try {
+    await call('transfer', {connect});
+    if (connect) $('handover').value = 'connected';
+    waitingTransfer = null; render();
+  } catch (error) {showError(error);}
+  finally {$('transfer-files').disabled = false; $('connect-workflow').disabled = false;}
+}
+$('transfer-files').onclick = () => transferFiles();
+$('connect-workflow').onclick = () => transferFiles(true);
 $('reset').onclick = async () => {
   const result = await call('reset'); records = result.records; states = {}; latestRun = ''; selected = 'submission';
   $('snapshot').value = '2023'; $('filter').value = '0'; $('mortality').value = '0.30'; $('run-id').textContent = '';

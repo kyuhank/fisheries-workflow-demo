@@ -29,11 +29,12 @@ def read_json(path):
 
 
 class Workflow:
-    def __init__(self, directory='runs', notify=None, pause=0):
+    def __init__(self, directory='runs', notify=None, pause=0, before_job=None):
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
         self.notify = notify or (lambda event: None)
         self.pause = pause
+        self.before_job = before_job
         self.settings = dict(DEFAULTS)
         self.records = {}
         self.events = []
@@ -243,6 +244,8 @@ class Workflow:
             run_id = f'Run {self.run_number:03d}'
             self.notify({'state':'plan', **plan, 'run_id':run_id})
             for key in plan['run']:
+                if self.before_job:
+                    await self.before_job(key)
                 await self.emit(key, 'running', SPEC[key]['description'])
                 try:
                     result = await self.calculate(key, run_id)

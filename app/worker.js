@@ -1,4 +1,6 @@
 let python;
+let handoverMode = 'connected', activePlan = [], transfer = null;
+const transferred = new Set();
 const decode = text => Uint8Array.from(atob(text), c => c.charCodeAt(0));
 
 async function initialise(payload) {
@@ -19,7 +21,24 @@ async function initialise(payload) {
     python.FS.mkdirTree(path.slice(0, path.lastIndexOf('/')));
     python.FS.writeFile(path, decode(content));
   }
-  python.globals.set('_notify_js', text => self.postMessage({type: 'event', event: JSON.parse(text)}));
+  python.globals.set('_notify_js', text => {
+    const event = JSON.parse(text);
+    if (event.state === 'plan') {activePlan = event.run; transferred.clear();}
+    self.postMessage({type: 'event', event});
+  });
+  python.globals.set('_before_job_js', async key => {
+    if (handoverMode !== 'manual') return '';
+    const boundary = ['cpue_a','cpue_b'].includes(key) && activePlan.includes('extract') ? 'data' :
+      key.startsWith('prepare_') && activePlan.some(job => ['extract','cpue_a','cpue_b'].includes(job)) ? 'cpue' : null;
+    if (!boundary || transferred.has(boundary)) return '';
+    const message = boundary === 'data' ? 'The extract is ready. The CPUE analyst is waiting for the selected records.' :
+      'The CPUE outputs are ready. The assessment analyst is waiting for the indices and their preparation details.';
+    self.postMessage({type:'event',event:{job:key,state:'handover',boundary,message}});
+    await new Promise(resolve => {transfer = resolve;});
+    transferred.add(boundary);
+    return boundary === 'data' ? 'Manual handover: selected records transferred to CPUE analysis.' :
+      'Manual handover: CPUE outputs transferred for assessment input preparation.';
+  });
   python.runPython(`
 import sys, json, base64, shutil
 sys.path.insert(0, '/workspace')
@@ -27,18 +46,29 @@ from workflow.engine import Workflow
 from workflow.spec import SPEC
 def _notify(event):
     _notify_js(json.dumps(event))
-runner = Workflow('/runs', notify=_notify, pause=0.35)
+async def _before_job(key):
+    message = await _before_job_js(key)
+    if message:
+        await runner.emit(key, 'received', message)
+runner = Workflow('/runs', notify=_notify, pause=0.7, before_job=_before_job)
 `);
   return JSON.parse(python.runPython('json.dumps(runner.state())'));
 }
 
 async function request(type, payload) {
+  if (type === 'transfer') {
+    if (!transfer) throw new Error('No file transfer is pending.');
+    if (payload.connect) handoverMode = 'connected';
+    const resume = transfer; transfer = null; resume();
+    return true;
+  }
   if (type === 'init') return initialise(payload);
   if (!python) throw new Error('The analysis runtime is still loading.');
   python.globals.set('_request', JSON.stringify(payload || {}));
   python.runPython('request = json.loads(_request)');
   if (type === 'plan') return JSON.parse(python.runPython('runner.configure(request["settings"]); json.dumps(runner.plan(request["start"]))'));
   if (type === 'run') {
+    handoverMode = payload.handover || 'connected';
     python.runPython('runner.configure(request["settings"])');
     return JSON.parse(await python.runPythonAsync('json.dumps(await runner.run(request["start"]))'));
   }
@@ -51,7 +81,7 @@ json.dumps({'html': (runner.directory/key/'report.html').read_text(), 'record':r
   }
   if (type === 'download') return python.runPython('base64.b64encode(runner.bundle()).decode()');
   if (type === 'reset') {
-    python.runPython("shutil.rmtree('/runs', ignore_errors=True); runner = Workflow('/runs', notify=_notify, pause=0.35)");
+    python.runPython("shutil.rmtree('/runs', ignore_errors=True); runner = Workflow('/runs', notify=_notify, pause=0.7, before_job=_before_job)");
     return JSON.parse(python.runPython('json.dumps(runner.state())'));
   }
   throw new Error('Unknown request.');

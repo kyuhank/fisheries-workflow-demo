@@ -18,6 +18,13 @@ def base64_file(path):
 
 
 def build():
+    diagram = json.loads((ROOT/'app/diagram.json').read_text())
+    if {node['key'] for node in diagram['nodes']} != set(SPEC):
+        raise ValueError('Diagram must include every job')
+    if {(edge['from'], edge['to']) for edge in diagram['edges']} != {
+        (parent, key) for key, job in SPEC.items() for parent in job['parents']
+    }:
+        raise ValueError('Diagram connections must match the calculation dependencies')
     with tempfile.TemporaryDirectory() as directory:
         runner = Workflow(directory)
         asyncio.run(runner.run())
@@ -37,7 +44,7 @@ def build():
     runtime_names = ['pyodide.js','pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json',
                      'sqlite3-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl']
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE','vendor/pyodide/LICENSE','vendor/pyodide/PYTHON-LICENSE'])
-    payload = {'jobs': list(SPEC.values()), 'saved': saved, 'example': example, 'notices': notices,
+    payload = {'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'notices': notices,
                'files': {str(p.relative_to(ROOT)):base64_file(p) for p in files},
                'runtime': {name:base64_file(ROOT/'vendor/pyodide'/name) for name in runtime_names}}
     page = (ROOT/'app/index.html').read_text()

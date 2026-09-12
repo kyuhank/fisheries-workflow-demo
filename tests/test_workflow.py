@@ -57,6 +57,34 @@ class WorkflowTest(unittest.TestCase):
         result = asyncio.run(runner.run('cpue_report'))
         self.assertEqual(result['run'], ['cpue_report'])
 
+    def test_handover_waits_before_replacing_assessment_inputs(self):
+        runner = self.clone()
+        previous = runner.records['prepare_a'].copy()
+
+        async def exercise():
+            waiting, received = asyncio.Event(), asyncio.Event()
+
+            async def transfer(key):
+                if key == 'prepare_a':
+                    waiting.set()
+                    await received.wait()
+
+            runner.before_job = transfer
+            runner.configure({'min_hooks_a': 1200})
+            execution = asyncio.create_task(runner.run('cpue_a'))
+            await asyncio.wait_for(waiting.wait(), timeout=5)
+            self.assertFalse(execution.done())
+            self.assertEqual(runner.records['prepare_a'], previous)
+            self.assertEqual(runner.records['cpue_a']['run_id'], 'Run 002')
+            self.assertNotIn(('prepare_a', 'running'),
+                             [(event['job'], event['state']) for event in runner.events])
+            received.set()
+            await execution
+            self.assertEqual(runner.records['prepare_a']['inputs']['cpue_a']['run_id'], 'Run 002')
+            self.assertTrue(runner.valid('assessment_report'))
+
+        asyncio.run(exercise())
+
     def test_changed_settings_rebuild_affected_branch(self):
         runner = self.clone()
         runner.configure({'min_hooks_a': 1200})

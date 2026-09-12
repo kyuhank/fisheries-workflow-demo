@@ -64,9 +64,36 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#output-close').click()
     page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for()
+    page.locator('[data-tab="workflow"]').click()
+    page.locator('#reset').click()
+    page.locator('#run:enabled').wait_for()
+    page.locator('#handover').select_option('manual')
+    page.locator('#run').click()
+    page.locator('#handover-panel:visible').wait_for(timeout=90000)
+    assert page.locator('#handover-title').inner_text() == 'Data manager → CPUE analyst'
+    assert page.locator('.job[data-job="cpue_a"]').get_attribute('class').split().count('handover') == 1
+    assert 'Fit a CPUE index' not in page.locator('#execution-log').inner_text()
+    page.locator('#transfer-files').click()
+    page.wait_for_function("document.querySelector('#handover-panel').hidden === false && document.querySelector('#handover-title').textContent === 'CPUE analyst → Assessment analyst'", timeout=90000)
+    page.locator('#transfer-files').click()
+    complete(page)
+    page.locator('#revise-cpue').click()
+    page.locator('.job[data-job="assessment_a1"].outdated').wait_for()
+    page.locator('#run:enabled').click()
+    page.locator('#handover-panel:visible').wait_for(timeout=90000)
+    assert page.locator('#handover-title').inner_text() == 'CPUE analyst → Assessment analyst'
+    page.locator('[data-tab="jobs"]').click()
+    page.locator('#all-tasks').click()
+    assert page.locator('#job-table-body tr[data-job="cpue_a"] td').nth(3).inner_text() == 'Run 002'
+    assert page.locator('#job-table-body tr[data-job="assessment_a1"] td').nth(3).inner_text() == 'Run 001'
+    page.locator('[data-tab="workflow"]').click()
+    page.locator('#connect-workflow').click()
+    complete(page)
+    assert page.locator('#handover').input_value() == 'connected'
+    assert '8 jobs completed' in page.locator('#status-message').inner_text()
     page.set_viewport_size({'width':390,'height':844})
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert not errors, errors
     assert not requests, requests
     browser.close()
-print('Passed: offline calculations, output comparison, repeated partial runs, task views and saved example.')
+print('Passed: offline calculations, output comparison, repeated partial runs, task views, saved example and manual transfers after a revision.')

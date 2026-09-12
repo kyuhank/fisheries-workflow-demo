@@ -1,0 +1,638 @@
+{
+  "width": 1690,
+  "height": 638,
+  "groups": [
+    {
+      "key": "data",
+      "title": "Data management",
+      "x": 8,
+      "width": 360,
+      "colour": "#287450",
+      "fill": "#f1f7f2"
+    },
+    {
+      "key": "cpue",
+      "title": "CPUE analysis",
+      "x": 396,
+      "width": 432,
+      "colour": "#176997",
+      "fill": "#eff6fb"
+    },
+    {
+      "key": "assessment",
+      "title": "Stock assessment",
+      "x": 852,
+      "width": 830,
+      "colour": "#765397",
+      "fill": "#f6f2fa"
+    }
+  ],
+  "nodes": [
+    {
+      "key": "submission",
+      "x": 28,
+      "y": 92,
+      "width": 174,
+      "height": 86,
+      "title": "Data submission",
+      "subtitle": ""
+    },
+    {
+      "key": "qc",
+      "x": 48,
+      "y": 202,
+      "width": 134,
+      "height": 70,
+      "title": "QC",
+      "subtitle": ""
+    },
+    {
+      "key": "database",
+      "x": 28,
+      "y": 342,
+      "width": 174,
+      "height": 104,
+      "title": "Database",
+      "subtitle": "Prepare + load"
+    },
+    {
+      "key": "extract",
+      "x": 230,
+      "y": 344,
+      "width": 128,
+      "height": 100,
+      "title": "Extract",
+      "subtitle": ""
+    },
+    {
+      "key": "cpue_a",
+      "x": 412,
+      "y": 122,
+      "width": 174,
+      "height": 106,
+      "title": "CPUE analysis A",
+      "subtitle": ""
+    },
+    {
+      "key": "cpue_b",
+      "x": 412,
+      "y": 434,
+      "width": 174,
+      "height": 106,
+      "title": "CPUE analysis B",
+      "subtitle": ""
+    },
+    {
+      "key": "cpue_summary",
+      "x": 630,
+      "y": 244,
+      "width": 190,
+      "height": 108,
+      "title": "Results summary",
+      "subtitle": "Plots + tables"
+    },
+    {
+      "key": "cpue_report",
+      "x": 630,
+      "y": 380,
+      "width": 190,
+      "height": 96,
+      "title": "CPUE report",
+      "subtitle": ""
+    },
+    {
+      "key": "prepare_a",
+      "x": 870,
+      "y": 122,
+      "width": 156,
+      "height": 106,
+      "title": "Input prep A",
+      "subtitle": ""
+    },
+    {
+      "key": "prepare_b",
+      "x": 870,
+      "y": 434,
+      "width": 156,
+      "height": 106,
+      "title": "Input prep B",
+      "subtitle": ""
+    },
+    {
+      "key": "assessment_a1",
+      "x": 1080,
+      "y": 86,
+      "width": 172,
+      "height": 84,
+      "title": "Assessment A1",
+      "subtitle": ""
+    },
+    {
+      "key": "assessment_a2",
+      "x": 1080,
+      "y": 204,
+      "width": 172,
+      "height": 84,
+      "title": "Assessment A2",
+      "subtitle": ""
+    },
+    {
+      "key": "assessment_b1",
+      "x": 1080,
+      "y": 397,
+      "width": 172,
+      "height": 84,
+      "title": "Assessment B1",
+      "subtitle": ""
+    },
+    {
+      "key": "assessment_b2",
+      "x": 1080,
+      "y": 515,
+      "width": 172,
+      "height": 84,
+      "title": "Assessment B2",
+      "subtitle": ""
+    },
+    {
+      "key": "assessment_summary",
+      "x": 1316,
+      "y": 297,
+      "width": 150,
+      "height": 114,
+      "title": "Results summary",
+      "subtitle": "Plots + tables"
+    },
+    {
+      "key": "assessment_report",
+      "x": 1510,
+      "y": 297,
+      "width": 152,
+      "height": 114,
+      "title": "Assessment report",
+      "subtitle": ""
+    }
+  ],
+  "edges": [
+    {
+      "from": "submission",
+      "to": "qc",
+      "points": [
+        [
+          115,
+          178
+        ],
+        [
+          115,
+          202
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "qc",
+      "to": "database",
+      "points": [
+        [
+          115,
+          272
+        ],
+        [
+          115,
+          342
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "database",
+      "to": "extract",
+      "points": [
+        [
+          202,
+          394
+        ],
+        [
+          230,
+          394
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "extract",
+      "to": "cpue_a",
+      "points": [
+        [
+          358,
+          377
+        ],
+        [
+          383,
+          377
+        ],
+        [
+          383,
+          175
+        ],
+        [
+          412,
+          175
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "extract",
+      "to": "cpue_b",
+      "points": [
+        [
+          358,
+          412
+        ],
+        [
+          383,
+          412
+        ],
+        [
+          383,
+          487
+        ],
+        [
+          412,
+          487
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "extract",
+      "to": "prepare_a",
+      "points": [
+        [
+          294,
+          344
+        ],
+        [
+          294,
+          67
+        ],
+        [
+          948,
+          67
+        ],
+        [
+          948,
+          122
+        ]
+      ],
+      "kind": "catch"
+    },
+    {
+      "from": "extract",
+      "to": "prepare_b",
+      "points": [
+        [
+          294,
+          444
+        ],
+        [
+          294,
+          614
+        ],
+        [
+          948,
+          614
+        ],
+        [
+          948,
+          540
+        ]
+      ],
+      "kind": "catch"
+    },
+    {
+      "from": "cpue_a",
+      "to": "cpue_summary",
+      "points": [
+        [
+          586,
+          205
+        ],
+        [
+          610,
+          205
+        ],
+        [
+          610,
+          275
+        ],
+        [
+          630,
+          275
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "cpue_b",
+      "to": "cpue_summary",
+      "points": [
+        [
+          586,
+          454
+        ],
+        [
+          610,
+          454
+        ],
+        [
+          610,
+          310
+        ],
+        [
+          630,
+          310
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "cpue_summary",
+      "to": "cpue_report",
+      "points": [
+        [
+          725,
+          352
+        ],
+        [
+          725,
+          380
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "cpue_a",
+      "to": "prepare_a",
+      "points": [
+        [
+          586,
+          175
+        ],
+        [
+          870,
+          175
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "cpue_b",
+      "to": "prepare_b",
+      "points": [
+        [
+          586,
+          487
+        ],
+        [
+          870,
+          487
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "prepare_a",
+      "to": "assessment_a1",
+      "points": [
+        [
+          1026,
+          156
+        ],
+        [
+          1053,
+          156
+        ],
+        [
+          1053,
+          128
+        ],
+        [
+          1080,
+          128
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "prepare_a",
+      "to": "assessment_a2",
+      "points": [
+        [
+          1026,
+          194
+        ],
+        [
+          1053,
+          194
+        ],
+        [
+          1053,
+          246
+        ],
+        [
+          1080,
+          246
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "prepare_b",
+      "to": "assessment_b1",
+      "points": [
+        [
+          1026,
+          468
+        ],
+        [
+          1053,
+          468
+        ],
+        [
+          1053,
+          439
+        ],
+        [
+          1080,
+          439
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "prepare_b",
+      "to": "assessment_b2",
+      "points": [
+        [
+          1026,
+          507
+        ],
+        [
+          1053,
+          507
+        ],
+        [
+          1053,
+          557
+        ],
+        [
+          1080,
+          557
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "assessment_a1",
+      "to": "assessment_summary",
+      "points": [
+        [
+          1252,
+          128
+        ],
+        [
+          1294,
+          128
+        ],
+        [
+          1294,
+          318
+        ],
+        [
+          1316,
+          318
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "assessment_a2",
+      "to": "assessment_summary",
+      "points": [
+        [
+          1252,
+          246
+        ],
+        [
+          1274,
+          246
+        ],
+        [
+          1274,
+          342
+        ],
+        [
+          1316,
+          342
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "assessment_b1",
+      "to": "assessment_summary",
+      "points": [
+        [
+          1252,
+          439
+        ],
+        [
+          1274,
+          439
+        ],
+        [
+          1274,
+          366
+        ],
+        [
+          1316,
+          366
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "assessment_b2",
+      "to": "assessment_summary",
+      "points": [
+        [
+          1252,
+          557
+        ],
+        [
+          1294,
+          557
+        ],
+        [
+          1294,
+          390
+        ],
+        [
+          1316,
+          390
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "assessment_summary",
+      "to": "assessment_report",
+      "points": [
+        [
+          1466,
+          354
+        ],
+        [
+          1510,
+          354
+        ]
+      ],
+      "kind": "dependency"
+    }
+  ],
+  "return": {
+    "points": [
+      [
+        182,
+        237
+      ],
+      [
+        214,
+        237
+      ],
+      [
+        214,
+        127
+      ],
+      [
+        202,
+        127
+      ]
+    ],
+    "label": "Correct + resubmit"
+  },
+  "labels": [
+    {
+      "x": 510,
+      "y": 60,
+      "text": "Annual catch"
+    },
+    {
+      "x": 510,
+      "y": 631,
+      "text": "Annual catch"
+    }
+  ]
+}
