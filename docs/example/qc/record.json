@@ -1,0 +1,44 @@
+{
+  "job": "qc",
+  "owner": "Data curator",
+  "run_id": "Run 001",
+  "signature": "091fa215f110f08e4cefb6c004a69e4a34c22b2f086b0005423de774377140be",
+  "settings": {},
+  "snapshot": 2023,
+  "code": {
+    "workflow/engine.py": "69a48d0bff3ecdb23ff0bdbc2bfb603db549f8b53fb7b9aabb4305a2a1f98618",
+    "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
+    "workflow/reports.py": "1a9c64287508c8e3c770ef179600f7f2172c59ec11b456075a8484ef53d7e78a"
+  },
+  "software": {
+    "python": "3.10.12",
+    "platform": "linux",
+    "runtime": "CPython",
+    "sqlite": "3.37.2"
+  },
+  "outputs": {
+    "output.json": "97a50e7129b7a1b7b553dfcd38e46712e470afee87225cb498325d8c3e93c07c",
+    "report.html": "ba0070d8f02c8aa63ea4d9f4ea2e634752ad508f065232ebfa0fd19ad31fdafc"
+  },
+  "log": [
+    "Check records and return invalid effort for correction.",
+    "Zero effort found. Return the record to the data provider.",
+    "Check the corrected submission.",
+    "Quality check complete."
+  ],
+  "inputs": {
+    "submission": {
+      "run_id": "Run 001",
+      "checksum": "062c76bb7dd45742e352bcd46d6d8422c0b8419c8adc4e6bcbd008cf05463323"
+    }
+  },
+  "source": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "commit": "9e4832b4d978b5acc8915b04fc67fbde0b54782f",
+    "version": "1.0.0"
+  },
+  "data_files": {
+    "fishery.sqlite": "a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf",
+    "submission.json": "b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6"
+  }
+}

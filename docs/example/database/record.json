@@ -1,0 +1,43 @@
+{
+  "job": "database",
+  "owner": "Data curator",
+  "run_id": "Run 001",
+  "signature": "0af69d79ebea7f13e12a0104b4a4911144bff40389a55ddf0be30b2fc736600f",
+  "settings": {},
+  "snapshot": 2023,
+  "code": {
+    "workflow/engine.py": "69a48d0bff3ecdb23ff0bdbc2bfb603db549f8b53fb7b9aabb4305a2a1f98618",
+    "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
+    "workflow/reports.py": "1a9c64287508c8e3c770ef179600f7f2172c59ec11b456075a8484ef53d7e78a"
+  },
+  "software": {
+    "python": "3.10.12",
+    "platform": "linux",
+    "runtime": "CPython",
+    "sqlite": "3.37.2"
+  },
+  "outputs": {
+    "output.json": "8f01c98219583cf054b6d46868811a27806bb0677ee046f3f051714e0e413026",
+    "snapshot.sqlite": "740d74f1672995fc6c9337b462f84fd9a2bf7c351ae7222fe0e4bf7b98fb8130",
+    "report.html": "2c7bc99e99b83b1d9a2beaf3b2b1e9c5e9825e96a5ec4f751336df5aeb10ef4f"
+  },
+  "log": [
+    "Store the accepted records in a fixed database snapshot.",
+    "Prepare and load complete."
+  ],
+  "inputs": {
+    "qc": {
+      "run_id": "Run 001",
+      "checksum": "97a50e7129b7a1b7b553dfcd38e46712e470afee87225cb498325d8c3e93c07c"
+    }
+  },
+  "source": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "commit": "9e4832b4d978b5acc8915b04fc67fbde0b54782f",
+    "version": "1.0.0"
+  },
+  "data_files": {
+    "fishery.sqlite": "a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf",
+    "submission.json": "b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6"
+  }
+}

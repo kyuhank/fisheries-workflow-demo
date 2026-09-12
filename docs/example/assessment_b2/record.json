@@ -1,0 +1,46 @@
+{
+  "job": "assessment_b2",
+  "owner": "Assessment analyst",
+  "run_id": "Run 001",
+  "signature": "7e19f015e9233090b964eff56d48d36783fef2c947a8b9a8f9afc80aeed7b159",
+  "settings": {
+    "M": 0.3
+  },
+  "snapshot": 2023,
+  "code": {
+    "workflow/engine.py": "69a48d0bff3ecdb23ff0bdbc2bfb603db549f8b53fb7b9aabb4305a2a1f98618",
+    "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
+    "workflow/reports.py": "1a9c64287508c8e3c770ef179600f7f2172c59ec11b456075a8484ef53d7e78a",
+    "workflow/models.py": "dfd653ada49800617f70c097538f84d0917443e68bc76883fa83105633445e1d",
+    "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
+  },
+  "software": {
+    "python": "3.10.12",
+    "platform": "linux",
+    "runtime": "CPython",
+    "sqlite": "3.37.2"
+  },
+  "outputs": {
+    "output.json": "40c4a28edc2a1aff2708d99036db082ba7b6d7b56c67520a60b9c278b61b0bb2",
+    "report.html": "200e3ae321c911b5cacf1c6447ff1bf07ef0ab03561667fd7bb90ca51d1699d3"
+  },
+  "log": [
+    "Fit the illustrative model to index B with mortality setting 2.",
+    "Assessment B2 complete."
+  ],
+  "inputs": {
+    "prepare_b": {
+      "run_id": "Run 001",
+      "checksum": "b48c071e723c76741bebbbdd5376df78ceea2d2270d2bfaafb6d4aba8b6bbc8d"
+    }
+  },
+  "source": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "commit": "9e4832b4d978b5acc8915b04fc67fbde0b54782f",
+    "version": "1.0.0"
+  },
+  "data_files": {
+    "fishery.sqlite": "a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf",
+    "submission.json": "b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6"
+  }
+}
