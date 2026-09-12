@@ -1,7 +1,7 @@
 """Check offline browser execution, partial reruns, saved outputs and task views."""
-import asyncio
 import os
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -10,7 +10,6 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from workflow.engine import Workflow
 from verify import verify
 
 
@@ -40,8 +39,8 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     download.value.save_as(directory/'browser.zip')
     with zipfile.ZipFile(directory/'browser.zip') as archive:
         archive.extractall(directory/'browser')
-    native = Workflow(directory/'native')
-    asyncio.run(native.run())
+    subprocess.run([sys.executable, str(ROOT/'run.py'), '--output', str(directory/'native')],
+                   check=True, stdout=subprocess.DEVNULL)
     verify(directory/'browser/reference', directory/'native')
     page.locator('[data-tab="workflow"]').click()
     page.locator('.job[data-job="prepare_a"]').click()

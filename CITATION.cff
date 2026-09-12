@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "Cite the version used in your analysis."
+type: software
+title: "Fisheries workflow: a portable example from data to assessment"
+version: 1.0.0
+authors:
+  - family-names: Kim
+    given-names: Kyuhan
+repository-code: "https://github.com/kyuhank/fisheries-workflow-demo"
+url: "https://kyuhank.github.io/fisheries-workflow-demo/"
+license: MIT
