@@ -1,0 +1,7 @@
+vendor/** linguist-vendored
+docs/** linguist-generated -whitespace
+workflow/extract.sql -whitespace
+*.sqlite binary
+*.wasm binary
+*.zip binary
+*.whl binary

@@ -1,0 +1,21 @@
+name: Check calculations
+on:
+  push:
+    paths: ['workflow/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+  pull_request:
+    paths: ['workflow/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Check native execution
+        run: python3 -m unittest discover -s tests -v
+      - name: Check the preserved container
+        run: |
+          docker build -t fisheries-workflow .
+          docker run --rm --network none fisheries-workflow python -m unittest discover -s tests -v

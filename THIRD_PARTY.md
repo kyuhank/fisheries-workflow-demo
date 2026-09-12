@@ -1,0 +1,22 @@
+# Sources and licences
+
+The synthetic records and illustrative calculations are derived from the
+[CPUE workflow demonstration](https://github.com/kyuhank/cpue-actions-demo)
+and its public data and analysis repositories. `data/sources.json` identifies
+the unchanged source files. The CPUE calculation has been adapted into a pure
+Python function; the age-structured model and extraction SQL retain their
+original code. The adapted analysis code is released under this repository’s MIT licence.
+
+The browser includes **Pyodide 0.27.7**, **CPython 3.12.7**, its standard library
+and the Pyodide SQLite package. Their files are preserved under `vendor/pyodide/`:
+
+- Pyodide: Mozilla Public License 2.0 (`LICENSE`).
+- Python: Python Software Foundation licence and included notices (`PYTHON-LICENSE`).
+- SQLite: public domain; the Python wrapper is covered by Python's licence.
+
+Runtime files were obtained from the [versioned Pyodide distribution](https://cdn.jsdelivr.net/pyodide/v0.27.7/full/).
+The package checksum is recorded in `pyodide-lock.json`. The runtime is embedded
+in the downloadable HTML, so it does not need a content delivery network to run.
+
+The optional container uses the public CPUE workshop image pinned by digest
+in `Dockerfile`. A container engine must have the image before it can run offline.

@@ -1,0 +1,38 @@
+[
+  {
+    "file": "workflow/age_model.py",
+    "sha256": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33",
+    "origin": "https://github.com/kyuhank/cpue-actions-demo",
+    "commit": "5c04eaf748de200cc8f5b60bee7901514f5b1e6a",
+    "original_path": "pipeline/age_model.py"
+  },
+  {
+    "file": "workflow/extract.sql",
+    "sha256": "808d90dd3057fe794f56b54ec094ebcee0daa741478d2e7d5e030cffd790fa9c",
+    "origin": "https://github.com/kyuhank/cpue-demo-extract",
+    "commit": "a0716f589325a5576f5b9d97990e3977c17bad36",
+    "original_path": "extract.sql"
+  },
+  {
+    "file": "workflow/extract-catch.sql",
+    "sha256": "e2d36a0e88aa44ea39fbb8432e2c7b24705be6d0911758f14de8e72959c96ac3",
+    "origin": "https://github.com/kyuhank/cpue-demo-extract",
+    "commit": "a0716f589325a5576f5b9d97990e3977c17bad36",
+    "original_path": "extract-catch.sql"
+  },
+  {
+    "file": "data/fishery.sqlite",
+    "sha256": "a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf",
+    "origin": "https://github.com/kyuhank/cpue-actions-demo",
+    "commit": "5c04eaf748de200cc8f5b60bee7901514f5b1e6a",
+    "original_path": "data/toy-fishery.sqlite"
+  },
+  {
+    "file": "data/submission.json",
+    "sha256": "b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6",
+    "origin": "https://github.com/kyuhank/cpue-actions-demo",
+    "commit": "5c04eaf748de200cc8f5b60bee7901514f5b1e6a",
+    "original_path": "supabase/functions/workshop-api/batches.json",
+    "selection": "2024"
+  }
+]
