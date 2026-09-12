@@ -71,7 +71,7 @@ def output_page(job, result, record, lineage):
         body += '<h2>Results</h2>' + plot(result['series'], value, label)
         rows = [{'case': name, 'year': values[-1]['year'], 'value': values[-1][value]} for name, values in result['series'].items()]
         body += table(rows, [('case','Analysis'),('year','Final year'),('value','Relative CPUE' if cpue else 'SB / SB₀')])
-        body += '<h2>Interpretation</h2><p>' + ('Both analyses use the same observations, with different treatment of vessel effects. The comparison documents how the method changes the index.' if cpue else 'The four cases combine two CPUE indices with two mortality settings. Their differences illustrate how analytical inputs and assumptions carry through to assessment outputs. These calculations provide no management advice.') + '</p>'
+        body += '<h2>Interpretation</h2><p>' + ('The two analyses use different treatment of vessel effects. Any selected record filter applies to analysis A. This comparison shows how those methods and inputs change the index.' if cpue else 'The four cases combine two CPUE indices with two mortality settings. Their differences illustrate how analytical inputs and assumptions carry through to assessment outputs. These calculations provide no management advice.') + '</p>'
     body += '<h2>Analysis record</h2><p>Produced in <strong>' + esc(record['run_id']) + '</strong>. Each retained input keeps its original run.</p>'
     if lineage:
         body += table(lineage, [('job','Input job'),('run_id','Original run'),('checksum','Output checksum')])
