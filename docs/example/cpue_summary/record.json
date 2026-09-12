@@ -2,13 +2,13 @@
   "job": "cpue_summary",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "0365ce03b6e839cadb264985e300578d94a09c54d71055db1f5a7dd1fbe1468b",
+  "signature": "cc949a7d959ce9fd8fe739a25f3176a7d46216c268788209ce8fa41c659fe1d2",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "workflow/engine.py": "e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139",
     "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
-    "workflow/reports.py": "eb01478392799d0b9978e7a3d7e13914db404d072d0e3cab6ec3529de3a63ee2",
+    "workflow/reports.py": "0bce2569b68d751ef64d131d6dd754d3bd3999ec3c04f96eaca25a76294ed86f",
     "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "7b7d39b21cd82a40b38fc5a02c2a1e79ca7c674e673ebe52425f4006e474a9ce",
-    "report.html": "53756825b7b4bb3bfef6c627e328529e0c9d39d8b170ccf88bc80aedf68f9b13"
+    "report.html": "f2b91b09f6b7887552bfceff1d44a6e4bb54f96199f48c70b131409c92c9d120"
   },
   "log": [
     "Compare both indices in a plot and table.",
@@ -38,7 +38,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "1473a25c9bff3fa31f80e119e1271fa365ee9772",
+    "commit": "48ab45ef61167b546ecc8c50503e6cb416e32e4c",
     "version": "1.0.0"
   },
   "data_files": {

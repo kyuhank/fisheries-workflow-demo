@@ -2,7 +2,7 @@
   "job": "assessment_b1",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "8ddd611743eba02160c49ae486b0341934b8e8556bf98daa2610a99e82941d4b",
+  "signature": "eab56dad2569b8e038f907d2cd332a0e91dddd5578879356fbde130c91da9826",
   "settings": {
     "M": 0.2
   },
@@ -10,7 +10,7 @@
   "code": {
     "workflow/engine.py": "e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139",
     "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
-    "workflow/reports.py": "eb01478392799d0b9978e7a3d7e13914db404d072d0e3cab6ec3529de3a63ee2",
+    "workflow/reports.py": "0bce2569b68d751ef64d131d6dd754d3bd3999ec3c04f96eaca25a76294ed86f",
     "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
@@ -22,7 +22,7 @@
   },
   "outputs": {
     "output.json": "dea138bbe06468ec6bccde307e39df299ce557739354e69e6a8492441834f189",
-    "report.html": "92807b60ec529ff284f85f6787e7c76728b7814e9014b0f800461893e69aa1d4"
+    "report.html": "6d219aab70d2fead423abca0d6a685edd8df9c68c080613e0a394bac642f7741"
   },
   "log": [
     "Fit the illustrative model to index B with mortality setting 1.",
@@ -36,7 +36,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "1473a25c9bff3fa31f80e119e1271fa365ee9772",
+    "commit": "48ab45ef61167b546ecc8c50503e6cb416e32e4c",
     "version": "1.0.0"
   },
   "data_files": {
