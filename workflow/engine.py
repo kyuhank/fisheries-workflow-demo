@@ -74,7 +74,7 @@ class Workflow:
 
     def code_record(self, key):
         names = ['workflow/engine.py', 'workflow/spec.py', 'workflow/reports.py']
-        if key.startswith(('cpue_', 'assessment_')):
+        if key.startswith(('cpue_', 'assessment_')) or key == 'database':
             names += ['workflow/models.py', 'workflow/age_model.py']
         if key == 'extract':
             names += ['workflow/extract.sql', 'workflow/extract-catch.sql']
@@ -200,7 +200,8 @@ class Workflow:
                 db.executemany('INSERT INTO sets VALUES(?,?,?,?,?)', [[r[k] for k in ['set_id','year','vessel','hooks','catch_n']] for r in result['sets']])
                 db.executemany('INSERT INTO removals VALUES(?,?)', [[r['year'],r['catch_t']] for r in result['catch']])
             years = [r['year'] for r in result['sets']]
-            return {'rows': len(years), 'first_year': min(years), 'last_year': max(years)}
+            return {'rows': len(years), 'first_year': min(years), 'last_year': max(years),
+                    **models.describe_data(result['sets'], result['catch'])}
         if key == 'extract':
             sql = (ROOT / 'workflow/extract.sql').read_text()
             catch_sql = (ROOT / 'workflow/extract-catch.sql').read_text()
@@ -220,7 +221,13 @@ class Workflow:
         if key in ('assessment_a1','assessment_a2','assessment_b1','assessment_b2'):
             return models.assessment(self.output('prepare_' + key[-2])['rows'], self.job_settings(key)['M'])
         if key in ('cpue_summary', 'assessment_summary'):
-            return {'series': {SPEC[p]['title']: self.output(p)['series'] for p in SPEC[key]['parents']}}
+            result = {'series': {SPEC[p]['title']: self.output(p)['series'] for p in SPEC[key]['parents']}}
+            if key == 'assessment_summary':
+                result['diagnostics'] = [{'case': SPEC[p]['title'], 'M': self.output(p)['M'],
+                                          'boundary_fit': self.output(p)['boundary_fit'],
+                                          'catch_check': self.output(p)['catch_check']}
+                                         for p in SPEC[key]['parents']]
+            return result
         if key in ('cpue_report', 'assessment_report'):
             return self.output(SPEC[key]['parents'][0])
         raise ValueError('No calculation registered for this job.')

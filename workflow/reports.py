@@ -17,23 +17,29 @@ def table(rows, columns, limit=None):
     return ''.join(parts) + '</tbody></table>'
 
 
-def plot(series, value, label):
+def plot(series, value, label, points=()):
     colours = ['#1378a3', '#b56435', '#7357a8', '#328363']
     all_rows = [r for rows in series.values() for r in rows]
     xs = [r['year'] for r in all_rows]; ys = [r[value] for r in all_rows]
-    xmin, xmax = min(xs), max(xs); ymax = max(ys) * 1.1
+    xmin, xmax = min(xs), max(xs)
+    ymin, ymax = min(0, min(ys) * 1.1), max(0, max(ys) * 1.1)
+    span = max(ymax - ymin, 1e-12)
     x = lambda year: 65 + (year - xmin) / max(1, xmax - xmin) * 660
-    y = lambda number: 280 - number / ymax * 225
+    y = lambda number: 280 - (number - ymin) / span * 225
     out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" aria-label="' + esc(label) + '">']
     for i in range(5):
-        v = ymax * i / 4
+        v = ymin + span * i / 4
         out.append(f'<path d="M65 {y(v):.1f}H730" stroke="#e1e8ee"/><text x="54" y="{y(v)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{v:.2f}</text>')
     for year in [xmin, (xmin+xmax)//2, xmax]:
         out.append(f'<text x="{x(year):.1f}" y="304" text-anchor="middle" fill="#607080" font-size="12">{year}</text>')
     for i, (name, rows) in enumerate(series.items()):
-        points = ' '.join(f'{x(r["year"]):.2f},{y(r[value]):.2f}' for r in rows)
+        coordinates = ' '.join(f'{x(r["year"]):.2f},{y(r[value]):.2f}' for r in rows)
         colour = colours[i % len(colours)]
-        out.append(f'<polyline points="{points}" fill="none" stroke="{colour}" stroke-width="2.5"/><text x="{65+i*170}" y="25" fill="{colour}" font-size="14">{esc(name)}</text>')
+        if name in points:
+            out.extend(f'<circle cx="{x(r["year"]):.2f}" cy="{y(r[value]):.2f}" r="3.5" fill="{colour}"/>' for r in rows)
+        else:
+            out.append(f'<polyline points="{coordinates}" fill="none" stroke="{colour}" stroke-width="2.5"/>')
+        out.append(f'<text x="{65+i*170}" y="25" fill="{colour}" font-size="14">{esc(name)}</text>')
     out.append(f'<text x="65" y="332" fill="#607080" font-size="12">{esc(label)}</text></svg>')
     return ''.join(out)
 
@@ -49,7 +55,14 @@ def output_page(job, result, record, lineage):
         if result['returned']:
             body += '<h2>Correction record</h2><p>The first submitted record had zero hooks. It was returned to the data provider and resubmitted with its recorded positive effort.</p>'
     elif key == 'database':
-        body += f'<p><strong>{result["rows"]:,}</strong> observations · {result["first_year"]}–{result["last_year"]}</p><p>Tables: <code>sets</code> and <code>removals</code>. This snapshot supplies the SQL extraction.</p>'
+        body += f'<p class="note"><strong>{result["rows"]:,}</strong> fishing observations · <strong>{len(result["vessels"])}</strong> vessels · <strong>{result["first_year"]}–{result["last_year"]}</strong></p>'
+        body += '<p>The database contains fishing observations (<code>sets</code>) and total annual removals (<code>removals</code>). Catch in numbers in the sampled observations is distinct from total catch in tonnes.</p>'
+        body += '<h2>Sampling coverage</h2>' + plot({'Observations': result['annual']}, 'observations', 'Number of fishing observations per year')
+        vessel_series = {v: [{'year': r['year'], 'share': 100*r['vessels'][v]/r['observations']} for r in result['annual']] for v in result['vessels']}
+        body += '<h2>Vessel composition</h2>' + plot(vessel_series, 'share', 'Share of sampled observations (%)')
+        body += '<p>Changes in which vessels are sampled can affect the observed catch rate. CPUE analysis A accounts for vessel effects.</p>'
+        body += '<h2>Annual data</h2>' + table(result['annual'], [('year','Year'),('observations','Observations'),('hooks','Hooks'),('catch_t','Total catch (t)'),('zero_catch_percent','Zero catch (%)')])
+        body += '<details><summary>Database fields</summary>' + table(result['fields'], [('name','Field'),('meaning','Meaning'),('type','Type')]) + '</details>'
     elif key == 'extract':
         body += '<h2>Selected observations</h2>' + table(result['sets'], [('set_id','Record'),('year','Year'),('vessel','Vessel'),('hooks','Hooks'),('catch_n','Catch')], 10)
         body += '<h2>SQL</h2><pre>' + esc(result['sql']) + '</pre><p class="muted">The preview shows the first ten rows. The JSON output contains every selected record.</p>'
@@ -60,10 +73,16 @@ def output_page(job, result, record, lineage):
         body += plot({job['title']: result['series']}, 'index', 'CPUE relative to the first year')
         body += table(result['series'], [('year','Year'),('index','Relative CPUE')])
     elif key.startswith('assessment_') and key[-2:] in ('a1','a2','b1','b2'):
-        body += f'<p>Natural mortality: {result["M"]:.2f} per year. Fixed biology and constant recruitment.</p>'
+        body += f'<p>Annual age-structured model · ages 0–10+ · natural mortality {result["M"]:.2f} per year. Biology is fixed and recruitment is constant.</p>'
+        fit_series = {'Observed CPUE':[{'year':r['year'], 'index':r['observed_index']} for r in result['series']],
+                      'Fitted CPUE':[{'year':r['year'], 'index':r['fitted_index']} for r in result['series']]}
+        body += '<h2>Fit to the CPUE index</h2>' + plot(fit_series, 'index', 'Relative CPUE', points=('Observed CPUE',))
+        body += '<h2>Fit residuals</h2>' + plot({'Log residual': result['series']}, 'log_residual', 'Log(observed / fitted); persistent patterns merit review', points=('Log residual',))
         if result['boundary_fit']:
             body += '<p class="note">The fit reached a search boundary. This is a diagnostic flag for review.</p>'
-        body += plot({job['title']:result['series']}, 'SB_over_SB0', 'Spawning biomass / unfished level')
+        body += '<p>Annual catches were reproduced within the numerical tolerance. The fit ' + ('reached' if result['boundary_fit'] else 'stayed within') + ' the biomass search bounds. These checks do not establish model adequacy.</p>'
+        body += '<h2>Biomass trajectory</h2>' + plot({job['title']:result['series']}, 'SB_over_SB0', 'Spawning biomass / unfished level')
+        body += '<h2>Annual estimates</h2>'
         body += table(result['series'], [('year','Year'),('SB_over_SB0','SB / SB₀'),('F','Fishing mortality')])
     else:
         cpue = key.startswith('cpue_'); value = 'index' if cpue else 'SB_over_SB0'
@@ -71,9 +90,14 @@ def output_page(job, result, record, lineage):
         body += '<h2>Results</h2>' + plot(result['series'], value, label)
         rows = [{'case': name, 'year': values[-1]['year'], 'value': values[-1][value]} for name, values in result['series'].items()]
         body += table(rows, [('case','Analysis'),('year','Final year'),('value','Relative CPUE' if cpue else 'SB / SB₀')])
+        if not cpue:
+            body += '<h2>Fishing mortality</h2>' + plot(result['series'], 'F', 'Annual fishing mortality')
+            diagnostics = [{**r, 'boundary': 'Review' if r['boundary_fit'] else 'Within bounds'} for r in result['diagnostics']]
+            body += '<h2>Case checks</h2>' + table(diagnostics, [('case','Case'),('M','Natural mortality'),('catch_check','Catch matching'),('boundary','Biomass search')])
         body += '<h2>Interpretation</h2><p>' + ('The two analyses use different treatment of vessel effects. Any selected record filter applies to analysis A. This comparison shows how those methods and inputs change the index.' if cpue else 'The four cases combine two CPUE indices with two mortality settings. Their differences illustrate how analytical inputs and assumptions carry through to assessment outputs. These calculations provide no management advice.') + '</p>'
     body += '<h2>Analysis record</h2><p>Produced in <strong>' + esc(record['run_id']) + '</strong>. Each retained input keeps its original run.</p>'
     if lineage:
-        body += table(lineage, [('job','Input job'),('run_id','Original run'),('checksum','Output checksum')])
+        preview = [{**row, 'checksum': row['checksum'][:12]} for row in lineage]
+        body += table(preview, [('job','Input job'),('run_id','Original run'),('checksum','Checksum prefix')])
     body += '<details><summary>Data, code, settings and software</summary><pre>' + esc(json.dumps(record, indent=2)) + '</pre></details>'
     return '<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(job['title']) + '</title><style>' + STYLE + '</style><body><p class="muted">Fisheries workflow · illustrative analysis</p><h1>' + esc(job['title']) + '</h1>' + body + '<footer>Synthetic data and simplified models. The downloadable run bundle preserves the inputs, code, settings and results.</footer></body></html>'

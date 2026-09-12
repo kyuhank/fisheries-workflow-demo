@@ -4,6 +4,28 @@ import math
 from .age_model import fit
 
 
+def describe_data(records, catches):
+    """Summarise the coverage and composition of a synthetic data snapshot."""
+    annual = []
+    vessels = sorted({row['vessel'] for row in records})
+    catch_by_year = {row['year']: row['catch_t'] for row in catches}
+    for year in sorted({row['year'] for row in records}):
+        rows = [row for row in records if row['year'] == year]
+        hooks = sum(row['hooks'] for row in rows)
+        annual.append({'year': year, 'observations': len(rows), 'hooks': hooks,
+                       'catch_n': sum(row['catch_n'] for row in rows),
+                       'catch_t': catch_by_year[year],
+                       'zero_catch_percent': 100 * sum(row['catch_n'] == 0 for row in rows) / len(rows),
+                       'vessels': {v: sum(row['vessel'] == v for row in rows) for v in vessels}})
+    return {'annual': annual, 'vessels': vessels, 'observations': len(records),
+            'fields': [
+                {'name':'set_id','meaning':'Unique fishing observation','type':'text'},
+                {'name':'year','meaning':'Year of fishing','type':'integer'},
+                {'name':'vessel','meaning':'Synthetic vessel identifier','type':'text'},
+                {'name':'hooks','meaning':'Fishing effort (hooks)','type':'integer'},
+                {'name':'catch_n','meaning':'Catch in number of fish','type':'integer'}]}
+
+
 def cpue(records, vessel_effect=True, min_hooks=0):
     rows = [r for r in records if r['hooks'] >= min_hooks]
     if not rows or any(r['hooks'] <= 0 or r['catch_n'] < 0 for r in rows):
@@ -47,7 +69,19 @@ def cpue(records, vessel_effect=True, min_hooks=0):
 
 def assessment(inputs, mortality):
     result = fit([r['index'] for r in inputs], [r['catch_t'] for r in inputs], mortality)
-    return {'series': [{'year': source['year'], 'SB_over_SB0': row['SB_over_SB0'],
-                       'F': row['F']} for source, row in zip(inputs, result['rows'])],
+    from .age_model import catch_fraction
+    series = []
+    errors = []
+    for source, row in zip(inputs, result['rows']):
+        predicted = result['q'] * row['vulnerable_biomass']
+        model_catch = row['vulnerable_biomass'] * catch_fraction(row['F'], mortality)
+        errors.append(abs(model_catch - source['catch_t']) / max(1, source['catch_t']))
+        series.append({'year': source['year'], 'observed_index': source['index'],
+                       'fitted_index': predicted, 'log_residual': math.log(source['index'] / predicted),
+                       'SB_over_SB0': row['SB_over_SB0'], 'F': row['F'],
+                       'biomass_t': row['biomass'], 'catch_t': source['catch_t']})
+    if max(errors) > 1e-8:
+        raise ValueError('The fitted trajectory does not reproduce annual catches.')
+    return {'series': series, 'catch_check': 'Pass',
             'M': mortality, 'boundary_fit': result['boundary_fit'],
-            'B0': result['B0'], 'q': result['q']}
+            'B0': result['B0'], 'q': result['q'], 'recruitment': result['R0']}

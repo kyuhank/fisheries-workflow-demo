@@ -100,6 +100,18 @@ class WorkflowTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.clone().configure({'last_year': 2050})
 
+    def test_data_coverage_and_assessment_diagnostics(self):
+        data = self.runner.output('database')
+        self.assertEqual(sum(row['observations'] for row in data['annual']), data['rows'])
+        for row in data['annual']:
+            self.assertEqual(sum(row['vessels'].values()), row['observations'])
+        for key in ['assessment_a1','assessment_a2','assessment_b1','assessment_b2']:
+            result = self.runner.output(key)
+            self.assertEqual(result['catch_check'], 'Pass')
+            self.assertEqual(len(result['series']), len(data['annual']))
+            self.assertTrue(all(row['fitted_index'] > 0 for row in result['series']))
+            self.assertAlmostEqual(sum(row['log_residual'] for row in result['series']), 0, places=8)
+
 
 if __name__ == '__main__':
     unittest.main()
