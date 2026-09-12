@@ -2,13 +2,13 @@
   "job": "extract",
   "owner": "Data analyst",
   "run_id": "Run 001",
-  "signature": "f296b8ce6f162d62ce4d1b9329b6c2fed502164aca48dfcda4630cb0d3dd13af",
+  "signature": "2e26909831d76e49fcda0e1d5dc61a9e90181013d0dfb19a955ce83e5695d440",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "69a48d0bff3ecdb23ff0bdbc2bfb603db549f8b53fb7b9aabb4305a2a1f98618",
+    "workflow/engine.py": "e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139",
     "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
-    "workflow/reports.py": "1a9c64287508c8e3c770ef179600f7f2172c59ec11b456075a8484ef53d7e78a",
+    "workflow/reports.py": "eb01478392799d0b9978e7a3d7e13914db404d072d0e3cab6ec3529de3a63ee2",
     "workflow/extract.sql": "808d90dd3057fe794f56b54ec094ebcee0daa741478d2e7d5e030cffd790fa9c",
     "workflow/extract-catch.sql": "e2d36a0e88aa44ea39fbb8432e2c7b24705be6d0911758f14de8e72959c96ac3"
   },
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "7258b69fab2c8676fb5a4e13a7434dcaf536b53cd0c35de74ab4b129f92e08e8",
-    "report.html": "ca4412ac5eca87d858724a3d15f5797fcc4f31413ac29168bfa3bfd53b142a8c"
+    "report.html": "cc9677c22711534e1c766a981ecf2b7263442407760b728bcb64e2adc02c2f5e"
   },
   "log": [
     "Use saved SQL to select observations and annual catches.",
@@ -29,12 +29,12 @@
   "inputs": {
     "database": {
       "run_id": "Run 001",
-      "checksum": "8f01c98219583cf054b6d46868811a27806bb0677ee046f3f051714e0e413026"
+      "checksum": "819bf925a5efb25730317daa9c36fa1c0e4ec6a7322d8b94e22ed6ea2fad9e20"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "9e4832b4d978b5acc8915b04fc67fbde0b54782f",
+    "commit": "1473a25c9bff3fa31f80e119e1271fa365ee9772",
     "version": "1.0.0"
   },
   "data_files": {

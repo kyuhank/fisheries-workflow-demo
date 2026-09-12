@@ -9,17 +9,17 @@ ORDER BY year, set_id;
 SELECT year, catch_t
 FROM removals
 ORDER BY year;
-</pre><p class="muted">The preview shows the first ten rows. The JSON output contains every selected record.</p><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Output checksum</th></tr></thead><tbody><tr><td>Prepare and load</td><td>Run 001</td><td>8f01c98219583cf054b6d46868811a27806bb0677ee046f3f051714e0e413026</td></tr></tbody></table><details><summary>Data, code, settings and software</summary><pre>{
+</pre><p class="muted">The preview shows the first ten rows. The JSON output contains every selected record.</p><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Checksum prefix</th></tr></thead><tbody><tr><td>Prepare and load</td><td>Run 001</td><td>819bf925a5ef</td></tr></tbody></table><details><summary>Data, code, settings and software</summary><pre>{
   &quot;job&quot;: &quot;extract&quot;,
   &quot;owner&quot;: &quot;Data analyst&quot;,
   &quot;run_id&quot;: &quot;Run 001&quot;,
-  &quot;signature&quot;: &quot;f296b8ce6f162d62ce4d1b9329b6c2fed502164aca48dfcda4630cb0d3dd13af&quot;,
+  &quot;signature&quot;: &quot;2e26909831d76e49fcda0e1d5dc61a9e90181013d0dfb19a955ce83e5695d440&quot;,
   &quot;settings&quot;: {},
   &quot;snapshot&quot;: 2023,
   &quot;code&quot;: {
-    &quot;workflow/engine.py&quot;: &quot;69a48d0bff3ecdb23ff0bdbc2bfb603db549f8b53fb7b9aabb4305a2a1f98618&quot;,
+    &quot;workflow/engine.py&quot;: &quot;e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139&quot;,
     &quot;workflow/spec.py&quot;: &quot;ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81&quot;,
-    &quot;workflow/reports.py&quot;: &quot;1a9c64287508c8e3c770ef179600f7f2172c59ec11b456075a8484ef53d7e78a&quot;,
+    &quot;workflow/reports.py&quot;: &quot;eb01478392799d0b9978e7a3d7e13914db404d072d0e3cab6ec3529de3a63ee2&quot;,
     &quot;workflow/extract.sql&quot;: &quot;808d90dd3057fe794f56b54ec094ebcee0daa741478d2e7d5e030cffd790fa9c&quot;,
     &quot;workflow/extract-catch.sql&quot;: &quot;e2d36a0e88aa44ea39fbb8432e2c7b24705be6d0911758f14de8e72959c96ac3&quot;
   },
@@ -39,12 +39,12 @@ ORDER BY year;
   &quot;inputs&quot;: {
     &quot;database&quot;: {
       &quot;run_id&quot;: &quot;Run 001&quot;,
-      &quot;checksum&quot;: &quot;8f01c98219583cf054b6d46868811a27806bb0677ee046f3f051714e0e413026&quot;
+      &quot;checksum&quot;: &quot;819bf925a5efb25730317daa9c36fa1c0e4ec6a7322d8b94e22ed6ea2fad9e20&quot;
     }
   },
   &quot;source&quot;: {
     &quot;repository&quot;: &quot;https://github.com/kyuhank/fisheries-workflow-demo&quot;,
-    &quot;commit&quot;: &quot;9e4832b4d978b5acc8915b04fc67fbde0b54782f&quot;,
+    &quot;commit&quot;: &quot;1473a25c9bff3fa31f80e119e1271fa365ee9772&quot;,
     &quot;version&quot;: &quot;1.0.0&quot;
   },
   &quot;data_files&quot;: {

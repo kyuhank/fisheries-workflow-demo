@@ -2,14 +2,14 @@
   "job": "assessment_report",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "8cce2ce8045ce8bb9bd83c589cf6077f3abf74322c82d92b42889aad5df42b73",
+  "signature": "3121b0b5c42197a7a5f16274b4cb6095d6bf4cee45400f07a8572e15ad36d479",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "69a48d0bff3ecdb23ff0bdbc2bfb603db549f8b53fb7b9aabb4305a2a1f98618",
+    "workflow/engine.py": "e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139",
     "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
-    "workflow/reports.py": "1a9c64287508c8e3c770ef179600f7f2172c59ec11b456075a8484ef53d7e78a",
-    "workflow/models.py": "dfd653ada49800617f70c097538f84d0917443e68bc76883fa83105633445e1d",
+    "workflow/reports.py": "eb01478392799d0b9978e7a3d7e13914db404d072d0e3cab6ec3529de3a63ee2",
+    "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
@@ -19,8 +19,8 @@
     "sqlite": "3.37.2"
   },
   "outputs": {
-    "output.json": "f8bcf7b9792a42b8b3873761d9f728f9cf2efd7cc4f0851d92f2006a4d31b639",
-    "report.html": "da72f8e6d4a3decbc202ea1425664898fca2b7588b2e7bfebc32e6f3a1ae61ee"
+    "output.json": "32310627f6998bb7617eabc2ce05f4f890894c7c3e588839dbf429ec2d13aab7",
+    "report.html": "96c291ab581f952de445793620aa5665d9e8eeb41e9db9579b023907aef615b8"
   },
   "log": [
     "Write a short report and preserve its analytical record.",
@@ -29,12 +29,12 @@
   "inputs": {
     "assessment_summary": {
       "run_id": "Run 001",
-      "checksum": "f8bcf7b9792a42b8b3873761d9f728f9cf2efd7cc4f0851d92f2006a4d31b639"
+      "checksum": "32310627f6998bb7617eabc2ce05f4f890894c7c3e588839dbf429ec2d13aab7"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "9e4832b4d978b5acc8915b04fc67fbde0b54782f",
+    "commit": "1473a25c9bff3fa31f80e119e1271fa365ee9772",
     "version": "1.0.0"
   },
   "data_files": {
