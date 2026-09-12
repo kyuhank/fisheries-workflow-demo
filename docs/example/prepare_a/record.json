@@ -2,13 +2,13 @@
   "job": "prepare_a",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "1dab8dccf89640ab884823f00a8dd9efd8685577fb7ba1cfeb39b675c323bce0",
+  "signature": "d6d234c1122c727cbbc0135177391eb763ab27e71a095ce6af212fcd20511740",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "workflow/engine.py": "e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139",
     "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
-    "workflow/reports.py": "0bce2569b68d751ef64d131d6dd754d3bd3999ec3c04f96eaca25a76294ed86f"
+    "workflow/reports.py": "619e137bc92d234b93dbb9a68ffce7b6f37aa8c99d2f933a59695e3f166cf151"
   },
   "software": {
     "python": "3.10.12",
@@ -17,8 +17,8 @@
     "sqlite": "3.37.2"
   },
   "outputs": {
-    "output.json": "fc7ff493bb7c22b4647ea7b75a8c37987e66a2dae322321e0afa7ffc01c2b378",
-    "report.html": "1019825ccd0bda89981e2527ecb6ed2361a46ad854fcfc4fbdba64050c9252d9"
+    "output.json": "45988392a50388dda4563df68059be87f7594b733f39454e9e81f3a4185f448e",
+    "report.html": "c6c6e459a6cd8ade1423b0f6fad6ef0cf34f17f5f5af7233f7ed2a819054e682"
   },
   "log": [
     "Join index A to annual catches and check the model inputs.",
@@ -27,20 +27,20 @@
   "inputs": {
     "extract": {
       "run_id": "Run 001",
-      "checksum": "7258b69fab2c8676fb5a4e13a7434dcaf536b53cd0c35de74ab4b129f92e08e8"
+      "checksum": "10c37e8b55f5b72522a9b701af23068868093a24a8205f29cb2ef84e668408aa"
     },
     "cpue_a": {
       "run_id": "Run 001",
-      "checksum": "7c0b85383cbb7ca56ba95d6ee8acfb4abf8fd23165ba85b1620b6ac5b61fecc2"
+      "checksum": "5bfc4e6b6808e9260785b7ab5e224212dead9a33fdd465ade3d8ad8f012f23ad"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "48ab45ef61167b546ecc8c50503e6cb416e32e4c",
-    "version": "1.0.0"
+    "commit": "deec79798d718fed1aba1d1993e26d3850587e56",
+    "version": "1.1.0"
   },
   "data_files": {
-    "fishery.sqlite": "a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf",
-    "submission.json": "b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6"
+    "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
+    "submission.json": "96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5"
   }
 }

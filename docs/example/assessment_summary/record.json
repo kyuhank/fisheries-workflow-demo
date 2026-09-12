@@ -2,13 +2,13 @@
   "job": "assessment_summary",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "857fcd68d0ee1ceeae114ce5d3fd7d88057cbf3ff679422ba66d9ffbcf9d2a43",
+  "signature": "94eff8dd5b9fdab1610e77a88da8dae565bf2ab692525fbbd34375bf86cb0a5b",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "workflow/engine.py": "e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139",
     "workflow/spec.py": "ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81",
-    "workflow/reports.py": "0bce2569b68d751ef64d131d6dd754d3bd3999ec3c04f96eaca25a76294ed86f",
+    "workflow/reports.py": "619e137bc92d234b93dbb9a68ffce7b6f37aa8c99d2f933a59695e3f166cf151",
     "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
@@ -19,8 +19,8 @@
     "sqlite": "3.37.2"
   },
   "outputs": {
-    "output.json": "32310627f6998bb7617eabc2ce05f4f890894c7c3e588839dbf429ec2d13aab7",
-    "report.html": "b9246e87b9b1ed65a7399f121498f3ee33f4ec38ec288625c55a70d2ee94065b"
+    "output.json": "547b4978a8bf46db092cd96e4bae7c8d1d02250caf80c76907f799d2f8811dbf",
+    "report.html": "0e93f82c72c136c1b2246232d0f51c26ca36fa151e26ed7bfea1a4906fe9dbf3"
   },
   "log": [
     "Compare the four fitted cases in plots and tables.",
@@ -29,28 +29,28 @@
   "inputs": {
     "assessment_a1": {
       "run_id": "Run 001",
-      "checksum": "283e91c7c10f50e441e98988d2981c59444ec70ea3d510cb0a4128f644525231"
+      "checksum": "76757b84658f49ac99f6183316482249dd5496eaa5c653a14b8abcf21f84ceac"
     },
     "assessment_a2": {
       "run_id": "Run 001",
-      "checksum": "81fe86471cf88e9a2db5dd955e7287891c8216a0e665525bb5e6face81bacba0"
+      "checksum": "0cd6875e20ee8845c142d9bf44fc280f9b378a41a727d4260b2683e3c44d964c"
     },
     "assessment_b1": {
       "run_id": "Run 001",
-      "checksum": "dea138bbe06468ec6bccde307e39df299ce557739354e69e6a8492441834f189"
+      "checksum": "a700f42d2dd90f5f400803c15dcae8a8fd7274ad2330feaab6212cd64e50897c"
     },
     "assessment_b2": {
       "run_id": "Run 001",
-      "checksum": "ca6bdd87c464af6c6299f85d79fb7445d8c760a4cf1f19c84620b780fb18d8f2"
+      "checksum": "32c09c236c6622da490aa3b4a00c691caa9c8d9e128f3d2809b155971526d7e4"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "48ab45ef61167b546ecc8c50503e6cb416e32e4c",
-    "version": "1.0.0"
+    "commit": "deec79798d718fed1aba1d1993e26d3850587e56",
+    "version": "1.1.0"
   },
   "data_files": {
-    "fishery.sqlite": "a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf",
-    "submission.json": "b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6"
+    "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
+    "submission.json": "96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5"
   }
 }

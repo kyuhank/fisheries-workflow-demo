@@ -1,14 +1,14 @@
-<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quality check</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}summary{cursor:pointer;font-weight:600}</style><body><p class="muted">Fisheries workflow · illustrative analysis</p><h1>Quality check</h1><p>Check records and return invalid effort for correction.</p><p class="note">The corrected submission passed all checks.</p><table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody><tr><td>Positive effort</td><td>Pass</td></tr><tr><td>Non-negative catch</td><td>Pass</td></tr><tr><td>Unique observation IDs</td><td>Pass</td></tr></tbody></table><h2>Correction record</h2><p>The first submitted record had zero hooks. It was returned to the data provider and resubmitted with its recorded positive effort.</p><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Checksum prefix</th></tr></thead><tbody><tr><td>Data submission</td><td>Run 001</td><td>062c76bb7dd4</td></tr></tbody></table><details><summary>Data, code, settings and software</summary><pre>{
+<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quality check</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}</style><body><p class="muted">Fisheries workflow · illustrative analysis</p><h1>Quality check</h1><p>Check records and return invalid effort for correction.</p><p class="note">The corrected submission passed all checks.</p><table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody><tr><td>Positive effort</td><td>Pass</td></tr><tr><td>Non-negative catch</td><td>Pass</td></tr><tr><td>Unique observation IDs</td><td>Pass</td></tr></tbody></table><h2>Correction record</h2><p>The first submitted record had zero hooks. It was returned to the data provider and resubmitted with its recorded positive effort.</p><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Checksum prefix</th></tr></thead><tbody><tr><td>Data submission</td><td>Run 001</td><td>4849c8aabc42</td></tr></tbody></table><details><summary>Data, code, settings and software</summary><pre>{
   &quot;job&quot;: &quot;qc&quot;,
   &quot;owner&quot;: &quot;Data curator&quot;,
   &quot;run_id&quot;: &quot;Run 001&quot;,
-  &quot;signature&quot;: &quot;bc39b8359e97805193e2205950ae9451ac743db3960b9c16a15676c81cdc3fd2&quot;,
+  &quot;signature&quot;: &quot;a2311de829f180bda0416d2e11e01b8f508c1003d8ff40784cf04ecd7b06a562&quot;,
   &quot;settings&quot;: {},
   &quot;snapshot&quot;: 2023,
   &quot;code&quot;: {
     &quot;workflow/engine.py&quot;: &quot;e077c2915bb9c8983d530c4b8f43bd50aa98e324d48dd617ecf30628c3577139&quot;,
     &quot;workflow/spec.py&quot;: &quot;ee6ffd3e031de34769bb041fab2abefa52772250440c96fc34a2d3ec5ceeed81&quot;,
-    &quot;workflow/reports.py&quot;: &quot;0bce2569b68d751ef64d131d6dd754d3bd3999ec3c04f96eaca25a76294ed86f&quot;
+    &quot;workflow/reports.py&quot;: &quot;619e137bc92d234b93dbb9a68ffce7b6f37aa8c99d2f933a59695e3f166cf151&quot;
   },
   &quot;software&quot;: {
     &quot;python&quot;: &quot;3.10.12&quot;,
@@ -17,7 +17,7 @@
     &quot;sqlite&quot;: &quot;3.37.2&quot;
   },
   &quot;outputs&quot;: {
-    &quot;output.json&quot;: &quot;97a50e7129b7a1b7b553dfcd38e46712e470afee87225cb498325d8c3e93c07c&quot;
+    &quot;output.json&quot;: &quot;8d3e46ad7625155a04f8f7207051a07b09d6b57dc6b321bf393536af32504268&quot;
   },
   &quot;log&quot;: [
     &quot;Check records and return invalid effort for correction.&quot;,
@@ -28,16 +28,16 @@
   &quot;inputs&quot;: {
     &quot;submission&quot;: {
       &quot;run_id&quot;: &quot;Run 001&quot;,
-      &quot;checksum&quot;: &quot;062c76bb7dd45742e352bcd46d6d8422c0b8419c8adc4e6bcbd008cf05463323&quot;
+      &quot;checksum&quot;: &quot;4849c8aabc42d90b5ae2531290a9e213c73d7354e8f07429571f57c2288dade5&quot;
     }
   },
   &quot;source&quot;: {
     &quot;repository&quot;: &quot;https://github.com/kyuhank/fisheries-workflow-demo&quot;,
-    &quot;commit&quot;: &quot;48ab45ef61167b546ecc8c50503e6cb416e32e4c&quot;,
-    &quot;version&quot;: &quot;1.0.0&quot;
+    &quot;commit&quot;: &quot;deec79798d718fed1aba1d1993e26d3850587e56&quot;,
+    &quot;version&quot;: &quot;1.1.0&quot;
   },
   &quot;data_files&quot;: {
-    &quot;fishery.sqlite&quot;: &quot;a04aac21a8eaddf0295658d54a4140802795607b0d7103c6e649c37364019ddf&quot;,
-    &quot;submission.json&quot;: &quot;b8863225ef2171b7f0b14fa7c14147720cef243e0ee1c8ce3f36a62eed314fe6&quot;
+    &quot;fishery.sqlite&quot;: &quot;707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e&quot;,
+    &quot;submission.json&quot;: &quot;96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5&quot;
   }
 }</pre></details><footer>Synthetic data and simplified models. The downloadable run bundle preserves the inputs, code, settings and results.</footer></body></html>
