@@ -2,7 +2,7 @@
   "job": "assessment_b2",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "57e75f5842d6f8ee4b354b58e5894de8ec74d3e92138c14d9863a3b24f506bf8",
+  "signature": "ebac8228d266645936bfaafaf5f9b748d3ff0520af7dcb0720050cd23dd5b631",
   "settings": {
     "M": 0.3
   },
@@ -22,7 +22,7 @@
   },
   "outputs": {
     "output.json": "32c09c236c6622da490aa3b4a00c691caa9c8d9e128f3d2809b155971526d7e4",
-    "report.html": "7d7b4b7ea270b05a08f3c576e4361a5ec3a192c84e00d6810c7004473bd50b3a"
+    "report.html": "99d553046978748eb6ebec45d398fec297921386ce92ecaa302565d86d2275da"
   },
   "log": [
     "Fit the illustrative model to index B with mortality setting 2.",
@@ -36,7 +36,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "9989f8dc29766ab92fbba9589131354a485af242",
+    "commit": "01aefbdf48f482f9ed29fda9b8d83fae43c64387",
     "version": "1.5.0"
   },
   "data_files": {
