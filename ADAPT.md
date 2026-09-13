@@ -17,8 +17,10 @@ with the packages available in the preserved browser runtime. Other software can
 be run through the Python/container interface instead.
 
 The hosted container runs independent jobs in separate processes and waits for the
-whole stage before advancing. The offline browser uses one Python worker with the
-same stage order. Define stage groups in `workflow/spec.py`. An operational
+whole peer group before its dependent stages advance. Independent reporting can
+continue during an assessment file handover. The offline browser uses one Python
+worker with the same barriers. Define peer groups and file-transfer boundaries
+in `workflow/spec.py`; calculation input dependencies remain separate. An operational
 orchestration service could submit the same dependency graph to approved HPC and
 provide shared access to authorised colleagues. Access controls, resource requests,
 storage and recovery must be implemented for that setting. Confidential data

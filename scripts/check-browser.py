@@ -124,13 +124,37 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#reset').click()
     page.locator('#run:enabled').wait_for()
     page.locator('#handover').select_option('manual')
+    assert page.locator('[data-tab="jobs"]').inner_text() == 'Job outputs'
+    assert 'Shared orchestration is not in use' in page.locator('#handover-note').inner_text()
+    assert page.locator('.handover-marker').count() == 4
     page.locator('#run').click()
     page.locator('#handover-panel:visible').wait_for(timeout=90000)
     assert page.locator('#handover-title').inner_text() == 'Data manager → CPUE analyst'
-    assert page.locator('.job[data-job="cpue_a"]').get_attribute('class').split().count('handover') == 1
+    for key in ['cpue_a', 'cpue_b']:
+        assert page.locator(f'.job[data-job="{key}"] .node-status').text_content() == 'Awaiting file'
+        assert page.locator(f'.handover-marker.active[data-to="{key}"]').count() == 1
+    assert page.locator('.connection.handover').count() == 2
+    assert page.locator('#transfer-files').inner_text() == 'Confirm file transfer →'
+    assert 'no shared orchestration' in page.locator('#handover-message').inner_text()
+    assert not page.locator('#handover-note').is_visible()
     assert 'Fit a CPUE index' not in page.locator('#execution-log').inner_text()
+    page.wait_for_timeout(1200)
+    assert page.locator('.job.handover').count() == 2
+    assert page.locator('.job.running').count() == 0
+    (ROOT/'.test-output').mkdir(exist_ok=True)
+    page.screenshot(path=str(ROOT/'.test-output/manual-data-handover.png'), full_page=True)
     page.locator('#transfer-files').click()
     page.wait_for_function("document.querySelector('#handover-panel').hidden === false && document.querySelector('#handover-title').textContent === 'CPUE analyst → Assessment analyst'", timeout=90000)
+    for key in ['prepare_a', 'prepare_b']:
+        assert page.locator(f'.job[data-job="{key}"] .node-status').text_content() == 'Awaiting file'
+        assert page.locator(f'.handover-marker.active[data-to="{key}"]').count() == 1
+    page.locator('.job[data-job="cpue_report"].complete').wait_for(timeout=30000)
+    assert page.locator('#handover-panel').is_visible()
+    assert page.locator('.job.handover').count() == 2
+    assert page.locator('.job[data-job="assessment_a1"].waiting').count() == 1
+    assert page.locator('#transfer-files').is_enabled()
+    assert 'click to continue' in page.locator('#status-title').inner_text()
+    page.screenshot(path=str(ROOT/'.test-output/manual-cpue-handover.png'), full_page=True)
     page.locator('#transfer-files').click()
     complete(page)
     page.locator('#revise-cpue').click()
@@ -138,6 +162,12 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#run:enabled').click()
     page.locator('#handover-panel:visible').wait_for(timeout=90000)
     assert page.locator('#handover-title').inner_text() == 'CPUE analyst → Assessment analyst'
+    assert page.locator('.job.handover').count() == 1
+    assert page.locator('.job[data-job="prepare_b"].retained').count() == 1
+    assert page.locator('.handover-marker.active[data-to="prepare_a"]').count() == 1
+    assert page.locator('.handover-marker.active[data-to="prepare_b"]').count() == 0
+    page.locator('.job[data-job="cpue_report"].complete').wait_for(timeout=30000)
+    assert page.locator('#handover-panel').is_visible()
     page.locator('[data-tab="jobs"]').click()
     page.locator('#all-tasks').click()
     assert page.locator('#job-table-body tr[data-job="cpue_a"] td').nth(3).inner_text() == 'Run 002'
@@ -152,4 +182,4 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert not errors, errors
     assert not [url for url in requests if '/functions/v1/paper-api/info' not in url], requests
     browser.close()
-print('Passed: offline calculations, output comparison, repeated partial runs, task views, saved example and manual transfers after a revision.')
+print('Passed: offline calculations, output comparison, repeated partial runs, peer barriers, grouped manual transfers, independent CPUE reporting, task views and saved example.')

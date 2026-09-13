@@ -2,14 +2,14 @@
   "job": "submission",
   "owner": "Data provider",
   "run_id": "Run 001",
-  "signature": "ef59aeeab87f2d465515c9b89b6f2de5aea4c032c01524a76c929ad2780f1fb9",
+  "signature": "d8acfd905dda1cc5d26f151de67b792c942886f8a463a886eb07f5ff79bdb356",
   "settings": {
     "last_year": 2023
   },
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "847f79702afbd4ebbea5fe38749a7dc75742492d6cab198755fc905bddee2096",
-    "workflow/spec.py": "f0b06cf5e64ce327aa65ca7aad9fe71acbe4748030e9885cf9ad4205ec6045cb",
+    "workflow/engine.py": "b65abfea20ef51e36a0d92fc51c022e098eec3acf695f11c1c029d11ded00254",
+    "workflow/spec.py": "cd0417a1d89626a1e1e781d26c10a43d3e138229628fea3dde2ac3aef4b30a9b",
     "workflow/reports.py": "bf21eb30889ac33723f06ecf712ed6f79f7250868d9a421057ba4bbf668d1706"
   },
   "software": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "4849c8aabc42d90b5ae2531290a9e213c73d7354e8f07429571f57c2288dade5",
-    "report.html": "6daa690c1760f239ac021c4094ded761e018a16b4e876eb25e5f28d34271d7cc"
+    "report.html": "3b4ba058f27237535edf171c970f03fd1d3b707a35cf6dbc7f6e3d8410c86543"
   },
   "log": [
     "Submit catch and effort records for checking.",
@@ -32,8 +32,8 @@
   "inputs": {},
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "579e4d5fb929952f537a711fbe15894a46115779",
-    "version": "1.6.1"
+    "commit": "e9e8bb029ec1cf28e43e4fccadade7d64daa515e",
+    "version": "1.6.2"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",

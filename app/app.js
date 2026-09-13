@@ -26,6 +26,7 @@ let correctionPending = false;
 let activities = {}, dispatchPending = false;
 let workspaceView = "tasks", jobStatusFilter = "";
 let waitingTransfer = null;
+let confirmingTransfer = false;
 const byKey = Object.fromEntries(jobs.map((job) => [job.key, job]));
 const messages = [];
 
@@ -413,6 +414,7 @@ function renderDiagram() {
       running: "#bb821f",
       saved: "#548c81",
       failed: "#b95139",
+      handover: "#b27b2d",
     })
   ) {
     const marker = svgElement("marker", {
@@ -457,13 +459,13 @@ function renderDiagram() {
     const receiving = busy && stageStatus(edge.to) === "running";
     const retained = plan?.retained.includes(edge.from) &&
       plan?.run.includes(edge.to);
-    const awaiting = waitingTransfer &&
+    const awaiting = waitingTransfer?.group.includes(edge.to) &&
       ((waitingTransfer.boundary === "data" && edge.from === "extract" &&
         edge.to.startsWith("cpue_")) ||
         (waitingTransfer.boundary === "cpue" && edge.from.startsWith("cpue_") &&
           edge.to.startsWith("prepare_")));
     const kind = awaiting
-      ? "failed"
+      ? "handover"
       : receiving
       ? (retained ? "saved" : "running")
       : !busy && inPath && mode !== "saved"
@@ -512,11 +514,17 @@ function renderDiagram() {
     svg.append(jobNode(node, group.colour));
   }
   if ($("handover").value === "manual" && mode !== "saved") {
-    for (const [boundary, x] of [["data", 383], ["cpue", 846]]) {
-      const active = waitingTransfer?.boundary === boundary;
+    for (const [boundary, x, y, to] of [
+      ["data", 383, 175, "cpue_a"], ["data", 383, 487, "cpue_b"],
+      ["cpue", 846, 175, "prepare_a"], ["cpue", 846, 487, "prepare_b"],
+    ]) {
+      const active = waitingTransfer?.boundary === boundary &&
+        waitingTransfer.group.includes(to);
       const group = svgElement("g", {
         class: "handover-marker" + (active ? " active" : ""),
-        transform: `translate(${x} 175)`,
+        transform: `translate(${x} ${y})`,
+        "data-boundary": boundary,
+        "data-to": to,
       });
       group.append(
         svgElement("circle", { r: 15 }),
@@ -524,9 +532,8 @@ function renderDiagram() {
         svgElement("path", { d: "M -7 7 Q -7 0 0 0 Q 7 0 7 7" }),
       );
       const title = svgElement("title");
-      title.textContent = boundary === "data"
-        ? "Pass selected records to the CPUE analyst"
-        : "Pass CPUE outputs to the assessment analyst";
+      title.textContent = (active ? "Confirm file transfer to " : "Manual file transfer to ") +
+        byKey[to].title;
       group.append(title);
       svg.append(group);
     }
@@ -596,6 +603,8 @@ function renderTasks() {
     const failed = members.find((job) => stageStatus(job.key) === "failed");
     const outdated = members.find((job) => stageStatus(job.key) === "outdated");
     const available = members.filter((job) => records[job.key]).length;
+    const completed = members.filter((job) => stageStatus(job.key) === "complete").length;
+    const reused = members.filter((job) => stageStatus(job.key) === "retained").length;
     const resolved = members.every((job) =>
       ["complete", "retained"].includes(stageStatus(job.key))
     );
@@ -608,7 +617,7 @@ function renderTasks() {
       : outdated
       ? "outdated"
       : resolved
-      ? "complete"
+      ? (reused === members.length ? "retained" : "complete")
       : "waiting";
     const button = uiElement(
       "button",
@@ -621,9 +630,12 @@ function renderTasks() {
     icon.append(lineIcon(task.icon));
     const name = uiElement("strong", "task-name", task.title);
     const status = uiElement("span", "task-status " + state);
-    status.append(statusSymbol(state), document.createTextNode(labels[state]));
+    status.append(statusSymbol(state), document.createTextNode(state === "retained" ? "Reused" : labels[state]));
     heading.append(icon, name, status);
     const description = uiElement("span", "task-description", task.description);
+    const responsibility = uiElement("span", "task-responsibility");
+    responsibility.append(lineIcon("person"), uiElement("span", "",
+      [...new Set(members.map((job) => job.owner))].join(" · ")));
     const progress = uiElement("span", "task-progress");
     progress.setAttribute("aria-hidden", "true");
     for (const job of members) {
@@ -633,8 +645,10 @@ function renderTasks() {
     }
     const footer = uiElement("span", "task-footer");
     footer.append(
-      uiElement("span", "", `${available}/${members.length} outputs available`),
-      uiElement("span", "task-open", "View jobs ›"),
+      uiElement("span", "", completed || reused
+        ? [completed && `${completed} complete`, reused && `${reused} reused`].filter(Boolean).join(" · ")
+        : `${available}/${members.length} outputs available`),
+      uiElement("span", "task-open", `${members.length} jobs ›`),
     );
     const activity = uiElement(
       "span",
@@ -646,10 +660,11 @@ function renderTasks() {
           ? "Resubmit corrected data"
           : active[0].title)
         : "") ||
-        awaiting?.title || failed?.title || "",
+        (awaiting ? "Waiting for file transfer" : "") || failed?.title ||
+        (outdated ? "Updated inputs need a rerun" : ""),
     );
     activity.hidden = !activity.textContent;
-    button.append(heading, description, progress, activity, footer);
+    button.append(heading, description, responsibility, progress, activity, footer);
     button.onclick = () => {
       selectedTask = task.key;
       workspaceView = "jobs";
@@ -666,6 +681,8 @@ function renderTasks() {
     statusSymbol(
       activeJobs.length
         ? "running"
+        : waitingTransfer
+        ? "handover"
         : busy || !Object.keys(records).length
         ? "waiting"
         : "complete",
@@ -673,6 +690,8 @@ function renderTasks() {
     document.createTextNode(
       activeJobs.length
         ? `${activeJobs.length} running`
+        : waitingTransfer
+        ? "Awaiting file transfer"
         : busy
         ? "Waiting"
         : Object.keys(records).length
@@ -681,17 +700,18 @@ function renderTasks() {
     ),
   );
   $("workspace-activity").classList.toggle("running", activeJobs.length > 0);
+  $("workspace-activity").classList.toggle("handover", Boolean(waitingTransfer));
   $("tasks").hidden = workspaceView !== "tasks";
   $("task-jobs").hidden = workspaceView !== "jobs";
   $("workspace-breadcrumb").textContent = workspaceView === "tasks"
-    ? "Tasks"
-    : "Tasks / Jobs";
+    ? "Task overview"
+    : "Task overview / Jobs";
   $("workspace-title").textContent = workspaceView === "tasks"
-    ? "Tasks and their jobs"
+    ? "Follow the work across teams"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "Open a task to follow its jobs, owners and results."
-    : "Open an output to see the result, its inputs and software versions.";
+    ? "See who owns each job, what it needs, and the record behind its result."
+    : "Follow required inputs; open the output or its recorded inputs and versions.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
   $("show-tasks").classList.toggle("active", workspaceView === "tasks");
@@ -705,35 +725,80 @@ function renderTasks() {
   );
 }
 
+function jobProgress(job) {
+  const state = stageStatus(job.key);
+  const pendingInputs = job.parents.filter((key) =>
+    !["complete", "retained"].includes(stageStatus(key)));
+  const detail = state === "handover" ? "Confirm file transfer to continue"
+    : state === "retained" ? "Earlier result kept unchanged"
+    : state === "outdated" ? "Rerun with the updated inputs"
+    : state === "failed" ? "Open the execution log"
+    : state === "waiting" && pendingInputs.length
+    ? "After " + byKey[pendingInputs[0]].title + (pendingInputs.length > 1 ? ` + ${pendingInputs.length - 1} more` : "")
+    : state === "waiting" ? (busy ? "Inputs available · queued" : "Inputs available")
+    : "";
+  const label = state === "retained" ? "Reused"
+    : state === "waiting" && !pendingInputs.length && !busy ? "Ready"
+    : statusLabel(job.key);
+  return { state, detail, label };
+}
+
+async function openJobRecord(key) {
+  await openOutput(key);
+  if (currentOutput?.record?.job === key && $("output-dialog").open) {
+    document.querySelector('[data-output="record"]').click();
+  }
+}
+
 function renderJobTable() {
   $("job-table-body").replaceChildren();
   for (const job of jobs) {
     if (selectedTask && job.module !== selectedTask) continue;
     if (jobStatusFilter && stageStatus(job.key) !== jobStatusFilter) continue;
     const row = document.createElement("tr");
+    const progress = jobProgress(job);
     row.className = stageStatus(job.key) +
       (selected === job.key ? " selected-job" : "");
     row.dataset.job = job.key;
+    row.dataset.module = job.module;
     const name = document.createElement("td");
+    name.className = "job-name-cell";
     const select = uiElement("button", "job-name", job.title);
     select.onclick = () => selectJob(job.key);
     select.setAttribute("aria-label", "Run from " + job.title);
     name.append(select);
     const owner = uiElement("td", "job-owner");
+    owner.dataset.label = "Responsible";
     const ownerLabel = uiElement("span", "owner-label");
     ownerLabel.append(lineIcon("person"), document.createTextNode(job.owner));
     owner.append(ownerLabel);
     row.append(name, owner);
-    const inputs = document.createElement("small");
-    inputs.className = "job-inputs";
-    inputs.textContent = job.parents.length
-      ? "Uses: " + job.parents.map((key) => byKey[key].title).join(" · ")
-      : "Starts with the supplied records";
+    const inputs = uiElement("div", "job-inputs");
+    inputs.append(uiElement("span", "input-caption", job.parents.length ? "Inputs" : "Supplied catch and effort records"));
+    for (const key of job.parents) {
+      const input = records[job.key]?.inputs?.[key];
+      const earlierVersion = input && (input.run_id !== records[key]?.run_id ||
+        input.checksum !== records[key]?.outputs?.["output.json"]);
+      const link = uiElement("button", "input-link", byKey[key].title);
+      link.dataset.inputJob = key;
+      link.disabled = Boolean(earlierVersion);
+      link.title = earlierVersion ? "Earlier input version · open this job’s Record"
+        : records[key] ? `Inspect input record · ${records[key].run_id}` : "Select this input job";
+      link.onclick = () => records[key] ? openJobRecord(key) : selectJob(key);
+      inputs.append(link);
+    }
     row.firstChild.append(inputs);
     const state = document.createElement("td");
-    state.append(badge(job.key));
+    const progressBadge = badge(job.key);
+    progressBadge.lastChild.textContent = progress.label;
+    if (progress.label === "Ready") progressBadge.classList.add("ready");
+    state.className = "job-progress";
+    state.append(progressBadge);
+    if (progress.detail) state.append(uiElement("small", "progress-detail", progress.detail));
     row.append(state);
     const origin = document.createElement("td");
+    origin.className = "job-origin";
+    origin.dataset.label = "Output from";
     origin.append(
       uiElement("span", "run-label", records[job.key]?.run_id || "—"),
     );
@@ -741,11 +806,16 @@ function renderJobTable() {
     const output = document.createElement("td"),
       button = document.createElement("button");
     button.className = "open-output";
-    button.append(lineIcon("file"), document.createTextNode("View outputs"));
+    button.append(lineIcon("file"), document.createTextNode("Output"));
     button.setAttribute("aria-label", "Open " + job.title + " output");
     button.disabled = !records[job.key];
     button.onclick = () => openOutput(job.key);
-    output.append(button);
+    const recordButton = uiElement("button", "open-job-record", "Record");
+    recordButton.disabled = !records[job.key];
+    recordButton.setAttribute("aria-label", "Inspect " + job.title + " recorded inputs and versions");
+    recordButton.onclick = () => openJobRecord(job.key);
+    output.className = "job-inspect";
+    output.append(button, recordButton);
     row.append(output);
     $("job-table-body").append(row);
   }
@@ -775,13 +845,26 @@ function render() {
   $("reset").disabled = busy || !ready || mode === "saved";
   $("mode").disabled = busy;
   $("handover").disabled = busy || mode === "saved";
-  $("handover-note").hidden = mode === "saved" ||
+  $("handover-note").hidden = Boolean(waitingTransfer) || mode === "saved" ||
     $("handover").value !== "manual";
   $("handover-help").textContent = $("handover").value === "manual"
-    ? "Wait for a file transfer."
+    ? "Confirm each file transfer to continue."
     : "Pass inputs automatically.";
   $("revise-cpue").hidden = busy || !records.cpue_a;
   $("handover-panel").hidden = !waitingTransfer;
+  $("transfer-files").disabled = confirmingTransfer;
+  $("connect-workflow").disabled = confirmingTransfer;
+  $("transfer-files").textContent = confirmingTransfer
+    ? "Confirming transfer…"
+    : "Confirm file transfer →";
+  const manual = $("handover").value === "manual" && mode !== "saved";
+  document.querySelector('[data-tab="jobs"]').textContent = manual ? "Job outputs" : "Orchestration tool";
+  document.querySelector('.workspace-brand .eyebrow').textContent = manual ? "Separate workspaces" : "Orchestration";
+  document.querySelector('.workspace-brand strong').textContent = manual ? "Job outputs" : "Analysis workspace";
+  document.querySelector('.workspace-nav').setAttribute('aria-label', manual
+    ? "Job outputs navigation" : "Orchestration navigation");
+  if (manual) $("workspace-description").textContent =
+    "Separate workspaces, without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
   for (const id of ["snapshot", "filter", "mortality"]) {
     $(id).disabled = busy || mode === "saved";
   }
@@ -850,6 +933,8 @@ function explainChanges() {
 function showError(error) {
   busy = false;
   dispatchPending = false;
+  waitingTransfer = null;
+  confirmingTransfer = false;
   status("failed", "The analysis stopped", String(error));
   $("offline-fallback").hidden = mode !== "cloud";
   render();
@@ -867,6 +952,7 @@ function handleEvent(event) {
     correctionPending = false;
     activities = {};
     waitingTransfer = null;
+    confirmingTransfer = false;
     plan = event;
     latestRun = event.run_id;
     $("run-id").textContent = latestRun;
@@ -877,19 +963,24 @@ function handleEvent(event) {
     );
   } else {
     dispatchPending = false;
-    if (event.state === "running" && event.group) {
+    if (["running", "handover", "received"].includes(event.state) && event.group) {
       for (const key of event.group) {
-        states[key] = "running";
+        states[key] = event.state;
         activities[key] = "";
       }
     }
     activities[event.job] = event.activity || "";
     if (event.state === "handover") {
-      waitingTransfer = event;
+      waitingTransfer = { ...event, group: event.group || [event.job] };
+      confirmingTransfer = false;
       $("handover-title").textContent = event.boundary === "data"
         ? "Data manager → CPUE analyst"
         : "CPUE analyst → Assessment analyst";
-    } else if (event.state === "received") waitingTransfer = null;
+      $("handover-message").textContent = "Separate workspaces · no shared orchestration. Confirm that the updated files have been transferred.";
+    } else if (event.state === "received") {
+      waitingTransfer = null;
+      confirmingTransfer = false;
+    }
     if (event.job === "qc" && event.state === "failed") {
       correctionPending = true;
     }
@@ -909,19 +1000,23 @@ function handleEvent(event) {
     status(
       event.state === "failed"
         ? "failed"
-        : event.state === "handover"
+        : waitingTransfer
         ? "handover"
         : "running",
-      event.state === "handover"
-        ? "Waiting for the next analyst"
+      waitingTransfer
+        ? "File transfer required · click to continue"
         : event.activity === "resubmit"
         ? "Resubmit corrected data"
         : event.state === "returned"
         ? "Correct the submission"
         : groupTitle || byKey[event.job].title,
-      groupTitle
+      waitingTransfer
+        ? waitingTransfer.group.map((key) => byKey[key].title).join(" and ") +
+          (waitingTransfer.group.length > 1 ? " await" : " awaits") +
+          " updated inputs. Confirm the transfer below to continue."
+        : groupTitle
         ? active.map((job) => job.title).join(" · ") +
-          ". The next stage waits for these jobs."
+          ". Dependent stages wait for their input group to finish."
         : event.message,
     );
   }
@@ -1005,7 +1100,7 @@ $("handover").onchange = () => {
     "",
     "Connection mode selected",
     $("handover").value === "manual"
-      ? "Calculations pause where inputs must pass to the next analyst."
+      ? "Separate workspaces; shared orchestration is not in use. Click Confirm file transfer at each analyst boundary."
       : "Recorded inputs pass directly to the dependent jobs.",
   );
   render();
@@ -1020,22 +1115,21 @@ $("revise-cpue").onclick = () => {
   selectJob("cpue_a");
 };
 async function transferFiles(connect = false) {
-  $("transfer-files").disabled = true;
-  $("connect-workflow").disabled = true;
+  if (!waitingTransfer || confirmingTransfer) return;
+  confirmingTransfer = true;
+  render();
   try {
     await call("transfer", { connect });
     if (connect) $("handover").value = "connected";
-    waitingTransfer = null;
     render();
   } catch (error) {
+    confirmingTransfer = false;
     status(
       "failed",
       "Transfer not confirmed",
       error.message + " Try the transfer again.",
     );
-  } finally {
-    $("transfer-files").disabled = false;
-    $("connect-workflow").disabled = false;
+    render();
   }
 }
 $("transfer-files").onclick = () => transferFiles();

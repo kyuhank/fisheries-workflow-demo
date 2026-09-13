@@ -32,9 +32,9 @@
       <nav class="tabs"
         aria-label="View"><button class="active" data-tab="workflow" aria-selected="true">Workflow</button><button data-tab="jobs" aria-selected="false">Orchestration tool</button><span id="completion"></span></nav>
       <section id="handover-note" class="handover-note"
-        hidden><div><strong>Manual handovers</strong><span>Pause at each transfer between analysts.</span></div><button id="revise-cpue" class="quiet" hidden>Revise CPUE A</button></section>
+        hidden><div><strong>Separate workspaces · manual file transfer</strong><span>Shared orchestration is not in use. Click Confirm file transfer at each analyst boundary to continue.</span></div><button id="revise-cpue" class="quiet" hidden>Revise CPUE A</button></section>
       <section id="handover-panel" class="handover-panel" hidden
-        aria-live="polite"><div><strong id="handover-title">Waiting for a file transfer</strong><p>Select Transfer files to continue. No message is sent.</p></div><button id="transfer-files">Transfer files →</button><button id="connect-workflow" class="quiet">Connect automatically</button></section>
+        aria-live="polite"><div><strong id="handover-title">Waiting for a file transfer</strong><p id="handover-message">Click Confirm file transfer to continue.</p></div><button id="transfer-files">Confirm file transfer →</button><button id="connect-workflow" class="quiet">Connect automatically</button></section>
       <section
         class="selection"><div><span class="eyebrow" id="selection-label">Start from</span><h2 id="selection-title">Data submission</h2><p id="selection-description">Submit records, check them and run the connected analyses.</p><p id="reuse-message" class="reuse"></p></div><button id="run" class="primary" disabled>Run full workflow <span aria-hidden="true">→</span></button></section>
       <section id="workflow-view" class="modules"
@@ -45,7 +45,7 @@
             <div
               class="workspace-brand"><span class="eyebrow">Orchestration</span><strong>Analysis workspace</strong></div>
             <button id="show-tasks"
-              class="workspace-link active"><span data-workspace-icon="folder"></span>Tasks<span class="nav-count">3</span></button>
+              class="workspace-link active"><span data-workspace-icon="folder"></span>Overview<span class="nav-count">3</span></button>
             <button id="all-tasks"
               class="workspace-link"><span data-workspace-icon="list"></span>All jobs<span class="nav-count">16</span></button>
             <button id="running-jobs"
@@ -53,20 +53,20 @@
           </aside>
           <div class="workspace-content">
             <div
-              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Tasks and their jobs</h2><p id="workspace-description">Open a task to follow its jobs, owners and results.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
+              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Task overview</p><h2 id="workspace-title">Follow the work across teams</h2><p id="workspace-description">See who owns each job, what it needs, and the record behind its result.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
             <div id="tasks" class="task-list"></div>
             <section id="task-jobs" hidden>
               <div
-                class="task-heading"><h3 id="task-title">Data management</h3><span id="task-subtitle"></span><label>Task<select id="task-filter" aria-label="Filter jobs by task"><option value="">All tasks</option><option value="data">Data management</option><option value="cpue">CPUE analysis</option><option value="assessment">Stock assessment</option></select></label><label>Status<select id="job-status-filter" aria-label="Filter jobs by status"><option value="">All states</option><option value="running">Running</option><option value="waiting">Waiting</option><option value="complete">Complete</option><option value="retained">Retained</option><option value="failed">Failed</option></select></label></div>
+                class="task-heading"><h3 id="task-title">Data management</h3><span id="task-subtitle"></span><label>Task<select id="task-filter" aria-label="Filter jobs by task"><option value="">All tasks</option><option value="data">Data management</option><option value="cpue">CPUE analysis</option><option value="assessment">Stock assessment</option></select></label><label>Status<select id="job-status-filter" aria-label="Filter jobs by status"><option value="">All states</option><option value="running">Running</option><option value="waiting">Waiting</option><option value="handover">Awaiting file</option><option value="complete">Complete</option><option value="retained">Reused</option><option value="outdated">Inputs changed</option><option value="failed">Failed</option></select></label></div>
               <div class="job-table-wrap">
                 <table class="job-table">
                   <thead>
                     <tr>
-                      <th>Job / inputs</th>
-                      <th>Owner</th>
-                      <th>Status</th>
-                      <th>Original run</th>
-                      <th>Output</th>
+                      <th scope="col">Job / required inputs</th>
+                      <th scope="col">Responsible</th>
+                      <th scope="col">Progress</th>
+                      <th scope="col">Output from</th>
+                      <th scope="col">Inspect</th>
                     </tr>
                   </thead>
                   <tbody id="job-table-body"></tbody>

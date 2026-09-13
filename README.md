@@ -27,9 +27,14 @@ tool** groups jobs into tasks and shows each job's owner, progress, inputs and
 outputs. Open **Inputs & versions** to follow an output back to its sources or
 use **Reproduce & compare** to check it again.
 
-With **Manual handover**, calculations wait for you to transfer inputs between
-analyses. This illustrates why a revised result does not reach the next analysis
-until the connection is completed. The pauses do not represent measured staff time.
+Parallel CPUE analyses, input preparations and assessment fits each finish their
+peer group before dependent stages start. Partial reruns retain unaffected peers.
+
+**Manual handover** represents separate analyst workspaces without shared
+orchestration. Both affected branches show **Awaiting file** until you click
+**Confirm file transfer**; one confirmation covers the highlighted boundary.
+CPUE summaries and reports continue while assessment waits for the CPUE files.
+The pauses do not represent measured staff time.
 
 **Download this run** keeps its code, data, settings and results. Live sessions are
 separate; temporary results expire after 10 minutes and are replaced by later runs.
