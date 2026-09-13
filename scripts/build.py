@@ -49,7 +49,7 @@ def build():
                'runtime': {name:base64_file(ROOT/'vendor/pyodide'/name) for name in runtime_names}}
     page = (ROOT/'app/index.html').read_text()
     inserts = {'CSS':(ROOT/'app/style.css').read_text(), 'PAYLOAD':json.dumps(payload, separators=(',', ':')).replace('</', '<\\/'),
-               'WORKER':(ROOT/'app/worker.js').read_text(), 'APP':(ROOT/'app/cloud.js').read_text()+'\n'+(ROOT/'app/app.js').read_text()}
+               'WORKER':(ROOT/'app/worker.js').read_text(), 'APP':'\n'.join((ROOT/'app'/name).read_text() for name in ['cloud.js', 'lineage.js', 'app.js', 'record.js'])}
     for name, content in inserts.items():
         page = page.replace('/*__'+name+'__*/', content)
     (ROOT/'docs/index.html').write_text(page)

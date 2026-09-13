@@ -82,7 +82,8 @@
     </main>
     <dialog id="output-dialog">
       <header><div><span class="eyebrow" id="output-kind">Job output</span><h2 id="output-title"></h2></div><button id="output-close" class="quiet" aria-label="Close output">Close ×</button></header>
-      <nav><button class="active" data-output="report">Report</button><button data-output="data">Data</button><button data-output="log">Log</button><button data-output="record">Record</button><button id="save-output" class="quiet">Save HTML</button></nav>
+      <nav><button class="active" data-output="report">Report</button><button data-output="data">Data</button><button data-output="log">Log</button><button data-output="record">Inputs &amp; versions</button><button id="save-output" class="quiet">Save HTML</button></nav>
+      <section id="output-record" hidden aria-label="Recorded inputs and versions"></section>
       <iframe id="output-frame" sandbox="allow-same-origin"
         title="Job report"></iframe>
       <pre id="output-json" hidden></pre>

@@ -454,6 +454,42 @@ dialog iframe {
   font-size: 12px;
   overflow-wrap: anywhere;
 }
+#output-record {
+  padding: 24px;
+  max-height: calc(100% - 143px);
+  overflow: auto;
+  background: #fbfcfd;
+}
+.record-heading h3 { margin: 5px 0; font-size: 19px; }
+.record-heading p { margin: 5px 0 18px; color: var(--muted); }
+.record-cards { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.record-card { padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: white; }
+.record-card strong, .record-card small { display: block; margin-top: 7px; overflow-wrap: anywhere; }
+.record-card strong { font-size: 17px; }
+.record-card small { color: var(--muted); font-size: 12px; }
+.record-source { display: inline-block; margin-top: 12px; font-size: 13px; }
+#output-record > h3 { font-size: 16px; margin: 24px 0 12px; }
+.record-inputs { display: grid; gap: 8px; }
+.record-input { display: flex; align-items: center; gap: 16px; padding: 14px; text-align: left; background: white; border: 1px solid var(--line); border-radius: 8px; }
+.record-input strong { flex: 1; }
+.record-input span { color: var(--muted); font: 12px ui-monospace,monospace; }
+.record-input small { color: #1779a0; }
+.record-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.record-actions .primary { background: #1779a0; color: white; padding: 12px 18px; }
+.record-note { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.record-details { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.record-details summary { cursor: pointer; font-size: 13px; }
+.record-details pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.5; }
+.record-comparison { padding: 16px; margin: 0 0 20px; border-radius: 8px; border-left: 4px solid #248268; background: #eaf5ef; }
+.record-comparison.differs { border-color: #b45635; background: #fff0e8; }
+.record-comparison p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; }
+@media (max-width:650px) {
+  .record-cards { grid-template-columns: 1fr; }
+  .record-input { flex-wrap: wrap; gap: 7px; }
+  .record-input strong { flex-basis: 100%; }
+  #output-record { padding: 16px; }
+  dialog nav { flex-wrap: wrap; }
+}
 [hidden] {
   display: none!important;
 }

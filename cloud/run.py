@@ -10,6 +10,7 @@ from pathlib import Path
 import sys
 import time
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 import uuid
 import zipfile
 
@@ -43,8 +44,15 @@ def api(path, body=None):
     request = Request(API + '/runner/' + path + '?request=' + REQUEST,
                       data=json.dumps(body).encode() if body is not None else None,
                       headers={'Authorization': 'Bearer ' + _token, 'Content-Type': 'application/json'})
-    with urlopen(request, timeout=45) as response:
-        return json.load(response)
+    try:
+        with urlopen(request, timeout=45) as response:
+            return json.load(response)
+    except HTTPError as error:
+        try:
+            message = json.load(error).get('error', 'Request rejected.')
+        except (ValueError, AttributeError):
+            message = 'Request rejected.'
+        raise RuntimeError(f'{path}: HTTP {error.code}: {str(message)[:240]}') from None
 
 
 def restore(encoded, directory):

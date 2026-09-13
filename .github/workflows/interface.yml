@@ -1,9 +1,9 @@
 name: Check diagram
 on:
   push:
-    paths: ['app/**', 'docs/index.html', 'scripts/check-diagram.py', '.github/workflows/interface.yml']
+    paths: ['app/**', 'docs/index.html', 'scripts/check-diagram.py', 'scripts/check-records.py', '.github/workflows/interface.yml']
   pull_request:
-    paths: ['app/**', 'docs/index.html', 'scripts/check-diagram.py', '.github/workflows/interface.yml']
+    paths: ['app/**', 'docs/index.html', 'scripts/check-diagram.py', 'scripts/check-records.py', '.github/workflows/interface.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,3 +22,4 @@ jobs:
         run: |
           .browser-check/bin/python scripts/check-diagram.py --engine chromium
           .browser-check/bin/python scripts/check-diagram.py --engine webkit
+          .browser-check/bin/python scripts/check-records.py

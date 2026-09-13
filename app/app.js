@@ -507,7 +507,7 @@ const taskGroups = [
   },
 ];
 
-function uiElement(tag, className, text) {
+function uiElement(tag, className = "", text) {
   const element = document.createElement(tag);
   element.className = className;
   if (text !== undefined) element.textContent = text;
@@ -910,6 +910,7 @@ $("run").onclick = async () => {
     completedSummary =
       `${result.run.length} completed · ${result.retained.length} retained`;
     await refreshPlan();
+    return result;
   } catch (error) {
     showError(error);
     await refreshPlan();
@@ -964,6 +965,7 @@ $("connect-workflow").onclick = () => transferFiles(true);
 $("reset").onclick = async () => {
   try {
     const result = await call("reset");
+    reproductionChecks.clear();
     completedSummary = null;
     records = result.records;
     states = {};
@@ -1052,12 +1054,16 @@ $("download").onclick = async () => {
   }
 };
 function displayOutput(title, output, kind = "Job output") {
+  if (output.record && !output.comparison) {
+    output.comparison = reproductionChecks.get(checkKey(output.record));
+  }
   currentOutput = output;
   $("output-title").textContent = title;
   $("output-kind").textContent = kind;
   $("output-frame").srcdoc = output.html;
   $("output-frame").hidden = false;
   $("output-json").hidden = true;
+  $("output-record").hidden = true;
   document.querySelectorAll("[data-output]").forEach((button) => {
     button.classList.toggle("active", button.dataset.output === "report");
     button.disabled = button.dataset.output !== "report" && !output.record;
@@ -1108,9 +1114,12 @@ for (const button of document.querySelectorAll("[data-output]")) {
       other.classList.toggle("active", other === button)
     );
     const report = button.dataset.output === "report";
+    const record = button.dataset.output === "record";
     $("output-frame").hidden = !report;
-    $("output-json").hidden = report;
-    if (!report) {
+    $("output-record").hidden = !record;
+    $("output-json").hidden = report || record;
+    if (record) renderRecord();
+    else if (!report) {
       $("output-json").textContent = button.dataset.output === "log"
         ? currentOutput.record.log.join("\n")
         : JSON.stringify(

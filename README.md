@@ -19,6 +19,12 @@ Run the full workflow, then select **Input prep A** and run again. Earlier data 
 CPUE results retain their original records. Selecting **CPUE report** repeats only
 that reporting job. **Orchestration tool** groups jobs into tasks and gives access
 to responsibilities, inputs, progress, logs and outputs.
+Each output's **Inputs & versions** view shows its original code, software and
+input jobs. Follow an input to inspect the version actually used.
+**Reproduce & compare** restores the recorded settings, recalculates the full
+workflow and compares the selected output. Changed code or software is reported
+separately from numerical agreement. **Copy context** and **Download record**
+include the available input chain for review or use with an analytical assistant.
 Hosted jobs within a stage run in parallel and finish before the next stage begins.
 The offline browser follows the same stages using one Python worker.
 
@@ -55,5 +61,7 @@ Run `make html` to rebuild the self-contained page. Optional browser checks use
 Playwright: `python3 scripts/check-browser.py`. They exercise offline calculations,
 partial reruns, saved outputs and manual transfers. `python3 scripts/check-behaviour.py`
 records the behavioural checks used in the accompanying paper.
+`python3 scripts/check-records.py` checks input tracing and actual reproduction;
+add `--online` to repeat the check on the hosted runner.
 Diagram checks run in Chromium and WebKit with `python3 scripts/check-diagram.py
 --engine chromium` or `--engine webkit`.
