@@ -1,8 +1,12 @@
 """Check SVG layout and output controls in Chromium or WebKit."""
 import argparse
+from contextlib import contextmanager
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 from pathlib import Path
+from threading import Thread
 
 from playwright.sync_api import sync_playwright
 
@@ -12,14 +16,30 @@ parser.add_argument("--engine", choices=("chromium", "webkit"), default="chromiu
 parser.add_argument("--executable", default=os.environ.get("CHROME_PATH"))
 args = parser.parse_args()
 
-with sync_playwright() as playwright:
+
+@contextmanager
+def hosted_docs():
+    """The lightweight page fetches its runtime from the same web origin."""
+    class QuietHandler(SimpleHTTPRequestHandler):
+        def log_message(self, *_):
+            pass
+
+    with ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=ROOT/'docs')) as server:
+        Thread(target=server.serve_forever, daemon=True).start()
+        try:
+            yield f'http://127.0.0.1:{server.server_port}/index.html'
+        finally:
+            server.shutdown()
+
+
+with hosted_docs() as url, sync_playwright() as playwright:
     options = {"executable_path": args.executable} if args.executable else {}
     browser = getattr(playwright, args.engine).launch(**options)
     page = browser.new_page(viewport={"width": 1440, "height": 1050})
     page.route("https://**/*", lambda route: route.abort())
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
-    page.goto((ROOT / "docs/index.html").as_uri(), wait_until="domcontentloaded")
+    page.goto(url, wait_until="domcontentloaded")
     page.locator("#mode").select_option("saved")
     page.locator('.job[data-job="submission"].complete').wait_for()
     checks = []
