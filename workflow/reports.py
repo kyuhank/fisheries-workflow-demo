@@ -55,7 +55,7 @@ def cpue_report(result):
     """Write an account of the supplied indices without refitting the analyses."""
     series = result['series']
     findings = ' '.join(
-        f'{esc(name)} was <strong>{rows[-1]["index"]:.3f}</strong> in '
+        f'The index from {esc(name)} was <strong>{rows[-1]["index"]:.3f}</strong> in '
         f'{esc(rows[-1]["year"])}, relative to 1 in {esc(rows[0]["year"])}.'
         for name, rows in series.items())
     return (
@@ -86,7 +86,7 @@ def assessment_report(result):
                     'of each case’s unfished level.')
     else:
         findings = ' '.join(
-            f'{esc(name)} ended at <strong>{row["SB_over_SB0"]:.3f}</strong> of its '
+            f'Spawning biomass in {esc(name)} was <strong>{row["SB_over_SB0"]:.3f}</strong> of its '
             f'unfished level in {esc(row["year"])}.' for name, row in final)
     boundary = [row['case'] for row in diagnostics if row['boundary_fit']]
     catch_failures = [row['case'] for row in diagnostics if row['catch_check'] != 'Pass']
