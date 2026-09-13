@@ -85,6 +85,9 @@ function renderRecord() {
       uiElement("strong", "", value),
       uiElement("small", "", detail),
     );
+    if (label === "Software" && image?.includes("@sha256:")) {
+      card.append(uiElement("code", "record-image-digest", image.split("@")[1]));
+    }
     cards.append(card);
   }
   panel.append(cards);
@@ -94,6 +97,15 @@ function renderRecord() {
   ) {
     const link = uiElement("a", "record-source", "Open recorded code ↗");
     link.href = source.repository + "/tree/" + source.commit;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    panel.append(link);
+  }
+  const execution = record.execution || {};
+  if (/^[\w.-]+\/[\w.-]+$/.test(execution.repository || "") &&
+      /^\d+$/.test(String(execution.github_run || ""))) {
+    const link = uiElement("a", "record-source", "Open actual run ↗");
+    link.href = `https://github.com/${execution.repository}/actions/runs/${execution.github_run}`;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     panel.append(link);

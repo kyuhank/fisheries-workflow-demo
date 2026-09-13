@@ -36,6 +36,8 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     if args.online:
         assert 'Docker image' in page.locator('.record-cards').inner_text()
         assert '@sha256:' in page.locator('.record-details pre').text_content()
+        assert page.locator('.record-image-digest').inner_text() == page.evaluate('currentOutput.record.execution.container.split("@")[1]')
+        assert page.get_by_role('link', name='Open actual run').get_attribute('href').endswith(str(page.evaluate('currentOutput.record.execution.github_run')))
     page.locator('.record-input').click()
     expect(page.locator('.record-heading')).to_contain_text('prepare_a · Run 001')
     page.get_by_role('button', name='CPUE analysis A Run 001').click()

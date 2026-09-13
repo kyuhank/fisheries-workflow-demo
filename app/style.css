@@ -486,7 +486,8 @@ dialog iframe {
 .record-card strong, .record-card small { display: block; margin-top: 7px; overflow-wrap: anywhere; }
 .record-card strong { font-size: 17px; }
 .record-card small { color: var(--muted); font-size: 12px; }
-.record-source { display: inline-block; margin-top: 12px; font-size: 13px; }
+.record-image-digest { display: block; margin-top: 9px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+.record-source { display: inline-block; margin: 12px 18px 0 0; font-size: 13px; }
 #output-record > h3 { font-size: 16px; margin: 24px 0 12px; }
 .record-inputs { display: grid; gap: 8px; }
 .record-input { display: flex; align-items: center; gap: 16px; padding: 14px; text-align: left; background: white; border: 1px solid var(--line); border-radius: 8px; }
