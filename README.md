@@ -5,6 +5,9 @@
 An executable example connecting data preparation, CPUE analysis and stock assessment.
 All observations are synthetic; the simple models illustrate the workflow, not an actual stock.
 Operational assessments contain additional inputs, diagnostics and model comparisons.
+The diagram's **Other assessment data** path represents inputs alongside CPUE;
+this example uses catch, while operational workflows may also prepare size, age
+and tagging data.
 
 ## Three ways to explore
 
@@ -50,3 +53,5 @@ Run `make html` to rebuild the self-contained page. Optional browser checks use
 Playwright: `python3 scripts/check-browser.py`. They exercise offline calculations,
 partial reruns, saved outputs and manual transfers. `python3 scripts/check-behaviour.py`
 records the behavioural checks used in the accompanying paper.
+Diagram checks run in Chromium and WebKit with `python3 scripts/check-diagram.py
+--engine chromium` or `--engine webkit`.
