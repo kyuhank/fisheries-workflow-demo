@@ -2,7 +2,7 @@
   "job": "prepare_b",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "fb40887aa4120c5821ae0d164c13221d859834eda4e060ed2680699d17500cc2",
+  "signature": "b5203614612fc99e724e56ff42bd7d2257d4356cb3acad072919caeaf1eeec47",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -18,7 +18,7 @@
   },
   "outputs": {
     "output.json": "d98086490484135779abfb81316cb95f0cb93a28dfe6c38ba5817c90ae50b916",
-    "report.html": "0a29467ee142b19340ecc830334cd0d004fa1940eb2a1c40bab9b706af1a21f0"
+    "report.html": "b61bfcd127962c749f059bda5b960e3583f581695ff95c3b63b6fd25ceb6924a"
   },
   "log": [
     "Join index B to annual catches and check the model inputs.",
@@ -36,8 +36,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "b3efb2b73b50dfac8d39352f670f46a77d0990a0",
-    "version": "1.4.0"
+    "commit": "0773a76640acfa18bf76a86d4922b552ddf17e1b",
+    "version": "1.4.1"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",

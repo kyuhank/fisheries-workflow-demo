@@ -2,7 +2,7 @@
   "job": "cpue_summary",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "02317d228ba91deaa5830126ce53682d4b9a273516a06cb9eb1f9135e690b027",
+  "signature": "f73a82f89b251aa2c9297bb89f01686bfdf9d764e4f4c082df44abeb2bcafe2d",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "c08398790c7c7617e5f99c9bb4961734d37cf456eee4dfcf154fdb2556d15c5d",
-    "report.html": "df3f50799e3bad687758cc8e9a6979783cc9113b6caf3efcc294ca4ba7307fc8"
+    "report.html": "26cc5275a5b8d4a8ad6340234e2d0ca2d1bafb8658170b189a2edd9fbcefd880"
   },
   "log": [
     "Compare both indices in a plot and table.",
@@ -38,8 +38,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "b3efb2b73b50dfac8d39352f670f46a77d0990a0",
-    "version": "1.4.0"
+    "commit": "0773a76640acfa18bf76a86d4922b552ddf17e1b",
+    "version": "1.4.1"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
