@@ -22,7 +22,7 @@ let selected = "submission",
 let mode = "cloud";
 const modeStates = {};
 let offlineReady = false, cloudReady = false, offlineInit = null;
-let completedSummary = null, modeVersion = 0;
+let completedRun = null, modeVersion = 0;
 let correctionPending = false;
 let activities = {}, dispatchPending = false;
 let workspaceView = "tasks", jobStatusFilter = "";
@@ -154,6 +154,17 @@ function currentStart() {
     : selected;
 }
 
+function displayedPlan() {
+  // After completion, keep the work just executed visible. The next run's plan
+  // can be smaller once changed settings have been saved in the new records.
+  return completedRun || plan;
+}
+
+function runStates(run, state) {
+  return Object.fromEntries(jobs.map((job) =>
+    [job.key, run.includes(job.key) ? state : "retained"]));
+}
+
 function status(kind, title, message) {
   $("offline-fallback").hidden = true;
   $("retry-connection").hidden = true;
@@ -239,14 +250,14 @@ function selectJob(key) {
   settingsIntent = false;
   selectedTask = byKey[key].module;
   if (!busy && mode !== "saved") {
-    completedSummary = null;
+    completedRun = null;
     refreshPlan();
   } else render();
 }
 
-function jobNode(node, colour) {
+function jobNode(node, colour, path) {
   const key = node.key, job = byKey[key], state = stageStatus(key);
-  const inPath = mode === "saved" || plan?.run.includes(key), database = key === "database";
+  const inPath = mode === "saved" || path?.run.includes(key), database = key === "database";
   const card = svgElement("g", {
     class: "job workflow-node " + state +
       (currentStart() === key ? " selected" : "") +
@@ -430,7 +441,7 @@ function roundedRoute(points) {
 }
 
 function renderDiagram() {
-  const layout = payload.diagram;
+  const layout = payload.diagram, path = displayedPlan();
   const svg = svgElement("svg", {
     viewBox: `0 0 ${layout.width} ${layout.height}`,
     class: "workflow-diagram",
@@ -485,10 +496,10 @@ function renderDiagram() {
     svg.append(title);
   }
   for (const edge of layout.edges) {
-    const inPath = plan?.run.includes(edge.from) && plan?.run.includes(edge.to);
+    const inPath = path?.run.includes(edge.from) && path?.run.includes(edge.to);
     const receiving = busy && stageStatus(edge.to) === "running";
-    const retained = plan?.retained.includes(edge.from) &&
-      plan?.run.includes(edge.to);
+    const retained = path?.retained.includes(edge.from) &&
+      path?.run.includes(edge.to);
     const awaiting = waitingTransfer?.group.includes(edge.to) &&
       ((waitingTransfer.boundary === "data" && edge.from === "extract" &&
         edge.to.startsWith("cpue_")) ||
@@ -541,7 +552,7 @@ function renderDiagram() {
     const group = layout.groups.find((group) =>
       group.key === byKey[node.key].module
     );
-    svg.append(jobNode(node, group.colour));
+    svg.append(jobNode(node, group.colour, path));
   }
   if ($("handover").value === "manual" && mode !== "saved") {
     for (const [boundary, x, y, to] of [
@@ -909,8 +920,9 @@ function render() {
     $("completion").textContent = "16 saved outputs";
     $("reuse-message").textContent = "";
   } else if (plan) {
-    $("completion").textContent = completedSummary ||
-      `${plan.run.length} jobs to run · ${plan.retained.length} retained`;
+    $("completion").textContent = completedRun
+      ? `${completedRun.run.length} completed · ${completedRun.retained.length} retained`
+      : `${plan.run.length} jobs to run · ${plan.retained.length} retained`;
     const parentNames = byKey[start].parents.filter((key) =>
       plan.retained.includes(key)
     ).map((key) => `${byKey[key].title} (${records[key]?.run_id})`);
@@ -984,11 +996,7 @@ function handleEvent(event) {
     plan = event;
     latestRun = event.run_id;
     $("run-id").textContent = latestRun;
-    states = Object.fromEntries(
-      jobs.map(
-        (job) => [job.key, plan.run.includes(job.key) ? "waiting" : "retained"],
-      ),
-    );
+    states = runStates(plan.run, "waiting");
   } else {
     dispatchPending = false;
     if (["running", "handover", "received"].includes(event.state) && event.group) {
@@ -1083,12 +1091,8 @@ $("run").onclick = async () => {
   dispatchPending = true;
   correctionPending = false;
   activities = {};
-  completedSummary = null;
-  states = Object.fromEntries(
-    jobs.map(
-      (job) => [job.key, plan?.run.includes(job.key) ? "waiting" : "retained"],
-    ),
-  );
+  completedRun = null;
+  states = runStates(plan.run, "waiting");
   messages.length = 0;
   $("execution-log").textContent = "";
   status(
@@ -1104,6 +1108,8 @@ $("run").onclick = async () => {
       handover: $("handover").value,
     });
     records = result.records;
+    states = runStates(result.run, "complete");
+    completedRun = { run: result.run, retained: result.retained };
     dispatchPending = false;
     busy = false;
     latestRun = result.run_id;
@@ -1114,8 +1120,6 @@ $("run").onclick = async () => {
         result.run.length === 1 ? "job" : "jobs"
       } completed · ${result.retained.length} retained unchanged. Open a job to inspect its output.`,
     );
-    completedSummary =
-      `${result.run.length} completed · ${result.retained.length} retained`;
     await refreshPlan();
     return result;
   } catch (error) {
@@ -1126,7 +1130,7 @@ $("run").onclick = async () => {
 for (const id of ["snapshot", "filter", "mortality"]) {
   $(id).onchange = () => {
     settingsIntent = true;
-    completedSummary = null;
+    completedRun = null;
     refreshPlan();
   };
 }
@@ -1173,7 +1177,7 @@ $("reset").onclick = async () => {
   try {
     const result = await call("reset");
     reproductionChecks.clear();
-    completedSummary = null;
+    completedRun = null;
     records = result.records;
     states = {};
     latestRun = "";
@@ -1365,7 +1369,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     latestRun,
     selected,
     settingsIntent,
-    completedSummary,
+    completedRun,
     messages: [...messages],
     settings: settings(),
     handover: $("handover").value,
@@ -1387,7 +1391,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   selected = saved?.selected || "submission";
   settingsIntent = saved?.settingsIntent || false;
   $("handover").value = saved?.handover || "connected";
-  completedSummary = saved?.completedSummary || null;
+  completedRun = saved?.completedRun || null;
   messages.splice(0, messages.length, ...(saved?.messages || []));
   $("execution-log").textContent = messages.join("\n") || "No execution yet.";
   if (saved?.settings) {

@@ -28,6 +28,9 @@ files and run records. **Orchestration tool** shows each job's owner, progress,
 inputs and outputs. Open **Inputs & versions** to trace the data, code and software
 behind a result, or use **Reproduce & compare** to check it again.
 
+After changing natural mortality, both A2 and B2 and their shared summary and
+report remain visible in the completed diagram.
+
 Parallel CPUE analyses, input preparations and assessment fits each finish their
 peer group before dependent stages start. Partial reruns retain unaffected peers.
 

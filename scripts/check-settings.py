@@ -59,6 +59,25 @@ def observe_runs(page):
     # Observe the actual UI request and result, preserving both execution paths.
     page.evaluate("""() => {
       window.checkedRuns = [];
+      window.checkedViews = [];
+      window.checkedView = () => ({
+        busy, pending: dispatchPending,
+        nodes: [...document.querySelectorAll('.workflow-node')].map(node => ({
+          key: node.dataset.job, inPath: node.classList.contains('in-path'),
+          opacity: Number(getComputedStyle(node).opacity),
+          state: states[node.dataset.job]
+        })),
+        edges: [...document.querySelectorAll('.connection[data-from]')].map(edge => ({
+          from: edge.dataset.from, to: edge.dataset.to,
+          kind: ['muted', 'selected', 'running', 'saved', 'handover']
+            .find(kind => edge.classList.contains(kind))
+        }))
+      });
+      const originalRender = render;
+      render = function() {
+        originalRender();
+        if (busy) checkedViews.push(checkedView());
+      };
       const original = call;
       call = async function(type, data) {
         const input = type === 'run' ? structuredClone(data) : null;
@@ -67,6 +86,30 @@ def observe_runs(page):
         return result;
       };
     }""")
+
+
+def expect_highlight(page, run, label, view=None):
+    view = view or page.evaluate('checkedView()')
+    expected = set(run)
+    highlighted = {node['key'] for node in view['nodes'] if node['inPath']}
+    assert highlighted == expected, f'{label}: highlighted {sorted(highlighted)}'
+    for node in view['nodes']:
+        strong = node['state'] in ('running', 'failed', 'returned', 'handover')
+        if not view['busy']:
+            strong = node['key'] in expected
+        assert (node['opacity'] == 1) == strong, (label, node)
+    nodes = {node['key']: node for node in view['nodes']}
+    for edge in view['edges']:
+        in_path = edge['from'] in expected and edge['to'] in expected
+        receiving = view['busy'] and nodes[edge['to']]['state'] == 'running'
+        if receiving:
+            assert edge['kind'] == ('running' if edge['from'] in expected else 'saved'), (label, edge)
+        elif view['busy']:
+            assert edge['kind'] in ('muted', 'handover'), (label, edge)
+        else:
+            assert edge['kind'] == ('selected' if in_path else 'muted'), (label, edge)
+        if view['pending']:
+            assert edge['kind'] not in ('running', 'saved'), (label, edge)
 
 
 def expect_plan(page, start, run):
@@ -95,12 +138,15 @@ def select_job(page, key, run):
     page.locator('[data-tab="workflow"]').click()
     page.locator(f'.job[data-job="{key}"]').click()
     expect_plan(page, key, run)
+    expect_highlight(page, run, 'explicit job selection')
 
 
 def run_and_check(page, start, expected, label):
     expect_plan(page, start, expected)
+    expect_highlight(page, expected, label + ' planned')
     before = page.evaluate('records')
     count = page.evaluate('checkedRuns.length')
+    view_count = page.evaluate('checkedViews.length')
     page.locator('#run').click()
     page.wait_for_function("""count => checkedRuns.length === count + 1 && !busy &&
       document.querySelector('#status-title').textContent === 'Results are ready' &&
@@ -119,6 +165,17 @@ def run_and_check(page, start, expected, label):
         # Includes original run ID, input identities and every output checksum.
         assert result['records'][key] == before[key], f'{label}: changed retained {key}'
     assert page.evaluate('records') == result['records']
+    expect_highlight(page, expected, label + ' completed')
+    views = page.evaluate('count => checkedViews.slice(count)', view_count)
+    assert any(view['pending'] for view in views), label + ': no pending dispatch observed'
+    for view in views:
+        expect_highlight(page, expected, label + ' executing', view)
+    if label.startswith('offline'):
+        running = {node['key'] for view in views for node in view['nodes']
+                   if node['state'] == 'running'}
+        assert running == set(expected), (label, 'observed running', running)
+    for node in page.evaluate('checkedView().nodes'):
+        assert node['state'] == ('complete' if node['key'] in expected else 'retained'), (label, node)
     assert f'{len(expected)} jobs completed' in page.locator('#status-message').inner_text()
     assert page.evaluate('selected') == start
     print(f'PASS: {label}: {len(expected)} executed, {len(result["retained"])} retained', flush=True)
@@ -140,6 +197,13 @@ def offline_checks(page):
     result = run_and_check(page, 'assessment_a2', MORTALITY, 'offline dropdown-only mortality')
     for key in ['assessment_a2', 'assessment_b2']:
         assert result['records'][key]['settings']['M'] == 0.35
+    # The next executable plan has only A2; the completed diagram must retain B2.
+    expect_plan(page, 'assessment_a2', [key for key in MORTALITY if key != 'assessment_b2'])
+    expect_highlight(page, MORTALITY, 'completed mortality after next-plan refresh')
+    page.locator('#mode').select_option('saved')
+    page.locator('#mode').select_option('live')
+    expect_plan(page, 'assessment_a2', [key for key in MORTALITY if key != 'assessment_b2'])
+    expect_highlight(page, MORTALITY, 'completed mortality after mode restoration')
 
     page.locator('#filter').select_option('0')
     page.locator('#mortality').select_option('0.30')
@@ -233,9 +297,10 @@ class MockCloud:
 def cloud_checks(page, mock, baseline):
     page.wait_for_function("mode === 'cloud' && ready", timeout=30000)
     observe_runs(page)
-    for control, value, start, run in [
-        ('filter', '1200', 'cpue_a', CPUE),
-        ('mortality', '0.35', 'assessment_a2', MORTALITY),
+    for controls, start, run in [
+        ({'filter': '1200'}, 'cpue_a', CPUE),
+        ({'mortality': '0.35'}, 'assessment_a2', MORTALITY),
+        ({'filter': '1200', 'mortality': '0.35'}, 'cpue_a', COMBINED),
     ]:
         # Supply already completed records without running a hosted calculation.
         mock.records = deepcopy(baseline)
@@ -250,16 +315,17 @@ def cloud_checks(page, mock, baseline):
           selectJob('submission');
           await refreshPlan();
         }""", baseline)
-        page.locator(f'#{control}').select_option(value)
+        for control, value in controls.items():
+            page.locator(f'#{control}').select_option(value)
         expect_plan(page, start, run)
-        run_and_check(page, start, run, f'mocked cloud dropdown-only {control}')
+        run_and_check(page, start, run, f'mocked cloud dropdown-only {list(controls)}')
         assert mock.dispatches[-1]['start'] == start
         assert mock.dispatches[-1]['handover'] == 'connected'
         assert mock.dispatches[-1]['settings'] == {
-            'last_year': 2023, 'min_hooks_a': 1200 if control == 'filter' else 0,
-            'mortality_2': 0.35 if control == 'mortality' else 0.30,
+            'last_year': 2023, 'min_hooks_a': int(controls.get('filter', '0')),
+            'mortality_2': float(controls.get('mortality', '0.30')),
         }
-    assert len(mock.dispatches) == 2
+    assert len(mock.dispatches) == 3
 
 
 def main():
@@ -294,7 +360,7 @@ def main():
         cloud_checks(page, mock, baseline)
         assert not errors, errors
         browser.close()
-    print('PASS: settings reruns, exact executed jobs/retained records, selection intent and cloud dispatch. '
+    print('PASS: settings reruns, planned/executed highlighting, retained records, selection intent and cloud dispatch. '
           + ('Current sources.' if args.source else 'Built offline artifact.'))
 
 
