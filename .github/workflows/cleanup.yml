@@ -1,0 +1,21 @@
+name: Clear temporary demonstration records
+on:
+  schedule:
+    - cron: '13,43 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  clean:
+    if: github.repository == 'kyuhank/fisheries-workflow-demo' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - name: Remove expired demonstration runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 cloud/cleanup.py

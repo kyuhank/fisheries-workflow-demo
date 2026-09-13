@@ -5,3 +5,5 @@ dist/
 .test-output/
 *.log
 .DS_Store
+.state/
+supabase/.temp/

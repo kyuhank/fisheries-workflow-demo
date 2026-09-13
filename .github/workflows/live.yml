@@ -1,0 +1,42 @@
+name: Live paper demonstration
+run-name: Paper demonstration · ${{ inputs.request_id }}
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: Registered demonstration request
+        required: true
+        type: string
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: paper-demo-${{ inputs.request_id }}
+  cancel-in-progress: false
+jobs:
+  analysis:
+    if: github.repository == 'kyuhank/fisheries-workflow-demo' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PAPER_REQUEST_ID: ${{ inputs.request_id }}
+      IMAGE: ghcr.io/pacificcommunity/cpue-workshop@sha256:17b03d6e06da229b17524997d8a3fc8eb5f8f25233894b5ab99f89109b3890c5
+    steps:
+      - name: Retrieve the analysis code
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+      - name: Download the preserved Docker image
+        run: |
+          python3 cloud/announce.py
+          docker pull "$IMAGE"
+      - name: Run the analysis and save its results
+        env:
+          PAPER_REQUEST_ID: ${{ inputs.request_id }}
+        run: |
+          docker run --rm \
+            --env PAPER_REQUEST_ID \
+            --env ACTIONS_ID_TOKEN_REQUEST_URL \
+            --env ACTIONS_ID_TOKEN_REQUEST_TOKEN \
+            --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
+            --entrypoint python3 "$IMAGE" cloud/run.py

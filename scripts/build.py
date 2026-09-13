@@ -44,12 +44,12 @@ def build():
     runtime_names = ['pyodide.js','pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json',
                      'sqlite3-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl']
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE','vendor/pyodide/LICENSE','vendor/pyodide/PYTHON-LICENSE'])
-    payload = {'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'notices': notices,
+    payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'notices': notices,
                'files': {str(p.relative_to(ROOT)):base64_file(p) for p in files},
                'runtime': {name:base64_file(ROOT/'vendor/pyodide'/name) for name in runtime_names}}
     page = (ROOT/'app/index.html').read_text()
     inserts = {'CSS':(ROOT/'app/style.css').read_text(), 'PAYLOAD':json.dumps(payload, separators=(',', ':')).replace('</', '<\\/'),
-               'WORKER':(ROOT/'app/worker.js').read_text(), 'APP':(ROOT/'app/app.js').read_text()}
+               'WORKER':(ROOT/'app/worker.js').read_text(), 'APP':(ROOT/'app/cloud.js').read_text()+'\n'+(ROOT/'app/app.js').read_text()}
     for name, content in inserts.items():
         page = page.replace('/*__'+name+'__*/', content)
     (ROOT/'docs/index.html').write_text(page)

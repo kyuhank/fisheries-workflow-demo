@@ -1,9 +1,9 @@
 name: Check calculations
 on:
   push:
-    paths: ['workflow/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   pull_request:
-    paths: ['workflow/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,3 +19,15 @@ jobs:
         run: |
           docker build -t fisheries-workflow .
           docker run --rm --network none fisheries-workflow python -m unittest discover -s tests -v
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
+        with:
+          deno-version: v2.9.6
+      - name: Check server identity and repository restrictions
+        run: |
+          deno check supabase/functions/paper-api/index.ts
+          deno test supabase/functions/paper-api/github_test.ts

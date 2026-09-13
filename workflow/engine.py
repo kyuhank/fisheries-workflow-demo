@@ -40,6 +40,7 @@ class Workflow:
         self.events = []
         self.run_number = 0
         self.running = False
+        self.execution = {}
         state = self.directory / 'state.json'
         if state.exists():
             previous = read_json(state)
@@ -149,6 +150,8 @@ class Workflow:
                   'inputs': {parent: {'run_id': self.records[parent]['run_id'],
                                       'checksum': self.records[parent]['outputs']['output.json']}
                              for parent in SPEC[key]['parents']}}
+        if self.execution:
+            record['execution'] = dict(self.execution)
         build = ROOT / 'build-info.json'
         if build.exists():
             record['source'] = read_json(build)
@@ -266,6 +269,7 @@ class Workflow:
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as archive:
             files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*')]
             files += list(ROOT.glob('tests/*.py'))
+            files += list(ROOT.glob('cloud/*.py'))
             files += [ROOT / name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json'] if (ROOT / name).exists()]
             files += list(ROOT.glob('vendor/analysis/*'))
             checksums = {}

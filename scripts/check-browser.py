@@ -29,6 +29,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.on('request', lambda request: requests.append(request.url) if request.url.startswith('http') else None)
     page.goto((ROOT/'docs/index.html').as_uri())
+    page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for(timeout=90000)
     page.locator('#run').click()
     page.locator('[data-tab="jobs"]').click()
@@ -94,6 +95,6 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.set_viewport_size({'width':390,'height':844})
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert not errors, errors
-    assert not requests, requests
+    assert not [url for url in requests if '/functions/v1/paper-api/info' not in url], requests
     browser.close()
 print('Passed: offline calculations, output comparison, repeated partial runs, task views, saved example and manual transfers after a revision.')

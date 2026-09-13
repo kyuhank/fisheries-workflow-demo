@@ -109,5 +109,10 @@ def output_page(job, result, record, lineage):
     if lineage:
         preview = [{**row, 'checksum': row['checksum'][:12]} for row in lineage]
         body += table(preview, [('job','Input job'),('run_id','Original run'),('checksum','Checksum prefix')])
+    if record.get('execution'):
+        execution = record['execution']
+        repo = esc(execution['repository'])
+        commit = esc(execution['commit'])
+        body += '<p>Executed on GitHub Actions · <a href="https://github.com/' + repo + '/commit/' + commit + '">' + commit[:8] + '</a></p>'
     body += '<details><summary>Data, code, settings and software</summary><pre>' + esc(json.dumps(record, indent=2)) + '</pre></details>'
     return '<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(job['title']) + '</title><style>' + STYLE + '</style><body><p class="muted">Fisheries workflow · illustrative analysis</p><h1>' + esc(job['title']) + '</h1>' + body + '<footer>Synthetic data and simplified models. The downloadable run bundle preserves the inputs, code, settings and results.</footer></body></html>'

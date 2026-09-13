@@ -94,6 +94,57 @@ class WorkflowTest(unittest.TestCase):
         self.assertNotIn('extract', result['run'])
         self.assertGreater(runner.output('cpue_a')['sets_excluded'], 0)
 
+    def test_partial_revision_matches_clean_full_calculation(self):
+        runner = self.clone()
+        retained = runner.records['cpue_b'].copy()
+        runner.configure({'min_hooks_a': 1200})
+        asyncio.run(runner.run('cpue_a'))
+        with tempfile.TemporaryDirectory() as directory:
+            fresh = Workflow(directory)
+            fresh.configure({'min_hooks_a': 1200})
+            asyncio.run(fresh.run())
+            for key in SPEC:
+                compare(runner.output(key), fresh.output(key))
+        self.assertEqual(runner.records['cpue_b'], retained)
+
+    def test_missing_output_rebuilds_its_dependants(self):
+        runner = self.clone()
+        (runner.directory / 'cpue_a/output.json').unlink()
+        result = asyncio.run(runner.run('assessment_report'))
+        self.assertIn('cpue_a', result['run'])
+        self.assertNotIn('cpue_b', result['run'])
+        self.assertTrue(all(runner.valid(key) for key in SPEC))
+
+    def test_failed_preparation_can_resume_from_saved_state(self):
+        runner = self.clone()
+        previous = runner.records['assessment_a1'].copy()
+        original = runner.calculate
+
+        async def fail_preparation(key, run_id):
+            if key == 'prepare_a':
+                raise ValueError('Injected input preparation failure')
+            return await original(key, run_id)
+
+        runner.calculate = fail_preparation
+        with self.assertRaisesRegex(ValueError, 'Injected'):
+            asyncio.run(runner.run('prepare_a'))
+        self.assertFalse(runner.running)
+        self.assertNotIn('prepare_a', runner.records)
+        self.assertEqual(runner.records['assessment_a1'], previous)
+        resumed = Workflow(runner.directory)
+        self.assertFalse(resumed.valid('prepare_a'))
+        result = asyncio.run(resumed.run('prepare_a'))
+        self.assertEqual(len(result['run']), 5)
+        self.assertTrue(all(resumed.valid(key) for key in SPEC))
+
+    def test_incompatible_year_is_rejected_before_model_fitting(self):
+        runner = self.clone()
+        output = runner.output('extract')
+        output['catch'] = output['catch'][1:]
+        (runner.directory / 'extract/output.json').write_text(json.dumps(output))
+        with self.assertRaisesRegex(ValueError, 'no matching catch'):
+            asyncio.run(runner.calculate('prepare_a', 'Input check'))
+
     def test_tampered_output_is_rebuilt(self):
         runner = self.clone()
         (runner.directory / 'cpue_a/output.json').write_text('{}')
