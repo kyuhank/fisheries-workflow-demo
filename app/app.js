@@ -17,7 +17,7 @@ let selected = "submission",
   ready = false,
   currentOutput = null,
   latestRun = "",
-  selectedTask = "";
+  selectedTask = "data";
 let mode = "cloud";
 const modeStates = {};
 let offlineReady = false, cloudReady = false, offlineInit = null;
@@ -136,6 +136,7 @@ function badge(key) {
 
 function selectJob(key) {
   selected = key;
+  selectedTask = byKey[key].module;
   $("selection-title").textContent = byKey[key].title;
   $("selection-description").textContent = byKey[key].description;
   if (!busy && mode !== "saved") {
@@ -171,10 +172,13 @@ function jobCard(key, layout) {
   const origin = document.createElement("div");
   origin.className = "origin";
   origin.textContent = state === "retained" && records[key]
-    ? records[key].run_id + " · saved"
+    ? records[key].run_id
     : records[key] && ["waiting", "handover", "outdated"].includes(state)
-    ? "Previous: " + records[key].run_id
+    ? records[key].run_id
     : layout?.subtitle || "";
+  origin.title = records[key]
+    ? "Output saved in " + records[key].run_id
+    : origin.textContent;
   const view = document.createElement("button");
   view.className = "view";
   view.textContent = "View ›";
@@ -383,50 +387,143 @@ function renderDiagram() {
   $("workflow-view").replaceChildren(svg);
 }
 
-function render() {
-  renderDiagram();
-  const groups = [
-    ["data", "Data management"],
-    ["cpue", "CPUE analysis"],
-    ["assessment", "Stock assessment"],
-  ];
-  $("job-table-body").replaceChildren();
+const taskGroups = [
+  {
+    key: "data",
+    title: "Data management",
+    description: "Submit, check and extract records.",
+    icon: "database",
+  },
+  {
+    key: "cpue",
+    title: "CPUE analysis",
+    description: "Standardise, compare and report indices.",
+    icon: "chart",
+  },
+  {
+    key: "assessment",
+    title: "Stock assessment",
+    description: "Prepare inputs, fit models and report results.",
+    icon: "layers",
+  },
+];
+
+function uiElement(tag, className, text) {
+  const element = document.createElement(tag);
+  element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
+}
+
+function lineIcon(name) {
+  const icon = svgElement("svg", {
+    viewBox: "0 0 24 24",
+    "aria-hidden": "true",
+    class: "line-icon",
+  });
+  const paths = {
+    database:
+      "M4 6c0-4 16-4 16 0s-16 4-16 0m0 0v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0",
+    chart: "M4 4v16h16M7 15l4-5 4 2 5-7",
+    layers: "M3 7l9-4 9 4-9 4-9-4m0 5 9 4 9-4M3 17l9 4 9-4",
+    file: "M6 3h8l4 4v14H6V3m8 0v5h4M9 12h6m-6 4h6",
+    person: "M8 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M4 21v-2a8 8 0 0 1 16 0v2",
+  };
+  icon.append(svgElement("path", { d: paths[name] }));
+  return icon;
+}
+
+function renderTasks() {
   $("tasks").replaceChildren();
-  for (const [module, title] of groups) {
-    const members = jobs.filter((job) => job.module === module),
-      active = members.filter((job) => stageStatus(job.key) === "running");
+  for (const task of taskGroups) {
+    const members = jobs.filter((job) => job.module === task.key);
+    const active = members.find((job) => stageStatus(job.key) === "running");
     const awaiting = members.find((job) => stageStatus(job.key) === "handover");
-    const button = document.createElement("button");
-    button.className = "task " + module +
-      (active.length ? " running" : awaiting ? " awaiting" : "") +
-      (selectedTask === module ? " active" : "");
-    const name = document.createElement("strong");
-    name.textContent = title;
-    const summary = document.createElement("span");
-    summary.textContent = active.length
-      ? "Running · " + active.map((job) => job.title).join(", ")
+    const failed = members.find((job) => stageStatus(job.key) === "failed");
+    const outdated = members.find((job) => stageStatus(job.key) === "outdated");
+    const available = members.filter((job) => records[job.key]).length;
+    const resolved = members.every((job) =>
+      ["complete", "retained"].includes(stageStatus(job.key))
+    );
+    const state = active
+      ? "running"
+      : failed
+      ? "failed"
       : awaiting
-      ? "Awaiting file · " + awaiting.title
-      : members.filter((job) => records[job.key]).length + " / " +
-        members.length + " outputs available";
-    button.append(name, summary);
+      ? "handover"
+      : outdated
+      ? "outdated"
+      : resolved
+      ? "complete"
+      : "waiting";
+    const button = uiElement(
+      "button",
+      "task " + task.key + " " + state +
+        (selectedTask === task.key ? " active" : ""),
+    );
+    button.setAttribute("aria-pressed", String(selectedTask === task.key));
+    const heading = uiElement("span", "task-card-heading");
+    const icon = uiElement("span", "task-icon");
+    icon.append(lineIcon(task.icon));
+    const name = uiElement("strong", "task-name", task.title);
+    const status = uiElement("span", "task-status " + state);
+    const symbol = uiElement(
+      "span",
+      "symbol" + (active ? " spinner" : ""),
+      active ? "" : symbols[state],
+    );
+    status.append(symbol, document.createTextNode(labels[state]));
+    heading.append(icon, name, status);
+    const description = uiElement("span", "task-description", task.description);
+    const progress = uiElement("span", "task-progress");
+    progress.setAttribute("aria-hidden", "true");
+    for (const job of members) {
+      const segment = uiElement("span", stageStatus(job.key));
+      segment.title = job.title + ": " + labels[stageStatus(job.key)];
+      progress.append(segment);
+    }
+    const footer = uiElement("span", "task-footer");
+    footer.append(
+      uiElement("span", "", `${available}/${members.length} outputs available`),
+      uiElement("span", "task-open", "View jobs ›"),
+    );
+    const activity = uiElement(
+      "span",
+      "task-activity",
+      active?.title || awaiting?.title || failed?.title ||
+        `${members.length} linked jobs`,
+    );
+    button.append(heading, description, progress, activity, footer);
     button.onclick = () => {
-      selectedTask = module;
-      $("task-title").textContent = title;
+      selectedTask = task.key;
       render();
     };
     $("tasks").append(button);
   }
+  $("task-title").textContent =
+    taskGroups.find((task) => task.key === selectedTask)?.title || "All jobs";
+  $("task-subtitle").textContent =
+    "Select a job to rerun it. Open an output to inspect its report, data or log.";
+}
+
+function renderJobTable() {
+  $("job-table-body").replaceChildren();
   for (const job of jobs) {
     if (selectedTask && job.module !== selectedTask) continue;
     const row = document.createElement("tr");
-    row.className = stageStatus(job.key);
+    row.className = stageStatus(job.key) +
+      (selected === job.key ? " selected-job" : "");
     row.dataset.job = job.key;
-    for (const value of [job.title, job.owner]) {
-      const cell = document.createElement("td");
-      cell.textContent = value;
-      row.append(cell);
-    }
+    const name = document.createElement("td");
+    const select = uiElement("button", "job-name", job.title);
+    select.onclick = () => selectJob(job.key);
+    select.setAttribute("aria-label", "Run from " + job.title);
+    name.append(select);
+    const owner = uiElement("td", "job-owner");
+    const ownerLabel = uiElement("span", "owner-label");
+    ownerLabel.append(lineIcon("person"), document.createTextNode(job.owner));
+    owner.append(ownerLabel);
+    row.append(name, owner);
     const inputs = document.createElement("small");
     inputs.className = "job-inputs";
     inputs.textContent = job.parents.length
@@ -437,18 +534,27 @@ function render() {
     state.append(badge(job.key));
     row.append(state);
     const origin = document.createElement("td");
-    origin.textContent = records[job.key]?.run_id || "—";
+    origin.append(
+      uiElement("span", "run-label", records[job.key]?.run_id || "—"),
+    );
     row.append(origin);
     const output = document.createElement("td"),
       button = document.createElement("button");
-    button.className = "quiet";
-    button.textContent = "View output";
+    button.className = "open-output";
+    button.append(lineIcon("file"), document.createTextNode("Open"));
+    button.setAttribute("aria-label", "Open " + job.title + " output");
     button.disabled = !records[job.key];
     button.onclick = () => openOutput(job.key);
     output.append(button);
     row.append(output);
     $("job-table-body").append(row);
   }
+}
+
+function render() {
+  renderDiagram();
+  renderTasks();
+  renderJobTable();
   $("run").disabled = !ready || busy || !plan || mode === "saved";
   $("run").hidden = mode === "saved";
   $("run").textContent = busy

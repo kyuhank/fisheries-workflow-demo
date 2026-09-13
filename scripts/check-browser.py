@@ -34,6 +34,8 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#run').click()
     page.locator('[data-tab="jobs"]').click()
     page.wait_for_function("document.querySelector('.task.running') !== null")
+    assert page.locator('.task.running .task-status').inner_text() == 'Running'
+    assert page.locator('.task.running .spinner').count() == 1
     complete(page)
     with page.expect_download() as download:
         page.locator('#download').click()
@@ -58,7 +60,9 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('[data-tab="jobs"]').click()
     page.locator('#tasks .cpue').click()
     assert page.locator('#job-table-body tr').count() == 4
-    page.locator('#job-table-body tr[data-job="cpue_a"] button').click()
+    page.locator('#job-table-body tr[data-job="cpue_a"] .job-name').click()
+    assert page.locator('#selection-title').inner_text() == 'CPUE analysis A'
+    page.locator('#job-table-body tr[data-job="cpue_a"] .open-output').click()
     assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'CPUE analysis A'
     page.locator('[data-output="log"]').click()
     assert 'Fit a CPUE index' in page.locator('#output-json').text_content()
