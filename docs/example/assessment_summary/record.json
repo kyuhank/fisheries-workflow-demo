@@ -2,7 +2,7 @@
   "job": "assessment_summary",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "1d27e70e77f3748371353acce8a0b3adb7c3702ba19d9e6ab858f9fd12401090",
+  "signature": "6b07991cc6bf538bb7fef22d5075ba01f599693ecf534aca1ddea65713bb189c",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "547b4978a8bf46db092cd96e4bae7c8d1d02250caf80c76907f799d2f8811dbf",
-    "report.html": "be01aacf63d402e072af3da09f9504d9384dc040d45c8a82650d3b505feac3ec"
+    "report.html": "bb0f841aee56aa09f46b5083ee0e07286166b809c4ce659af5126288becde005"
   },
   "log": [
     "Compare the four fitted cases in plots and tables.",
@@ -46,8 +46,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "01aefbdf48f482f9ed29fda9b8d83fae43c64387",
-    "version": "1.5.0"
+    "commit": "36370a15869900dab66c65c110c7c7446d46b3c6",
+    "version": "1.5.1"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
