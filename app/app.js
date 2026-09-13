@@ -598,9 +598,9 @@ function renderTasks() {
           ? "Resubmit corrected data"
           : active[0].title)
         : "") ||
-        awaiting?.title || failed?.title ||
-        `${members.length} linked jobs`,
+        awaiting?.title || failed?.title || "",
     );
+    activity.hidden = !activity.textContent;
     button.append(heading, description, progress, activity, footer);
     button.onclick = () => {
       selectedTask = task.key;
@@ -639,11 +639,11 @@ function renderTasks() {
     ? "Tasks"
     : "Tasks / Jobs";
   $("workspace-title").textContent = workspaceView === "tasks"
-    ? "Track the work together."
+    ? "Tasks and their jobs"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "Tasks group related jobs. Open one to see who runs each job, its progress and the inputs behind its output."
-    : "Each job keeps its owner, inputs and original run. Open its outputs to inspect the result or trace it back.";
+    ? "Open a task to follow its jobs, owners and results."
+    : "Open an output to see the result, its inputs and software versions.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
   $("show-tasks").classList.toggle("active", workspaceView === "tasks");
@@ -730,17 +730,20 @@ function render() {
   $("handover-note").hidden = mode === "saved" ||
     $("handover").value !== "manual";
   $("handover-help").textContent = $("handover").value === "manual"
-    ? "Wait for you to transfer the inputs."
-    : "Pass results to the next job.";
+    ? "Wait for a file transfer."
+    : "Pass inputs automatically.";
   $("revise-cpue").hidden = busy || !records.cpue_a;
   $("handover-panel").hidden = !waitingTransfer;
   for (const id of ["snapshot", "filter", "mortality"]) {
     $(id).disabled = busy || mode === "saved";
   }
+  $("selection-label").textContent = mode === "saved" ? "Selected job" : "Start from";
+  $("hint").textContent = mode === "saved"
+    ? "Use View to inspect a job’s outputs and inputs."
+    : "Select a job to rerun it and the analyses that use its output.";
   if (mode === "saved") {
     $("completion").textContent = "16 saved outputs";
-    $("reuse-message").textContent =
-      "These results are already calculated. Choose Live run or Offline run to change inputs and calculate again.";
+    $("reuse-message").textContent = "";
   } else if (plan) {
     $("completion").textContent = completedSummary ||
       `${plan.run.length} jobs to run · ${plan.retained.length} retained`;
@@ -790,9 +793,9 @@ function explainChanges() {
   )) changes.push("Assessment mortality setting changed");
   if (changes.length) {
     status("settings-changed", "New settings · previous results kept",
-      changes.join(" · ") + ". Run to update the affected jobs; existing outputs still show the earlier inputs.");
+      changes.join(" · ") + ". Run to update the affected jobs.");
   } else if ($("status").classList.contains("settings-changed")) {
-    status("complete", "Previous settings restored", "The saved results match these settings. You can inspect them or run again.");
+    status("complete", "Previous settings restored", "Saved results match these settings.");
   }
 }
 
@@ -964,7 +967,7 @@ $("revise-cpue").onclick = () => {
   status(
     "",
     "CPUE A needs an update",
-    "The effort filter has changed. The existing assessment still contains the earlier result. Run the revision to follow the handover.",
+    "Run the revised analysis, then pass its output to assessment.",
   );
   selectJob("cpue_a");
 };
@@ -1164,13 +1167,10 @@ $("save-output").onclick = () =>
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"
-    ? "Calculate on GitHub, using Docker."
-    : mode === "live" ? "Calculate here, without internet." : "Inspect results without running code.";
-  $("mode-note").textContent = mode === "cloud"
-    ? "Live run calculates new results. If the connection is unavailable, choose Offline run to calculate in this browser."
+    ? "New results on GitHub · Docker."
     : mode === "live"
-    ? "Offline run calculates new results using the code and data in this page. Each run mode keeps its own settings and results."
-    : "View example opens a completed workflow included in this page. It does not run code or apply changes to settings.";
+    ? "New results here, without internet."
+    : "Saved results; does not run code.";
 }
 
 async function activateMode(next) {
@@ -1221,8 +1221,8 @@ async function activateMode(next) {
     payload.saved.events.forEach(log);
     status(
       "",
-      "View an example · no calculation",
-      "Open the saved outputs and their input records. To change settings and calculate new results, choose Live run or Offline run.",
+      "Saved results",
+      "Open a job’s output, or choose a run mode to recalculate.",
     );
   } else {
     status(
@@ -1252,8 +1252,8 @@ async function activateMode(next) {
         "",
         Object.keys(records).length ? "Your results are still here" : "Ready to run",
         mode === "cloud"
-          ? "GitHub runs the analysis in its recorded Docker image. No login is needed."
-          : "The same Python analysis runs in this browser. No internet connection is needed.",
+          ? "No login needed. If the live service is unavailable, choose Offline run."
+          : "The same Python analysis runs in this browser.",
       );
       await refreshPlan();
     } catch (error) {
@@ -1263,7 +1263,7 @@ async function activateMode(next) {
         "failed",
         mode === "cloud" ? "Live connection unavailable" : "Offline run could not start",
         mode === "cloud"
-          ? "Use Offline run to calculate the same analysis in this browser, or View example to inspect saved results."
+          ? "Choose Offline run for new calculations, or View example for saved results."
           : error.message + " You can still choose View example to inspect the saved results.",
       );
       $("offline-fallback").hidden = mode !== "cloud";
@@ -1271,10 +1271,10 @@ async function activateMode(next) {
   }
   $("run-id").textContent = latestRun;
   $("execution-note").textContent = mode === "cloud"
-    ? "Online results expire after 10 minutes. Download a run to keep its code, data and results."
+    ? "Live results expire after 10 minutes. Download this run to keep them."
     : mode === "live"
-    ? "Actual Python calculations in this browser tab. This HTML file also works offline."
-    : "Previously calculated outputs, preserved inside this HTML file.";
+    ? "Results stay in this tab. Download this run to keep them."
+    : "Example outputs are included in this HTML file.";
   $("selection-title").textContent = byKey[selected].title;
   $("selection-description").textContent = byKey[selected].description;
   render();

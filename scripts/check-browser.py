@@ -95,7 +95,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#mode').select_option('saved')
     assert page.locator('#run').is_hidden()
     assert page.locator('#snapshot').input_value() == '2023'
-    assert 'does not run code' in page.locator('#mode-note').inner_text()
+    assert 'does not run code' in page.locator('#mode-help').inner_text()
     page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for()
     assert page.locator('#snapshot').input_value() == '2024'
