@@ -1,67 +1,50 @@
-# Fisheries workflow
+# Fisheries workflow demonstration
 
-[Run the demonstration](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download a version](https://github.com/kyuhank/fisheries-workflow-demo/releases)
+[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download for offline use](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
-An executable example connecting data preparation, CPUE analysis and stock assessment.
-All observations are synthetic; the simple models illustrate the workflow, not an actual stock.
-Operational assessments contain additional inputs, diagnostics and model comparisons.
-The diagram's **Other assessment data** path represents inputs alongside CPUE;
-this example uses catch, while operational workflows may also prepare size, age
-and tagging data.
+Follow a change from fisheries data through analysis to assessment. See which jobs
+need to run again, which results can be kept, and where each output came from.
+The data are synthetic and the models are simplified.
 
-## Three ways to explore
+## Choose a mode
 
-- **Online · GitHub Actions** downloads the recorded Docker image and calculates results on a free standard runner, using synthetic records from PostgreSQL. No reader account or installation is needed.
-- **Offline · browser calculation** runs the included Python code and data in the browser. A downloaded `index.html` works without an internet connection or maintained web service.
-- **Saved example** opens previously calculated reports, data and records without running code. Plain HTML reports are also included in `example/`.
+| Mode | What happens |
+| --- | --- |
+| **Live run** | GitHub downloads the recorded Docker image and calculates new results, using synthetic data from PostgreSQL. No login is needed. |
+| **Offline run** | The same Python analysis runs in your browser, using code and data included in the page. No internet connection is needed. |
+| **View example** | Open completed reports and their input records. No code runs. |
 
-Run the full workflow, then select **Input prep A** and run again. Earlier data and
-CPUE results retain their original records. Selecting **CPUE report** repeats only
-that reporting job. **Orchestration tool** groups jobs into tasks and gives access
-to responsibilities, inputs, progress, logs and outputs.
-Each output's **Inputs & versions** view shows its original code, software and
-input jobs. Follow an input to inspect the version actually used.
-**Reproduce & compare** restores the recorded settings, recalculates the full
-workflow and compares the selected output. Changed code or software is reported
-separately from numerical agreement. **Copy context** and **Download record**
-include the available input chain for review or use with an analytical assistant.
-Hosted jobs within a stage run in parallel and finish before the next stage begins.
-The offline browser follows the same stages using one Python worker.
+If the live service is unavailable, select **Offline run**. Downloaded versions
+include the complete page and saved reports, so they remain usable without the
+hosted service.
 
-Select **Manual handover** to pause where files pass between analyses. **Transfer
-files** continues the calculation. After a full run, **Revise CPUE A** changes the
-effort filter: the earlier assessment stays visible until the new inputs are
-passed on and the dependent work is repeated. The pauses illustrate coordination;
-no message is sent and no staff response time is assumed.
+## Follow the connections
 
-**Download this run** saves its code, data, settings, records and reference results.
-Online sessions are separate. Their latest results expire after 10 minutes;
-previous temporary runs are replaced. GitHub demonstration logs are cleared by a
-scheduled maintenance workflow. Published releases and saved examples are retained.
+Run the workflow, then change the **CPUE A records** selection. Its dependent jobs
+update; other results retain their original files and run records. **Orchestration
+tool** groups jobs into tasks and shows each job's owner, progress, inputs and
+outputs. Open **Inputs & versions** to follow an output back to its sources or
+use **Reproduce & compare** to check it again.
 
-## Python and container
+With **Manual handover**, calculations wait for you to transfer inputs between
+analyses. This illustrates why a revised result does not reach the next analysis
+until the connection is completed. The pauses do not represent measured staff time.
+
+**Download this run** keeps its code, data, settings and results. Live sessions are
+separate; temporary results expire after 10 minutes and are replaced by later runs.
+Scheduled maintenance removes old execution logs. Published versions are retained.
+
+## Run locally
 
 ```bash
 python3 run.py
 python3 run.py --from prepare_a
 make container
-make check
 ```
 
-Open `runs/assessment_report/report.html`. Python 3.12 or later is recommended;
-no third-party Python packages are required. Container execution needs the image
-locally or a network connection to download it. CI checks the calculations in
-Python and the preserved image when source files change.
+Open `runs/assessment_report/report.html`. Use Python 3.12 or later; no additional
+Python packages are needed. Docker needs its image locally or a connection to
+download it. `make check` runs the checks; `make html` rebuilds the page.
 
-`workflow/spec.py` defines dependencies; `workflow/` contains the calculations;
-`app/` contains the interface. See [ADAPT.md](ADAPT.md), [cloud/README.md](cloud/README.md)
-and [THIRD_PARTY.md](THIRD_PARTY.md) for adaptation, hosting and software sources.
-
-Run `make html` to rebuild the self-contained page. Optional browser checks use
-Playwright: `python3 scripts/check-browser.py`. They exercise offline calculations,
-partial reruns, saved outputs and manual transfers. `python3 scripts/check-behaviour.py`
-records the behavioural checks used in the accompanying paper.
-`python3 scripts/check-records.py` checks input tracing and actual reproduction;
-add `--online` to repeat the check on the hosted runner.
-Diagram checks run in Chromium and WebKit with `python3 scripts/check-diagram.py
---engine chromium` or `--engine webkit`.
+See [ADAPT.md](ADAPT.md) to adapt the workflow, [cloud/README.md](cloud/README.md)
+for hosting, and [THIRD_PARTY.md](THIRD_PARTY.md) for software sources and licences.

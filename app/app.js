@@ -76,6 +76,7 @@ function settings() {
 }
 
 function status(kind, title, message) {
+  $("offline-fallback").hidden = true;
   $("status").className = "status " + kind;
   $("status-title").textContent = title;
   $("status-message").textContent = message;
@@ -114,7 +115,7 @@ const labels = {
   returned: "Correction",
   handover: "Awaiting file",
   received: "Received",
-  outdated: "Needs update",
+  outdated: "Inputs changed",
 };
 const symbols = {
   waiting: "clock",
@@ -166,7 +167,7 @@ function selectJob(key) {
 
 function jobNode(node, colour) {
   const key = node.key, job = byKey[key], state = stageStatus(key);
-  const inPath = plan?.run.includes(key), database = key === "database";
+  const inPath = mode === "saved" || plan?.run.includes(key), database = key === "database";
   const card = svgElement("g", {
     class: "job workflow-node " + state +
       (selected === key ? " selected" : "") +
@@ -638,11 +639,11 @@ function renderTasks() {
     ? "Tasks"
     : "Tasks / Jobs";
   $("workspace-title").textContent = workspaceView === "tasks"
-    ? "Follow each analysis."
+    ? "Track the work together."
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "Open a task to inspect its jobs, inputs and outputs."
-    : "Select a job to rerun it. View outputs to inspect its report, data and log.";
+    ? "Tasks group related jobs. Open one to see who runs each job, its progress and the inputs behind its output."
+    : "Each job keeps its owner, inputs and original run. Open its outputs to inspect the result or trace it back.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
   $("show-tasks").classList.toggle("active", workspaceView === "tasks");
@@ -728,6 +729,9 @@ function render() {
   $("handover").disabled = busy || mode === "saved";
   $("handover-note").hidden = mode === "saved" ||
     $("handover").value !== "manual";
+  $("handover-help").textContent = $("handover").value === "manual"
+    ? "Wait for you to transfer the inputs."
+    : "Pass results to the next job.";
   $("revise-cpue").hidden = busy || !records.cpue_a;
   $("handover-panel").hidden = !waitingTransfer;
   for (const id of ["snapshot", "filter", "mortality"]) {
@@ -736,7 +740,7 @@ function render() {
   if (mode === "saved") {
     $("completion").textContent = "16 saved outputs";
     $("reuse-message").textContent =
-      "A preserved execution. Select online or offline calculation to produce new results.";
+      "These results are already calculated. Choose Live run or Offline run to change inputs and calculate again.";
   } else if (plan) {
     $("completion").textContent = completedSummary ||
       `${plan.run.length} jobs to run · ${plan.retained.length} retained`;
@@ -757,16 +761,38 @@ function render() {
 
 async function refreshPlan() {
   if (!ready || busy || mode === "saved") return;
-  const version = ++planVersion;
+  const version = ++planVersion, executionMode = mode;
   $("run").disabled = true;
   try {
     const next = await call("plan", { start: selected, settings: settings() });
-    if (version === planVersion) {
+    if (version === planVersion && executionMode === mode) {
       plan = next;
+      explainChanges();
       render();
     }
   } catch (error) {
-    showError(error);
+    if (version === planVersion && executionMode === mode) showError(error);
+  }
+}
+
+function explainChanges() {
+  const changes = [];
+  const previous = records.submission?.settings.last_year;
+  if (previous && previous !== settings().last_year) {
+    changes.push(`Data snapshot: ${previous} → ${settings().last_year}`);
+  }
+  const filter = records.cpue_a?.settings.min_hooks;
+  if (filter !== undefined && filter !== settings().min_hooks_a) {
+    changes.push("CPUE A record selection changed");
+  }
+  if (["assessment_a2", "assessment_b2"].some((key) =>
+    records[key] && records[key].settings.M !== settings().mortality_2
+  )) changes.push("Assessment mortality setting changed");
+  if (changes.length) {
+    status("settings-changed", "New settings · previous results kept",
+      changes.join(" · ") + ". Run to update the affected jobs; existing outputs still show the earlier inputs.");
+  } else if ($("status").classList.contains("settings-changed")) {
+    status("complete", "Previous settings restored", "The saved results match these settings. You can inspect them or run again.");
   }
 }
 
@@ -774,6 +800,7 @@ function showError(error) {
   busy = false;
   dispatchPending = false;
   status("failed", "The analysis stopped", String(error));
+  $("offline-fallback").hidden = mode !== "cloud";
   render();
 }
 
@@ -1135,8 +1162,20 @@ for (const button of document.querySelectorAll("[data-output]")) {
 $("save-output").onclick = () =>
   download("analysis-output.html", currentOutput.html, "text/html");
 
+function explainMode() {
+  $("mode-help").textContent = mode === "cloud"
+    ? "Calculate on GitHub, using Docker."
+    : mode === "live" ? "Calculate here, without internet." : "Inspect results without running code.";
+  $("mode-note").textContent = mode === "cloud"
+    ? "Live run calculates new results. If the connection is unavailable, choose Offline run to calculate in this browser."
+    : mode === "live"
+    ? "Offline run calculates new results using the code and data in this page. Each run mode keeps its own settings and results."
+    : "View example opens a completed workflow included in this page. It does not run code or apply changes to settings.";
+}
+
 async function activateMode(next) {
   const version = ++modeVersion;
+  ++planVersion;
   modeStates[mode] = {
     records,
     states,
@@ -1145,20 +1184,24 @@ async function activateMode(next) {
     completedSummary,
     messages: [...messages],
     settings: settings(),
+    handover: $("handover").value,
   };
   mode = next;
+  explainMode();
   ready = false;
   plan = null;
   waitingTransfer = null;
   correctionPending = false;
   activities = {};
   dispatchPending = false;
+  $("mode").value = mode;
   $("github-run").hidden = true;
   const saved = modeStates[mode];
   records = saved?.records || {};
   states = saved?.states || {};
   latestRun = saved?.latestRun || "";
   selected = saved?.selected || "submission";
+  $("handover").value = saved?.handover || "connected";
   completedSummary = saved?.completedSummary || null;
   messages.splice(0, messages.length, ...(saved?.messages || []));
   $("execution-log").textContent = messages.join("\n") || "No execution yet.";
@@ -1175,15 +1218,15 @@ async function activateMode(next) {
     payload.saved.events.forEach(log);
     status(
       "",
-      "Explore a saved execution",
-      "Inspect every job, input, log and report. No calculation or internet connection is needed.",
+      "View an example · no calculation",
+      "Open the saved outputs and their input records. To change settings and calculate new results, choose Live run or Offline run.",
     );
   } else {
     status(
       "running",
       mode === "cloud"
-        ? "Connecting to the demonstration"
-        : "Preparing offline calculation",
+        ? "Connecting to the live run"
+        : "Preparing Offline run",
       mode === "cloud"
         ? "No account or installation is required."
         : "Loading the Python code and data included in this HTML file.",
@@ -1202,10 +1245,10 @@ async function activateMode(next) {
       ready = mode === "cloud" ? cloudReady : offlineReady;
       status(
         "",
-        "Ready to run",
+        Object.keys(records).length ? "Your results are still here" : "Ready to run",
         mode === "cloud"
-          ? "A free GitHub runner will download the Docker image and calculate the results."
-          : "The preserved Python code runs here. Internet access is not needed.",
+          ? "GitHub runs the analysis in its recorded Docker image. No login is needed."
+          : "The same Python analysis runs in this browser. No internet connection is needed.",
       );
       await refreshPlan();
     } catch (error) {
@@ -1213,9 +1256,12 @@ async function activateMode(next) {
       ready = false;
       status(
         "failed",
-        "Online connection unavailable",
-        error.message + " You can select Offline calculation or Saved example.",
+        mode === "cloud" ? "Live connection unavailable" : "Offline run could not start",
+        mode === "cloud"
+          ? "Use Offline run to calculate the same analysis in this browser, or View example to inspect saved results."
+          : error.message + " You can still choose View example to inspect the saved results.",
       );
+      $("offline-fallback").hidden = mode !== "cloud";
     }
   }
   $("run-id").textContent = latestRun;
@@ -1229,5 +1275,6 @@ async function activateMode(next) {
   render();
 }
 $("mode").onchange = () => activateMode($("mode").value);
+$("offline-fallback").onclick = () => activateMode("live");
 render();
 activateMode("cloud");

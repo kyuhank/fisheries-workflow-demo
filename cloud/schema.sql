@@ -49,10 +49,101 @@ create or replace function public.paper_cleanup() returns void language sql secu
 $$;
 revoke all on function public.paper_cleanup from public,anon,authenticated;
 grant execute on function public.paper_cleanup to service_role;
+
+-- Atomic runner updates. A repeated operation acknowledges the original write;
+-- it never adds an event or replaces newer state a second time.
+create table if not exists public.paper_runner_receipts (
+ request_id uuid references public.paper_runs on delete cascade,
+ operation_id uuid not null, payload_hash text not null,
+ primary key(request_id,operation_id)
+);
+alter table public.paper_runner_receipts enable row level security;
+revoke all on public.paper_runner_receipts from public,anon,authenticated;
+grant all on public.paper_runner_receipts to service_role;
+create or replace function public.paper_runner_write(
+ p_request uuid,p_operation uuid,p_action text,p_body jsonb
+) returns void language plpgsql security definer set search_path='' as $$
+declare
+ r public.paper_runs%rowtype;
+ fingerprint text := encode(sha256(convert_to(p_action || p_body::text,'UTF8')),'hex');
+ previous text;
+ pending jsonb;
+begin
+ if p_operation is null or p_action is null or p_action not in ('event','finish') or p_body is null then
+  raise exception 'Invalid runner operation';
+ end if;
+ select * into r from public.paper_runs where id=p_request for update;
+ if not found then raise exception 'Run expired'; end if;
+ select payload_hash into previous from public.paper_runner_receipts
+  where request_id=p_request and operation_id=p_operation;
+ if found then
+  if previous<>fingerprint then raise exception 'Operation identifier already used'; end if;
+  return;
+ end if;
+ if r.status not in ('queued','running','handover') then
+  raise exception 'Run is no longer active';
+ end if;
+ if p_action='event' then
+  if jsonb_typeof(p_body->'event') is distinct from 'object' or
+     jsonb_typeof(p_body->'event'->'state') is distinct from 'string' then
+   raise exception 'Invalid job event';
+  end if;
+  -- An optional setup announcement may arrive after its caller timed out.
+  -- Once analysis events exist it is obsolete and must not move the display back.
+  if p_body->'event'->>'state'='phase' and
+     exists(select 1 from public.paper_events where request_id=p_request) then
+   insert into public.paper_runner_receipts(request_id,operation_id,payload_hash)
+    values(p_request,p_operation,fingerprint);
+   return;
+  end if;
+  insert into public.paper_events(request_id,event) values(p_request,p_body->'event');
+  if p_body->'event'->>'state'<>'phase' then
+   update public.paper_runs set status=case when p_body->'event'->>'state'='handover'
+    then 'handover' else 'running' end where id=p_request;
+  end if;
+  if p_body->'output' is not null and p_body->'output'<>'null'::jsonb then
+   insert into public.paper_outputs(session_id,job,output)
+    values(r.session_id,p_body->'event'->>'job',p_body->'output')
+    on conflict(session_id,job) do update set output=excluded.output;
+  end if;
+  if p_body->'state' is not null and p_body->'state'<>'null'::jsonb then
+   update public.paper_sessions set state=p_body->'state',touched_at=now()
+    where id=r.session_id;
+  end if;
+  if p_body->'event'->>'job'='database' and p_body->'event'->>'state'='complete' then
+   update public.paper_sessions set accepted_year=(r.settings->>'last_year')::integer
+    where id=r.session_id;
+  end if;
+ else
+  if jsonb_typeof(p_body->'pending_events') is distinct from 'array' or
+     jsonb_typeof(p_body->'checkpoint') is distinct from 'string' or
+     jsonb_typeof(p_body->'bundle') is distinct from 'string' or
+     jsonb_typeof(p_body->'state') is distinct from 'object' or
+     (coalesce(p_body->>'error','')='' and
+      jsonb_typeof(p_body->'result') is distinct from 'object') then
+   raise exception 'Invalid completed execution';
+  end if;
+  for pending in select value from jsonb_array_elements(p_body->'pending_events') loop
+   perform public.paper_runner_write(p_request,(pending->>'operation_id')::uuid,
+    'event',pending-'operation_id');
+  end loop;
+  update public.paper_sessions set checkpoint=p_body->>'checkpoint',
+   bundle=p_body->>'bundle',state=p_body->'state',touched_at=now() where id=r.session_id;
+  update public.paper_runs set status=case when coalesce(p_body->>'error','')<>''
+   then 'failed' else 'complete' end,error=nullif(p_body->>'error',''),
+   result=p_body->'result' where id=p_request;
+ end if;
+ insert into public.paper_runner_receipts(request_id,operation_id,payload_hash)
+  values(p_request,p_operation,fingerprint);
+end $$;
+revoke all on function public.paper_runner_write from public,anon,authenticated;
+grant execute on function public.paper_runner_write to service_role;
+
 create extension if not exists pg_cron;
 do $$ begin
  if not exists(select 1 from cron.job where jobname='paper-demo-expiry') then
   perform cron.schedule('paper-demo-expiry','* * * * *','select public.paper_cleanup();');
  end if;
 end $$;
+notify pgrst, 'reload schema';
 commit;

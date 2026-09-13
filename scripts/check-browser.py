@@ -29,7 +29,10 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.on('request', lambda request: requests.append(request.url) if request.url.startswith('http') else None)
     page.goto((ROOT/'docs/index.html').as_uri())
-    page.locator('#mode').select_option('live')
+    page.locator('#offline-fallback:visible').wait_for(timeout=40000)
+    page.locator('#offline-fallback').click()
+    assert page.locator('#mode').input_value() == 'live'
+    assert 'without internet' in page.locator('#mode-help').inner_text()
     page.locator('#run:enabled').wait_for(timeout=90000)
     page.evaluate("""() => {
       window.sequence = [];
@@ -78,8 +81,25 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.wait_for_function("document.querySelector('#completion').textContent.includes('2 jobs')")
     page.locator('#run').click(); complete(page)
     assert '2 jobs completed' in page.locator('#status-message').text_content()
+    # A mode switch must not mix settings, plans or records from different runs.
+    page.locator('#snapshot').select_option('2024')
+    page.wait_for_function("document.querySelector('#status-title').textContent === 'New settings · previous results kept'")
+    assert '2023 → 2024' in page.locator('#status-message').inner_text()
     page.locator('#mode').select_option('saved')
     assert page.locator('#run').is_hidden()
+    assert 'does not run code' in page.locator('#mode-note').inner_text()
+    page.locator('#mode').select_option('live')
+    page.locator('#run:enabled').wait_for()
+    assert page.locator('#snapshot').input_value() == '2024'
+    assert 'previous results kept' in page.locator('#status-title').inner_text()
+    page.locator('#snapshot').select_option('2023')
+    page.wait_for_function("document.querySelectorAll('.workflow-node.outdated').length === 0")
+    page.locator('#mode').select_option('saved')
+    page.locator('#mode').select_option('live')
+    page.locator('#run:enabled').wait_for()
+    assert page.locator('.workflow-node.outdated').count() == 0
+    assert '2 jobs' in page.locator('#completion').inner_text()
+    page.locator('#mode').select_option('saved')
     page.locator('[data-tab="jobs"]').click()
     page.locator('#tasks .cpue').click()
     assert page.locator('#job-table-body tr').count() == 4

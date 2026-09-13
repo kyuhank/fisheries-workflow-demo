@@ -118,6 +118,24 @@ h1 {
   font-size: 12px;
   color: var(--muted);
 }
+.controls label small {
+  font-size: 11px;
+  line-height: 1.4;
+  max-width: 25ch;
+  min-height: 2.8em;
+  font-weight: 400;
+}
+.controls label select { align-self: start; }
+.mode-note {
+  margin: -8px 0 18px;
+  padding-left: 12px;
+  border-left: 2px solid #a6c7d8;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+#offline-fallback { white-space: nowrap; }
+.status.settings-changed { background: #fff8e9; border-color: #e7d5af; }
 select {
   background: white;
   border: 1px solid #cddae2;

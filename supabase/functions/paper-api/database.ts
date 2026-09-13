@@ -1,7 +1,15 @@
-/** Retry temporary failures only for reads and repeatable state updates. */
+export class DatabaseError extends Error {
+  constructor(message: string, readonly retryable: boolean) {
+    super(message);
+  }
+}
+
+/** Retry reads, repeatable patches and the transactional runner receipt RPC. */
 export function createDatabase(url: string, key: string, transport = fetch) {
   return async function db(path: string, method = "GET", body?: unknown) {
-    const attempts = ["GET", "PATCH"].includes(method) ? 3 : 1;
+    const repeatable = ["GET", "PATCH"].includes(method) ||
+      (method === "POST" && path === "rpc/paper_runner_write");
+    const attempts = repeatable ? 3 : 1;
     for (let attempt = 0; attempt < attempts; attempt++) {
       let response: Response | undefined;
       try {
@@ -14,25 +22,28 @@ export function createDatabase(url: string, key: string, transport = fetch) {
             Prefer: "return=representation,resolution=merge-duplicates",
           },
           body: body === undefined ? undefined : JSON.stringify(body),
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.timeout(8000),
         });
-      } catch {
-        if (attempt + 1 === attempts) {
-          throw Error("The database connection was interrupted.");
+        if (response.ok) {
+          return response.status === 204 ? null : await response.json();
         }
-      }
-      if (response?.ok) {
-        return response.status === 204 ? null : await response.json();
+      } catch {
+        response = undefined;
+        if (attempt + 1 === attempts) {
+          throw new DatabaseError(
+            "The database connection was interrupted.",
+            true,
+          );
+        }
       }
       if (response) {
         const status = response.status;
         await response.body?.cancel();
-        if (
-          ![429, 500, 502, 503, 504].includes(status) ||
-          attempt + 1 === attempts
-        ) {
-          throw Error(
+        const retryable = [429, 500, 502, 503, 504].includes(status);
+        if (!retryable || attempt + 1 === attempts) {
+          throw new DatabaseError(
             `The database request could not be completed (HTTP ${status}).`,
+            retryable,
           );
         }
       }

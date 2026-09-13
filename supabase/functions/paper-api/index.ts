@@ -1,6 +1,7 @@
 import { createGitHub, REPOSITORY as REPO, WORKFLOW } from "./github.ts";
 import { setup } from "./setup.ts";
-import { createDatabase } from "./database.ts";
+import { createDatabase, DatabaseError } from "./database.ts";
+import { validateRunnerWrite } from "./runner-write.ts";
 const jobs = [
   "submission",
   "qc",
@@ -61,7 +62,7 @@ const bytes = (s: string) =>
     (c) => c.charCodeAt(0),
   );
 let jwks: any;
-async function runner(request: Request, id: string) {
+async function runner(request: Request, id: string, finishing = false) {
   if (!uuid(id)) throw Error("Invalid run.");
   const parts = bearer(request).split(".");
   if (parts.length !== 3) throw Error("Runner identity required.");
@@ -116,7 +117,13 @@ async function runner(request: Request, id: string) {
   if (run.github_run && run.github_run !== claims.run_id) {
     throw Error("Different run identity.");
   }
-  if (!["queued", "running", "handover"].includes(run.status)) {
+  // A lost finish response may be retried by the same verified runner. The RPC
+  // permits only an identical receipt once the run has reached a terminal state.
+  if (
+    !["queued", "running", "handover"].includes(run.status) &&
+    !(finishing && ["complete", "failed"].includes(run.status) &&
+      run.github_run)
+  ) {
     throw Error("Run is no longer active.");
   }
   if (!run.github_run) {
@@ -125,10 +132,12 @@ async function runner(request: Request, id: string) {
       remote.path !== WORKFLOW || remote.head_sha !== run.commit_sha ||
       remote.head_sha !== claims.sha || !remote.display_title.endsWith(id)
     ) throw Error("Run does not match the request.");
-    await db("paper_runs?id=eq." + id, "PATCH", {
-      github_run: claims.run_id,
-      status: "running",
-    });
+    await db(
+      "paper_runs?id=eq." + id +
+        "&github_run=is.null&status=in.(queued,running,handover)",
+      "PATCH",
+      { github_run: claims.run_id, status: "running" },
+    );
   }
   return { ...run, github_run: claims.run_id };
 }
@@ -224,7 +233,7 @@ export async function handle(request: Request) {
     }
     if (path.startsWith("/runner/")) {
       const id = u.searchParams.get("request") || "";
-      const run = await runner(request, id);
+      const run = await runner(request, id, path === "/runner/finish");
       if (path === "/runner/context") {
         const [s] = await db("paper_sessions?id=eq." + run.session_id);
         return reply({ ...run, checkpoint: s.checkpoint });
@@ -242,45 +251,15 @@ export async function handle(request: Request) {
       const text = await request.text();
       if (text.length > 16000000) throw Error("Output too large.");
       const body = JSON.parse(text);
-      if (path === "/runner/event") {
-        if (body.event.job && !jobs.includes(body.event.job)) {
-          throw Error("Unknown job.");
-        }
-        await db("paper_events", "POST", { request_id: id, event: body.event });
-        await db("paper_runs?id=eq." + id, "PATCH", {
-          status: body.event.state === "handover" ? "handover" : "running",
-        });
-        if (body.output && jobs.includes(body.event.job)) {
-          await db("paper_outputs", "POST", {
-            session_id: run.session_id,
-            job: body.event.job,
-            output: body.output,
-          });
-        }
-        if (body.state) {
-          await db("paper_sessions?id=eq." + run.session_id, "PATCH", {
-            state: body.state,
-            touched_at: new Date().toISOString(),
-          });
-        }
-        if (body.event.job === "database" && body.event.state === "complete") {
-          await db("paper_sessions?id=eq." + run.session_id, "PATCH", {
-            accepted_year: run.settings.last_year,
-          });
-        }
-        return reply({ ok: true });
-      }
-      if (path === "/runner/finish") {
-        await db("paper_sessions?id=eq." + run.session_id, "PATCH", {
-          checkpoint: body.checkpoint,
-          bundle: body.bundle,
-          state: body.state,
-          touched_at: new Date().toISOString(),
-        });
-        await db("paper_runs?id=eq." + id, "PATCH", {
-          status: body.error ? "failed" : "complete",
-          error: body.error || null,
-          result: body.result || null,
+      if (path === "/runner/event" || path === "/runner/finish") {
+        const action = path.slice("/runner/".length);
+        validateRunnerWrite(action, body, jobs);
+        const { operation_id, ...payload } = body;
+        await db("rpc/paper_runner_write", "POST", {
+          p_request: id,
+          p_operation: operation_id,
+          p_action: action,
+          p_body: payload,
         });
         return reply({ ok: true });
       }
@@ -373,11 +352,16 @@ export async function handle(request: Request) {
         "paper_runs?session_id=eq." + sid + "&status=eq.handover",
       );
       if (rows.length !== 1) throw Error("No transfer is pending.");
-      await db("paper_runs?id=eq." + rows[0].id, "PATCH", {
-        transfer_count: rows[0].transfer_count + 1,
-        connected: b.connect === true,
-        status: "running",
-      });
+      await db(
+        "paper_runs?id=eq." + rows[0].id +
+          "&status=eq.handover&transfer_count=eq." + rows[0].transfer_count,
+        "PATCH",
+        {
+          transfer_count: rows[0].transfer_count + 1,
+          connected: b.connect === true,
+          status: "running",
+        },
+      );
       return reply({ ok: true });
     }
     if (path === "/reset") {
@@ -400,7 +384,7 @@ export async function handle(request: Request) {
   } catch (e) {
     return reply(
       { error: e instanceof Error ? e.message : "Request failed." },
-      400,
+      e instanceof DatabaseError && e.retryable ? 503 : 400,
     );
   }
 }
