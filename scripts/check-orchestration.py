@@ -39,7 +39,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(path.as_uri())
-    page.locator('#offline-fallback:visible').wait_for()
+    page.wait_for_function("document.querySelector('#mode').value === 'live'")
     page.locator('#mode').select_option('saved')
     page.locator('[data-tab="jobs"]').click()
     assert page.locator('.task-responsibility').count() == 3

@@ -29,8 +29,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.on('request', lambda request: requests.append(request.url) if request.url.startswith('http') else None)
     page.goto((ROOT/'docs/offline.html').as_uri())
-    page.locator('#offline-fallback:visible').wait_for(timeout=40000)
-    page.locator('#offline-fallback').click()
+    page.wait_for_function("document.querySelector('#mode').value === 'live'", timeout=40000)
     assert page.locator('#mode').input_value() == 'live'
     assert 'without internet' in page.locator('#mode-help').inner_text()
     # Runtime loading must not overwrite the example if the reader switches away.

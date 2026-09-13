@@ -22,17 +22,18 @@
       <section class="controls"
         aria-label="Analysis settings">
         <label>Run mode<select id="mode" aria-describedby="mode-help"><option value="cloud" selected>Live run</option><option value="live">Offline run</option><option value="saved">View example</option></select><small id="mode-help">New results on GitHub · Docker.</small></label>
-        <label>Connection<select id="handover" aria-describedby="handover-help"><option value="connected">Connected workflow</option><option value="manual">Manual handover</option></select><small id="handover-help">Pass inputs automatically.</small></label>
+        <label>Connection<select id="handover" aria-describedby="handover-help"><option value="connected">Connected workflow</option><option value="manual">Manual handover</option></select><small id="handover-help">Pass recorded inputs automatically.</small></label>
         <label>Data snapshot<select id="snapshot" aria-describedby="snapshot-help"><option>2021</option><option>2022</option><option selected>2023</option><option>2024</option></select><small id="snapshot-help">Records through this year.</small></label>
         <label>CPUE A records<select id="filter" aria-describedby="filter-help"><option value="0">All valid effort</option><option value="1200">At least 1,200 hooks</option></select><small id="filter-help">Filter the records used by A.</small></label>
         <label>Mortality setting 2<select id="mortality" aria-describedby="mortality-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="mortality-help">Applies to assessments A2 and B2.</small></label>
         <button id="reset" class="quiet" disabled>Start afresh</button></section>
+      <aside id="mode-notice" class="mode-notice" role="status" hidden><div><strong>Switched to Offline run</strong><p id="mode-notice-message"></p></div><button id="dismiss-mode-notice" class="quiet" aria-label="Dismiss mode notice">Dismiss ×</button></aside>
       <section class="status" id="status"
         aria-live="polite"><span class="status-icon spinner" id="status-icon"></span><div><strong id="status-title">Loading the demonstration</strong><p id="status-message">The live connection starts when the page is ready.</p></div><span id="run-id"></span><button id="retry-connection" class="quiet" hidden>Retry connection</button><button id="offline-fallback" class="quiet" hidden>Use Offline run</button><a id="github-run" hidden target="_blank" rel="noopener">Execution ↗</a></section>
       <nav class="tabs"
         aria-label="View"><button class="active" data-tab="workflow" aria-selected="true">Workflow</button><button data-tab="jobs" aria-selected="false">Orchestration tool</button><span id="completion"></span></nav>
       <section id="handover-note" class="handover-note"
-        hidden><div><strong>Separate workspaces · manual file transfer</strong><span>Shared orchestration is not in use. Click Confirm file transfer at each analyst boundary to continue.</span></div><button id="revise-cpue" class="quiet" hidden>Revise CPUE A</button></section>
+        hidden><div><strong>Separate workspaces · manual file transfer</strong><span>Shared orchestration is not in use. Receiving analyses wait until you click Confirm file transfer.</span></div><button id="revise-cpue" class="quiet" hidden>Revise CPUE A</button></section>
       <section id="handover-panel" class="handover-panel" hidden
         aria-live="polite"><div><strong id="handover-title">Waiting for a file transfer</strong><p id="handover-message">Click Confirm file transfer to continue.</p></div><button id="transfer-files">Confirm file transfer →</button><button id="connect-workflow" class="quiet">Connect automatically</button></section>
       <section

@@ -127,6 +127,22 @@ h1 {
 }
 .controls label select { align-self: start; }
 #offline-fallback { white-space: nowrap; }
+.mode-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 18px;
+  margin-bottom: 14px;
+  border: 1px solid #cbdfe8;
+  border-radius: 9px;
+  background: #edf5f8;
+  color: #28546a;
+  font-size: 13px;
+}
+.mode-notice[hidden] { display: none; }
+.mode-notice p { margin: 4px 0 0; line-height: 1.45; }
+.mode-notice .quiet { flex: none; }
 .status.settings-changed { background: #fff8e9; border-color: #e7d5af; }
 select {
   background: white;

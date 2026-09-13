@@ -14,27 +14,29 @@ The data are synthetic and the models are simplified.
 | **Offline run** | The same Python analysis runs in your browser. The website downloads Python when first needed; the offline HTML already includes it. |
 | **View example** | Open completed reports and their input records. No code runs. |
 
-If the live service is unavailable, select **Offline run**. For use without an
-internet connection, select **Download offline demo** on the website, or use
+If the live service cannot connect, the page switches to **Offline run** and
+explains the change. Press **Run** to start; no analysis starts automatically.
+For use without an internet connection, select **Download offline demo** on the website, or use
 `index.html` from a published release. These files include Python, data and saved
 reports; saving the lightweight website page alone does not include Python.
 
 ## Follow the connections
 
-Run the workflow, then change the **CPUE A records** selection. Its dependent jobs
-update; other results retain their original files and run records. **Orchestration
-tool** groups jobs into tasks and shows each job's owner, progress, inputs and
-outputs. Open **Inputs & versions** to follow an output back to its sources or
-use **Reproduce & compare** to check it again.
+Run the workflow, then change the **CPUE A records** selection. Follow the revised
+analysis into the assessments that use it; unaffected results keep their original
+files and run records. **Orchestration tool** shows each job's owner, progress,
+inputs and outputs. Open **Inputs & versions** to trace the data, code and software
+behind a result, or use **Reproduce & compare** to check it again.
 
 Parallel CPUE analyses, input preparations and assessment fits each finish their
 peer group before dependent stages start. Partial reruns retain unaffected peers.
 
 **Manual handover** represents separate analyst workspaces without shared
-orchestration. Both affected branches show **Awaiting file** until you click
-**Confirm file transfer**; one confirmation covers the highlighted boundary.
-CPUE summaries and reports continue while assessment waits for the CPUE files.
-The pauses do not represent measured staff time.
+orchestration. Receiving analyses wait for updated files, while independent work
+can continue: CPUE summaries and reports run while assessment preparation waits
+for the CPUE files. Click **Confirm file transfer** to release the highlighted
+branches. The click represents an analyst's handover; it does not upload files
+or measure staff time.
 
 **Download this run** keeps its code, data, settings and results. Live sessions are
 separate; temporary results expire after 10 minutes and are replaced by later runs.

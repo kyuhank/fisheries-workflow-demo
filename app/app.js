@@ -849,7 +849,7 @@ function render() {
     $("handover").value !== "manual";
   $("handover-help").textContent = $("handover").value === "manual"
     ? "Confirm each file transfer to continue."
-    : "Pass inputs automatically.";
+    : "Pass recorded inputs automatically.";
   $("revise-cpue").hidden = busy || !records.cpue_a;
   $("handover-panel").hidden = !waitingTransfer;
   $("transfer-files").disabled = confirmingTransfer;
@@ -935,7 +935,13 @@ function showError(error) {
   dispatchPending = false;
   waitingTransfer = null;
   confirmingTransfer = false;
-  status("failed", "The analysis stopped", String(error));
+  if (error.executionUnknown && mode === "cloud") ready = false;
+  status("failed", error.executionUnknown ? "Live run status unavailable" : "The analysis stopped",
+    error.executionUnknown
+      ? "The live run may still be active. " +
+        ($("github-run").hidden ? "" : "Open Execution to check it. ") +
+        "Choose Offline run, then press Run to start a separate analysis."
+      : String(error));
   $("offline-fallback").hidden = mode !== "cloud";
   render();
 }
@@ -976,7 +982,7 @@ function handleEvent(event) {
       $("handover-title").textContent = event.boundary === "data"
         ? "Data manager → CPUE analyst"
         : "CPUE analyst → Assessment analyst";
-      $("handover-message").textContent = "Separate workspaces · no shared orchestration. Confirm that the updated files have been transferred.";
+      $("handover-message").textContent = "Separate workspaces · no shared orchestration. The button represents the analyst’s file transfer; no upload is needed.";
     } else if (event.state === "received") {
       waitingTransfer = null;
       confirmingTransfer = false;
@@ -1011,9 +1017,9 @@ function handleEvent(event) {
         ? "Correct the submission"
         : groupTitle || byKey[event.job].title,
       waitingTransfer
-        ? waitingTransfer.group.map((key) => byKey[key].title).join(" and ") +
-          (waitingTransfer.group.length > 1 ? " await" : " awaits") +
-          " updated inputs. Confirm the transfer below to continue."
+        ? waitingTransfer.boundary === "cpue"
+          ? "Assessment preparation waits for revised CPUE files. CPUE summaries and reports can continue; confirm the transfer below."
+          : "CPUE analysis waits for extracted data. Confirm the transfer below to continue."
         : groupTitle
         ? active.map((job) => job.title).join(" · ") +
           ". Dependent stages wait for their input group to finish."
@@ -1100,8 +1106,8 @@ $("handover").onchange = () => {
     "",
     "Connection mode selected",
     $("handover").value === "manual"
-      ? "Separate workspaces; shared orchestration is not in use. Click Confirm file transfer at each analyst boundary."
-      : "Recorded inputs pass directly to the dependent jobs.",
+      ? "Receiving analyses wait for a file transfer; independent work can continue. Click Confirm file transfer at each analyst boundary."
+      : "Recorded inputs pass directly to dependent jobs. Each result keeps its inputs and versions.",
   );
   render();
 };
@@ -1317,9 +1323,13 @@ function explainMode() {
     : "Saved results; does not run code.";
 }
 
-async function activateMode(next) {
+async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
   const version = ++modeVersion;
   ++planVersion;
+  const selection = { settings: settings(), selected, handover: $("handover").value };
+  $("mode-notice").hidden = !fallbackReason;
+  if (fallbackReason) $("mode-notice-message").textContent =
+    fallbackReason + " Preparing Python for analysis in this browser.";
   modeStates[mode] = {
     records,
     states,
@@ -1354,6 +1364,13 @@ async function activateMode(next) {
     $("filter").value = saved.settings.min_hooks_a;
     $("mortality").value = Number(saved.settings.mortality_2).toFixed(2);
   }
+  if (preserveSelection) {
+    selected = selection.selected;
+    $("handover").value = selection.handover;
+    $("snapshot").value = selection.settings.last_year;
+    $("filter").value = selection.settings.min_hooks_a;
+    $("mortality").value = Number(selection.settings.mortality_2).toFixed(2);
+  }
   if (mode === "saved") {
     records = payload.saved.records;
     $("snapshot").value = payload.saved.settings.last_year;
@@ -1375,14 +1392,14 @@ async function activateMode(next) {
         ? "Connecting to the live run"
         : "Preparing Offline run",
       mode === "cloud"
-        ? "Checking the live service. You can also choose Offline run."
+        ? "Checking the live service. If it is unavailable, Offline run opens automatically."
         : "Preparing the supplied Python code and data.",
     );
     $("offline-fallback").hidden = mode !== "cloud";
     const slowConnection = mode === "cloud" ? setTimeout(() => {
       if (version !== modeVersion || ready) return;
       status("running", "Waiting for the live service",
-        "The connection is taking longer than usual. You can choose Offline run instead.");
+        "Checking briefly before switching to Offline run. No analysis has started.");
       $("offline-fallback").hidden = false;
     }, 3000) : null;
     render();
@@ -1400,28 +1417,34 @@ async function activateMode(next) {
       if (version !== modeVersion) return;
       ready = mode === "cloud" ? cloudReady : offlineReady;
       explainMode();
+      if (fallbackReason) $("mode-notice-message").textContent =
+        fallbackReason + " Use Run to calculate in this browser. No analysis has started automatically.";
       status(
         "",
         Object.keys(records).length ? "Your results are still here" : "Ready to run",
         mode === "cloud"
-          ? "No login needed. If the live service is unavailable, choose Offline run."
+          ? "No login needed. Select a job, then run the analyses that use its output."
           : "The same Python analysis runs in this browser.",
       );
       await refreshPlan();
     } catch (error) {
       if (version !== modeVersion) return;
+      if (mode === "cloud") {
+        const reason = /8 seconds/.test(error.message)
+          ? "The live service did not respond."
+          : "The live service is unavailable.";
+        await activateMode("live", { fallbackReason: reason, preserveSelection: true });
+        return;
+      }
       ready = false;
+      if (fallbackReason) $("mode-notice-message").textContent =
+        fallbackReason + " Offline run could not load. Retry below or choose View example.";
       status(
         "failed",
-        mode === "cloud" ? "Live connection unavailable" : "Offline run could not start",
-        mode === "cloud"
-          ? (error.message === "Failed to fetch"
-            ? "The live service could not be reached. Retry or choose Offline run."
-            : error.message)
-          : error.message + " You can still choose View example to inspect the saved results.",
+        "Offline run could not start",
+        error.message + " You can still choose View example to inspect the saved results.",
       );
-      $("offline-fallback").hidden = mode !== "cloud";
-      $("retry-connection").textContent = mode === "cloud" ? "Retry connection" : "Try Offline run again";
+      $("retry-connection").textContent = "Try Offline run again";
       $("retry-connection").hidden = false;
     } finally {
       clearTimeout(slowConnection);
@@ -1438,6 +1461,7 @@ async function activateMode(next) {
   render();
 }
 $("mode").onchange = () => activateMode($("mode").value);
+$("dismiss-mode-notice").onclick = () => { $("mode-notice").hidden = true; };
 $("offline-fallback").onclick = () => activateMode("live");
 $("retry-connection").onclick = () => activateMode(mode);
 if (!payload.runtimeUrl) $("offline-download").hidden = true;

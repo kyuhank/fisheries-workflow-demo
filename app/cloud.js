@@ -41,17 +41,17 @@ class CloudRun {
 
   async connect() {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    const timeout = setTimeout(() => controller.abort(), 8000);
     try {
       const info = await this.request("/info", undefined, true, controller.signal);
       if (!info.configured) {
-        throw Error("The live service is unavailable. Try again or use Offline run.");
+        throw Error("The live service is unavailable.");
       }
       this.session = await this.request("/session", {}, true, controller.signal);
       return { records: {} };
     } catch (error) {
       if (controller.signal.aborted) {
-        throw Error("The live service did not respond within 10 seconds. Retry or use Offline run.");
+        throw Error("The live service did not respond within 8 seconds.");
       }
       throw error;
     } finally {
@@ -89,7 +89,15 @@ class CloudRun {
   }
 
   async execute(input) {
-    const request = await this.request("/run", input);
+    let request;
+    try {
+      request = await this.request("/run", input);
+    } catch (error) {
+      if (["TypeError", "AbortError", "TimeoutError"].includes(error.name)) {
+        error.executionUnknown = true;
+      }
+      throw error;
+    }
     let cursor = 0, failures = 0, holdUntil = 0, shownGroup = "";
     const deadline = Date.now() + 10 * 60 * 1000;
     while (Date.now() < deadline) {
@@ -99,9 +107,8 @@ class CloudRun {
         failures = 0;
       } catch (error) {
         if (++failures >= 4) {
-          throw Error(
-            "The connection was interrupted. The GitHub run may still be active; try checking it again shortly.",
-          );
+          throw Object.assign(Error("The connection to the live run was interrupted."),
+            { executionUnknown: true });
         }
         this.onPhase(
           "Reconnecting",
@@ -162,9 +169,8 @@ class CloudRun {
       }
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    throw Error(
-      "The online execution timed out. Start a new session or use Offline calculation.",
-    );
+    throw Object.assign(Error("The live run has not reported completion."),
+      { executionUnknown: true });
   }
 
   async call(type, data = {}) {
