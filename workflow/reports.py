@@ -51,6 +51,65 @@ def plot(series, value, label, points=()):
     return ''.join(out)
 
 
+def cpue_report(result):
+    """Write an account of the supplied indices without refitting the analyses."""
+    series = result['series']
+    findings = ' '.join(
+        f'{esc(name)} was <strong>{rows[-1]["index"]:.3f}</strong> in '
+        f'{esc(rows[-1]["year"])}, relative to 1 in {esc(rows[0]["year"])}.'
+        for name, rows in series.items())
+    return (
+        '<p>This report brings together the CPUE indices prepared for the assessment.</p>'
+        '<h2>Methods</h2><p>Analysis A includes year and vessel effects; analysis B '
+        'includes year effects only. Both account for fishing effort. Each index is '
+        'scaled to one in its first year.</p>'
+        '<h2>Results</h2><p class="note">' + findings + '</p>'
+        + plot(series, 'index', 'CPUE relative to the first year')
+        + '<h2>Interpretation</h2><p>Differences between the indices can reflect vessel '
+        'adjustment and record selection. Their input records identify the analyses '
+        'used in this comparison. These synthetic indices illustrate the workflow '
+        'and do not describe a real fishery.</p>')
+
+
+def assessment_report(result):
+    """Describe the supplied assessment cases and their recorded checks."""
+    series = result['series']
+    diagnostics = result['diagnostics']
+    mortalities = ' and '.join(f'{value:.2f}' for value in
+                             sorted({row['M'] for row in diagnostics}))
+    final = [(name, rows[-1]) for name, rows in series.items()]
+    years = {row['year'] for _, row in final}
+    if len(years) == 1:
+        values = [row['SB_over_SB0'] for _, row in final]
+        findings = (f'In <strong>{esc(next(iter(years)))}</strong>, spawning biomass '
+                    f'ranged from <strong>{min(values):.3f} to {max(values):.3f}</strong> '
+                    'of each case’s unfished level.')
+    else:
+        findings = ' '.join(
+            f'{esc(name)} ended at <strong>{row["SB_over_SB0"]:.3f}</strong> of its '
+            f'unfished level in {esc(row["year"])}.' for name, row in final)
+    boundary = [row['case'] for row in diagnostics if row['boundary_fit']]
+    catch_failures = [row['case'] for row in diagnostics if row['catch_check'] != 'Pass']
+    checks = ('Annual catches were reproduced within the numerical tolerance.'
+              if not catch_failures else
+              'Catch matching needs review for ' + ', '.join(map(esc, catch_failures)) + '.')
+    checks += (' The biomass search boundary was reached for ' + ', '.join(map(esc, boundary))
+               + '; these fits need review.' if boundary else
+               ' The fits stayed within the biomass search bounds.')
+    return (
+        '<p>This report compares the assessment cases using CPUE indices A and B.</p>'
+        '<h2>Methods</h2><p>The simple age-structured model uses annual catch and a CPUE '
+        'index, with fixed biology and constant recruitment. The cases use natural '
+        'mortality of ' + mortalities + ' per year.</p>'
+        '<h2>Results</h2><p class="note">' + findings + '</p>'
+        + plot(series, 'SB_over_SB0', 'Spawning biomass / unfished level')
+        + '<p>' + checks + '</p>'
+        '<h2>Interpretation</h2><p>The cases show how CPUE inputs and mortality '
+        'assumptions carry through to assessment results. Differences between cases '
+        'are not an uncertainty interval. These synthetic examples provide no '
+        'stock-management advice.</p>')
+
+
 def output_page(job, result, record, lineage):
     key = job['key']; body = '<p>' + esc(job['description']) + '</p>'
     if key == 'submission':
@@ -71,8 +130,18 @@ def output_page(job, result, record, lineage):
         body += '<h2>Annual data</h2>' + table(result['annual'], [('year','Year'),('observations','Observations'),('hooks','Hooks'),('catch_t','Total catch (t)'),('zero_catch_percent','Zero catch (%)')]) + '</details>'
         body += '<details><summary>Database fields</summary>' + table(result['fields'], [('name','Field'),('meaning','Meaning'),('type','Type')]) + '</details>'
     elif key == 'extract':
-        body += '<h2>Selected observations</h2>' + table(result['sets'], [('set_id','Record'),('year','Year'),('vessel','Vessel'),('hooks','Hooks'),('catch_n','Catch')], 10)
-        body += '<p class="muted">First ten rows; the Data tab contains all selected records.</p><details><summary>Extraction SQL</summary><pre>' + esc(result['sql']) + '</pre></details>'
+        years = [row['year'] for row in result['sets']]
+        coverage = f'{min(years)}–{max(years)}' if years else 'No observation years'
+        body += (f'<p class="note"><strong>{len(result["sets"]):,}</strong> observations · '
+                 f'<strong>{esc(coverage)}</strong> · <strong>{len(result["catch"])}</strong> '
+                 'annual catch records</p>')
+        body += ('<p>The saved query selects shared fields from observations with positive effort '
+                 'and non-negative catch; any effort filter for analysis A is applied later.</p>')
+        body += '<h2>Observations → CPUE</h2>' + table(result['sets'], [('set_id','Record'),('year','Year'),('vessel','Vessel'),('hooks','Hooks'),('catch_n','Catch')], 10)
+        body += '<p class="muted">Preview of up to ten observations; the Data tab contains all selected records.</p>'
+        body += ('<h2>Annual catch → assessment inputs</h2><p>Annual total catches in tonnes '
+                 'are joined to each CPUE index during input preparation.</p>')
+        body += '<details><summary>Extraction SQL</summary><pre>' + esc(result['sql']) + '</pre></details>'
     elif key.startswith('prepare_'):
         body += '<p>One annual CPUE index is joined to annual catch by year. No years or values are missing.</p>' + table(result['rows'], [('year','Year'),('index','Relative CPUE'),('catch_t','Catch (t)')], 6)
         body += '<p class="muted">First six years shown; the Data tab contains every model input.</p>'
@@ -94,6 +163,10 @@ def output_page(job, result, record, lineage):
         body += '<p>Annual catches were reproduced within the numerical tolerance. The fit ' + ('reached' if result['boundary_fit'] else 'stayed within') + ' the biomass search bounds. These checks do not establish model adequacy.</p>'
         body += '</details><details><summary>All annual estimates</summary>'
         body += table(result['series'], [('year','Year'),('SB_over_SB0','SB / SB₀'),('F','Fishing mortality')]) + '</details>'
+    elif key == 'cpue_report':
+        body = '<article class="narrative-report" data-report="cpue_report">' + cpue_report(result) + '</article>'
+    elif key == 'assessment_report':
+        body = '<article class="narrative-report" data-report="assessment_report">' + assessment_report(result) + '</article>'
     else:
         cpue = key.startswith('cpue_'); value = 'index' if cpue else 'SB_over_SB0'
         label = 'CPUE relative to the first year' if cpue else 'Spawning biomass / unfished level'

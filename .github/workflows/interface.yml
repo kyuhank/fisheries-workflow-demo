@@ -26,3 +26,4 @@ jobs:
           .browser-check/bin/python scripts/check-connection.py
           .browser-check/bin/python scripts/check-browser.py
           .browser-check/bin/python scripts/check-settings.py
+          .browser-check/bin/python scripts/check-reports.py
