@@ -2,13 +2,13 @@
   "job": "assessment_summary",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "d2f6a4513b6366da0a17e154eb9a4a38cf0a3cf4013b219cc2d3aa821db2e90c",
+  "signature": "111147c942a5573103e1f152f95823a5d5cde842e56d1bb3bf4eb8f09923da3b",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "workflow/engine.py": "b65abfea20ef51e36a0d92fc51c022e098eec3acf695f11c1c029d11ded00254",
     "workflow/spec.py": "cd0417a1d89626a1e1e781d26c10a43d3e138229628fea3dde2ac3aef4b30a9b",
-    "workflow/reports.py": "bc9a304a0b733a43cb37bb59253da4d09744072706cdbba7c66083d37c30b6c5",
+    "workflow/reports.py": "66a50221c5bbef1dd188de836cb8cd41c89d5445a0826c1c0db0e34076c841d1",
     "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "547b4978a8bf46db092cd96e4bae7c8d1d02250caf80c76907f799d2f8811dbf",
-    "report.html": "88861ff0e63171a426dcb52032afe7456d90c12668a642896eba5be572e14a7d"
+    "report.html": "b536785809bc9b615d97188fba98f3ba50ea1351c8f90226ef7c6f21ac9ab88d"
   },
   "log": [
     "Compare the four fitted cases in plots and tables.",
@@ -46,7 +46,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "c76dc3e2e8123a5a00b0d6bfd28c0726a7b4985b",
+    "commit": "34ee8bceeb69b4b07f9f79c15e1e12dffb633b61",
     "version": "1.6.6"
   },
   "data_files": {
