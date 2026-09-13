@@ -14,7 +14,7 @@ Run `make html` to build a self-contained browser file. The calculation must wor
 with the packages available in the preserved browser runtime. Other software can
 be run through the Python/container interface instead.
 
-The example runs jobs sequentially in one browser worker. An operational
+The example runs jobs sequentially inside a browser worker or a hosted container. An operational
 orchestration service could submit the same dependency graph to approved HPC and
 provide shared access to authorised colleagues. Access controls, resource requests,
 storage and recovery must be implemented for that setting. Confidential data

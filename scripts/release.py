@@ -9,7 +9,7 @@ version = json.loads((ROOT/'build-info.json').read_text())['version']
 destination = ROOT/'dist'
 destination.mkdir(exist_ok=True)
 files = {}
-for folder in ['workflow','data','app','scripts','tests','vendor']:
+for folder in ['workflow','data','app','scripts','tests','vendor','cloud','supabase/functions','.github/workflows']:
     for path in (ROOT/folder).rglob('*'):
         if path.is_file() and '__pycache__' not in path.parts:
             files[str(path.relative_to(ROOT))] = path.read_bytes()

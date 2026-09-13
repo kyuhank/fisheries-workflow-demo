@@ -172,6 +172,8 @@ function jobCard(key, layout) {
   origin.className = "origin";
   origin.textContent = state === "retained" && records[key]
     ? records[key].run_id + " · saved"
+    : records[key] && ["waiting", "handover", "outdated"].includes(state)
+    ? "Previous: " + records[key].run_id
     : layout?.subtitle || "";
   const view = document.createElement("button");
   view.className = "view";
@@ -607,7 +609,9 @@ $("run").onclick = async () => {
     status(
       "complete",
       "Results are ready",
-      `${result.run.length} jobs completed · ${result.retained.length} retained unchanged. Open a job to inspect its output.`,
+      `${result.run.length} ${
+        result.run.length === 1 ? "job" : "jobs"
+      } completed · ${result.retained.length} retained unchanged. Open a job to inspect its output.`,
     );
     completedSummary =
       `${result.run.length} completed · ${result.retained.length} retained`;
@@ -651,7 +655,11 @@ async function transferFiles(connect = false) {
     waitingTransfer = null;
     render();
   } catch (error) {
-    showError(error);
+    status(
+      "failed",
+      "Transfer not confirmed",
+      error.message + " Try the transfer again.",
+    );
   } finally {
     $("transfer-files").disabled = false;
     $("connect-workflow").disabled = false;
@@ -660,24 +668,28 @@ async function transferFiles(connect = false) {
 $("transfer-files").onclick = () => transferFiles();
 $("connect-workflow").onclick = () => transferFiles(true);
 $("reset").onclick = async () => {
-  const result = await call("reset");
-  completedSummary = null;
-  records = result.records;
-  states = {};
-  latestRun = "";
-  selected = "submission";
-  $("snapshot").value = "2023";
-  $("filter").value = "0";
-  $("mortality").value = "0.30";
-  $("run-id").textContent = "";
-  messages.length = 0;
-  $("execution-log").textContent = "No execution yet.";
-  status(
-    "",
-    "Ready to run",
-    "Begin with data submission, or select an analysis job.",
-  );
-  selectJob("submission");
+  try {
+    const result = await call("reset");
+    completedSummary = null;
+    records = result.records;
+    states = {};
+    latestRun = "";
+    selected = "submission";
+    $("snapshot").value = "2023";
+    $("filter").value = "0";
+    $("mortality").value = "0.30";
+    $("run-id").textContent = "";
+    messages.length = 0;
+    $("execution-log").textContent = "No execution yet.";
+    status(
+      "",
+      "Ready to run",
+      "Begin with data submission, or select an analysis job.",
+    );
+    selectJob("submission");
+  } catch (error) {
+    status("failed", "Reset unavailable", error.message);
+  }
 };
 for (const button of document.querySelectorAll("[data-tab]")) {
   button.onclick = () => {
@@ -712,11 +724,15 @@ function download(name, bytes, type) {
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 $("download").onclick = async () => {
-  const bytes = Uint8Array.from(
-    atob(mode === "saved" ? payload.saved.bundle : await call("download")),
-    (char) => char.charCodeAt(0),
-  );
-  download("fisheries-workflow-run.zip", bytes, "application/zip");
+  try {
+    const bytes = Uint8Array.from(
+      atob(mode === "saved" ? payload.saved.bundle : await call("download")),
+      (char) => char.charCodeAt(0),
+    );
+    download("fisheries-workflow-run.zip", bytes, "application/zip");
+  } catch (error) {
+    status("failed", "Download unavailable", error.message);
+  }
 };
 function displayOutput(title, output, kind = "Job output") {
   currentOutput = output;

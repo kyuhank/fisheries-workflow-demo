@@ -13,7 +13,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from workflow.engine import Workflow, digest
+from workflow.engine import Workflow, digest, encoded
 from workflow.spec import SPEC
 
 API = 'https://gvunwnpsfmylmqfqowzp.supabase.co/functions/v1/paper-api'
@@ -67,12 +67,19 @@ class HostedWorkflow(Workflow):
         self.execution = {'provider': 'GitHub Actions', 'repository': 'kyuhank/fisheries-workflow-demo',
                           'commit': context['commit_sha'], 'github_run': context['github_run'],
                           'container': 'ghcr.io/pacificcommunity/cpue-workshop@sha256:17b03d6e06da229b17524997d8a3fc8eb5f8f25233894b5ab99f89109b3890c5',
-                          'data_source': 'Supabase PostgreSQL: fixed synthetic records'}
+                          'data_source': 'Supabase PostgreSQL: fixed synthetic records',
+                          'data_checksum': digest(encoded(self.hosted_data))}
         self.configure(context['settings'])
         self.active = self.plan(context['start_job'])['run']
 
     def code_record(self, key):
         return {**super().code_record(key), 'cloud/run.py': digest(Path(__file__).read_bytes())}
+
+    def signature(self, key):
+        value = super().signature(key)
+        if key == 'submission':
+            return digest(encoded({'calculation': value, 'hosted_data': digest(encoded(self.hosted_data))}))
+        return value
 
     def source_rows(self):
         # Copy the PostgreSQL response: the first QC example modifies one field.

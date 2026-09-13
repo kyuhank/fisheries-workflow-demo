@@ -58,7 +58,9 @@ async function session(request: Request, id: string) {
     "paper_sessions?id=eq." + id + "&select=id,token_hash,state",
   );
   if (rows.length !== 1 || await hash(bearer(request)) !== rows[0].token_hash) {
-    throw Error("This demonstration session is unavailable.");
+    throw Error(
+      "This demonstration session is unavailable. Select Start afresh.",
+    );
   }
   return rows[0];
 }
