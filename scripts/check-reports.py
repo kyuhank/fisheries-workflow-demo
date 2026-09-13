@@ -57,7 +57,7 @@ def inspect(page, key, report=False):
     if report:
         page.locator('[data-output="record"]').click()
         assert page.locator('.record-input').count() == 1
-        if args.online:
+        if page.locator('#mode').input_value() == 'cloud':
             assert 'Docker image' in page.locator('.record-cards').inner_text()
             assert '@sha256:' in output['record']['execution']['container']
     page.locator('#output-close').click()
