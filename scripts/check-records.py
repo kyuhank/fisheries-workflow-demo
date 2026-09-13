@@ -53,7 +53,7 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     page.locator('tr[data-job="cpue_a"] .open-output').click()
     page.locator('[data-output="record"]').click()
     page.locator('#reproduce-job').click()
-    page.wait_for_function("document.querySelector('.record-comparison') || document.querySelector('#status').classList.contains('failed')", timeout=600000)
+    page.wait_for_function("document.querySelector('.record-comparison') || (!busy && document.querySelector('#status').classList.contains('failed'))", timeout=600000)
     assert page.locator('.record-comparison').count(), page.locator('#status-message').inner_text()
     assert page.locator('.record-comparison strong').inner_text() == 'Reproduced · output agrees'
     assert page.locator('#filter').input_value() == '0'

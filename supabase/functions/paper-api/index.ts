@@ -1,5 +1,6 @@
 import { createGitHub, REPOSITORY as REPO, WORKFLOW } from "./github.ts";
 import { setup } from "./setup.ts";
+import { createDatabase } from "./database.ts";
 const jobs = [
   "submission",
   "qc",
@@ -34,20 +35,10 @@ const hash = async (s: string) =>
   ).map((x) => x.toString(16).padStart(2, "0")).join("");
 const uuid = (s: string) =>
   /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(s);
-async function db(path: string, method = "GET", body?: unknown) {
-  const r = await fetch(Deno.env.get("SUPABASE_URL") + "/rest/v1/" + path, {
-    method,
-    headers: {
-      apikey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      Authorization: "Bearer " + Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
-      "Content-Type": "application/json",
-      Prefer: "return=representation,resolution=merge-duplicates",
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  if (!r.ok) throw Error("The database request could not be completed.");
-  return r.status === 204 ? null : await r.json();
-}
+const db = createDatabase(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+);
 const connection = createGitHub(db);
 const github = connection.request;
 const bearer = (r: Request) =>

@@ -27,7 +27,7 @@ jobs:
       - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
         with:
           deno-version: v2.9.6
-      - name: Check server identity and repository restrictions
+      - name: Check server access and transient-error recovery
         run: |
           deno check supabase/functions/paper-api/index.ts
-          deno test supabase/functions/paper-api/github_test.ts
+          deno test supabase/functions/paper-api/*_test.ts
