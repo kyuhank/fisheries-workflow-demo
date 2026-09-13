@@ -156,21 +156,21 @@ function selectJob(key) {
   } else render();
 }
 
-function jobCard(key, layout) {
-  const job = byKey[key],
-    card = document.createElement("div"),
-    state = stageStatus(key);
-  card.className = "job " + state + (selected === key ? " selected" : "") +
-    (plan?.run.includes(key) ? " in-path" : " outside-path") +
-    (layout ? " diagram-job" : "") +
-    (key === "database" ? " database-job" : "");
-  card.dataset.job = key;
-  card.tabIndex = 0;
-  card.setAttribute("role", "button");
-  card.setAttribute(
-    "aria-label",
-    job.title + ": " + (labels[state] || state) + ". Select starting job.",
-  );
+function jobNode(node, colour) {
+  const key = node.key, job = byKey[key], state = stageStatus(key);
+  const inPath = plan?.run.includes(key), database = key === "database";
+  const card = svgElement("g", {
+    class: "job workflow-node " + state +
+      (selected === key ? " selected" : "") +
+      (inPath ? " in-path" : " outside-path"),
+    transform: `translate(${node.x} ${node.y})`,
+    "data-job": key,
+    role: "button",
+    tabindex: 0,
+    "aria-label": job.title + ": " + (labels[state] || state) +
+      ". Select starting job.",
+  });
+  card.style.setProperty("--accent", colour);
   card.onclick = () => selectJob(key);
   card.onkeydown = (event) => {
     if (event.key === "Enter" || event.key === " ") {
@@ -178,29 +178,123 @@ function jobCard(key, layout) {
       selectJob(key);
     }
   };
-  const title = document.createElement("h3");
-  title.textContent = layout?.title || job.title;
-  const origin = document.createElement("div");
-  origin.className = "origin";
-  origin.textContent = state === "retained" && records[key]
-    ? records[key].run_id
-    : records[key] && ["waiting", "handover", "outdated"].includes(state)
-    ? records[key].run_id
-    : layout?.subtitle || "";
-  origin.title = records[key]
-    ? "Output saved in " + records[key].run_id
-    : origin.textContent;
-  const view = document.createElement("button");
-  view.className = "view";
-  view.textContent = "View ›";
-  view.disabled = !records[key];
-  view.setAttribute("aria-label", "View " + job.title + " output");
-  view.onclick = (event) => {
-    event.stopPropagation();
-    openOutput(key);
+  const w = node.width, h = node.height;
+  const shape = database
+    ? svgElement("path", {
+      d: `M 0 13 A ${w / 2} 13 0 0 1 ${w} 13 V ${h - 13} A ${
+        w / 2
+      } 13 0 0 1 0 ${h - 13} Z`,
+    })
+    : svgElement("rect", { width: w, height: h, rx: 11 });
+  const outline = shape.cloneNode();
+  outline.setAttribute("class", "node-outline");
+  shape.setAttribute("class", "node-shape");
+  card.append(outline, shape);
+  if (database) {
+    card.append(
+      svgElement("ellipse", {
+        cx: w / 2,
+        cy: 13,
+        rx: w / 2,
+        ry: 13,
+        class: "node-cap",
+      }),
+    );
+  }
+
+  const titles = {
+    submission: ["Data", "submission"],
+    cpue_a: ["CPUE analysis", "A"],
+    cpue_b: ["CPUE analysis", "B"],
+    assessment_summary: ["Results", "summary"],
+    assessment_report: ["Assessment", "report"],
   };
-  view.onkeydown = (event) => event.stopPropagation();
-  card.append(title, badge(key), origin, view);
+  const lines = titles[key] || [node.title];
+  const titleY = database ? 44 : 26;
+  const title = svgElement("text", { x: 14, y: titleY, class: "node-title" });
+  for (const [index, line] of lines.entries()) {
+    const part = svgElement("tspan", { x: 14, y: titleY + index * 20 });
+    part.textContent = line;
+    title.append(part);
+  }
+  card.append(title);
+  const statusY = titleY + (lines.length - 1) * 20 + 24;
+  const status = svgElement("g", {
+    class: "node-status",
+    transform: `translate(14 ${statusY - 12})`,
+  });
+  if (state === "running") {
+    const spinner = svgElement("circle", {
+      cx: 7,
+      cy: 7,
+      r: 5.5,
+      class: "node-spinner",
+    });
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      spinner.append(
+        svgElement("animateTransform", {
+          attributeName: "transform",
+          type: "rotate",
+          from: "0 7 7",
+          to: "360 7 7",
+          dur: "1s",
+          repeatCount: "indefinite",
+        }),
+      );
+    }
+    status.append(spinner);
+  } else {
+    const icon = lineIcon(symbols[state] || "clock");
+    icon.setAttribute("class", "node-status-icon");
+    icon.setAttribute("width", "14");
+    icon.setAttribute("height", "14");
+    status.append(icon);
+  }
+  const statusText = svgElement("text", { x: 22, y: 12 });
+  statusText.textContent = labels[state] || state;
+  status.append(statusText);
+  card.append(status);
+
+  const prior = records[key] &&
+    ["retained", "waiting", "handover", "outdated"].includes(state);
+  const origin = svgElement("text", {
+    x: database ? w / 2 : 14,
+    y: database ? 17 : h - 11,
+    "text-anchor": database ? "middle" : "start",
+    class: "node-origin",
+  });
+  origin.textContent = prior ? records[key].run_id : node.subtitle || "";
+  card.append(origin);
+
+  const view = svgElement("g", {
+    class: "view node-view",
+    transform: `translate(${w - 51} ${h - 26})`,
+    role: "button",
+    tabindex: records[key] ? 0 : -1,
+    "aria-disabled": String(!records[key]),
+    "aria-label": "View " + job.title + " output",
+  });
+  view.append(svgElement("rect", { width: 44, height: 22, rx: 4 }));
+  const viewText = svgElement("text", {
+    x: 22,
+    y: 15,
+    "text-anchor": "middle",
+  });
+  viewText.textContent = "View ›";
+  view.append(viewText);
+  const open = (event) => {
+    event.stopPropagation();
+    if (records[key]) openOutput(key);
+  };
+  view.onclick = open;
+  view.onkeydown = (event) => {
+    event.stopPropagation();
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      open(event);
+    }
+  };
+  card.append(view);
   return card;
 }
 
@@ -341,38 +435,7 @@ function renderDiagram() {
     const group = layout.groups.find((group) =>
       group.key === byKey[node.key].module
     );
-    const foreign = svgElement("foreignObject", {
-      x: node.x,
-      y: node.y,
-      width: node.width,
-      height: node.height,
-      overflow: "visible",
-    });
-    const card = jobCard(node.key, node);
-    card.style.setProperty("--accent", group.colour);
-    if (node.key === "database") {
-      const state = stageStatus(node.key),
-        inPath = plan?.run.includes(node.key);
-      const cylinder = svgElement("g", {
-        class: "database-shape " + state +
-          (inPath ? " in-path" : " outside-path") +
-          (selected === node.key ? " selected" : ""),
-      });
-      const { x, y, width: w, height: h } = node;
-      cylinder.append(
-        svgElement("path", {
-          d: `M ${x} ${y + 13} A ${w / 2} 13 0 0 1 ${x + w} ${y + 13} V ${
-            y + h - 13
-          } A ${w / 2} 13 0 0 1 ${x} ${y + h - 13} Z`,
-        }),
-      );
-      cylinder.append(
-        svgElement("ellipse", { cx: x + w / 2, cy: y + 13, rx: w / 2, ry: 13 }),
-      );
-      svg.append(cylinder);
-    }
-    foreign.append(card);
-    svg.append(foreign);
+    svg.append(jobNode(node, group.colour));
   }
   if ($("handover").value === "manual" && mode !== "saved") {
     for (const [boundary, x] of [["data", 383], ["cpue", 846]]) {

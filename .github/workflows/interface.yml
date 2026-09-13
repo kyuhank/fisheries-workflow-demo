@@ -1,0 +1,24 @@
+name: Check diagram
+on:
+  push:
+    paths: ['app/**', 'docs/index.html', 'scripts/check-diagram.py', '.github/workflows/interface.yml']
+  pull_request:
+    paths: ['app/**', 'docs/index.html', 'scripts/check-diagram.py', '.github/workflows/interface.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagram:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Install browser checks
+        run: |
+          python3 -m venv .browser-check
+          .browser-check/bin/pip install playwright==1.60.0
+          .browser-check/bin/python -m playwright install --with-deps chromium webkit
+      - name: Check layout and controls
+        run: |
+          .browser-check/bin/python scripts/check-diagram.py --engine chromium
+          .browser-check/bin/python scripts/check-diagram.py --engine webkit

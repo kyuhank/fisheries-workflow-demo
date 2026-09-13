@@ -275,132 +275,10 @@ dialog nav .active {
   font-size: 15px;
   fill: #77909d;
 }
-.database-shape path,
-.database-shape ellipse {
-  fill: #f8fcf9;
-  stroke: #88b59a;
-  stroke-width: 1.5;
-}
-.database-shape ellipse {
-  fill: #e2efe5;
-}
-.database-shape.in-path path,
-.database-shape.selected path {
-  stroke: #287450;
-  stroke-width: 2;
-}
-.database-shape.outside-path {
-  opacity: .45;
-}
-.database-shape.running path,
-.database-shape.running ellipse {
-  fill: #fff6e4;
-  stroke: #bb821f;
-  stroke-width: 3;
-}
 @keyframes flow {
   to {
     stroke-dashoffset: -14;
   }
-}
-.job {
-  position: relative;
-  border: 1px solid #e2e9ee;
-  border-left: 3px solid color-mix(in srgb,var(--accent) 35%,white);
-  border-radius: 7px;
-  background: #fcfdfe;
-  margin-bottom: 10px;
-  padding: 12px 12px 10px;
-  cursor: pointer;
-  min-height: 83px;
-  transition: background .15s,border-color .15s,opacity .15s;
-}
-.job:last-child {
-  margin-bottom: 0;
-}
-.job:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
-}
-.job h3 {
-  font-size: 13px;
-  margin: 0 0 9px;
-  font-weight: 650;
-}
-.job.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px color-mix(in srgb,var(--accent) 10%,transparent);
-  background: color-mix(in srgb,var(--accent) 4%,white);
-}
-.job.in-path {
-  border-left-color: var(--accent);
-}
-.job.retained {
-  background: #fafcfd;
-  color: #718491;
-  border-left-color: #c4d0d9;
-}
-.job.running {
-  background: var(--gold-bg);
-  border-color: #c99332;
-  box-shadow: 0 0 0 2px #c993321c;
-  opacity: 1!important;
-}
-.job.failed {
-  border-color: #c46a4b;
-  background: #fff1ec;
-}
-.job.returned {
-  border-color: #c99332;
-  background: #fff6e4;
-}
-.job .state {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.state .symbol {
-  width: 13px;
-  height: 13px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.job.running .state {
-  color: #916119;
-}
-.job.complete .state {
-  color: #347e60;
-}
-.job.failed .state {
-  color: #a84530;
-}
-.job .view {
-  position: absolute;
-  right: 8px;
-  bottom: 6px;
-  border: 0;
-  background: transparent;
-  font-size: 11px;
-  color: var(--muted);
-  padding: 4px 5px;
-}
-.job .view:disabled {
-  visibility: hidden;
-}
-.job .view:hover {
-  background: #e8f0f5;
-  color: var(--blue);
-}
-.job .origin {
-  font-size: 10px;
-  margin-left: 20px;
-  color: #7c8d98;
-  margin-top: 5px;
-  min-height: 13px;
 }
 .job-table-wrap {
   border: 1px solid var(--line);
@@ -851,142 +729,6 @@ dialog iframe {
   }
 }
 
-.diagram-job {
-  height: 100%;
-  min-height: 0;
-  margin: 0;
-  padding: 11px 13px;
-  border: 1.5px solid color-mix(in srgb,var(--accent) 35%,white);
-  border-radius: 11px;
-  background: white;
-}
-.diagram-job h3 {
-  font-size: 18px;
-  line-height: 1.22;
-  color: var(--accent);
-  margin: 0 0 8px;
-  font-weight: 650;
-  letter-spacing: -.3px;
-}
-.diagram-job .state {
-  font-size: 15px;
-  gap: 7px;
-}
-.diagram-job .symbol {
-  width: 14px;
-  height: 14px;
-}
-.diagram-job .origin {
-  font-size: 12px;
-  line-height: 1.2;
-  margin: 7px 0 0;
-  max-width: 112px;
-  min-height: 0;
-}
-.diagram-job .view {
-  font-size: 12px;
-  right: 7px;
-  bottom: 5px;
-  padding: 3px 4px;
-}
-.diagram-job.in-path {
-  border-color: var(--accent);
-  box-shadow: 0 2px 5px #19334809;
-}
-.diagram-job.outside-path {
-  opacity: .42;
-}
-.diagram-job.selected {
-  outline: 2px solid var(--blue);
-  outline-offset: 3px;
-  box-shadow: none;
-}
-.is-running .diagram-job:not(.running):not(.failed):not(.returned) {
-  opacity: .48;
-  box-shadow: none;
-  border-width: 1px;
-}
-.diagram-job.running {
-  border: 3px solid #bb821f;
-  padding: 9.5px 11.5px;
-  box-shadow: 0 0 0 4px #c9933220,0 5px 14px #96610f19;
-}
-.diagram-job.running h3 {
-  color: #87590f;
-}
-.diagram-job.running .state {
-  font-weight: 650;
-}
-.diagram-job.failed {
-  opacity: 1;
-  border: 2px solid #b95139;
-}
-.diagram-job.returned {
-  opacity: 1;
-  border: 2px solid #bb821f;
-}
-.diagram-job.database-job {
-  border: 0!important;
-  outline: 0;
-  background: transparent;
-  box-shadow: none;
-  padding-top: 28px;
-}
-.database-job h3 {
-  margin-bottom: 5px;
-}
-.database-job .origin {
-  position: absolute;
-  top: 8px;
-  left: 0;
-  text-align: center;
-  max-width: none;
-  width: 100%;
-  margin: 0;
-  font-size: 12px;
-}
-.database-job .view {
-  bottom: 9px;
-}
-@media (prefers-reduced-motion:reduce) {
-  .connection {
-    animation: none;
-  }
-}
-
-.diagram-job h3 {
-  font-size: 17px;
-  line-height: 1.18;
-  letter-spacing: -.2px;
-  margin-bottom: 7px;
-}
-.diagram-job .origin {
-  position: absolute;
-  bottom: 9px;
-  left: 12px;
-  right: 53px;
-  margin: 0;
-  font-size: 11px;
-  max-width: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.diagram-job .origin:empty {
-  display: none;
-}
-.diagram-job[data-job^="assessment_"]:not([data-job="assessment_summary"]):not([data-job="assessment_report"]) h3 {
-  font-size: 16px;
-  white-space: nowrap;
-}
-.database-job .origin {
-  top: 8px;
-  bottom: auto;
-  left: 0;
-  right: 0;
-  max-width: none;
-  font-size: 12px;
-}
 .handover-note {
   display: flex;
   align-items: center;
@@ -1052,26 +794,6 @@ dialog iframe {
   stroke: #b27b2d;
   stroke-width: 2.5;
 }
-.diagram-job.handover {
-  opacity: 1!important;
-  border: 2px solid #b47a2d;
-  background: #fff7e8;
-}
-.diagram-job.handover .state,
-.diagram-job.outdated .state {
-  color: #95651e;
-  font-weight: 600;
-}
-.diagram-job.outdated {
-  background: #fffaf1;
-}
-.diagram-job[data-job="qc"] .state {
-  font-size: 13px;
-}
-.diagram-job[data-job="qc"] .view {
-  font-size: 11px;
-  bottom: 3px;
-}
 @media (max-width:850px) {
   .handover-panel {
     flex-wrap: wrap;
@@ -1082,14 +804,6 @@ dialog iframe {
   .controls {
     flex-wrap: wrap;
   }
-}
-.diagram-job[data-job="qc"] .view {
-  top: 5px;
-  bottom: auto;
-  right: 5px;
-}
-.is-running .database-shape:not(.running) {
-  opacity: .35;
 }
 .return-label {
   font-size: 14px;
@@ -1290,4 +1004,154 @@ dialog iframe {
   width: 100%;
   height: 100%;
   stroke-width: 1.8;
+}
+
+.state .symbol {
+  width: 13px;
+  height: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.workflow-node {
+  cursor: pointer;
+  outline: none;
+}
+.workflow-node .node-shape {
+  fill: white;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.workflow-node .node-cap {
+  fill: color-mix(in srgb,var(--accent) 9%,white);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.workflow-node .node-outline {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 7;
+  opacity: 0;
+}
+.workflow-node.selected .node-outline,
+.workflow-node:focus-visible .node-outline {
+  opacity: .22;
+}
+.workflow-node.outside-path {
+  opacity: .44;
+}
+.workflow-node.retained .node-shape {
+  fill: #fafcfd;
+}
+.is-running .workflow-node:not(.running):not(.failed):not(.returned):not(.handover) {
+  opacity: .46;
+}
+.workflow-node.running,
+.workflow-node.failed,
+.workflow-node.returned,
+.workflow-node.handover {
+  opacity: 1;
+}
+.workflow-node.running .node-shape,
+.workflow-node.running .node-cap {
+  fill: #fff6e4;
+  stroke: #bb821f;
+  stroke-width: 3;
+}
+.workflow-node.running .node-outline {
+  stroke: #bb821f;
+  opacity: .22;
+}
+.workflow-node.failed .node-shape,
+.workflow-node.failed .node-cap {
+  fill: #fff1ec;
+  stroke: #b95139;
+  stroke-width: 2;
+}
+.workflow-node.returned .node-shape,
+.workflow-node.handover .node-shape,
+.workflow-node.outdated .node-shape {
+  fill: #fff8eb;
+  stroke: #b47a2d;
+  stroke-width: 2;
+}
+.node-title {
+  font-size: 17px;
+  font-weight: 650;
+  fill: var(--accent);
+  letter-spacing: -.2px;
+}
+.workflow-node[data-job^="assessment_"] .node-title {
+  font-size: 16px;
+}
+.node-status {
+  font-size: 15px;
+  color: var(--muted);
+}
+.node-status text {
+  fill: currentColor;
+}
+.node-status-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.workflow-node[data-job="qc"] .node-status,
+.workflow-node[data-job="extract"] .node-status {
+  font-size: 13px;
+}
+.workflow-node.complete .node-status {
+  color: #347e60;
+}
+.workflow-node.running .node-status,
+.workflow-node.running .node-title {
+  color: #8a5d13;
+  fill: #8a5d13;
+  font-weight: 650;
+}
+.workflow-node.failed .node-status {
+  color: #a84530;
+}
+.workflow-node.handover .node-status,
+.workflow-node.outdated .node-status {
+  color: #95651e;
+}
+.node-spinner {
+  fill: none;
+  stroke: #bb821f;
+  stroke-width: 2;
+  stroke-dasharray: 24 10.56;
+  stroke-linecap: round;
+}
+.node-origin {
+  font-size: 11px;
+  fill: #7c8d98;
+}
+.node-view rect {
+  fill: transparent;
+  stroke: none;
+}
+.node-view text {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--muted);
+}
+.node-view:hover rect,
+.node-view:focus-visible rect {
+  fill: #e8f0f5;
+}
+.node-view:hover text,
+.node-view:focus-visible text {
+  fill: var(--blue);
+}
+.node-view[aria-disabled="true"] {
+  display: none;
+}
+@media (prefers-reduced-motion:reduce) {
+  .connection {
+    animation: none;
+  }
 }
