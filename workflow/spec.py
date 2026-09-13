@@ -40,6 +40,15 @@ SPEC = {key: dict(key=key, title=title, module=module, owner=owner, parents=pare
         for key, title, module, owner, parents, description in JOBS}
 DEFAULTS = {'last_year': 2023, 'min_hooks_a': 0, 'mortality_2': 0.30}
 
+# Complete each stage before starting the next; retained peers stay unchanged.
+STAGES = [
+    ['submission'], ['qc'], ['database'], ['extract'],
+    ['cpue_a', 'cpue_b'],
+    ['prepare_a', 'prepare_b', 'cpue_summary'],
+    ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2', 'cpue_report'],
+    ['assessment_summary'], ['assessment_report'],
+]
+
 
 def downstream(roots):
     selected = set(roots)

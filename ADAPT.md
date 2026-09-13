@@ -14,7 +14,9 @@ Run `make html` to build a self-contained browser file. The calculation must wor
 with the packages available in the preserved browser runtime. Other software can
 be run through the Python/container interface instead.
 
-The example runs jobs sequentially inside a browser worker or a hosted container. An operational
+The hosted container runs independent jobs in separate processes and waits for the
+whole stage before advancing. The offline browser uses one Python worker with the
+same stage order. Define stage groups in `workflow/spec.py`. An operational
 orchestration service could submit the same dependency graph to approved HPC and
 provide shared access to authorised colleagues. Access controls, resource requests,
 storage and recovery must be implemented for that setting. Confidential data

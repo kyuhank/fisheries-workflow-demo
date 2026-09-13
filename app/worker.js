@@ -85,7 +85,7 @@ async def _before_job(key):
     message = await _before_job_js(key)
     if message:
         await runner.emit(key, 'received', message)
-runner = Workflow('/runs', notify=_notify, pause=0.7, before_job=_before_job)
+runner = Workflow('/runs', notify=_notify, pause=1, before_job=_before_job)
 `);
   return JSON.parse(python.runPython("json.dumps(runner.state())"));
 }
@@ -131,7 +131,7 @@ json.dumps({'html': (runner.directory/key/'report.html').read_text(), 'record':r
   }
   if (type === "reset") {
     python.runPython(
-      "shutil.rmtree('/runs', ignore_errors=True); runner = Workflow('/runs', notify=_notify, pause=0.7, before_job=_before_job)",
+      "shutil.rmtree('/runs', ignore_errors=True); runner = Workflow('/runs', notify=_notify, pause=1, before_job=_before_job)",
     );
     return JSON.parse(python.runPython("json.dumps(runner.state())"));
   }

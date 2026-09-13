@@ -19,6 +19,8 @@ Run the full workflow, then select **Input prep A** and run again. Earlier data 
 CPUE results retain their original records. Selecting **CPUE report** repeats only
 that reporting job. **Orchestration tool** groups jobs into tasks and gives access
 to responsibilities, inputs, progress, logs and outputs.
+Hosted jobs within a stage run in parallel and finish before the next stage begins.
+The offline browser follows the same stages using one Python worker.
 
 Select **Manual handover** to pause where files pass between analyses. **Transfer
 files** continues the calculation. After a full run, **Revise CPUE A** changes the

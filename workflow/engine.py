@@ -11,7 +11,7 @@ import sys
 import zipfile
 
 from . import models, reports
-from .spec import DEFAULTS, SPEC, downstream
+from .spec import DEFAULTS, SPEC, STAGES, downstream
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -115,11 +115,14 @@ class Workflow:
         return {'run': selected, 'retained': [key for key in SPEC if key not in selected],
                 'changed': changed, 'start': start}
 
-    async def emit(self, key, state, message):
-        event = {'job': key, 'state': state, 'message': message}
+    def record_event(self, key, state, message, **details):
+        event = {'job': key, 'state': state, 'message': message, **details}
         self.events.append(event)
         self.notify({**event, 'record': self.records.get(key)})
-        if self.pause:
+
+    async def emit(self, key, state, message, **details):
+        self.record_event(key, state, message, **details)
+        if self.pause and state in ('running', 'failed', 'returned', 'received'):
             await asyncio.sleep(self.pause)
 
     def source_rows(self):
@@ -185,7 +188,8 @@ class Workflow:
             if invalid:
                 await self.emit('qc', 'failed', 'Zero effort found. Return the record to the data provider.')
                 await self.emit('submission', 'returned', 'The provider corrects the effort field.')
-                await self.emit('submission', 'running', 'Resubmit the corrected records.')
+                await self.emit('submission', 'running', 'The provider resubmits the corrected records.',
+                                activity='resubmit')
                 submission = self.source_rows()
                 self.save('submission', submission, run_id)
                 await self.emit('submission', 'complete', 'Corrected submission received.')
@@ -249,19 +253,34 @@ class Workflow:
             self.run_number += 1
             run_id = f'Run {self.run_number:03d}'
             self.notify({'state':'plan', **plan, 'run_id':run_id})
-            for key in plan['run']:
-                if self.before_job:
-                    await self.before_job(key)
-                await self.emit(key, 'running', SPEC[key]['description'])
-                try:
-                    result = await self.calculate(key, run_id)
-                    self.save(key, result, run_id)
-                    await self.emit(key, 'complete', SPEC[key]['title'] + ' complete.')
-                except Exception as error:
-                    self.records.pop(key, None)
-                    self.persist()
-                    await self.emit(key, 'failed', str(error))
-                    raise
+            for stage in STAGES:
+                keys = [key for key in stage if key in plan['run']]
+                if not keys:
+                    continue
+                for key in keys:
+                    if self.before_job:
+                        await self.before_job(key)
+                for key in keys:
+                    self.record_event(key, 'running', SPEC[key]['description'], group=keys)
+                if self.pause:
+                    await asyncio.sleep(self.pause)
+                results = await asyncio.gather(
+                    *(self.calculate(key, run_id) for key in keys), return_exceptions=True)
+                failures = []
+                for key, result in zip(keys, results):
+                    try:
+                        if isinstance(result, BaseException):
+                            raise result
+                        self.save(key, result, run_id)
+                    except Exception as error:
+                        self.records.pop(key, None)
+                        self.persist()
+                        await self.emit(key, 'failed', str(error))
+                        failures.append(error)
+                    else:
+                        await self.emit(key, 'complete', SPEC[key]['title'] + ' complete.')
+                if failures:
+                    raise failures[0]
             self.persist()
             return {'run_id':run_id, **plan, **self.state()}
         finally:

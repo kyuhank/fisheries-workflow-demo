@@ -23,6 +23,8 @@ const modeStates = {};
 let offlineReady = false, cloudReady = false, offlineInit = null;
 let completedSummary = null, modeVersion = 0;
 let correctionPending = false;
+let activities = {}, dispatchPending = false;
+let workspaceView = "tasks", jobStatusFilter = "";
 let waitingTransfer = null;
 const byKey = Object.fromEntries(jobs.map((job) => [job.key, job]));
 const messages = [];
@@ -135,12 +137,18 @@ function statusSymbol(state) {
   return symbol;
 }
 
+function statusLabel(key) {
+  return activities[key] === "resubmit" && stageStatus(key) === "running"
+    ? "Resubmit"
+    : labels[stageStatus(key)];
+}
+
 function badge(key) {
   const state = stageStatus(key), span = document.createElement("span");
   span.className = "state";
   span.append(
     statusSymbol(state),
-    document.createTextNode(labels[state] || state),
+    document.createTextNode(statusLabel(key) || state),
   );
   return span;
 }
@@ -162,12 +170,14 @@ function jobNode(node, colour) {
   const card = svgElement("g", {
     class: "job workflow-node " + state +
       (selected === key ? " selected" : "") +
+      (dispatchPending && key === plan?.run[0] ? " queued-start" : "") +
       (inPath ? " in-path" : " outside-path"),
     transform: `translate(${node.x} ${node.y})`,
     "data-job": key,
+    "data-activity": activities[key] || "",
     role: "button",
     tabindex: 0,
-    "aria-label": job.title + ": " + (labels[state] || state) +
+    "aria-label": job.title + ": " + (statusLabel(key) || state) +
       ". Select starting job.",
   });
   card.style.setProperty("--accent", colour);
@@ -251,7 +261,7 @@ function jobNode(node, colour) {
     status.append(icon);
   }
   const statusText = svgElement("text", { x: 22, y: 12 });
-  statusText.textContent = labels[state] || state;
+  statusText.textContent = statusLabel(key) || state;
   status.append(statusText);
   card.append(status);
 
@@ -415,7 +425,7 @@ function renderDiagram() {
   svg.append(loop);
   if (correctionPending) {
     const text = svgElement("text", { x: 218, y: 287, class: "return-label" });
-    for (const [i, line] of ["Correct +", "resubmit"].entries()) {
+    for (const [i, line] of ["Correct +", "Resubmit"].entries()) {
       const part = svgElement("tspan", { x: 218, dy: i ? 18 : 0 });
       part.textContent = line;
       text.append(part);
@@ -496,6 +506,8 @@ function lineIcon(name) {
     class: "line-icon",
   });
   const paths = {
+    folder: "M3 6h7l2 3h9v11H3Z M3 6V4h7l2 2h9v3",
+    list: "M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1",
     database:
       "M4 6c0-4 16-4 16 0s-16 4-16 0m0 0v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0",
     chart: "M4 4v16h16M7 15l4-5 4 2 5-7",
@@ -515,7 +527,7 @@ function renderTasks() {
   $("tasks").replaceChildren();
   for (const task of taskGroups) {
     const members = jobs.filter((job) => job.module === task.key);
-    const active = members.find((job) => stageStatus(job.key) === "running");
+    const active = members.filter((job) => stageStatus(job.key) === "running");
     const awaiting = members.find((job) => stageStatus(job.key) === "handover");
     const failed = members.find((job) => stageStatus(job.key) === "failed");
     const outdated = members.find((job) => stageStatus(job.key) === "outdated");
@@ -523,7 +535,7 @@ function renderTasks() {
     const resolved = members.every((job) =>
       ["complete", "retained"].includes(stageStatus(job.key))
     );
-    const state = active
+    const state = active.length
       ? "running"
       : failed
       ? "failed"
@@ -563,26 +575,77 @@ function renderTasks() {
     const activity = uiElement(
       "span",
       "task-activity",
-      active?.title || awaiting?.title || failed?.title ||
+      (active.length > 1
+        ? `${active.length} jobs running together`
+        : active.length
+        ? (activities[active[0].key] === "resubmit"
+          ? "Resubmit corrected data"
+          : active[0].title)
+        : "") ||
+        awaiting?.title || failed?.title ||
         `${members.length} linked jobs`,
     );
     button.append(heading, description, progress, activity, footer);
     button.onclick = () => {
       selectedTask = task.key;
+      workspaceView = "jobs";
+      jobStatusFilter = "";
       render();
     };
     $("tasks").append(button);
   }
   $("task-title").textContent =
     taskGroups.find((task) => task.key === selectedTask)?.title || "All jobs";
-  $("task-subtitle").textContent =
-    "Select a job to rerun it. Open an output to inspect its report, data or log.";
+  const activeJobs = jobs.filter((job) => stageStatus(job.key) === "running");
+  $("running-count").textContent = activeJobs.length;
+  $("workspace-activity").replaceChildren(
+    statusSymbol(
+      activeJobs.length
+        ? "running"
+        : busy || !Object.keys(records).length
+        ? "waiting"
+        : "complete",
+    ),
+    document.createTextNode(
+      activeJobs.length
+        ? `${activeJobs.length} running`
+        : busy
+        ? "Waiting"
+        : Object.keys(records).length
+        ? "Results available"
+        : "Ready",
+    ),
+  );
+  $("workspace-activity").classList.toggle("running", activeJobs.length > 0);
+  $("tasks").hidden = workspaceView !== "tasks";
+  $("task-jobs").hidden = workspaceView !== "jobs";
+  $("workspace-breadcrumb").textContent = workspaceView === "tasks"
+    ? "Tasks"
+    : "Tasks / Jobs";
+  $("workspace-title").textContent = workspaceView === "tasks"
+    ? "Follow each analysis."
+    : $("task-title").textContent;
+  $("workspace-description").textContent = workspaceView === "tasks"
+    ? "Open a task to inspect its jobs, inputs and outputs."
+    : "Select a job to rerun it. View outputs to inspect its report, data and log.";
+  $("task-filter").value = selectedTask || "";
+  $("job-status-filter").value = jobStatusFilter;
+  $("show-tasks").classList.toggle("active", workspaceView === "tasks");
+  $("all-tasks").classList.toggle(
+    "active",
+    workspaceView === "jobs" && !jobStatusFilter,
+  );
+  $("running-jobs").classList.toggle(
+    "active",
+    workspaceView === "jobs" && jobStatusFilter === "running",
+  );
 }
 
 function renderJobTable() {
   $("job-table-body").replaceChildren();
   for (const job of jobs) {
     if (selectedTask && job.module !== selectedTask) continue;
+    if (jobStatusFilter && stageStatus(job.key) !== jobStatusFilter) continue;
     const row = document.createElement("tr");
     row.className = stageStatus(job.key) +
       (selected === job.key ? " selected-job" : "");
@@ -614,12 +677,21 @@ function renderJobTable() {
     const output = document.createElement("td"),
       button = document.createElement("button");
     button.className = "open-output";
-    button.append(lineIcon("file"), document.createTextNode("Open"));
+    button.append(lineIcon("file"), document.createTextNode("View outputs"));
     button.setAttribute("aria-label", "Open " + job.title + " output");
     button.disabled = !records[job.key];
     button.onclick = () => openOutput(job.key);
     output.append(button);
     row.append(output);
+    $("job-table-body").append(row);
+  }
+  const count = $("job-table-body").children.length;
+  $("task-subtitle").textContent = `${count} ${count === 1 ? "job" : "jobs"}`;
+  if (!count) {
+    const row = document.createElement("tr"),
+      cell = uiElement("td", "empty-jobs", "No jobs in this state.");
+    cell.colSpan = 5;
+    row.append(cell);
     $("job-table-body").append(row);
   }
 }
@@ -685,6 +757,7 @@ async function refreshPlan() {
 
 function showError(error) {
   busy = false;
+  dispatchPending = false;
   status("failed", "The analysis stopped", String(error));
   render();
 }
@@ -699,6 +772,7 @@ function log(event) {
 function handleEvent(event) {
   if (event.state === "plan") {
     correctionPending = false;
+    activities = {};
     waitingTransfer = null;
     plan = event;
     latestRun = event.run_id;
@@ -709,6 +783,14 @@ function handleEvent(event) {
       ),
     );
   } else {
+    dispatchPending = false;
+    if (event.state === "running" && event.group) {
+      for (const key of event.group) {
+        states[key] = "running";
+        activities[key] = "";
+      }
+    }
+    activities[event.job] = event.activity || "";
     if (event.state === "handover") {
       waitingTransfer = event;
       $("handover-title").textContent = event.boundary === "data"
@@ -718,12 +800,19 @@ function handleEvent(event) {
     if (event.job === "qc" && event.state === "failed") {
       correctionPending = true;
     }
-    if (event.job === "qc" && event.state === "complete") {
+    if (event.job === "submission" && event.state === "returned") {
+      states.qc = "waiting";
+    }
+    if (event.job === "qc" && ["running", "complete"].includes(event.state)) {
       correctionPending = false;
     }
     states[event.job] = event.state;
     if (event.record) records[event.job] = event.record;
     log(event);
+    const active = jobs.filter((job) => states[job.key] === "running");
+    const groupTitle = active.length > 1
+      ? `${active.length} jobs running together`
+      : "";
     status(
       event.state === "failed"
         ? "failed"
@@ -732,8 +821,15 @@ function handleEvent(event) {
         : "running",
       event.state === "handover"
         ? "Waiting for the next analyst"
-        : byKey[event.job].title,
-      event.message,
+        : event.activity === "resubmit"
+        ? "Resubmit corrected data"
+        : event.state === "returned"
+        ? "Correct the submission"
+        : groupTitle || byKey[event.job].title,
+      groupTitle
+        ? active.map((job) => job.title).join(" · ") +
+          ". The next stage waits for these jobs."
+        : event.message,
     );
   }
   render();
@@ -762,6 +858,9 @@ worker.onerror = (event) => {
 $("run").onclick = async () => {
   if (!ready || busy) return;
   busy = true;
+  dispatchPending = true;
+  correctionPending = false;
+  activities = {};
   completedSummary = null;
   states = Object.fromEntries(
     jobs.map(
@@ -783,6 +882,7 @@ $("run").onclick = async () => {
       handover: $("handover").value,
     });
     records = result.records;
+    dispatchPending = false;
     busy = false;
     latestRun = result.run_id;
     status(
@@ -890,9 +990,32 @@ $("record-toggle").onclick = () => showRecord($("record-panel").hidden);
 $("record-close").onclick = () => showRecord(false);
 $("all-tasks").onclick = () => {
   selectedTask = "";
+  workspaceView = "jobs";
+  jobStatusFilter = "";
   $("task-title").textContent = "All jobs";
   render();
 };
+$("show-tasks").onclick = () => {
+  workspaceView = "tasks";
+  render();
+};
+$("running-jobs").onclick = () => {
+  workspaceView = "jobs";
+  selectedTask = "";
+  jobStatusFilter = "running";
+  render();
+};
+$("task-filter").onchange = () => {
+  selectedTask = $("task-filter").value;
+  render();
+};
+$("job-status-filter").onchange = () => {
+  jobStatusFilter = $("job-status-filter").value;
+  render();
+};
+for (const icon of document.querySelectorAll("[data-workspace-icon]")) {
+  icon.append(lineIcon(icon.dataset.workspaceIcon));
+}
 
 function download(name, bytes, type) {
   const url = URL.createObjectURL(new Blob([bytes], { type })),
@@ -1004,6 +1127,8 @@ async function activateMode(next) {
   plan = null;
   waitingTransfer = null;
   correctionPending = false;
+  activities = {};
+  dispatchPending = false;
   $("github-run").hidden = true;
   const saved = modeStates[mode];
   records = saved?.records || {};

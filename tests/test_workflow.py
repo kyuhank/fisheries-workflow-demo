@@ -50,6 +50,54 @@ class WorkflowTest(unittest.TestCase):
             self.assertEqual(runner.records['cpue_a'], previous)
             self.assertFalse(runner.running)
 
+    def test_parallel_stage_waits_for_both_cpue_jobs(self):
+        runner = self.clone()
+        original = runner.calculate
+
+        async def exercise():
+            entered, both_started, release = set(), asyncio.Event(), asyncio.Event()
+
+            async def calculate(key, run_id):
+                if key in ('cpue_a', 'cpue_b'):
+                    entered.add(key)
+                    if len(entered) == 2:
+                        both_started.set()
+                    await both_started.wait()
+                    if key == 'cpue_b':
+                        await release.wait()
+                return await original(key, run_id)
+
+            runner.calculate = calculate
+            execution = asyncio.create_task(runner.run('extract'))
+            await asyncio.wait_for(both_started.wait(), timeout=5)
+            await asyncio.sleep(0.01)
+            self.assertFalse(any(e['job'] == 'prepare_a' for e in runner.events))
+            self.assertFalse(any(e['job'] == 'cpue_a' and e['state'] == 'complete'
+                                 for e in runner.events))
+            release.set()
+            await execution
+            self.assertTrue(all(runner.valid(key) for key in SPEC))
+
+        asyncio.run(exercise())
+
+    def test_failed_parallel_job_blocks_the_next_stage(self):
+        runner = self.clone()
+        original = runner.calculate
+        previous = runner.records['prepare_b'].copy()
+
+        async def calculate(key, run_id):
+            if key == 'cpue_a':
+                raise ValueError('Invalid CPUE input')
+            return await original(key, run_id)
+
+        runner.calculate = calculate
+        with self.assertRaisesRegex(ValueError, 'Invalid CPUE input'):
+            asyncio.run(runner.run('extract'))
+        self.assertTrue(runner.valid('cpue_b'))
+        self.assertEqual(runner.records['prepare_b'], previous)
+        self.assertFalse(any(e['job'].startswith('prepare_') for e in runner.events))
+        self.assertFalse(runner.running)
+
     def test_cpue_reporting_does_not_run_assessment(self):
         runner = self.clone()
         previous = runner.records['assessment_report'].copy()

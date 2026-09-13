@@ -64,6 +64,19 @@ with sync_playwright() as playwright:
     page.locator("#output-close").click()
     page.locator('.job[data-job="prepare_a"]').press("Enter")
     assert page.locator("#selection-title").inner_text() == "Prepare inputs A"
+    page.locator('[data-tab="jobs"]').click()
+    assert page.locator('#tasks .task').count() == 3
+    assert page.locator('#workspace-activity').bounding_box()['height'] < 50
+    page.locator('#tasks .assessment').click()
+    assert page.locator('#job-table-body tr').count() == 8
+    page.locator('#job-table-body tr[data-job="assessment_a1"] .open-output').click()
+    assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'Assessment A1'
+    page.locator('#output-close').click()
+    page.locator('#running-jobs').click()
+    assert page.locator('#job-table-body').inner_text() == 'No jobs in this state.'
+    page.locator('#show-tasks').click()
+    page.set_viewport_size({'width': 390, 'height': 844})
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
     assert not errors, errors
     browser.close()
 print(json.dumps({"engine": args.engine, "layout": checks, "selection_and_output": "passed"}))

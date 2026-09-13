@@ -31,12 +31,35 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.goto((ROOT/'docs/index.html').as_uri())
     page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for(timeout=90000)
+    page.evaluate("""() => {
+      window.sequence = [];
+      new MutationObserver(() => {
+        const nodes = [...document.querySelectorAll('.job[data-job]')];
+        const running = nodes.filter(n => n.classList.contains('running')).map(n => n.dataset.job);
+        const phase = nodes.filter(n => /running|failed|returned/.test(n.getAttribute('class')))
+          .map(n => [n.dataset.job, n.getAttribute('class'), n.dataset.activity || '']);
+        const signature = JSON.stringify(phase);
+        if (window.sequence.at(-1)?.signature !== signature)
+          window.sequence.push({time: performance.now(), signature, running, phase});
+      }).observe(document.querySelector('#workflow-view'), {subtree:true, attributes:true, childList:true});
+    }""")
     page.locator('#run').click()
     page.locator('[data-tab="jobs"]').click()
     page.wait_for_function("document.querySelector('.task.running') !== null")
     assert page.locator('.task.running .task-status').inner_text() == 'Running'
     assert page.locator('.task.running .spinner').count() == 1
     complete(page)
+    sequence = page.evaluate('window.sequence')
+    assert next(item['running'] for item in sequence if item['running']) == ['submission']
+    resubmit = next(i for i, item in enumerate(sequence)
+                    if any(job == 'submission' and activity == 'resubmit'
+                           for job, _, activity in item['phase']))
+    assert sequence[resubmit + 1]['time'] - sequence[resubmit]['time'] >= 850
+    assert any(item['running'] == ['database'] for item in sequence)
+    assert any(set(item['running']) == {'cpue_a', 'cpue_b'} for item in sequence)
+    assert any({'prepare_a', 'prepare_b'} <= set(item['running']) for item in sequence)
+    assert any({'assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'}
+               <= set(item['running']) for item in sequence)
     with page.expect_download() as download:
         page.locator('#download').click()
     download.value.save_as(directory/'browser.zip')

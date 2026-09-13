@@ -37,22 +37,42 @@
       <section id="workflow-view" class="modules"
         aria-label="Connected workflow"></section>
       <section id="jobs-view" hidden>
-        <div id="tasks" class="task-list"></div>
-        <div
-          class="task-heading"><div><p class="eyebrow">Jobs in this task</p><h2 id="task-title">Data management</h2><p id="task-subtitle"></p></div><button id="all-tasks" class="quiet">Show all jobs</button></div>
-        <div class="job-table-wrap">
-          <table class="job-table">
-            <thead>
-              <tr>
-                <th>Job / inputs</th>
-                <th>Owner</th>
-                <th>Status</th>
-                <th>Original run</th>
-                <th>Output</th>
-              </tr>
-            </thead>
-            <tbody id="job-table-body"></tbody>
-          </table>
+        <div class="orchestration-workspace">
+          <aside class="workspace-nav" aria-label="Orchestration navigation">
+            <div
+              class="workspace-brand"><span class="eyebrow">Orchestration</span><strong>Analysis workspace</strong></div>
+            <button id="show-tasks"
+              class="workspace-link active"><span data-workspace-icon="folder"></span>Tasks<span class="nav-count">3</span></button>
+            <button id="all-tasks"
+              class="workspace-link"><span data-workspace-icon="list"></span>All jobs<span class="nav-count">16</span></button>
+            <button id="running-jobs"
+              class="workspace-link"><span data-workspace-icon="clock"></span>Running<span class="nav-count" id="running-count">0</span></button>
+            <p
+              class="workspace-note">Follow the same inputs, jobs and results.</p>
+          </aside>
+          <div class="workspace-content">
+            <div
+              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Follow each analysis.</h2><p id="workspace-description">Open a task to inspect its jobs, inputs and outputs.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
+            <div id="tasks" class="task-list"></div>
+            <section id="task-jobs" hidden>
+              <div
+                class="task-heading"><h3 id="task-title">Data management</h3><span id="task-subtitle"></span><label>Task<select id="task-filter" aria-label="Filter jobs by task"><option value="">All tasks</option><option value="data">Data management</option><option value="cpue">CPUE analysis</option><option value="assessment">Stock assessment</option></select></label><label>Status<select id="job-status-filter" aria-label="Filter jobs by status"><option value="">All states</option><option value="running">Running</option><option value="waiting">Waiting</option><option value="complete">Complete</option><option value="retained">Retained</option><option value="failed">Failed</option></select></label></div>
+              <div class="job-table-wrap">
+                <table class="job-table">
+                  <thead>
+                    <tr>
+                      <th>Job / inputs</th>
+                      <th>Owner</th>
+                      <th>Status</th>
+                      <th>Original run</th>
+                      <th>Output</th>
+                    </tr>
+                  </thead>
+                  <tbody id="job-table-body"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
         </div>
       </section>
       <section

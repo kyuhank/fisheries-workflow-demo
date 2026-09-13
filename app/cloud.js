@@ -70,7 +70,7 @@ class CloudRun {
 
   async execute(input) {
     const request = await this.request("/run", input);
-    let cursor = 0, failures = 0;
+    let cursor = 0, failures = 0, holdUntil = 0, shownGroup = "";
     const deadline = Date.now() + 10 * 60 * 1000;
     while (Date.now() < deadline) {
       let update;
@@ -100,21 +100,29 @@ class CloudRun {
       for (const row of update.events) {
         cursor = row.id;
         const event = row.event;
+        const group = event.state === "running" && event.group?.length > 1
+          ? event.group.join(",")
+          : "";
+        if (!group || group !== shownGroup) {
+          const remaining = holdUntil - performance.now();
+          if (remaining > 0) {
+            await new Promise((resolve) => setTimeout(resolve, remaining));
+          }
+        }
         if (event.state === "phase") {
           this.onPhase(event.title, event.message, this.run.github_run);
         } else {
           if (event.record) this.records[event.job] = event.record;
           this.onEvent(event);
-          // Preserve the order of observed QC/transfer events when a poll returns a batch.
-          await new Promise((resolve) =>
-            setTimeout(
-              resolve,
-              event.state === "failed" || event.state === "returned"
-                ? 650
-                : 120,
-            )
-          );
         }
+        // Keep observed activity readable even when a poll returns several events.
+        if (!group || group !== shownGroup) {
+          holdUntil = performance.now() +
+            (["running", "failed", "returned"].includes(event.state)
+              ? 1000
+              : 0);
+        }
+        shownGroup = group;
       }
       if (["complete", "failed", "expired"].includes(this.run.status)) {
         if (update.state?.records) this.records = update.state.records;
