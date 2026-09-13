@@ -155,6 +155,9 @@ class Workflow:
         build = ROOT / 'build-info.json'
         if build.exists():
             record['source'] = read_json(build)
+        if self.execution.get('commit'):
+            record['source'] = {'repository': 'https://github.com/' + self.execution['repository'],
+                                'commit': self.execution['commit']}
         record['data_files'] = {name: digest((ROOT / 'data' / name).read_bytes())
                                 for name in ['fishery.sqlite', 'submission.json']}
         self.records[key] = record

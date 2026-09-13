@@ -52,8 +52,12 @@ class WorkflowTest(unittest.TestCase):
 
     def test_cpue_reporting_does_not_run_assessment(self):
         runner = self.clone()
+        previous = runner.records['assessment_report'].copy()
+        runner.execution = {'repository': 'example/workflow', 'commit': 'a' * 40}
         result = asyncio.run(runner.run('cpue_summary'))
         self.assertEqual(result['run'], ['cpue_summary','cpue_report'])
+        self.assertEqual(runner.records['cpue_report']['source']['commit'], 'a' * 40)
+        self.assertEqual(runner.records['assessment_report'], previous)
         result = asyncio.run(runner.run('cpue_report'))
         self.assertEqual(result['run'], ['cpue_report'])
 
