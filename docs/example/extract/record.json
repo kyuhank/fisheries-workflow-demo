@@ -2,7 +2,7 @@
   "job": "extract",
   "owner": "Data analyst",
   "run_id": "Run 001",
-  "signature": "0797bcc67c0e3a616fb2a97b7bf5a4ac669a03a57b532eba7add0932825168c7",
+  "signature": "ae070d3bdff4107b55bfd524f24fc42c0123b23f0775911a51f613264b3afce6",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "10c37e8b55f5b72522a9b701af23068868093a24a8205f29cb2ef84e668408aa",
-    "report.html": "eab7146e3b6a119a53e1b6b59ab13b1fd558cbac4ea7309060098dcde719be69"
+    "report.html": "49290c38e8688c23dcacf1bc9fa71bf8947911f539623723c2ae05855aaebb81"
   },
   "log": [
     "Use saved SQL to select observations and annual catches.",
@@ -34,7 +34,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "c8b89098140d5c56e2f74ad0d315383419e483ad",
+    "commit": "4bbc0b57d05bce5f2e5ceedcc174342a7ad5ee68",
     "version": "1.6.3"
   },
   "data_files": {

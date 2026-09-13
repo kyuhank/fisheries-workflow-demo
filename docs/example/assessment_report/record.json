@@ -2,7 +2,7 @@
   "job": "assessment_report",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "edc909d4a77c141495362f29f4e5f7c37b51ffb9c48f9f303c700f1689816313",
+  "signature": "60d689ec5c7d59f417a0cdb407c36e6821b15fa5f344bb0c81031c3e12cdb18a",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "547b4978a8bf46db092cd96e4bae7c8d1d02250caf80c76907f799d2f8811dbf",
-    "report.html": "4f95d6cb3e79186f1eddcb9131b63c5a4292616e18c0d54e5a9902a3740c6506"
+    "report.html": "c1860d0746a3391747d87a93b635d012b36fcd81d21ec851e52adfbc378c313a"
   },
   "log": [
     "Write a short report and preserve its analytical record.",
@@ -34,7 +34,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "c8b89098140d5c56e2f74ad0d315383419e483ad",
+    "commit": "4bbc0b57d05bce5f2e5ceedcc174342a7ad5ee68",
     "version": "1.6.3"
   },
   "data_files": {
