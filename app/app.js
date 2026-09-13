@@ -265,6 +265,17 @@ function jobNode(node, colour) {
   status.append(statusText);
   card.append(status);
 
+  const summary = key === "cpue_summary" || key === "assessment_summary";
+  if (summary) {
+    const subtitle = svgElement("text", {
+      x: 14,
+      y: statusY + 22,
+      class: "node-origin",
+    });
+    subtitle.textContent = node.subtitle;
+    card.append(subtitle);
+  }
+
   const prior = records[key] &&
     ["retained", "waiting", "handover", "outdated"].includes(state);
   const origin = svgElement("text", {
@@ -273,7 +284,11 @@ function jobNode(node, colour) {
     "text-anchor": database ? "middle" : "start",
     class: "node-origin",
   });
-  origin.textContent = prior ? records[key].run_id : node.subtitle || "";
+  origin.textContent = prior
+    ? records[key].run_id
+    : summary
+    ? ""
+    : node.subtitle || "";
   card.append(origin);
 
   const view = svgElement("g", {
