@@ -11,12 +11,13 @@ The data are synthetic and the models are simplified.
 | Mode | What happens |
 | --- | --- |
 | **Live run** | GitHub downloads the recorded Docker image and calculates new results, using synthetic data from PostgreSQL. No login is needed. |
-| **Offline run** | The same Python analysis runs in your browser, using code and data included in the page. No internet connection is needed. |
+| **Offline run** | The same Python analysis runs in your browser. The website downloads Python when first needed; the offline HTML already includes it. |
 | **View example** | Open completed reports and their input records. No code runs. |
 
-If the live service is unavailable, select **Offline run**. Downloaded versions
-include the complete page and saved reports, so they remain usable without the
-hosted service.
+If the live service is unavailable, select **Offline run**. For use without an
+internet connection, select **Download offline demo** on the website, or use
+`index.html` from a published release. These files include Python, data and saved
+reports; saving the lightweight website page alone does not include Python.
 
 ## Follow the connections
 

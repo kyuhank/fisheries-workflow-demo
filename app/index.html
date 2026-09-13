@@ -17,7 +17,7 @@
             class="intro">Run connected analyses. Trace each result from data to assessment.</p>
         </div>
         <div
-          class="header-links"><button id="example" class="quiet">Example report</button><a href="https://github.com/kyuhank/fisheries-workflow-demo" target="_blank" rel="noopener">Code &amp; download ↗</a></div>
+          class="header-links"><button id="example" class="quiet">Example report</button><a id="offline-download" href="offline.html" download="fisheries-workflow-offline.html">Download offline demo</a><a href="https://github.com/kyuhank/fisheries-workflow-demo" target="_blank" rel="noopener">Code &amp; download ↗</a></div>
       </header>
       <section class="controls"
         aria-label="Analysis settings">
@@ -28,7 +28,7 @@
         <label>Mortality setting 2<select id="mortality" aria-describedby="mortality-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="mortality-help">Applies to assessments A2 and B2.</small></label>
         <button id="reset" class="quiet" disabled>Start afresh</button></section>
       <section class="status" id="status"
-        aria-live="polite"><span class="status-icon spinner" id="status-icon"></span><div><strong id="status-title">Connecting to the live run</strong><p id="status-message">No account or installation is required.</p></div><span id="run-id"></span><button id="offline-fallback" class="quiet" hidden>Use Offline run</button><a id="github-run" hidden target="_blank" rel="noopener">Execution ↗</a></section>
+        aria-live="polite"><span class="status-icon spinner" id="status-icon"></span><div><strong id="status-title">Loading the demonstration</strong><p id="status-message">The live connection starts when the page is ready.</p></div><span id="run-id"></span><button id="retry-connection" class="quiet" hidden>Retry connection</button><button id="offline-fallback" class="quiet" hidden>Use Offline run</button><a id="github-run" hidden target="_blank" rel="noopener">Execution ↗</a></section>
       <nav class="tabs"
         aria-label="View"><button class="active" data-tab="workflow" aria-selected="true">Workflow</button><button data-tab="jobs" aria-selected="false">Orchestration tool</button><span id="completion"></span></nav>
       <section id="handover-note" class="handover-note"

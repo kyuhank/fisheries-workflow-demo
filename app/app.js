@@ -55,16 +55,63 @@ function call(type, data = {}) {
 }
 async function initialiseOffline() {
   if (!offlineInit) {
-    offlineInit = localCall("init", {
-      runtime: payload.runtime,
-      files: payload.files,
-    })
+    offlineInit = loadOfflineRuntime()
+      .then(() => {
+        offlineLoading("Starting Python with the supplied code and data.");
+        return localCall("init", { runtime: payload.runtime, files: payload.files });
+      })
       .then((result) => {
         offlineReady = true;
         return result;
+      })
+      .catch((error) => {
+        offlineInit = null;
+        throw error;
       });
   }
   return offlineInit;
+}
+
+function offlineLoading(message) {
+  if (mode === "live" && !ready) status("running", "Preparing Offline run", message);
+}
+
+async function loadOfflineRuntime() {
+  if (payload.runtime) return;
+  const controller = new AbortController();
+  let timeout;
+  const watch = () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => controller.abort(), 20000);
+  };
+  watch();
+  try {
+    offlineLoading("Downloading Python once for this tab. Save the offline demo for use without internet.");
+    const response = await fetch(new URL(payload.runtimeUrl, location.href), {
+      signal: controller.signal,
+    });
+    if (!response.ok) throw Error("The offline runtime could not be downloaded. Try again when connected.");
+    const reader = response.body.getReader(), decoder = new TextDecoder();
+    const parts = [];
+    let received = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      received += value.byteLength;
+      parts.push(decoder.decode(value, { stream: true }));
+      watch();
+      offlineLoading(`Downloading Python · ${(received / 1e6).toFixed(1)} / ${(payload.runtimeBytes / 1e6).toFixed(1)} MB`);
+    }
+    parts.push(decoder.decode());
+    payload.runtime = JSON.parse(parts.join(""));
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw Error("The offline download stopped responding. Retry when connected, or open the downloaded offline demo.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function settings() {
@@ -77,6 +124,7 @@ function settings() {
 
 function status(kind, title, message) {
   $("offline-fallback").hidden = true;
+  $("retry-connection").hidden = true;
   $("status").className = "status " + kind;
   $("status-title").textContent = title;
   $("status-message").textContent = message;
@@ -1169,7 +1217,9 @@ function explainMode() {
   $("mode-help").textContent = mode === "cloud"
     ? "New results on GitHub · Docker."
     : mode === "live"
-    ? "New results here, without internet."
+    ? payload.runtime
+      ? "New results here, without internet."
+      : "Download Python once; then run here."
     : "Saved results; does not run code.";
 }
 
@@ -1231,9 +1281,16 @@ async function activateMode(next) {
         ? "Connecting to the live run"
         : "Preparing Offline run",
       mode === "cloud"
-        ? "No account or installation is required."
-        : "Loading the Python code and data included in this HTML file.",
+        ? "Checking the live service. You can also choose Offline run."
+        : "Preparing the supplied Python code and data.",
     );
+    $("offline-fallback").hidden = mode !== "cloud";
+    const slowConnection = mode === "cloud" ? setTimeout(() => {
+      if (version !== modeVersion || ready) return;
+      status("running", "Waiting for the live service",
+        "The connection is taking longer than usual. You can choose Offline run instead.");
+      $("offline-fallback").hidden = false;
+    }, 3000) : null;
     render();
     try {
       if (mode === "cloud" && !cloudReady) {
@@ -1248,6 +1305,7 @@ async function activateMode(next) {
       }
       if (version !== modeVersion) return;
       ready = mode === "cloud" ? cloudReady : offlineReady;
+      explainMode();
       status(
         "",
         Object.keys(records).length ? "Your results are still here" : "Ready to run",
@@ -1263,10 +1321,16 @@ async function activateMode(next) {
         "failed",
         mode === "cloud" ? "Live connection unavailable" : "Offline run could not start",
         mode === "cloud"
-          ? "Choose Offline run for new calculations, or View example for saved results."
+          ? (error.message === "Failed to fetch"
+            ? "The live service could not be reached. Retry or choose Offline run."
+            : error.message)
           : error.message + " You can still choose View example to inspect the saved results.",
       );
       $("offline-fallback").hidden = mode !== "cloud";
+      $("retry-connection").textContent = mode === "cloud" ? "Retry connection" : "Try Offline run again";
+      $("retry-connection").hidden = false;
+    } finally {
+      clearTimeout(slowConnection);
     }
   }
   $("run-id").textContent = latestRun;
@@ -1281,5 +1345,7 @@ async function activateMode(next) {
 }
 $("mode").onchange = () => activateMode($("mode").value);
 $("offline-fallback").onclick = () => activateMode("live");
+$("retry-connection").onclick = () => activateMode(mode);
+if (!payload.runtimeUrl) $("offline-download").hidden = true;
 render();
 activateMode("cloud");

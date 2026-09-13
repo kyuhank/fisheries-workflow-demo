@@ -19,7 +19,7 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     page = context.new_page()
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
-    page.goto((ROOT / 'docs/index.html').as_uri())
+    page.goto((ROOT / 'docs/offline.html').as_uri())
     if not args.online:
         page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for(timeout=90000)

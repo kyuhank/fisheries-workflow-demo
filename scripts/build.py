@@ -1,6 +1,7 @@
 """Build a self-contained browser demo and a readable saved example."""
 import asyncio
 import base64
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -47,14 +48,30 @@ def build():
     payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'notices': notices,
                'files': {str(p.relative_to(ROOT)):base64_file(p) for p in files},
                'runtime': {name:base64_file(ROOT/'vendor/pyodide'/name) for name in runtime_names}}
-    page = (ROOT/'app/index.html').read_text()
-    inserts = {'CSS':(ROOT/'app/style.css').read_text(), 'PAYLOAD':json.dumps(payload, separators=(',', ':')).replace('</', '<\\/'),
+    template = (ROOT/'app/index.html').read_text()
+    inserts = {'CSS':(ROOT/'app/style.css').read_text(),
                'WORKER':(ROOT/'app/worker.js').read_text(), 'APP':'\n'.join((ROOT/'app'/name).read_text() for name in ['cloud.js', 'lineage.js', 'app.js', 'record.js'])}
-    for name, content in inserts.items():
-        page = page.replace('/*__'+name+'__*/', content)
-    (ROOT/'docs/index.html').write_text(page)
+
+    def page(data):
+        html = template
+        for name, content in inserts.items():
+            html = html.replace('/*__'+name+'__*/', content)
+        return html.replace('/*__PAYLOAD__*/', json.dumps(data, separators=(',', ':')).replace('</', '<\\/'))
+
+    # Live execution does not need to download the offline Python runtime first.
+    offline_page = page(payload)
+    (ROOT/'docs/offline.html').write_text(offline_page)
+    runtime = json.dumps(payload.pop('runtime'), separators=(',', ':')).encode()
+    runtime_name = 'runtime-' + hashlib.sha256(runtime).hexdigest()[:12] + '.json'
+    (ROOT/'docs'/runtime_name).write_bytes(runtime)
+    for previous in (ROOT/'docs').glob('runtime-*.json'):
+        if previous.name != runtime_name:
+            previous.unlink()
+    payload.update(runtimeUrl=runtime_name, runtimeBytes=len(runtime))
+    live_page = page(payload)
+    (ROOT/'docs/index.html').write_text(live_page)
     (ROOT/'docs/.nojekyll').touch()
-    print(f'Built docs/index.html ({len(page.encode())/1e6:.1f} MB) and {len(SPEC)} saved job reports.')
+    print(f'Built live page ({len(live_page.encode())/1e6:.1f} MB), self-contained offline page ({len(offline_page.encode())/1e6:.1f} MB) and {len(SPEC)} saved job reports.')
 
 
 if __name__ == '__main__':

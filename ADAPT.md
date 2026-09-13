@@ -10,7 +10,9 @@
 5. Add a small check using fixed, shareable data. Run `make check` before adopting
    the revised version.
 
-Run `make html` to build a self-contained browser file. The calculation must work
+Run `make html` to build the website in `docs/index.html` and the self-contained
+download in `docs/offline.html`. The website loads its `runtime-*.json` file only
+when Offline run is selected. The calculation must work
 with the packages available in the preserved browser runtime. Other software can
 be run through the Python/container interface instead.
 

@@ -9,17 +9,18 @@ class CloudRun {
     this.session = null;
   }
 
-  async request(path, body, anonymous = false) {
+  async request(path, body, anonymous = false, signal) {
     const suffix = anonymous
       ? ""
       : (path.includes("?") ? "&" : "?") + "session=" + this.session.id;
-    const headers = { "Content-Type": "application/json" };
+    const headers = {};
+    if (body !== undefined) headers["Content-Type"] = "application/json";
     if (!anonymous) headers.Authorization = "Bearer " + this.session.token;
     const response = await fetch(this.url + path + suffix, {
       method: body === undefined ? "GET" : "POST",
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
-      signal: AbortSignal.timeout(30000),
+      signal: signal || AbortSignal.timeout(30000),
     });
     const value = await response.json();
     if (!response.ok) {
@@ -28,15 +29,34 @@ class CloudRun {
     return value;
   }
 
-  async initialise() {
-    const info = await this.request("/info", undefined, true);
-    if (!info.configured) {
-      throw Error(
-        "Online execution is not connected yet. Select Offline calculation to run the same analysis here.",
-      );
+  initialise() {
+    // Switching modes while connecting must not create duplicate sessions.
+    if (!this.initialising) {
+      this.initialising = this.connect().finally(() => {
+        this.initialising = null;
+      });
     }
-    this.session = await this.request("/session", {}, true);
-    return { records: {} };
+    return this.initialising;
+  }
+
+  async connect() {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    try {
+      const info = await this.request("/info", undefined, true, controller.signal);
+      if (!info.configured) {
+        throw Error("The live service is unavailable. Try again or use Offline run.");
+      }
+      this.session = await this.request("/session", {}, true, controller.signal);
+      return { records: {} };
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw Error("The live service did not respond within 10 seconds. Retry or use Offline run.");
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   plan(start, settings) {
