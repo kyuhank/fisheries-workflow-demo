@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "4849c8aabc42d90b5ae2531290a9e213c73d7354e8f07429571f57c2288dade5",
-    "report.html": "76035c46ee414f2245d5642b85d61b620baa726fdefb527428c97bf18586d7e2"
+    "report.html": "30e2c80466edbf51b49c9962d34db05b886a8bb5a7e16a7859134ecf076d0bcc"
   },
   "log": [
     "Submit catch and effort records for checking.",
@@ -32,7 +32,7 @@
   "inputs": {},
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "0773a76640acfa18bf76a86d4922b552ddf17e1b",
+    "commit": "f0f8d93801014d638e596f7e5910b3723fe7bab0",
     "version": "1.4.1"
   },
   "data_files": {

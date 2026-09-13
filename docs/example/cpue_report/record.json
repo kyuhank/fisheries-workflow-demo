@@ -2,7 +2,7 @@
   "job": "cpue_report",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "9ff002d509426dfa16471c18a7a3f1ad624577d22f96bff9ba3b8b7e3afa1b4e",
+  "signature": "27cb5fb85a4dfaccace03beb3247600d3e58dfa4e4d13440991766538dff4339",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "c08398790c7c7617e5f99c9bb4961734d37cf456eee4dfcf154fdb2556d15c5d",
-    "report.html": "78f567c53f9622647bea561e8175f0c8d6000f406ef2121d633e57da358dddac"
+    "report.html": "2a7e26706fd2fadc24a57f4ed74adae5bbb8c07f04b0b91c29a37c4f3846db73"
   },
   "log": [
     "Write a short account of the CPUE methods and results.",
@@ -34,7 +34,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "0773a76640acfa18bf76a86d4922b552ddf17e1b",
+    "commit": "f0f8d93801014d638e596f7e5910b3723fe7bab0",
     "version": "1.4.1"
   },
   "data_files": {
