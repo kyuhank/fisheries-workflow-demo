@@ -33,6 +33,13 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#offline-fallback').click()
     assert page.locator('#mode').input_value() == 'live'
     assert 'without internet' in page.locator('#mode-help').inner_text()
+    # Runtime loading must not overwrite the example if the reader switches away.
+    page.locator('#mode').select_option('saved')
+    page.wait_for_function('offlineReady === true', timeout=90000)
+    page.locator('.job[data-job="cpue_a"]').click()
+    assert page.locator('.workflow-node.complete').count() == 16
+    assert page.locator('#download').is_enabled()
+    page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for(timeout=90000)
     page.evaluate("""() => {
       window.sequence = [];
@@ -87,6 +94,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert '2023 → 2024' in page.locator('#status-message').inner_text()
     page.locator('#mode').select_option('saved')
     assert page.locator('#run').is_hidden()
+    assert page.locator('#snapshot').input_value() == '2023'
     assert 'does not run code' in page.locator('#mode-note').inner_text()
     page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for()

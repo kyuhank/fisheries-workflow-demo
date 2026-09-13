@@ -1212,6 +1212,9 @@ async function activateMode(next) {
   }
   if (mode === "saved") {
     records = payload.saved.records;
+    $("snapshot").value = payload.saved.settings.last_year;
+    $("filter").value = payload.saved.settings.min_hooks_a;
+    $("mortality").value = Number(payload.saved.settings.mortality_2).toFixed(2);
     states = Object.fromEntries(jobs.map((job) => [job.key, "complete"]));
     latestRun = "Saved example";
     messages.length = 0;
@@ -1236,9 +1239,11 @@ async function activateMode(next) {
       if (mode === "cloud" && !cloudReady) {
         await cloud.initialise();
         cloudReady = true;
+        if (version !== modeVersion) return;
       }
       if (mode === "live" && !offlineReady) {
         const result = await initialiseOffline();
+        if (version !== modeVersion) return;
         records = result.records;
       }
       if (version !== modeVersion) return;
