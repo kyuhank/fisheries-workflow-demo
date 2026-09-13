@@ -40,14 +40,30 @@ SPEC = {key: dict(key=key, title=title, module=module, owner=owner, parents=pare
         for key, title, module, owner, parents, description in JOBS}
 DEFAULTS = {'last_year': 2023, 'min_hooks_a': 0, 'mortality_2': 0.30}
 
-# Complete each stage before starting the next; retained peers stay unchanged.
+# Complete each peer group before its dependent groups; independent paths continue.
+# These barriers coordinate execution without adding scientific input dependencies.
 STAGES = [
     ['submission'], ['qc'], ['database'], ['extract'],
     ['cpue_a', 'cpue_b'],
-    ['prepare_a', 'prepare_b', 'cpue_summary'],
-    ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2', 'cpue_report'],
+    ['prepare_a', 'prepare_b'], ['cpue_summary'], ['cpue_report'],
+    ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'],
     ['assessment_summary'], ['assessment_report'],
 ]
+
+# These are file-transfer boundaries, separate from calculation dependencies.
+HANDOVERS = {
+    'data': {'cpue_a': ['extract'], 'cpue_b': ['extract']},
+    'cpue': {'prepare_a': ['extract', 'cpue_a'], 'prepare_b': ['extract', 'cpue_b']},
+}
+
+
+def handover_groups(stage, active):
+    """Only selected recipients whose incoming files were updated need a transfer."""
+    for boundary, recipients in HANDOVERS.items():
+        group = [key for key in stage if key in recipients
+                 and any(parent in active for parent in recipients[key])]
+        if group:
+            yield {'boundary': boundary, 'group': group}
 
 
 def downstream(roots):

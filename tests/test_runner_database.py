@@ -146,3 +146,20 @@ class RunnerDatabaseTest(unittest.TestCase):
             self.assertIn('permission denied', error)
             self.assertIn('permission denied', self.sql(
                 f'set role {role}; select * from public.paper_runner_receipts;', success=False))
+
+    def test_independent_reporting_keeps_manual_transfer_available(self):
+        self.write(str(uuid.uuid4()), 'event', {
+            'event': {'job': 'prepare_a', 'state': 'handover', 'boundary': 'cpue',
+                      'group': ['prepare_a', 'prepare_b']}})
+        for state in ('running', 'complete'):
+            self.write(str(uuid.uuid4()), 'event', {
+                'event': {'job': 'cpue_report', 'state': state}})
+            self.assertEqual(self.value('status', 'paper_runs'), 'handover')
+        # Match the reader API's conditional acknowledgement while reporting is complete.
+        self.sql(f"update public.paper_runs set transfer_count=transfer_count+1,status='running' "
+                 f"where id='{self.request}' and status='handover' and transfer_count=0;")
+        self.assertEqual(self.value('transfer_count', 'paper_runs'), '1')
+        self.write(str(uuid.uuid4()), 'event', {'event': {
+            'job': 'prepare_a', 'state': 'received', 'boundary': 'cpue',
+            'group': ['prepare_a', 'prepare_b']}})
+        self.assertEqual(self.value('status', 'paper_runs'), 'running')

@@ -11,7 +11,7 @@ import sys
 import zipfile
 
 from . import models, reports
-from .spec import DEFAULTS, SPEC, STAGES, downstream
+from .spec import DEFAULTS, SPEC, STAGES, downstream, handover_groups
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -29,12 +29,14 @@ def read_json(path):
 
 
 class Workflow:
-    def __init__(self, directory='runs', notify=None, pause=0, before_job=None):
+    def __init__(self, directory='runs', notify=None, pause=0, before_job=None,
+                 manual_transfer=None):
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
         self.notify = notify or (lambda event: None)
         self.pause = pause
         self.before_job = before_job
+        self.manual_transfer = manual_transfer
         self.settings = dict(DEFAULTS)
         self.records = {}
         self.events = []
@@ -149,7 +151,9 @@ class Workflow:
                   'signature': self.signature(key), 'settings': self.job_settings(key),
                   'snapshot': self.settings['last_year'], 'code': self.code_record(key),
                   'software': self.software(), 'outputs': outputs,
-                  'log': [e['message'] for e in self.events if e['job'] == key] + [SPEC[key]['title'] + ' complete.'],
+                  'log': [e['message'] for e in self.events if e['job'] == key or
+                          (e['state'] in ('handover', 'received') and key in e.get('group', []))]
+                         + [SPEC[key]['title'] + ' complete.'],
                   'inputs': {parent: {'run_id': self.records[parent]['run_id'],
                                       'checksum': self.records[parent]['outputs']['output.json']}
                              for parent in SPEC[key]['parents']}}
@@ -253,10 +257,28 @@ class Workflow:
             self.run_number += 1
             run_id = f'Run {self.run_number:03d}'
             self.notify({'state':'plan', **plan, 'run_id':run_id})
-            for stage in STAGES:
-                keys = [key for key in stage if key in plan['run']]
-                if not keys:
-                    continue
+            stages = [[key for key in stage if key in plan['run']] for stage in STAGES]
+            stages = [keys for keys in stages if keys]
+            stage_for = {key: index for index, keys in enumerate(stages) for key in keys}
+            tasks = {}
+
+            async def run_stage(index, keys):
+                parents = {stage_for[parent] for key in keys for parent in SPEC[key]['parents']
+                           if parent in stage_for and stage_for[parent] != index}
+                await asyncio.gather(*(tasks[parent] for parent in parents))
+                for handover in handover_groups(keys, plan['run']):
+                    if self.manual_transfer is None:
+                        break
+                    recipients = ' and '.join(SPEC[key]['title'] for key in handover['group'])
+                    key = handover['group'][0]
+                    self.record_event(key, 'handover',
+                                      f'Updated inputs are ready for {recipients}. '
+                                      'Click Confirm file transfer to continue.', **handover)
+                    connected = await self.manual_transfer(handover)
+                    await self.emit(key, 'received',
+                                    f'File transfer confirmed for {recipients}.', **handover)
+                    if connected:
+                        self.manual_transfer = None
                 for key in keys:
                     if self.before_job:
                         await self.before_job(key)
@@ -281,6 +303,12 @@ class Workflow:
                         await self.emit(key, 'complete', SPEC[key]['title'] + ' complete.')
                 if failures:
                     raise failures[0]
+            for index, keys in enumerate(stages):
+                tasks[index] = asyncio.create_task(run_stage(index, keys))
+            outcomes = await asyncio.gather(*tasks.values(), return_exceptions=True)
+            for outcome in outcomes:
+                if isinstance(outcome, BaseException):
+                    raise outcome
             self.persist()
             return {'run_id':run_id, **plan, **self.state()}
         finally:

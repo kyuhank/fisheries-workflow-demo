@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "Cite the version used in your analysis."
 type: software
 title: "Fisheries workflow: a portable example from data to assessment"
-version: 1.6.1
+version: 1.6.2
 authors:
   - family-names: Kim
     given-names: Kyuhan

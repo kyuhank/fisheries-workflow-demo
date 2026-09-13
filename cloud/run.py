@@ -132,11 +132,10 @@ class HostedWorkflow(Workflow):
     def __init__(self, context):
         self.context = context
         self.hosted_data = api('data')
-        self.transferred = set()
         self.transfer_count = 0
-        self.connected = context['handover'] != 'manual'
         self.delivery = EventDelivery()
-        super().__init__('/tmp/paper-results', notify=self.publish, pause=1, before_job=self.handover)
+        super().__init__('/tmp/paper-results', notify=self.publish, pause=1,
+                         manual_transfer=self.handover if context['handover'] == 'manual' else None)
         self.pool = None
         self.execution = {'provider': 'GitHub Actions', 'repository': 'kyuhank/fisheries-workflow-demo',
                           'commit': context['commit_sha'], 'github_run': context['github_run'],
@@ -144,7 +143,6 @@ class HostedWorkflow(Workflow):
                           'data_source': 'Supabase PostgreSQL: fixed synthetic records',
                           'data_checksum': digest(encoded(self.hosted_data))}
         self.configure(context['settings'])
-        self.active = self.plan(context['start_job'])['run']
 
     def code_record(self, key):
         return {**super().code_record(key), 'cloud/run.py': digest(Path(__file__).read_bytes())}
@@ -185,16 +183,7 @@ class HostedWorkflow(Workflow):
         self.delivery.publish({'event': event, 'state': self.state(), 'output': output})
         print(event.get('job', 'workflow'), event['state'], event.get('message', ''), flush=True)
 
-    async def handover(self, key):
-        if self.connected:
-            return
-        boundary = 'data' if key in ('cpue_a', 'cpue_b') and 'extract' in self.active else (
-            'cpue' if key.startswith('prepare_') and any(k in self.active for k in ('extract','cpue_a','cpue_b')) else None)
-        if boundary is None or boundary in self.transferred:
-            return
-        event = {'job':key, 'state':'handover', 'boundary':boundary,
-                 'message':'The updated output is ready. Pass the files to the next analyst to continue.'}
-        self.events.append(event); self.publish(event)
+    async def handover(self, handover):
         deadline = time.monotonic() + 180
         while time.monotonic() < deadline:
             try:
@@ -205,10 +194,8 @@ class HostedWorkflow(Workflow):
                 await asyncio.sleep(1.5)
                 continue
             if control['transfer_count'] > self.transfer_count or control['connected']:
-                self.transfer_count = control['transfer_count']; self.connected = control['connected']
-                self.transferred.add(boundary)
-                await self.emit(key, 'received', 'The next analyst received the updated inputs.')
-                return
+                self.transfer_count = control['transfer_count']
+                return control['connected']
             await asyncio.sleep(1.5)
         raise TimeoutError('File transfer was not acknowledged within three minutes. Start again to continue.')
 

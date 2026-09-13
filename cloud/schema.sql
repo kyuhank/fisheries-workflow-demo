@@ -98,8 +98,12 @@ begin
   end if;
   insert into public.paper_events(request_id,event) values(p_request,p_body->'event');
   if p_body->'event'->>'state'<>'phase' then
-   update public.paper_runs set status=case when p_body->'event'->>'state'='handover'
-    then 'handover' else 'running' end where id=p_request;
+   -- Independent reporting may continue while another branch awaits files.
+   update public.paper_runs set status=case
+    when p_body->'event'->>'state'='handover' then 'handover'
+    when p_body->'event'->>'state'='received' then 'running'
+    when r.status='handover' then 'handover'
+    else 'running' end where id=p_request;
   end if;
   if p_body->'output' is not null and p_body->'output'<>'null'::jsonb then
    insert into public.paper_outputs(session_id,job,output)
