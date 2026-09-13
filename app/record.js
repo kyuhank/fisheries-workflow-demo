@@ -211,6 +211,7 @@ async function reproduceOutput(reference, context) {
   $("mortality").value = Number(context.settings.mortality_2).toFixed(2);
   $("handover").value = "connected";
   selected = "submission";
+  settingsIntent = false;
   await refreshPlan();
   const result = await $("run").onclick();
   if (!result) return;

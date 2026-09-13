@@ -52,6 +52,7 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     page.locator('#output-close').click()
     # A changed form must not silently replace the settings of the reference job.
     page.locator('#filter').select_option('1200')
+    page.locator('#mortality').select_option('0.35')
     page.locator('tr[data-job="cpue_a"] .open-output').click()
     page.locator('[data-output="record"]').click()
     page.locator('#reproduce-job').click()
