@@ -50,7 +50,10 @@ def inspect(page, key, report=False):
         assert all(set(row) == {'set_id', 'year', 'vessel', 'hooks', 'catch_n'}
                    and row['hooks'] > 0 and row['catch_n'] >= 0 for row in selected['sets'])
         assert all(set(row) == {'year', 'catch_t'} for row in selected['catch'])
-    frame.locator('body').screenshot(path=str(destination / f'{key}.png'))
+    preview = page.context.new_page()
+    preview.set_content(output['html'])
+    preview.screenshot(path=str(destination / f'{key}.png'), full_page=True)
+    preview.close()
     if report:
         page.locator('[data-output="record"]').click()
         assert page.locator('.record-input').count() == 1
