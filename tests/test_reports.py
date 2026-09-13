@@ -122,8 +122,8 @@ class ReportTest(unittest.TestCase):
     def test_different_assessment_end_years_are_reported_separately(self):
         self.assessment['series']['Assessment A1'][-1]['year'] = 2024
         text = ReportReader(self.page('assessment_report', self.assessment)).text
-        self.assertIn('Assessment A1 ended at 0.400 of its unfished level in 2024.', text)
-        self.assertIn('Assessment B2 ended at 0.700 of its unfished level in 2001.', text)
+        self.assertIn('Spawning biomass in Assessment A1 was 0.400 of its unfished level in 2024.', text)
+        self.assertIn('Spawning biomass in Assessment B2 was 0.700 of its unfished level in 2001.', text)
         self.assertNotIn('ranged from', text)
 
     def test_report_names_and_records_remain_escaped_html(self):
