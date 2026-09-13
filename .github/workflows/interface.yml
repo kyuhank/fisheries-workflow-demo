@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install browser checks
         run: |
           python3 -m venv .browser-check
@@ -25,3 +25,4 @@ jobs:
           .browser-check/bin/python scripts/check-records.py
           .browser-check/bin/python scripts/check-connection.py
           .browser-check/bin/python scripts/check-browser.py
+          .browser-check/bin/python scripts/check-settings.py

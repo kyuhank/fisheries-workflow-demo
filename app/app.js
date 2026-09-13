@@ -13,6 +13,7 @@ let sequence = 0,
   states = {},
   plan = null;
 let selected = "submission",
+  settingsIntent = false,
   busy = false,
   ready = false,
   currentOutput = null,
@@ -123,6 +124,36 @@ function settings() {
   };
 }
 
+function settingsChanges() {
+  const current = settings(), changes = [];
+  const previous = records.submission?.settings.last_year;
+  if (previous !== undefined && previous !== current.last_year) {
+    changes.push({
+      start: "submission",
+      message: `Data snapshot: ${previous} → ${current.last_year}`,
+    });
+  }
+  const filter = records.cpue_a?.settings.min_hooks;
+  if (filter !== undefined && filter !== current.min_hooks_a) {
+    changes.push({ start: "cpue_a", message: "CPUE A record selection changed" });
+  }
+  const assessment = ["assessment_a2", "assessment_b2"].find((key) =>
+    records[key] && records[key].settings.M !== current.mortality_2
+  );
+  if (assessment) {
+    changes.push({ start: assessment, message: "Assessment mortality setting changed" });
+  }
+  return changes;
+}
+
+function currentStart() {
+  // Reverting settings restores the reader's explicit job selection. The planner
+  // still adds every changed or missing input, including the other mortality fit.
+  return settingsIntent && mode !== "saved"
+    ? settingsChanges()[0]?.start || selected
+    : selected;
+}
+
 function status(kind, title, message) {
   $("offline-fallback").hidden = true;
   $("retry-connection").hidden = true;
@@ -205,9 +236,8 @@ function badge(key) {
 
 function selectJob(key) {
   selected = key;
+  settingsIntent = false;
   selectedTask = byKey[key].module;
-  $("selection-title").textContent = byKey[key].title;
-  $("selection-description").textContent = byKey[key].description;
   if (!busy && mode !== "saved") {
     completedSummary = null;
     refreshPlan();
@@ -219,7 +249,7 @@ function jobNode(node, colour) {
   const inPath = mode === "saved" || plan?.run.includes(key), database = key === "database";
   const card = svgElement("g", {
     class: "job workflow-node " + state +
-      (selected === key ? " selected" : "") +
+      (currentStart() === key ? " selected" : "") +
       (dispatchPending && key === plan?.run[0] ? " queued-start" : "") +
       (inPath ? " in-path" : " outside-path"),
     transform: `translate(${node.x} ${node.y})`,
@@ -758,7 +788,7 @@ function renderJobTable() {
     const row = document.createElement("tr");
     const progress = jobProgress(job);
     row.className = stageStatus(job.key) +
-      (selected === job.key ? " selected-job" : "");
+      (currentStart() === job.key ? " selected-job" : "");
     row.dataset.job = job.key;
     row.dataset.module = job.module;
     const name = document.createElement("td");
@@ -831,14 +861,17 @@ function renderJobTable() {
 }
 
 function render() {
+  const start = currentStart();
   renderDiagram();
   renderTasks();
   renderJobTable();
+  $("selection-title").textContent = byKey[start].title;
+  $("selection-description").textContent = byKey[start].description;
   $("run").disabled = !ready || busy || !plan || mode === "saved";
   $("run").hidden = mode === "saved";
   $("run").textContent = busy
     ? "Running…"
-    : selected === "submission"
+    : start === "submission"
     ? "Run full workflow →"
     : "Run from this job →";
   $("download").disabled = busy || !Object.keys(records).length;
@@ -878,7 +911,7 @@ function render() {
   } else if (plan) {
     $("completion").textContent = completedSummary ||
       `${plan.run.length} jobs to run · ${plan.retained.length} retained`;
-    const parentNames = byKey[selected].parents.filter((key) =>
+    const parentNames = byKey[start].parents.filter((key) =>
       plan.retained.includes(key)
     ).map((key) => `${byKey[key].title} (${records[key]?.run_id})`);
     $("reuse-message").textContent = parentNames.length
@@ -886,7 +919,7 @@ function render() {
       : plan.retained.length
       ? "Other results keep their original run and files."
       : "";
-    if (plan.changed.length && selected !== "submission") {
+    if (plan.changed.length && start !== "submission") {
       $("reuse-message").textContent +=
         " Missing or changed inputs are rebuilt first.";
     }
@@ -898,7 +931,7 @@ async function refreshPlan() {
   const version = ++planVersion, executionMode = mode;
   $("run").disabled = true;
   try {
-    const next = await call("plan", { start: selected, settings: settings() });
+    const next = await call("plan", { start: currentStart(), settings: settings() });
     if (version === planVersion && executionMode === mode) {
       plan = next;
       explainChanges();
@@ -910,18 +943,7 @@ async function refreshPlan() {
 }
 
 function explainChanges() {
-  const changes = [];
-  const previous = records.submission?.settings.last_year;
-  if (previous && previous !== settings().last_year) {
-    changes.push(`Data snapshot: ${previous} → ${settings().last_year}`);
-  }
-  const filter = records.cpue_a?.settings.min_hooks;
-  if (filter !== undefined && filter !== settings().min_hooks_a) {
-    changes.push("CPUE A record selection changed");
-  }
-  if (["assessment_a2", "assessment_b2"].some((key) =>
-    records[key] && records[key].settings.M !== settings().mortality_2
-  )) changes.push("Assessment mortality setting changed");
+  const changes = settingsChanges().map((change) => change.message);
   if (changes.length) {
     status("settings-changed", "New settings · previous results kept",
       changes.join(" · ") + ". Run to update the affected jobs.");
@@ -1050,7 +1072,13 @@ worker.onerror = (event) => {
 };
 
 $("run").onclick = async () => {
-  if (!ready || busy) return;
+  if (!ready || busy || !plan || $("run").disabled) return;
+  const start = currentStart(), runSettings = settings();
+  // Once dispatched, repeating Run should repeat this stage even after its
+  // settings have been saved and no longer differ from the current records.
+  selected = start;
+  settingsIntent = false;
+  ++planVersion;
   busy = true;
   dispatchPending = true;
   correctionPending = false;
@@ -1071,8 +1099,8 @@ $("run").onclick = async () => {
   render();
   try {
     const result = await call("run", {
-      start: selected,
-      settings: settings(),
+      start,
+      settings: runSettings,
       handover: $("handover").value,
     });
     records = result.records;
@@ -1097,6 +1125,7 @@ $("run").onclick = async () => {
 };
 for (const id of ["snapshot", "filter", "mortality"]) {
   $(id).onchange = () => {
+    settingsIntent = true;
     completedSummary = null;
     refreshPlan();
   };
@@ -1326,7 +1355,7 @@ function explainMode() {
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
   const version = ++modeVersion;
   ++planVersion;
-  const selection = { settings: settings(), selected, handover: $("handover").value };
+  const selection = { settings: settings(), selected, settingsIntent, handover: $("handover").value };
   $("mode-notice").hidden = !fallbackReason;
   if (fallbackReason) $("mode-notice-message").textContent =
     fallbackReason + " Preparing Python for analysis in this browser.";
@@ -1335,6 +1364,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     states,
     latestRun,
     selected,
+    settingsIntent,
     completedSummary,
     messages: [...messages],
     settings: settings(),
@@ -1355,6 +1385,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   states = saved?.states || {};
   latestRun = saved?.latestRun || "";
   selected = saved?.selected || "submission";
+  settingsIntent = saved?.settingsIntent || false;
   $("handover").value = saved?.handover || "connected";
   completedSummary = saved?.completedSummary || null;
   messages.splice(0, messages.length, ...(saved?.messages || []));
@@ -1366,6 +1397,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   }
   if (preserveSelection) {
     selected = selection.selected;
+    settingsIntent = selection.settingsIntent;
     $("handover").value = selection.handover;
     $("snapshot").value = selection.settings.last_year;
     $("filter").value = selection.settings.min_hooks_a;
@@ -1456,8 +1488,6 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     : mode === "live"
     ? "Results stay in this tab. Download this run to keep them."
     : "Example outputs are included in this HTML file.";
-  $("selection-title").textContent = byKey[selected].title;
-  $("selection-description").textContent = byKey[selected].description;
   render();
 }
 $("mode").onchange = () => activateMode($("mode").value);
