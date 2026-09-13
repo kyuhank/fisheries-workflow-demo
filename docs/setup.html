@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Connect the paper demonstration</title>
+<style>body{font:17px/1.6 system-ui;color:#163044;background:#f5f8fa;max-width:650px;margin:12vh auto;padding:24px}h1{line-height:1.2}button,a.action{display:inline-block;border:0;border-radius:8px;padding:14px 22px;background:#087ca8;color:white;font:inherit;text-decoration:none;cursor:pointer}p{color:#506979}.note{border-left:3px solid #087ca8;padding-left:16px}</style>
+<h1>Connect the paper demonstration</h1><p id="message">Checking the owner setup link.</p><div id="actions"></div><p class="note">This step is for the repository owner. Readers use the demonstration without a GitHub account.</p>
+<script>
+const API='https://gvunwnpsfmylmqfqowzp.supabase.co/functions/v1/paper-api';
+const message=document.getElementById('message'),actions=document.getElementById('actions');
+const query=new URLSearchParams(location.search),state=location.hash.slice(1)||query.get('state'),code=query.get('code');
+history.replaceState(null,'',location.pathname);
+async function post(path,body){const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await r.json();if(!r.ok)throw Error(data.error);return data;}
+(async()=>{
+ if(code){
+  const result=await post('/setup/complete',{state,code});
+  message.textContent='App registered. Install it in your account and select only fisheries-workflow-demo.';
+  const link=document.createElement('a');link.className='action';link.href=result.install_url;link.textContent='Install the paper app';actions.append(link);
+ }else if(query.has('installed')){
+  const r=await fetch(API+'/info'),info=await r.json();
+  message.textContent=info.configured?'Connected. Readers can run the example without signing in.':'The app is not connected to fisheries-workflow-demo yet. Check the selected repository in the app installation.';
+ }else if(state){
+  const result=await post('/setup/manifest',{state});
+  message.textContent='Register a private GitHub App for this demonstration. It can read the selected repository and run its Actions. It cannot edit source files or account settings.';
+  const form=document.createElement('form');form.method='POST';form.action='https://github.com/settings/apps/new?state='+encodeURIComponent(state);
+  const input=document.createElement('input');input.type='hidden';input.name='manifest';input.value=JSON.stringify(result.manifest);
+  const button=document.createElement('button');button.textContent='Register the paper app';form.append(input,button);actions.append(form);
+ }else message.textContent='Open the one-use setup link supplied to the repository owner.';
+})().catch(error=>{message.textContent=error.message;});
+</script></html>
