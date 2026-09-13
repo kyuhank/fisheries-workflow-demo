@@ -79,13 +79,14 @@ function status(kind, title, message) {
   $("status-message").textContent = message;
   $("status-icon").className = "status-icon" +
     (kind === "running" ? " spinner" : "");
-  $("status-icon").textContent = kind === "running"
-    ? ""
-    : kind === "failed"
-    ? "!"
-    : kind === "complete"
-    ? "✓"
-    : "·";
+  $("status-icon").replaceChildren();
+  if (kind !== "running") {
+    $("status-icon").append(
+      lineIcon(
+        kind === "failed" ? "alert" : kind === "complete" ? "check" : "clock",
+      ),
+    );
+  }
 }
 
 function affectedByChange(key) {
@@ -114,23 +115,33 @@ const labels = {
   outdated: "Needs update",
 };
 const symbols = {
-  waiting: "○",
-  complete: "✓",
-  retained: "↶",
-  failed: "!",
-  returned: "↶",
-  handover: "○",
-  received: "✓",
-  outdated: "↻",
+  waiting: "clock",
+  complete: "check",
+  retained: "restore",
+  failed: "alert",
+  returned: "restore",
+  handover: "clock",
+  received: "check",
+  outdated: "restore",
 };
+
+function statusSymbol(state) {
+  const symbol = uiElement(
+    "span",
+    "symbol" + (state === "running" ? " spinner" : ""),
+  );
+  symbol.setAttribute("aria-hidden", "true");
+  if (state !== "running") symbol.append(lineIcon(symbols[state] || "clock"));
+  return symbol;
+}
 
 function badge(key) {
   const state = stageStatus(key), span = document.createElement("span");
   span.className = "state";
-  const symbol = document.createElement("span");
-  symbol.className = "symbol" + (state === "running" ? " spinner" : "");
-  symbol.textContent = symbols[state] || "";
-  span.append(symbol, document.createTextNode(labels[state] || state));
+  span.append(
+    statusSymbol(state),
+    document.createTextNode(labels[state] || state),
+  );
   return span;
 }
 
@@ -428,6 +439,10 @@ function lineIcon(name) {
     layers: "M3 7l9-4 9 4-9 4-9-4m0 5 9 4 9-4M3 17l9 4 9-4",
     file: "M6 3h8l4 4v14H6V3m8 0v5h4M9 12h6m-6 4h6",
     person: "M8 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M4 21v-2a8 8 0 0 1 16 0v2",
+    check: "M5 12l4 4L19 6",
+    clock: "M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18M12 7v5l3 2",
+    restore: "M4 11a8 8 0 1 1 1 6M4 5v6h6",
+    alert: "M12 3l10 18H2L12 3zM12 9v5m0 3v.1",
   };
   icon.append(svgElement("path", { d: paths[name] }));
   return icon;
@@ -467,12 +482,7 @@ function renderTasks() {
     icon.append(lineIcon(task.icon));
     const name = uiElement("strong", "task-name", task.title);
     const status = uiElement("span", "task-status " + state);
-    const symbol = uiElement(
-      "span",
-      "symbol" + (active ? " spinner" : ""),
-      active ? "" : symbols[state],
-    );
-    status.append(symbol, document.createTextNode(labels[state]));
+    status.append(statusSymbol(state), document.createTextNode(labels[state]));
     heading.append(icon, name, status);
     const description = uiElement("span", "task-description", task.description);
     const progress = uiElement("span", "task-progress");
