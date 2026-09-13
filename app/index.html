@@ -12,7 +12,6 @@
     <main>
       <header class="masthead">
         <div>
-          <p class="eyebrow">Interactive research example</p>
           <h1>From fisheries data to assessment.</h1>
           <p
             class="intro">Explore how data, analyses and results stay connected.</p>
@@ -20,8 +19,6 @@
         <div
           class="header-links"><button id="example" class="quiet">Example report</button><a href="https://github.com/kyuhank/fisheries-workflow-demo" target="_blank" rel="noopener">Code &amp; download ↗</a></div>
       </header>
-      <div class="reader-guide"
-        aria-label="How to explore"><span><b>1</b> Run the workflow</span><span><b>2</b> Open a job’s output</span><span><b>3</b> Change an input and rerun</span></div>
       <section class="controls"
         aria-label="Analysis settings"><label>Execution<select id="mode"><option value="cloud" selected>Online · GitHub Actions</option><option value="live">Offline · browser calculation</option><option value="saved">Saved example</option></select></label><label>Connection<select id="handover"><option value="connected">Connected workflow</option><option value="manual">Manual handover</option></select></label><label>Data snapshot<select id="snapshot"><option>2021</option><option>2022</option><option selected>2023</option><option>2024</option></select></label><label>CPUE A records<select id="filter"><option value="0">All valid effort</option><option value="1200">At least 1,200 hooks</option></select></label><label>Mortality setting 2<select id="mortality"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select></label><button id="reset" class="quiet" disabled>Start afresh</button></section>
       <section class="status" id="status"

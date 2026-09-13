@@ -75,14 +75,16 @@ a:hover {
   align-items: flex-end;
   justify-content: space-between;
   gap: 25px;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
 }
 h1 {
   font-size: clamp(27px,3vw,38px);
   line-height: 1.08;
   font-weight: 650;
   letter-spacing: -1.7px;
-  margin: 10px 0 14px;
+  margin: 0 0 10px;
 }
 .eyebrow {
   font-size: 11px;
@@ -93,7 +95,7 @@ h1 {
   margin: 0;
 }
 .intro {
-  font-size: 17px;
+  font-size: 15px;
   color: var(--muted);
   margin: 0;
 }
@@ -839,34 +841,6 @@ dialog iframe {
   padding-top: 14px;
 }
 
-.reader-guide {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  margin: 20px 0 24px;
-  padding: 13px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  font-size: 13px;
-  color: var(--muted);
-  flex-wrap: wrap;
-}
-.reader-guide > span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.reader-guide b {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #e4edf2;
-  color: #346078;
-  font-size: 11px;
-  font-weight: 650;
-}
 .job-table td {
   padding: 14px 16px;
   vertical-align: middle;
@@ -977,15 +951,8 @@ dialog iframe {
   .task-name {
     font-size: 14px;
   }
-  .reader-guide {
-    gap: 14px;
-  }
 }
 @media (max-width:650px) {
-  .reader-guide {
-    font-size: 12px;
-    gap: 10px;
-  }
   .task-list {
     grid-template-columns: 1fr;
   }
