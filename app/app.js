@@ -781,7 +781,7 @@ function renderTasks() {
     ? "Follow the work across teams"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "See who owns each job, what it needs, and the record behind its result."
+    ? "This view illustrates shared job coordination, using example roles and linked job records."
     : "Follow required inputs; open the output or its recorded inputs and versions.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
