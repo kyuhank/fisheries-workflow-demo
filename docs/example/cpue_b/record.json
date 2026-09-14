@@ -2,7 +2,7 @@
   "job": "cpue_b",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "b28caf6dc007558249bec47d257e5fe369cc6c998b06520c813d7fc6eeca4343",
+  "signature": "57c0892dc3847190fd50b61a4082447c093ad0122786a4b356d69d0cf49d5645",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "32426eba06ae5235a011d872080d75c209b411b089eb16488158e797deb8521a",
-    "report.html": "05abd9ad6e7afe8fd0bcd7d0e85df6060ad69e6127a8d0cfc57716a35ca71507"
+    "report.html": "330b4f39b74a06910a02293e2b10ffc8dcdae7e07d0ff048926d9a127ddd3d17"
   },
   "log": [
     "Fit an alternative index with year effects only.",
@@ -34,8 +34,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "618021687196d8ad2712f57b2be3be8064c1fa37",
-    "version": "1.7.2"
+    "commit": "a325776ef1c5127572f5165c725d02083013c03a",
+    "version": "1.7.3"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",

@@ -2,7 +2,7 @@
   "job": "mse_constant",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "981b373412de9a2dacaa7fd9484959540d9309e495cfd81b5ce783403235f1ed",
+  "signature": "1acd076b935dfc4ba55c5b7c9dbc10aed95621ac110d616c16e03e3dfcf21820",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "491c3f015aeaa133ec95f747775c2c3156f8ea491de66a4a681c880f2c3f48ac",
-    "report.html": "c11934116cf67a03ccfb913b6e232a5aa842dedd20dc6615e7ba92fcf372edcd"
+    "report.html": "eba3c4859ccd8b011f713b98f1be71f3e6df88da8d37e1241b46e5f1d9c67d25"
   },
   "log": [
     "Test a fixed annual catch under the same simulated future conditions.",
@@ -34,8 +34,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "618021687196d8ad2712f57b2be3be8064c1fa37",
-    "version": "1.7.2"
+    "commit": "a325776ef1c5127572f5165c725d02083013c03a",
+    "version": "1.7.3"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
