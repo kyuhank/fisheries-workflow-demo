@@ -128,10 +128,52 @@ class MSETest(unittest.TestCase):
         results['index']['operating_models'][0]['numbers'][2] += 1
         with self.assertRaisesRegex(ValueError, 'same operating models'):
             mse.summarise(results)
+        results = copy.deepcopy(self.results)
+        results['buffered']['assumptions']['observation_cv'] = 0.2
+        with self.assertRaisesRegex(ValueError, 'same operating models'):
+            mse.summarise(results)
         invalid = copy.deepcopy(self.assessments)
         invalid['assessment_a1']['series'][-1]['year'] += 1
         with self.assertRaisesRegex(ValueError, 'consecutive annual'):
             mse.prepare(invalid)
+
+    def test_buffer_changes_only_the_rule_and_its_recorded_descriptions(self):
+        original = copy.deepcopy(self.prepared)
+        self.assertNotIn('buffer', self.prepared['assumptions'])
+        preparation = self.page('mse_prepare', self.prepared)
+        self.assertNotIn('80%', preparation)
+        self.assertIn('fraction actually tested', preparation)
+        for buffer in (.6, .8, 1.0):
+            with self.subTest(buffer=buffer):
+                changed = mse.simulate(self.prepared, 'buffered', buffer=buffer)
+                self.assertEqual(changed['rule_settings'], {'buffer': buffer})
+                self.assertEqual(changed['assumptions'], self.results['index']['assumptions'])
+                expected = f'{100 * buffer:g}% of index-based catch advice'
+                self.assertIn(expected, changed['description'])
+                self.assertIn('15%', changed['description'])
+                if buffer != .8:
+                    self.assertNotEqual(changed['metrics'], self.results['buffered']['metrics'])
+                previous = changed['operating_models'][0]['reference_catch_t']
+                for row in changed['example']['rows']:
+                    self.assertGreaterEqual(row['requested_catch_t'], previous * .85 - 1e-8)
+                    self.assertLessEqual(row['requested_catch_t'], previous * 1.15 + 1e-8)
+                    previous = row['requested_catch_t']
+                results = {**self.results, 'buffered': changed}
+                summary = mse.summarise(results)
+                self.assertEqual(summary['rules']['buffered']['settings'], {'buffer': buffer})
+                for key, result in [('mse_buffered', changed), ('mse_summary', summary), ('mse_report', summary)]:
+                    page = self.page(key, result)
+                    self.assertIn(expected, page)
+                    if buffer != .8:
+                        self.assertNotIn('80% of', page)
+        self.assertEqual(self.prepared, original)
+
+    def test_buffer_rejects_unavailable_choices_and_other_rules(self):
+        for value in (True, False, .7, '0.6', float('nan'), float('inf')):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'supplied Buffered rule'):
+                mse.simulate(self.prepared, 'buffered', buffer=value)
+        with self.assertRaisesRegex(ValueError, 'supplied Buffered rule'):
+            mse.simulate(self.prepared, 'constant', buffer=.6)
 
     def page(self, key, result):
         return output_page({'key': key, 'title': key, 'description': 'Compare management rules.'},

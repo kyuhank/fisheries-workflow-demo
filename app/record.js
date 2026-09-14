@@ -209,6 +209,7 @@ async function reproduceOutput(reference, context) {
   $("snapshot").value = context.settings.last_year;
   $("filter").value = context.settings.min_hooks_a;
   $("mortality").value = Number(context.settings.mortality_2).toFixed(2);
+  $("mse-buffer").value = context.settings.mse_buffer ?? 0.8;
   $("handover").value = "connected";
   selected = "submission";
   settingsIntent = false;

@@ -11,18 +11,19 @@ import random
 from statistics import mean, median
 
 from .age_model import MATURITY, SELECTIVITY, WEIGHT, catch_fraction, fishing_mortality, trajectory
+from .spec import DEFAULTS
 
 CASES = ('assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2')
 RULES = {
     'constant': {'name': 'Constant catch', 'description': 'Keep catch at its recent mean.'},
     'index': {'name': 'Index rule', 'description': 'Adjust catch in proportion to the three-year mean observed index.'},
-    'buffered': {'name': 'Buffered rule', 'description': 'Use 80% of the index-based catch, limiting annual advice changes to 15%.'},
+    'buffered': {'name': 'Buffered rule', 'description': 'Apply the selected catch fraction and an annual advice limit.'},
 }
 ASSUMPTIONS = {
     'seed': 20260915, 'years': 15, 'replicates': 20,
     'recruitment_cv': 0.35, 'observation_cv': 0.15,
     'index_window': 3, 'maximum_catch_multiple': 2.0,
-    'buffer': 0.8, 'annual_change_limit': 0.15,
+    'annual_change_limit': 0.15,
     'maximum_fishing_mortality': 2.0, 'depletion_threshold': 0.2,
     'scenarios': [
         {'key': 'baseline', 'name': 'Baseline recruitment', 'recruitment_multiplier': 1.0},
@@ -100,7 +101,7 @@ def catch_advice(rule, recent_indices, reference_index, reference_catch, previou
     ratio = mean(recent_indices[-assumptions['index_window']:]) / reference_index
     proposed = reference_catch * min(assumptions['maximum_catch_multiple'], max(0.0, ratio))
     if rule == 'buffered':
-        proposed *= assumptions['buffer']
+        proposed *= assumptions.get('buffer', DEFAULTS['mse_buffer'])
         change = assumptions['annual_change_limit']
         proposed = min(previous_catch * (1 + change), max(previous_catch * (1 - change), proposed))
     return proposed
@@ -164,12 +165,23 @@ def _metrics(trials):
             'shortfall_trials': sum(row['shortfall_years'] > 0 for row in trials)}
 
 
-def simulate(prepared, rule):
+def simulate(prepared, rule, buffer=None):
     """Test one rule against paired stochastic trials, preserving compact results."""
     rule = rule.removeprefix('mse_')
     if rule not in RULES:
         raise ValueError('Unknown MSE management rule.')
-    assumptions = prepared['assumptions']
+    if buffer is not None and (rule != 'buffered' or type(buffer) not in (int, float)
+                               or buffer not in (0.6, 0.8, 1.0)):
+        raise ValueError('Select one of the supplied Buffered rule catch fractions.')
+    # Common trial conditions stay independent of the setting of any one MP.
+    assumptions = copy.deepcopy(prepared['assumptions'])
+    legacy_buffer = assumptions.pop('buffer', DEFAULTS['mse_buffer'])
+    rule_settings = {'buffer': legacy_buffer if buffer is None else buffer} if rule == 'buffered' else {}
+    effective = {**assumptions, **rule_settings}
+    description = RULES[rule]['description']
+    if rule == 'buffered':
+        description = (f'Use {100 * rule_settings["buffer"]:g}% of index-based catch advice, '
+                       f'limiting annual advice changes to {100 * assumptions["annual_change_limit"]:g}%.')
     trials, paths = [], []
     example = None
     for case_number, model in enumerate(prepared['operating_models']):
@@ -178,7 +190,7 @@ def simulate(prepared, rule):
                 seed = assumptions['seed'] + case_number * 10000 + scenario_number * 1000 + replicate
                 errors = _errors(seed, assumptions['years'], assumptions['recruitment_cv'],
                                  assumptions['observation_cv'])
-                result = trial(model, rule, scenario, assumptions, errors)
+                result = trial(model, rule, scenario, effective, errors)
                 paths.append(result['rows'])
                 trials.append({key: value for key, value in result.items()
                                if key not in ('rows', 'final_numbers')})
@@ -202,7 +214,8 @@ def simulate(prepared, rule):
             selected = [row for row in trials if row['case'] == model['case']
                         and row['scenario'] == scenario['key']]
             cases.append({'case': model['name'], 'scenario': scenario['name'], **_metrics(selected)})
-    return {'rule': rule, 'name': RULES[rule]['name'], 'description': RULES[rule]['description'],
+    return {'rule': rule, 'name': RULES[rule]['name'], 'description': description,
+            'rule_settings': rule_settings,
             'assumptions': copy.deepcopy(assumptions), 'metrics': _metrics(trials),
             'series': annual, 'cases': cases, 'trials': trials, 'example': example,
             'operating_models': copy.deepcopy(prepared['operating_models']),
@@ -230,7 +243,9 @@ def summarise(results):
                         for rule in RULES],
             'cases': [{'rule': by_rule[rule]['name'], **row}
                       for rule in RULES for row in by_rule[rule]['cases']],
-            'assumptions': copy.deepcopy(first['assumptions']), 'rules': copy.deepcopy(RULES),
+            'assumptions': copy.deepcopy(first['assumptions']),
+            'rules': {rule: {'name': by_rule[rule]['name'], 'description': by_rule[rule]['description'],
+                             'settings': copy.deepcopy(by_rule[rule]['rule_settings'])} for rule in RULES},
             'operating_models': copy.deepcopy(first['operating_models']),
             'limitations': first['limitations'], 'boundary_cases': first['boundary_cases'],
             'scope': first['scope']}

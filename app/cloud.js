@@ -72,6 +72,9 @@ class CloudRun {
       if (["assessment_a2", "assessment_b2"].includes(job.key)) {
         return record.settings.M !== settings.mortality_2;
       }
+      if (job.key === "mse_buffered") {
+        return (record.settings.buffer ?? 0.8) !== (settings.mse_buffer ?? 0.8);
+      }
       return false;
     }).map((job) => job.key);
     const run = new Set([start, ...changed]);

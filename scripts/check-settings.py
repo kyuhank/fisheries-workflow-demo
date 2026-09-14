@@ -35,6 +35,7 @@ PREPARE_A = ['prepare_a', 'assessment_a1', 'assessment_a2',
              'assessment_summary', 'assessment_report']
 PREPARE_A += MSE
 CPUE_SUMMARY = ['cpue_summary', 'cpue_report']
+BUFFER = ['mse_buffered', 'mse_summary', 'mse_report']
 
 
 def preview():
@@ -191,6 +192,49 @@ def offline_checks(page):
     page.wait_for_function("mode === 'live' && ready", timeout=90000)
     observe_runs(page)
     baseline = run_and_check(page, 'submission', JOBS, 'offline full baseline')['records']
+    buffered = page.evaluate("async () => (await call('view', {job: 'mse_buffered'})).output")
+
+    page.locator('#mse-buffer').select_option('0.6')
+    expect_plan(page, 'mse_buffered', BUFFER)
+    page.locator('#mse-buffer').select_option('0.8')
+    expect_plan(page, 'submission', JOBS)
+    assert page.evaluate('plan.changed') == []
+    page.locator('#mse-buffer').select_option('0.6')
+    page.locator('#mode').select_option('saved')
+    assert page.locator('#mse-buffer').input_value() == '0.8'
+    assert page.locator('#mse-buffer').is_disabled()
+    page.locator('#mode').select_option('live')
+    expect_plan(page, 'mse_buffered', BUFFER)
+    assert page.locator('#mse-buffer').input_value() == '0.6'
+    result = run_and_check(page, 'mse_buffered', BUFFER, 'offline dropdown-only MSE buffer')
+    assert result['records']['mse_buffered']['settings'] == {'buffer': .6}
+    assert result['records']['mse_buffered']['inputs']['mse_prepare']['run_id'] == baseline['mse_prepare']['run_id']
+    assert result['records']['mse_summary']['inputs']['mse_constant']['run_id'] == baseline['mse_constant']['run_id']
+
+    # Reproduction must recover the recorded MP setting, even with a different
+    # pending form value and inputs reused from an earlier run.
+    page.locator('#mse-buffer').select_option('1')
+    page.evaluate("() => openOutput('mse_report')")
+    page.locator('[data-output="record"]').click()
+    context = page.evaluate('recordContext()')
+    assert context['settings']['mse_buffer'] == .6
+    assert context['jobs']['mse_constant'] == baseline['mse_constant']
+    assert context['jobs']['mse_prepare'] == baseline['mse_prepare']
+    assert page.evaluate("""() => recordedSettings(
+      {mse_buffered: {settings: {}}}, {mse_buffer: .6}).mse_buffer""") == .8
+    page.locator('#reproduce-job').click()
+    page.wait_for_function("document.querySelector('.record-comparison') || (!busy && document.querySelector('#status').classList.contains('failed'))", timeout=90000)
+    assert page.locator('.record-comparison strong').inner_text() == 'Reproduced · output agrees'
+    assert page.locator('#mse-buffer').input_value() == '0.6'
+    assert page.evaluate('currentOutput.comparison.changed_materials') == []
+    assert page.evaluate('currentOutput.output.rules.buffered.settings.buffer') == .6
+    page.locator('#output-close').click()
+    for value in ('1', '0.8'):
+        page.locator('#mse-buffer').select_option(value)
+        run_and_check(page, 'mse_buffered', BUFFER, f'offline MSE buffer {value}')
+    restored = page.evaluate("async () => (await call('view', {job: 'mse_buffered'})).output")
+    assert restored == buffered
+    print('PASS: MSE setting reversion, saved/live restoration, exact retained lineage and real reproduction', flush=True)
 
     # The controls alone must override the previous full-workflow starting job.
     page.locator('#filter').select_option('1200')
@@ -251,11 +295,14 @@ def offline_checks(page):
 
     page.locator('#filter').select_option('0')
     expect_plan(page, 'cpue_a', CPUE)
+    page.locator('#mse-buffer').select_option('0.6')
+    expect_plan(page, 'cpue_a', CPUE)
     page.locator('#reset').click()
     expect_plan(page, 'submission', JOBS)
     assert page.evaluate('records') == {}
     assert page.locator('#filter').input_value() == '0'
     assert page.locator('#mortality').input_value() == '0.30'
+    assert page.locator('#mse-buffer').input_value() == '0.8'
     return baseline
 
 
@@ -284,6 +331,7 @@ class MockCloud:
             updated['cpue_a']['settings']['min_hooks'] = data['settings']['min_hooks_a']
             for key in ['assessment_a2', 'assessment_b2']:
                 updated[key]['settings']['M'] = data['settings']['mortality_2']
+            updated['mse_buffered']['settings']['buffer'] = data['settings']['mse_buffer']
             self.result = {
                 'run_id': run_id, 'start': data['start'], 'run': self.run,
                 'retained': [key for key in JOBS if key not in self.run], 'records': updated,
@@ -306,6 +354,9 @@ def cloud_checks(page, mock, baseline):
         ({'filter': '1200'}, 'cpue_a', CPUE),
         ({'mortality': '0.35'}, 'assessment_a2', MORTALITY),
         ({'filter': '1200', 'mortality': '0.35'}, 'cpue_a', COMBINED),
+        ({'mse-buffer': '0.6'}, 'mse_buffered', BUFFER),
+        ({'mse-buffer': '1'}, 'mse_buffered', BUFFER),
+        ({'mortality': '0.35', 'mse-buffer': '0.6'}, 'assessment_a2', MORTALITY),
     ]:
         # Supply already completed records without running a hosted calculation.
         mock.records = deepcopy(baseline)
@@ -317,6 +368,7 @@ def cloud_checks(page, mock, baseline):
           document.querySelector('#snapshot').value = '2023';
           document.querySelector('#filter').value = '0';
           document.querySelector('#mortality').value = '0.30';
+          document.querySelector('#mse-buffer').value = '0.8';
           selectJob('submission');
           await refreshPlan();
         }""", baseline)
@@ -329,8 +381,9 @@ def cloud_checks(page, mock, baseline):
         assert mock.dispatches[-1]['settings'] == {
             'last_year': 2023, 'min_hooks_a': int(controls.get('filter', '0')),
             'mortality_2': float(controls.get('mortality', '0.30')), 'mse': True,
+            'mse_buffer': float(controls.get('mse-buffer', '0.8')),
         }
-    assert len(mock.dispatches) == 3
+    assert len(mock.dispatches) == 6
 
 
 def main():

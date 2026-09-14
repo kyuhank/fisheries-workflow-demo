@@ -40,3 +40,21 @@ orchestration service could submit the same dependency graph to approved HPC and
 provide shared access to authorised colleagues. Access controls, resource requests,
 storage and recovery must be implemented for that setting. Confidential data
 should not be embedded in a public HTML file.
+
+The **MSE catch buffer** control maps to `mse_buffer` in `workflow/spec.py` defaults
+and downloaded `settings.json`. Only `mse_buffered` records that value as its
+`buffer` setting. `workflow/mse.py:simulate()` applies it and preserves it in the
+MP output and comparison. Allowed choices are 0.6, 0.8 and 1.0; the annual advice
+change limit stays at 0.15. Older settings files without the control use 0.8.
+The UI, cloud planner and hosted request allowlist must agree with the Python
+settings validation; redeploy `paper-api` when that allowlist changes.
+
+To change **Prepare MSE**, edit `prepare()` and `ASSUMPTIONS` in `workflow/mse.py`.
+`CASES` selects the four fitted assessment inputs; `prepare()` reconstructs their
+future starting numbers and derives reference catches and indices from the last
+three years. `ASSUMPTIONS` defines the seed, horizon, trial count, recruitment
+scenarios and observation errors. Fixed biology is in `workflow/age_model.py`.
+These common trial conditions are separate from the Buffered rule's catch
+fraction, so changing that fraction retains the prepared operating models and
+the other MPs. Adapting the common assumptions requires rerunning preparation
+and all management trials.

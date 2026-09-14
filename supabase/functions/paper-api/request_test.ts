@@ -8,7 +8,8 @@ const body = {
 const jobs = ["submission", "mse_report"];
 
 Deno.test("old downloads retain assessment-only execution; current demos include MSE", () => {
-  if ("mse" in runSettings(body, jobs)) {
+  const legacy = runSettings(body, jobs);
+  if ("mse" in legacy || "mse_buffer" in legacy) {
     throw Error("Legacy request changed.");
   }
   const extended = {
@@ -16,7 +17,30 @@ Deno.test("old downloads retain assessment-only execution; current demos include
     start: "mse_report",
     settings: { ...body.settings, mse: true },
   };
-  if (runSettings(extended, jobs).mse !== true) throw Error("MSE was lost.");
+  const current = runSettings(extended, jobs);
+  if (current.mse !== true) throw Error("MSE was lost.");
+  if ("mse_buffer" in current) throw Error("Legacy buffer setting changed.");
+  if (
+    runSettings({
+      ...body,
+      settings: { ...body.settings, mse: false },
+    }, jobs).mse !== false
+  ) throw Error("Assessment-only execution was lost.");
+});
+
+Deno.test("supported numeric buffers survive with either MSE flag", () => {
+  for (const mse of [false, true]) {
+    for (const mse_buffer of [.6, .8, 1]) {
+      const settings = runSettings({
+        ...body,
+        start: mse ? "mse_report" : "submission",
+        settings: { ...body.settings, mse, mse_buffer },
+      }, jobs);
+      if (settings.mse !== mse || settings.mse_buffer !== mse_buffer) {
+        throw Error("MSE settings changed.");
+      }
+    }
+  }
 });
 
 Deno.test("MSE does not open arbitrary jobs or analysis settings", () => {
@@ -27,9 +51,39 @@ Deno.test("MSE does not open arbitrary jobs or analysis settings", () => {
       { ...body, start: "shell" },
       { ...body, command: "anything" },
       { ...body, start: "mse_report" },
+      {
+        ...body,
+        start: "mse_report",
+        settings: { ...body.settings, mse: false, mse_buffer: .8 },
+      },
       { ...body, settings: { ...body.settings, mse: "true" } },
+      { ...body, settings: { ...body.settings, mse_buffer: .8 } },
       { ...body, settings: { ...body.settings, seed: 3 } },
+      {
+        ...body,
+        settings: { ...body.settings, mse: true, mse_buffer: .8, seed: 3 },
+      },
       { ...body, settings: { ...body.settings, mortality_2: -1 } },
+      ...[
+        true,
+        false,
+        null,
+        undefined,
+        "0.8",
+        .7,
+        0,
+        -1,
+        1.1,
+        NaN,
+        Infinity,
+        [],
+        {},
+      ].map(
+        (mse_buffer) => ({
+          ...body,
+          settings: { ...body.settings, mse: true, mse_buffer },
+        }),
+      ),
     ]
   ) {
     let rejected = false;

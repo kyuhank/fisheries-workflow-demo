@@ -189,9 +189,10 @@ def mse_report(result):
                   'limit; the comparison uses realised catches.' if shortfalls else '')
     return ('<p>This report compares three simple catch rules under the same simulated '
             'stock conditions and observation errors.</p><h2>Methods</h2>' + mse_methods(result)
-            + '<p>Constant catch keeps the recent mean. The index rule changes catch in proportion '
-            'to the observed index. The buffered rule uses 80% of that amount, with annual advice '
-            'changes limited to 15%.</p><h2>Results</h2><p class="note">' + findings + '</p>'
+            + '<p>' + ' '.join(esc(result['rules'][rule]['name']) + ': '
+                               + esc(result['rules'][rule]['description'])
+                               for rule in ('constant', 'index', 'buffered'))
+            + '</p><h2>Results</h2><p class="note">' + findings + '</p>'
             + plot(mse_series(result), 'SB_over_SB0', 'Median end-of-year spawning biomass / unfished level')
             + '<p>' + changes + catch_note + '</p>'
             '<h2>Interpretation</h2><p>The comparison shows how management decisions feed back '
@@ -283,6 +284,9 @@ def output_page(job, result, record, lineage):
                  'assumptions; they are not estimated by the assessments. Every rule faces the '
                  'same scenarios and random trials.</p>')
         body += mse_rules(result)
+        body += ('<p>The MSE catch buffer belongs to the Buffered rule job. Changing it reuses '
+                 'these prepared stocks and common trial conditions; the MP output and MSE '
+                 'comparison record the fraction actually tested.</p>')
         body += ('<h2>What is compared?</h2><p>Catch, spawning biomass and annual catch changes. '
                  'These are illustrative objectives for demonstrating the connected workflow.</p>')
         body += '<details><summary>Simulation assumptions</summary>' + mse_methods(result) + mse_limits(result)

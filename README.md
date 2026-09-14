@@ -34,8 +34,14 @@ of the methods and findings, linked to the results used to write them.
 The MSE task uses the four fitted assessment cases to test three simple catch
 rules under two future recruitment scenarios. **Prepare MSE** shows what comes
 from each assessment. Simulated observations inform catch decisions, which affect
-the stock and its next observation. **Compare strategies** summarises the trials;
+the stock and its next observation. **MSE results summary** summarises the trials;
 **MSE report** describes the results and their limits.
+
+Change **MSE catch buffer** to test the Buffered rule at 60%, 80% (default), or
+100% of index-based catch advice, keeping the annual advice change limit at ±15%.
+Only **Buffered rule → MSE results summary → MSE report** reruns. Prepared stocks,
+random trial conditions, and the other two MPs keep their original outputs and
+run records. Each revised output records the fraction tested.
 
 Parallel CPUE analyses, input preparations, assessment fits and management trials finish their
 peer group before dependent stages start. Partial reruns retain unaffected peers.

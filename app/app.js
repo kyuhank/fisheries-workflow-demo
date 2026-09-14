@@ -121,6 +121,7 @@ function settings() {
     last_year: Number($("snapshot").value),
     min_hooks_a: Number($("filter").value),
     mortality_2: Number($("mortality").value),
+    mse_buffer: Number($("mse-buffer").value),
     mse: true,
   };
 }
@@ -143,6 +144,10 @@ function settingsChanges() {
   );
   if (assessment) {
     changes.push({ start: assessment, message: "Assessment mortality setting changed" });
+  }
+  if (records.mse_buffered &&
+      (records.mse_buffered.settings.buffer ?? 0.8) !== current.mse_buffer) {
+    changes.push({ start: "mse_buffered", message: "MSE catch buffer changed" });
   }
   return changes;
 }
@@ -934,7 +939,7 @@ function render() {
     ? "Job outputs navigation" : "Orchestration navigation");
   if (manual) $("workspace-description").textContent =
     "Separate workspaces, without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
-  for (const id of ["snapshot", "filter", "mortality"]) {
+  for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
   }
   $("selection-label").textContent = mode === "saved" ? "Selected job" : "Start from";
@@ -1152,7 +1157,7 @@ $("run").onclick = async () => {
     await refreshPlan();
   }
 };
-for (const id of ["snapshot", "filter", "mortality"]) {
+for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
   $(id).onchange = () => {
     settingsIntent = true;
     completedRun = null;
@@ -1210,6 +1215,7 @@ $("reset").onclick = async () => {
     $("snapshot").value = "2023";
     $("filter").value = "0";
     $("mortality").value = "0.30";
+    $("mse-buffer").value = "0.8";
     $("run-id").textContent = "";
     messages.length = 0;
     $("execution-log").textContent = "No execution yet.";
@@ -1423,6 +1429,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     $("snapshot").value = saved.settings.last_year;
     $("filter").value = saved.settings.min_hooks_a;
     $("mortality").value = Number(saved.settings.mortality_2).toFixed(2);
+    $("mse-buffer").value = saved.settings.mse_buffer ?? 0.8;
   }
   if (preserveSelection) {
     selected = selection.selected;
@@ -1431,12 +1438,14 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     $("snapshot").value = selection.settings.last_year;
     $("filter").value = selection.settings.min_hooks_a;
     $("mortality").value = Number(selection.settings.mortality_2).toFixed(2);
+    $("mse-buffer").value = selection.settings.mse_buffer ?? 0.8;
   }
   if (mode === "saved") {
     records = payload.saved.records;
     $("snapshot").value = payload.saved.settings.last_year;
     $("filter").value = payload.saved.settings.min_hooks_a;
     $("mortality").value = Number(payload.saved.settings.mortality_2).toFixed(2);
+    $("mse-buffer").value = payload.saved.settings.mse_buffer ?? 0.8;
     states = Object.fromEntries(jobs.map((job) => [job.key, "complete"]));
     latestRun = "Saved example";
     messages.length = 0;

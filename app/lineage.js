@@ -39,6 +39,7 @@ function recordedSettings(chain, fallback) {
     );
   }
   if (mortality.length) values.mortality_2 = mortality[0];
+  if (chain.mse_buffered) values.mse_buffer = chain.mse_buffered.settings.buffer ?? 0.8;
   return values;
 }
 

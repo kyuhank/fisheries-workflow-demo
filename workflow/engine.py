@@ -61,7 +61,10 @@ class Workflow:
         if candidate['mortality_2'] not in (0.25, 0.30, 0.35):
             raise ValueError('Select one of the supplied mortality settings.')
         if type(candidate['mse']) is not bool:
-            raise ValueError('Select whether to include the MSE extension.')
+            raise ValueError('Select whether to include the MSE analyses.')
+        if (type(candidate['mse_buffer']) not in (int, float) or
+                candidate['mse_buffer'] not in (0.6, 0.8, 1.0)):
+            raise ValueError('Select one of the supplied MSE catch buffers.')
         self.settings = candidate
 
     @property
@@ -80,6 +83,8 @@ class Workflow:
             return {'M': self.settings['mortality_2']}
         if key in ('assessment_a1', 'assessment_b1'):
             return {'M': 0.20}
+        if key == 'mse_buffered':
+            return {'buffer': self.settings['mse_buffer']}
         return {}
 
     def code_record(self, key):
@@ -259,7 +264,8 @@ class Workflow:
             if key == 'mse_prepare':
                 return mse.prepare({parent: self.output(parent) for parent in SPEC[key]['parents']})
             if key in ('mse_constant', 'mse_index', 'mse_buffered'):
-                return mse.simulate(self.output('mse_prepare'), key.removeprefix('mse_'))
+                return mse.simulate(self.output('mse_prepare'), key.removeprefix('mse_'),
+                                    buffer=self.settings['mse_buffer'] if key == 'mse_buffered' else None)
             if key == 'mse_summary':
                 return mse.summarise({parent: self.output(parent) for parent in SPEC[key]['parents']})
             if key == 'mse_report':
@@ -350,7 +356,13 @@ class Workflow:
                     name = 'reference/' + str(path.relative_to(self.directory))
                     data = path.read_bytes()
                     archive.writestr(name, data); checksums[name] = digest(data)
-            settings = encoded(self.settings)
+            bundle_settings = dict(self.settings)
+            if 'mse_buffered' in self.records:
+                # A planned but unexecuted control change is not the setting of
+                # the downloaded result. Historical records used the default.
+                bundle_settings['mse_buffer'] = self.records['mse_buffered']['settings'].get(
+                    'buffer', DEFAULTS['mse_buffer'])
+            settings = encoded(bundle_settings)
             archive.writestr('settings.json', settings)
             checksums['settings.json'] = digest(settings)
             archive.writestr('SHA256SUMS.json', json.dumps(checksums, indent=2))
