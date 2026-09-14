@@ -2,7 +2,7 @@
   "job": "mse_index",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "1acd076b935dfc4ba55c5b7c9dbc10aed95621ac110d616c16e03e3dfcf21820",
+  "signature": "dfa22eb67a0361a965e9800a6c5e66e29228c56f70beeae041637b2a6187a92b",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "9a2d15366c5ef083702447ccc32523a2eff9871ba951079195ffb6f2e1c066df",
-    "report.html": "21dba95dbb555ada4fae982cb5fb04ed4e5af72254004326aea0c2d0d4950981"
+    "report.html": "3015668b24a4436beaf07acdeb3181bee8aaa49fe1f0cd891cd4295a26914778"
   },
   "log": [
     "Update annual catch using a simulated abundance index.",
@@ -34,7 +34,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "a325776ef1c5127572f5165c725d02083013c03a",
+    "commit": "3bfdd22f9842b44d8561ec9bc82cd3dd8c231383",
     "version": "1.7.3"
   },
   "data_files": {

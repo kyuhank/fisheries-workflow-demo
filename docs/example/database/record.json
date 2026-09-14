@@ -2,7 +2,7 @@
   "job": "database",
   "owner": "Data curator",
   "run_id": "Run 001",
-  "signature": "02f2e90865d3e84f36ea093e07ad7fd3c5f8d891f5c43a7cd16c8123e2fed8f7",
+  "signature": "0df68ea35b97d0c576f9106ef9849b1fa19367b7d0bf94e03c87768b235be8dd",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -21,7 +21,7 @@
   "outputs": {
     "output.json": "7902e0657e373d0eec8a34e8713f16cbd75165b23f68c9cf832dd25c56be0769",
     "snapshot.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
-    "report.html": "a3bd6d6da5dccc715a52a305a3197773b293b48873d72d3c98d6976381788205"
+    "report.html": "1b5c00e305061057a8fd6f9a49af9f5c0cb10c28f3866238ec40a6964c58b62f"
   },
   "log": [
     "Store the accepted records in a fixed database snapshot.",
@@ -35,7 +35,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "a325776ef1c5127572f5165c725d02083013c03a",
+    "commit": "3bfdd22f9842b44d8561ec9bc82cd3dd8c231383",
     "version": "1.7.3"
   },
   "data_files": {

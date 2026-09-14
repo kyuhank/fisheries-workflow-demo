@@ -2,7 +2,7 @@
   "job": "mse_prepare",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "ddd42cbed52a088791a85961cf8e54d83588c606fd160f61f9eb7fe7e75f6591",
+  "signature": "755b2a93f424317a77836886444f842b7ea4ef87e55acb51cc26b2ef755d5f56",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "c709c68dc0e1fc81a3467fbbf4cc42283e1477824503beb0cf58b15cfdb6b6ba",
-    "report.html": "7812e9e0f92478fb07b4519c50d35b55708982303ef37aadd0309ef56e5a92ff"
+    "report.html": "9fc8fa37bed1a87271489283efc0d5a5f06a72d0d23fc00189c2c6e7abb2d172"
   },
   "log": [
     "Use the four assessment cases to prepare stocks for simulated management trials.",
@@ -46,7 +46,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "a325776ef1c5127572f5165c725d02083013c03a",
+    "commit": "3bfdd22f9842b44d8561ec9bc82cd3dd8c231383",
     "version": "1.7.3"
   },
   "data_files": {

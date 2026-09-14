@@ -2,7 +2,7 @@
   "job": "qc",
   "owner": "Data curator",
   "run_id": "Run 001",
-  "signature": "b42c2a94b7e1c04cf2470fdcc36f84cb7ddb5bb2a73b3830438480763f364df8",
+  "signature": "e02307d5f4d4830af2c08374c94836972142bcaa0217766b158105f4cac3bfea",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -18,7 +18,7 @@
   },
   "outputs": {
     "output.json": "8d3e46ad7625155a04f8f7207051a07b09d6b57dc6b321bf393536af32504268",
-    "report.html": "fcdba2fe3a92ee5ba2e2b930d4bf06bc9c705c77b39c4ef45aeacd99a2ec0634"
+    "report.html": "76ddb5635f09eefadee687c26968980dc1245bc8dd7a10dd9e48b4118d8d77e8"
   },
   "log": [
     "Check records and return invalid effort for correction.",
@@ -34,7 +34,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "a325776ef1c5127572f5165c725d02083013c03a",
+    "commit": "3bfdd22f9842b44d8561ec9bc82cd3dd8c231383",
     "version": "1.7.3"
   },
   "data_files": {
