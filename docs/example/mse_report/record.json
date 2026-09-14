@@ -2,14 +2,14 @@
   "job": "mse_report",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "de053351055b982d33e326d615d9731c578ef2edf850ca6ac19fe5a237ded9eb",
+  "signature": "273cb0c248e988b56fecf34b7b80feffd423eee0bd9185eab44a4876aede4f9f",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "8c223a414b9d8c6955b54db1776fb613477e36c891a99926b5c48c685f0d6282",
-    "workflow/spec.py": "bb99c1806b32a422974cbbadcca8da2ba320ba56e563bdec90dd101212344bd5",
-    "workflow/reports.py": "345765e78cce94adfe576eec6ef3617a3570b3e59ded0b903b4c2c60ecd0e57f",
-    "workflow/mse.py": "1a28108dac91a5fa5919d8d834d8aadecd037466f833f30668ac004429553d48",
+    "workflow/engine.py": "b97c8bd7f0ad7f444c16c8eabe4c3934592a22e4eb09cfdc0b87c9e6fe133f64",
+    "workflow/spec.py": "bb59d99a89a352db7901b0ebac82dfe3376fa4ad3f6daa2a68f1f2b884d5c15d",
+    "workflow/reports.py": "8d3bd722e63a7bec4e7796bc9ff0814e5bae1579a044a22ae98d3fef8cdf6163",
+    "workflow/mse.py": "7a4ec08d5a9b8abbb12c2e386c697d692e0a1d5989d7b61d1c364cd777ce1d7c",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
@@ -19,8 +19,8 @@
     "sqlite": "3.37.2"
   },
   "outputs": {
-    "output.json": "0230101ec21d2a89dcb3432f1fd888025159317ef03b3f71e637dfd3f6da683c",
-    "report.html": "e29573d262e18443bf258066fe766fe538324e8c8899757a1eb432e1efd28da5"
+    "output.json": "b9448f2aa46df01356a76eadaafbc43c2d16ea58c333cb459384839992591937",
+    "report.html": "a1ed643b2798e07e392153ae6a93996fa23d49b2c415c78dd1af4fd4100256cb"
   },
   "log": [
     "Report the tested procedures, their trade-offs and the limits of the example.",
@@ -29,13 +29,13 @@
   "inputs": {
     "mse_summary": {
       "run_id": "Run 001",
-      "checksum": "0230101ec21d2a89dcb3432f1fd888025159317ef03b3f71e637dfd3f6da683c"
+      "checksum": "b9448f2aa46df01356a76eadaafbc43c2d16ea58c333cb459384839992591937"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "eb86e7b4681e28d066538b2f31f9fafdc64b4cdf",
-    "version": "1.7.1"
+    "commit": "618021687196d8ad2712f57b2be3be8064c1fa37",
+    "version": "1.7.2"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
