@@ -12,6 +12,10 @@ args = parser.parse_args()
 mode = 'online' if args.online else 'offline'
 destination = ROOT / '.test-output' / f'reports-{mode}'
 destination.mkdir(parents=True, exist_ok=True)
+MSE_JOBS = {
+    'mse_prepare', 'mse_constant', 'mse_index', 'mse_buffered',
+    'mse_summary', 'mse_report',
+}
 
 
 def run(page):
@@ -78,10 +82,11 @@ with sync_playwright() as playwright:
     page.locator('#run:enabled').wait_for(timeout=90000)
     assert page.locator('#mode').input_value() == ('cloud' if args.online else 'live')
     baseline = run(page)
-    for key in ['extract', 'cpue_summary', 'assessment_summary']:
+    for key in ['extract', 'cpue_summary', 'assessment_summary', 'mse_prepare', 'mse_summary']:
         inspect(page, key)
     cpue_before, _ = inspect(page, 'cpue_report', True)
     assessment_before, _ = inspect(page, 'assessment_report', True)
+    mse_before, _ = inspect(page, 'mse_report', True)
 
     page.locator('#filter').select_option('1200')
     cpue_records = run(page)
@@ -95,17 +100,26 @@ with sync_playwright() as playwright:
     mortality_records = run(page)
     assert {key for key in mortality_records
             if mortality_records[key] != cpue_records[key]} == {
-                'assessment_a2', 'assessment_b2', 'assessment_summary', 'assessment_report'}
+                'assessment_a2', 'assessment_b2', 'assessment_summary', 'assessment_report'} | MSE_JOBS
     assessment_after, output = inspect(page, 'assessment_report', True)
     assert assessment_after != assessment_before and '0.35' in assessment_after
     assert output['record']['inputs']['assessment_summary']['run_id'] == page.evaluate('latestRun')
+    mse_after, output = inspect(page, 'mse_report', True)
+    assert mse_after != mse_before
+    assert output['record']['inputs']['mse_summary']['run_id'] == page.evaluate('latestRun')
+    for key in ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2']:
+        assert mortality_records['mse_prepare']['inputs'][key] == {
+            'run_id': mortality_records[key]['run_id'],
+            'checksum': mortality_records[key]['outputs']['output.json'],
+        }
 
     page.locator('#mode').select_option('saved')
-    for key in ['cpue_report', 'assessment_report']:
+    for key in ['cpue_report', 'assessment_report', 'mse_report']:
         inspect(page, key, True)
     assert not errors, errors
     result = {'mode': mode, 'distinct_reports': True, 'settings_updates': True,
-              'retained_inputs': True, 'saved_reports': True, 'page_errors': errors,
+              'retained_inputs': True, 'mse_assessment_inputs': True,
+              'saved_reports': True, 'page_errors': errors,
               'execution': mortality_records['assessment_report'].get('execution'),
               'source': mortality_records['assessment_report'].get('source')}
     (destination / 'checks.json').write_text(json.dumps(result, indent=2) + '\n')
