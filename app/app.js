@@ -938,13 +938,13 @@ function render() {
   document.querySelector('.workspace-nav').setAttribute('aria-label', manual
     ? "Job outputs navigation" : "Orchestration navigation");
   if (manual) $("workspace-description").textContent =
-    "Separate workspaces, without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
+    "This view represents separate workspaces without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
   for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
   }
   $("selection-label").textContent = mode === "saved" ? "Selected job" : "Start from";
   $("hint").textContent = mode === "saved"
-    ? "Use View to inspect a job’s outputs and inputs."
+    ? "Open a job’s output, then use Inputs & versions to trace its inputs."
     : "Select a job to rerun it and the analyses that use its output.";
   if (mode === "saved") {
     $("completion").textContent = `${Object.keys(records).length} saved outputs`;
@@ -1042,7 +1042,7 @@ function handleEvent(event) {
       $("handover-title").textContent = event.boundary === "data"
         ? "Data manager → CPUE analyst"
         : "CPUE analyst → Assessment analyst";
-      $("handover-message").textContent = "Separate workspaces · no shared orchestration. The button represents the analyst’s file transfer; no upload is needed.";
+      $("handover-message").textContent = "This simulates a file transfer between separate workspaces with no shared orchestration. No upload is needed.";
     } else if (event.state === "received") {
       waitingTransfer = null;
       confirmingTransfer = false;
@@ -1082,7 +1082,7 @@ function handleEvent(event) {
           : "CPUE analysis waits for extracted data. Confirm the transfer below to continue."
         : groupTitle
         ? active.map((job) => job.title).join(" · ") +
-          ". Dependent stages wait for their input group to finish."
+          ". Jobs using these results wait for the group to finish."
         : event.message,
     );
   }
@@ -1222,7 +1222,7 @@ $("reset").onclick = async () => {
     status(
       "",
       "Ready to run",
-      "Begin with data submission, or select an analysis job.",
+      "Run the workflow, then change a setting to see which results update and which are reused.",
     );
     selectJob("submission");
   } catch (error) {
@@ -1493,8 +1493,8 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
         "",
         Object.keys(records).length ? "Your results are still here" : "Ready to run",
         mode === "cloud"
-          ? "No login needed. Select a job, then run the analyses that use its output."
-          : "The same Python analysis runs in this browser.",
+          ? "No login needed. Run the workflow, then change a setting to compare updated and reused results."
+          : "Run the workflow here, then change a setting to compare updated and reused results.",
       );
       await refreshPlan();
     } catch (error) {

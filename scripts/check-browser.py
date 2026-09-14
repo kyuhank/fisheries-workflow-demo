@@ -124,7 +124,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#run:enabled').wait_for()
     page.locator('#handover').select_option('manual')
     assert page.locator('[data-tab="jobs"]').inner_text() == 'Job outputs'
-    assert 'Shared orchestration is not in use' in page.locator('#handover-note').inner_text()
+    assert 'This mode represents work without shared orchestration.' in page.locator('#handover-note').inner_text()
     assert page.locator('.handover-marker').count() == 4
     page.locator('#run').click()
     page.locator('#handover-panel:visible').wait_for(timeout=90000)

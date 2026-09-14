@@ -187,7 +187,7 @@ function renderRecord() {
       unavailable ||
         (mode === "saved"
           ? "This is a saved example. Select a calculation mode to run new results."
-          : "Recalculates the workflow from the recorded inputs and settings, then compares this job’s output. Other jobs will also run."),
+          : "Reruns the full workflow with the recorded settings and compares this output with the original."),
     ),
   );
   const details = uiElement("details", "record-details");
