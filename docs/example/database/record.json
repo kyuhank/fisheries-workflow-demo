@@ -2,13 +2,13 @@
   "job": "database",
   "owner": "Data curator",
   "run_id": "Run 001",
-  "signature": "44bb52d13a34d2a73130cb33b31b9f0278fcf87934aca3d29a4284e6b8ec937c",
+  "signature": "5b65c379785993c58f2dade5b8b1dd67d7d2a6d116e158ca2c0a80ba5c070a71",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "workflow/engine.py": "8c223a414b9d8c6955b54db1776fb613477e36c891a99926b5c48c685f0d6282",
     "workflow/spec.py": "bb99c1806b32a422974cbbadcca8da2ba320ba56e563bdec90dd101212344bd5",
-    "workflow/reports.py": "4a3c225fe138dd2f7dd64ea96cf2ae1bb741675f9a82ed0dd998f63f6c2254cb",
+    "workflow/reports.py": "345765e78cce94adfe576eec6ef3617a3570b3e59ded0b903b4c2c60ecd0e57f",
     "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
@@ -21,7 +21,7 @@
   "outputs": {
     "output.json": "7902e0657e373d0eec8a34e8713f16cbd75165b23f68c9cf832dd25c56be0769",
     "snapshot.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
-    "report.html": "153b656813fea9f1209a61a53687bff0e90871e8ab73a6a732d13aa155f1426a"
+    "report.html": "1528fa717f323454b9fe497421f59f0483382cab1c9f885b6696c55b0e1dc1f0"
   },
   "log": [
     "Store the accepted records in a fixed database snapshot.",
@@ -35,8 +35,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "aa23dd2503a5bf8f8a3cc8c67bae60f20d2f50e9",
-    "version": "1.7.0"
+    "commit": "eb86e7b4681e28d066538b2f31f9fafdc64b4cdf",
+    "version": "1.7.1"
   },
   "data_files": {
     "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
