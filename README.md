@@ -2,9 +2,9 @@
 
 [Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download for offline use](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
-Follow a change from fisheries data through assessment to management trials. See which jobs
+Follow a change from fisheries data through assessment to management strategy evaluation. See which jobs
 need to run again, which results can be kept, and where each output came from.
-The data are synthetic and the models are simplified.
+Synthetic data and simplified models demonstrate how these analyses can be connected.
 
 ## Choose a mode
 
