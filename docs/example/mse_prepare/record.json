@@ -2,12 +2,12 @@
   "job": "mse_prepare",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "6ae727b8d8a4fff980a3fa011b5589ac5adb126dd43239701b9d7283ea905c40",
+  "signature": "191df4d7ed85faa0d66f5982f1a20ec53f1bcd0f64e9e1dea1a231346188e4f2",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "workflow/engine.py": "8c223a414b9d8c6955b54db1776fb613477e36c891a99926b5c48c685f0d6282",
-    "workflow/spec.py": "6a7fd61c63d70295c643c760a0406e10b03625458bc85b94f5bcc045e9a96749",
+    "workflow/spec.py": "bb99c1806b32a422974cbbadcca8da2ba320ba56e563bdec90dd101212344bd5",
     "workflow/reports.py": "4a3c225fe138dd2f7dd64ea96cf2ae1bb741675f9a82ed0dd998f63f6c2254cb",
     "workflow/mse.py": "1a28108dac91a5fa5919d8d834d8aadecd037466f833f30668ac004429553d48",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "d89a7b7d7c2986418ea3ce1c66d73b21daf7d9021af7f52515c0e0f58248b9c0",
-    "report.html": "92adb4951d3c88d3a02518a343d010bbd2fdcf48a7cdb8265ef64be33a5a34e0"
+    "report.html": "53260a3d3d39bd368fbcbbf0cc6a1c3e949821768b6d1fc210d65074a6bf5681"
   },
   "log": [
     "Use the four assessment cases to prepare stocks for simulated management trials.",
@@ -46,7 +46,7 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "85fda8f6864d573bcdd9b79d5da6269e8f14808a",
+    "commit": "aa23dd2503a5bf8f8a3cc8c67bae60f20d2f50e9",
     "version": "1.7.0"
   },
   "data_files": {
