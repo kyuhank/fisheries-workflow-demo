@@ -110,6 +110,74 @@ def assessment_report(result):
         'stock-management advice.</p>')
 
 
+def mse_metrics(rows):
+    return table(rows, [('name', 'Management rule'), ('mean_catch_t', 'Mean catch (t/year)'),
+                        ('final_SB_over_SB0', 'Final SB / SB₀'),
+                        ('below_threshold_percent', 'Trials below 0.2 (%)'),
+                        ('catch_change_percent', 'Catch change (%)')])
+
+
+def mse_series(result):
+    """Keep rule colours consistent after a result has been saved as sorted JSON."""
+    return {row['name']: result['series'][row['name']] for row in result['metrics']}
+
+
+def mse_metric_note():
+    return ('<p class="muted">Final biomass is the median across trials. The threshold column '
+            'counts trials that fell below 0.2 of unfished spawning biomass at any time; '
+            '0.2 is an illustrative comparison level. Catch change is annual absolute change '
+            'relative to mean catch, including the first change from recent catch. Cases and '
+            'scenarios have equal weight, not estimated probabilities.</p>')
+
+
+def mse_methods(result):
+    assumptions = result['assumptions']
+    return (f'<p>Four fitted assessment cases supply the simulated stocks. Each rule is tested '
+            f'for {assumptions["years"]} years under two recruitment scenarios, with '
+            f'{assumptions["replicates"]} repeated trials per case and scenario. The same '
+            'random errors are used when comparing rules.</p>'
+            '<p>Each year, an index is observed with error, a catch rule is applied, and the '
+            'stock responds to that catch. The next observation comes from the updated stock. '
+            'The index-based rules use a three-year mean; they do not see the true stock size.</p>')
+
+
+def mse_limits(result):
+    text = '<p>' + ' '.join(esc(item) for item in result['limitations']) + '</p>'
+    if result.get('boundary_cases'):
+        text += ('<p>The fitted biomass reached its search boundary in '
+                 + ', '.join(map(esc, result['boundary_cases']))
+                 + '. These operating-model inputs need review.</p>')
+    return text
+
+
+def mse_report(result):
+    """Write a short account of the comparison, separate from the summary page."""
+    metrics = result['metrics']
+    catches = [row['mean_catch_t'] for row in metrics]
+    stock = [row['final_SB_over_SB0'] for row in metrics]
+    findings = (f'Across the three rules, mean annual catch ranged from '
+                f'<strong>{min(catches):,.0f} to {max(catches):,.0f} tonnes</strong>. '
+                f'Median final spawning biomass ranged from <strong>{min(stock):.2f} to '
+                f'{max(stock):.2f}</strong> of its unfished level.')
+    changes = ' '.join(f'{esc(row["name"])} had average annual catch changes of '
+                       f'{row["catch_change_percent"]:.1f}%.' for row in metrics)
+    shortfalls = sum(row['shortfall_trials'] for row in metrics)
+    catch_note = (' Some requested catches could not be taken within the simulated fishing '
+                  'limit; the comparison uses realised catches.' if shortfalls else '')
+    return ('<p>This report compares three simple catch rules under the same simulated '
+            'stock conditions and observation errors.</p><h2>Methods</h2>' + mse_methods(result)
+            + '<p>Constant catch keeps the recent mean. The index rule changes catch in proportion '
+            'to the observed index. The buffered rule uses 80% of that amount, with annual advice '
+            'changes limited to 15%.</p><h2>Results</h2><p class="note">' + findings + '</p>'
+            + plot(mse_series(result), 'SB_over_SB0', 'Median end-of-year spawning biomass / unfished level')
+            + '<p>' + changes + catch_note + '</p>'
+            '<h2>Interpretation</h2><p>The comparison shows how management decisions feed back '
+            'into future stock conditions and catches. Catch, stock condition and stability '
+            'must be considered together; this example does not select a preferred rule or '
+            'provide advice for a real fishery.</p>'
+            '<details><summary>Scope and assumptions</summary>' + mse_limits(result) + '</details>')
+
+
 def output_page(job, result, record, lineage):
     key = job['key']; body = '<p>' + esc(job['description']) + '</p>'
     if key == 'submission':
@@ -167,6 +235,64 @@ def output_page(job, result, record, lineage):
         body = '<article class="narrative-report" data-report="cpue_report">' + cpue_report(result) + '</article>'
     elif key == 'assessment_report':
         body = '<article class="narrative-report" data-report="assessment_report">' + assessment_report(result) + '</article>'
+    elif key == 'mse_prepare':
+        body += '<p class="note">Four assessment cases → three catch rules → one comparison.</p>'
+        body += ('<h2>From stock assessment to MSE</h2><p>Each fitted assessment supplies a '
+                 'starting stock and its estimated parameters. Preparation reconstructs numbers '
+                 'at age after the last observed year, so simulation begins in the following year. '
+                 'The four cases are deliberately included in this example.</p>')
+        body += table([
+            {'source': 'Fitted model and catch history', 'use': 'Reconstruct the starting numbers at age.'},
+            {'source': 'Natural mortality and recruitment', 'use': 'Set survival and the baseline number of new fish.'},
+            {'source': 'Catchability and recent CPUE indices', 'use': 'Simulate future indices and define the reference index.'},
+            {'source': 'Recent annual catches', 'use': 'Set the reference catch for the management rules.'},
+        ], [('source', 'Assessment result used'), ('use', 'Role in MSE')])
+        from .mse import spawning
+        model_rows = [{**model, 'starting_depletion': spawning(model['numbers']) / model['SB0']}
+                      for model in result['operating_models']]
+        body += '<h2>Starting stocks</h2>' + table(model_rows, [
+            ('name', 'Assessment case'), ('first_year', 'First future year'),
+            ('starting_depletion', 'Starting SB / SB₀'), ('reference_catch_t', 'Reference catch (t/year)')])
+        body += ('<p>Open <strong>Inputs &amp; versions</strong> to follow each case to the exact '
+                 'assessment run used. Full starting states and parameters are in the Data tab.</p>')
+        body += ('<h2>Added for the future trials</h2><p>The example specifies two recruitment '
+                 'scenarios, observation error and three management rules. These are additional '
+                 'assumptions; they are not estimated by the assessments. Every rule faces the '
+                 'same scenarios and random trials.</p>')
+        body += '<h2>Management rules</h2>' + table(
+            list(result['rules'].values()), [('name', 'Rule'), ('description', 'Catch decision')])
+        body += ('<h2>What is compared?</h2><p>Catch, spawning biomass and annual catch changes. '
+                 'These are illustrative objectives for demonstrating the connected workflow.</p>')
+        body += '<details><summary>Simulation assumptions</summary>' + mse_methods(result) + mse_limits(result)
+        body += '<pre>' + esc(json.dumps(result['assumptions'], indent=2)) + '</pre></details>'
+    elif key in ('mse_constant', 'mse_index', 'mse_buffered'):
+        body += '<p class="note">' + esc(result['description']) + '</p>'
+        body += plot({result['name']: result['series']}, 'SB_over_SB0',
+                     'Median end-of-year spawning biomass / unfished level')
+        body += mse_metrics([{'name': result['name'], **result['metrics']}]) + mse_metric_note()
+        example = result['example']
+        body += ('<details><summary>Follow one trial: observation → decision → stock response</summary>'
+                 '<p>' + esc(example['case']) + ' · ' + esc(example['scenario'])
+                 + ' · trial ' + str(example['replicate']) + '.</p>')
+        body += table(example['rows'], [('year', 'Year'), ('index_ratio', 'Observed index / reference'),
+                      ('requested_catch_t', 'Requested catch (t)'), ('catch_t', 'Realised catch (t)'),
+                      ('SB_over_SB0', 'End-of-year SB / SB₀')]) + '</details>'
+        body += '<details><summary>Results by stock case and scenario</summary>' + table(
+            result['cases'], [('case', 'Stock case'), ('scenario', 'Recruitment'),
+                              ('mean_catch_t', 'Mean catch (t/year)'), ('final_SB_over_SB0', 'Final SB / SB₀'),
+                              ('below_threshold_percent', 'Trials below 0.2 (%)')]) + '</details>'
+        body += '<details><summary>Scope and assumptions</summary>' + mse_methods(result) + mse_limits(result) + '</details>'
+    elif key == 'mse_summary':
+        body += '<p class="note">Compare the three rules under the same simulated conditions.</p>'
+        body += plot(mse_series(result), 'SB_over_SB0', 'Median end-of-year spawning biomass / unfished level')
+        body += plot(mse_series(result), 'catch_t', 'Median annual realised catch (tonnes)')
+        body += mse_metrics(result['metrics']) + mse_metric_note()
+        body += '<details><summary>Results by stock case and scenario</summary>' + table(
+            result['cases'], [('rule', 'Rule'), ('case', 'Stock case'), ('scenario', 'Recruitment'),
+                              ('mean_catch_t', 'Mean catch (t/year)'),
+                              ('final_SB_over_SB0', 'Final SB / SB₀')]) + '</details>'
+    elif key == 'mse_report':
+        body = '<article class="narrative-report" data-report="mse_report">' + mse_report(result) + '</article>'
     else:
         cpue = key.startswith('cpue_'); value = 'index' if cpue else 'SB_over_SB0'
         label = 'CPUE relative to the first year' if cpue else 'Spawning biomass / unfished level'

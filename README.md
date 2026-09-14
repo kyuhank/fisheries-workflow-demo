@@ -2,7 +2,7 @@
 
 [Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download for offline use](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
-Follow a change from fisheries data through analysis to assessment. See which jobs
+Follow a change from fisheries data through assessment to management trials. See which jobs
 need to run again, which results can be kept, and where each output came from.
 The data are synthetic and the models are simplified.
 
@@ -31,7 +31,13 @@ behind a result, or use **Reproduce & compare** to check it again.
 Summaries compare results in plots and tables. Reports provide a short account
 of the methods and findings, linked to the results used to write them.
 
-Parallel CPUE analyses, input preparations and assessment fits each finish their
+The MSE task uses the four fitted assessment cases to test three simple catch
+rules under two future recruitment scenarios. **Prepare MSE** shows what comes
+from each assessment. Simulated observations inform catch decisions, which affect
+the stock and its next observation. **Compare strategies** summarises the trials;
+**MSE report** describes the results and their limits.
+
+Parallel CPUE analyses, input preparations, assessment fits and management trials finish their
 peer group before dependent stages start. Partial reruns retain unaffected peers.
 
 **Manual handover** represents separate analyst workspaces without shared
@@ -53,7 +59,7 @@ python3 run.py --from prepare_a
 make container
 ```
 
-Open `runs/assessment_report/report.html`. Use Python 3.12 or later; no additional
+Open `runs/assessment_report/report.html` or `runs/mse_report/report.html`. Use Python 3.12 or later; no additional
 Python packages are needed. Docker needs its image locally or a connection to
 download it. `make check` runs the checks; `make html` rebuilds the page.
 

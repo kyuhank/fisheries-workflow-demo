@@ -11,6 +11,8 @@ from workflow.engine import Workflow
 from workflow.spec import SPEC, STAGES
 from verify import compare
 
+MSE_JOBS = ['mse_prepare', 'mse_constant', 'mse_index', 'mse_buffered', 'mse_summary', 'mse_report']
+
 
 class WorkflowTest(unittest.TestCase):
     @classmethod
@@ -37,7 +39,7 @@ class WorkflowTest(unittest.TestCase):
                     ('submission','complete'), ('qc','running'), ('qc','complete'),
                     ('database','running')]
         self.assertEqual(events[:len(sequence)], sequence)
-        self.assertEqual(len(self.full['run']), 16)
+        self.assertEqual(len(self.full['run']), 22)
         self.assertTrue(all(self.runner.valid(key) for key in SPEC))
 
     def test_input_preparation_reruns_only_its_dependants(self):
@@ -46,7 +48,7 @@ class WorkflowTest(unittest.TestCase):
         for i in range(2):
             result = asyncio.run(runner.run('prepare_a'))
             self.assertEqual(result['run'], ['prepare_a','assessment_a1','assessment_a2',
-                                             'assessment_summary','assessment_report'])
+                                             'assessment_summary','assessment_report'] + MSE_JOBS)
             self.assertEqual(runner.records['cpue_a'], previous)
             self.assertFalse(runner.running)
 
@@ -191,7 +193,7 @@ class WorkflowTest(unittest.TestCase):
         for _ in range(2):
             result = asyncio.run(runner.run('cpue_a'))
             self.assertEqual(transfers[-1], {'boundary': 'cpue', 'group': ['prepare_a']})
-            self.assertEqual(len(result['run']), 8)
+            self.assertEqual(len(result['run']), 14)
             self.assertEqual({key: runner.records[key] for key in retained_b}, retained_b)
         self.assertEqual(len(transfers), 2)
         asyncio.run(runner.run('prepare_a'))
@@ -299,7 +301,7 @@ class WorkflowTest(unittest.TestCase):
         resumed = Workflow(runner.directory)
         self.assertFalse(resumed.valid('prepare_a'))
         result = asyncio.run(resumed.run('prepare_a'))
-        self.assertEqual(len(result['run']), 5)
+        self.assertEqual(len(result['run']), 11)
         self.assertTrue(all(resumed.valid(key) for key in SPEC))
 
     def test_incompatible_year_is_rejected_before_model_fitting(self):
@@ -321,7 +323,7 @@ class WorkflowTest(unittest.TestCase):
         runner = self.clone()
         runner.configure({'mortality_2': 0.35})
         result = asyncio.run(runner.run('assessment_report'))
-        self.assertEqual(result['run'], ['assessment_a2','assessment_b2','assessment_summary','assessment_report'])
+        self.assertEqual(result['run'], ['assessment_a2','assessment_b2','assessment_summary','assessment_report'] + MSE_JOBS)
         self.assertEqual(runner.records['assessment_a1']['run_id'], 'Run 001')
 
     def test_data_versions_do_not_accumulate(self):

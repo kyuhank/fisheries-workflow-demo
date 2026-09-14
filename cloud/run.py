@@ -142,7 +142,7 @@ class HostedWorkflow(Workflow):
                           'container': 'ghcr.io/pacificcommunity/cpue-workshop@sha256:17b03d6e06da229b17524997d8a3fc8eb5f8f25233894b5ab99f89109b3890c5',
                           'data_source': 'Supabase PostgreSQL: fixed synthetic records',
                           'data_checksum': digest(encoded(self.hosted_data))}
-        self.configure(context['settings'])
+        self.configure({'mse': False, **context['settings']})
 
     def code_record(self, key):
         return {**super().code_record(key), 'cloud/run.py': digest(Path(__file__).read_bytes())}

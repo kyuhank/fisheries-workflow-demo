@@ -4,7 +4,7 @@ import json
 import math
 from pathlib import Path
 
-from workflow.spec import SPEC
+from workflow.spec import DEFAULTS, active_spec
 
 
 def compare(expected, actual, path='output'):
@@ -23,7 +23,9 @@ def compare(expected, actual, path='output'):
 
 
 def verify(reference, result):
-    for key in SPEC:
+    state = json.loads((reference / 'state.json').read_text())
+    spec = active_spec({**DEFAULTS, 'mse': False, **state['settings']})
+    for key in spec:
         left = json.loads((reference / key / 'output.json').read_text())
         right = json.loads((result / key / 'output.json').read_text())
         # A resubmission can pass immediately when it uses already corrected data.
@@ -31,7 +33,7 @@ def verify(reference, result):
             left.pop('returned', None)
             right.pop('returned', None)
         compare(left, right, key)
-    return len(SPEC)
+    return len(spec)
 
 
 if __name__ == '__main__':

@@ -26,9 +26,14 @@ JOBS = [
 CPUE = ['cpue_a', 'cpue_summary', 'cpue_report', 'prepare_a',
         'assessment_a1', 'assessment_a2', 'assessment_summary', 'assessment_report']
 MORTALITY = ['assessment_a2', 'assessment_b2', 'assessment_summary', 'assessment_report']
+MSE = ['mse_prepare', 'mse_constant', 'mse_index', 'mse_buffered', 'mse_summary', 'mse_report']
+JOBS += MSE
+CPUE += MSE
+MORTALITY += MSE
 COMBINED = [key for key in JOBS if key in CPUE or key in MORTALITY]
 PREPARE_A = ['prepare_a', 'assessment_a1', 'assessment_a2',
              'assessment_summary', 'assessment_report']
+PREPARE_A += MSE
 CPUE_SUMMARY = ['cpue_summary', 'cpue_report']
 
 

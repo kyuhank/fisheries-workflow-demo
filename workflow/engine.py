@@ -11,7 +11,7 @@ import sys
 import zipfile
 
 from . import models, reports
-from .spec import DEFAULTS, SPEC, STAGES, downstream, handover_groups
+from .spec import DEFAULTS, SPEC, STAGES, active_spec, downstream, handover_groups
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -47,7 +47,7 @@ class Workflow:
         if state.exists():
             previous = read_json(state)
             self.records = previous['records']
-            self.settings = previous['settings']
+            self.settings = {**DEFAULTS, 'mse': False, **previous['settings']}
             self.run_number = previous['run_number']
 
     def configure(self, settings):
@@ -60,7 +60,13 @@ class Workflow:
             raise ValueError('Select one of the supplied CPUE filters.')
         if candidate['mortality_2'] not in (0.25, 0.30, 0.35):
             raise ValueError('Select one of the supplied mortality settings.')
+        if type(candidate['mse']) is not bool:
+            raise ValueError('Select whether to include the MSE extension.')
         self.settings = candidate
+
+    @property
+    def spec(self):
+        return active_spec(self.settings)
 
     def output(self, key):
         return read_json(self.directory / key / 'output.json')
@@ -82,6 +88,8 @@ class Workflow:
             names += ['workflow/models.py', 'workflow/age_model.py']
         if key == 'extract':
             names += ['workflow/extract.sql', 'workflow/extract-catch.sql']
+        if key.startswith('mse_'):
+            names += ['workflow/mse.py', 'workflow/age_model.py']
         return {name: digest((ROOT / name).read_bytes()) for name in names}
 
     def signature(self, key):
@@ -110,11 +118,12 @@ class Workflow:
                    for name, checksum in record['outputs'].items())
 
     def plan(self, start):
-        if start not in SPEC:
+        spec = self.spec
+        if start not in spec:
             raise ValueError('Unknown starting job.')
-        changed = [key for key in SPEC if not self.valid(key)]
-        selected = downstream([start, *changed])
-        return {'run': selected, 'retained': [key for key in SPEC if key not in selected],
+        changed = [key for key in spec if not self.valid(key)]
+        selected = downstream([start, *changed], spec)
+        return {'run': selected, 'retained': [key for key in spec if key not in selected],
                 'changed': changed, 'start': start}
 
     def record_event(self, key, state, message, **details):
@@ -179,7 +188,7 @@ class Workflow:
 
     def state(self):
         return {'settings': self.settings, 'records': self.records,
-                'run_number': self.run_number, 'jobs': list(SPEC.values()), 'events': self.events}
+                'run_number': self.run_number, 'jobs': list(self.spec.values()), 'events': self.events}
 
     async def calculate(self, key, run_id):
         if key == 'submission':
@@ -245,6 +254,16 @@ class Workflow:
             return result
         if key in ('cpue_report', 'assessment_report'):
             return self.output(SPEC[key]['parents'][0])
+        if key.startswith('mse_'):
+            from . import mse
+            if key == 'mse_prepare':
+                return mse.prepare({parent: self.output(parent) for parent in SPEC[key]['parents']})
+            if key in ('mse_constant', 'mse_index', 'mse_buffered'):
+                return mse.simulate(self.output('mse_prepare'), key.removeprefix('mse_'))
+            if key == 'mse_summary':
+                return mse.summarise({parent: self.output(parent) for parent in SPEC[key]['parents']})
+            if key == 'mse_report':
+                return self.output('mse_summary')
         raise ValueError('No calculation registered for this job.')
 
     async def run(self, start='submission'):

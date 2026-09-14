@@ -55,7 +55,7 @@ class HostedProcessesTest(unittest.TestCase):
                     self.assertEqual([item['event']['group'] for item in delivered
                                       if item['event']['state'] == 'handover'], [['prepare_a']])
                     self.assertEqual({key: runner.records[key] for key in retained}, retained)
-                    self.assertEqual(len(partial['run']), 8)
+                    self.assertEqual(len(partial['run']), 14)
                     self.assert_event_barriers(partial['events'])
                     self.assert_reporting_before_transfer(partial['events'])
                     self.assertTrue(all(runner.valid(key) for key in SPEC))

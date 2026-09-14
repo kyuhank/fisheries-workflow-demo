@@ -121,6 +121,7 @@ function settings() {
     last_year: Number($("snapshot").value),
     min_hooks_a: Number($("filter").value),
     mortality_2: Number($("mortality").value),
+    mse: true,
   };
 }
 
@@ -356,7 +357,7 @@ function jobNode(node, colour, path) {
   status.append(statusText);
   card.append(status);
 
-  const summary = key === "cpue_summary" || key === "assessment_summary";
+  const summary = key.endsWith("_summary");
   if (summary) {
     const subtitle = svgElement("text", {
       x: 14,
@@ -445,7 +446,7 @@ function renderDiagram() {
   const svg = svgElement("svg", {
     viewBox: `0 0 ${layout.width} ${layout.height}`,
     class: "workflow-diagram",
-    "aria-label": "Data management, CPUE analysis and stock assessment jobs",
+    "aria-label": "Data management, CPUE analysis, stock assessment and management strategy evaluation jobs",
   });
   const defs = svgElement("defs");
   for (
@@ -477,9 +478,9 @@ function renderDiagram() {
     svg.append(
       svgElement("rect", {
         x: group.x,
-        y: 42,
+        y: group.y ?? 42,
         width: group.width,
-        height: 580,
+        height: group.height ?? 580,
         rx: 16,
         fill: group.fill,
         stroke: group.colour,
@@ -488,7 +489,7 @@ function renderDiagram() {
     );
     const title = svgElement("text", {
       x: group.x + 14,
-      y: 24,
+      y: (group.y ?? 42) - 18,
       fill: group.colour,
       class: "module-title",
     });
@@ -548,6 +549,38 @@ function renderDiagram() {
     text.textContent = label.text;
     svg.append(text);
   }
+  for (const note of layout.notes || []) {
+    const text = svgElement("text", {
+      x: note.x, y: note.y, class: "diagram-note",
+      "text-anchor": note.anchor || "start",
+    });
+    text.textContent = note.text;
+    svg.append(text);
+  }
+  for (const reference of layout.references || []) {
+    const available = Boolean(records[reference.key]);
+    const link = svgElement("g", {
+      class: "input-reference " + stageStatus(reference.key),
+      transform: `translate(${reference.x} ${reference.y})`,
+      role: "button", tabindex: 0, "data-reference": reference.key,
+      "aria-label": `${reference.label}: ${available ? "inspect recorded input" : "select assessment job"}`,
+    });
+    link.append(svgElement("rect", { width: reference.width, height: reference.height, rx: 7 }));
+    const text = svgElement("text", { x: 12, y: 25 });
+    text.textContent = reference.label;
+    const action = svgElement("text", { x: reference.width - 12, y: 25, "text-anchor": "end" });
+    action.textContent = "›";
+    link.append(text, action);
+    const open = () => available ? openJobRecord(reference.key) : selectJob(reference.key);
+    link.onclick = open;
+    link.onkeydown = (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        open();
+      }
+    };
+    svg.append(link);
+  }
   for (const node of layout.nodes) {
     const group = layout.groups.find((group) =>
       group.key === byKey[node.key].module
@@ -602,6 +635,12 @@ const taskGroups = [
     description: "Prepare inputs, fit models and report results.",
     icon: "layers",
   },
+  {
+    key: "mse",
+    title: "Management strategy evaluation",
+    description: "Test management rules, compare outcomes and report results.",
+    icon: "cycle",
+  },
 ];
 
 function uiElement(tag, className = "", text) {
@@ -623,6 +662,7 @@ function lineIcon(name) {
     database:
       "M4 6c0-4 16-4 16 0s-16 4-16 0m0 0v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0",
     chart: "M4 4v16h16M7 15l4-5 4 2 5-7",
+    cycle: "M20 9a8 8 0 0 0-14-3L3 9m0-5v5h5m-4 6a8 8 0 0 0 14 3l3-3m0 5v-5h-5",
     layers: "M3 7l9-4 9 4-9 4-9-4m0 5 9 4 9-4M3 17l9 4 9-4",
     file: "M6 3h8l4 4v14H6V3m8 0v5h4M9 12h6m-6 4h6",
     person: "M8 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M4 21v-2a8 8 0 0 1 16 0v2",
@@ -637,6 +677,8 @@ function lineIcon(name) {
 
 function renderTasks() {
   $("tasks").replaceChildren();
+  $("task-count").textContent = taskGroups.length;
+  $("job-count").textContent = jobs.length;
   for (const task of taskGroups) {
     const members = jobs.filter((job) => job.module === task.key);
     const active = members.filter((job) => stageStatus(job.key) === "running");
@@ -917,7 +959,7 @@ function render() {
     ? "Use View to inspect a job’s outputs and inputs."
     : "Select a job to rerun it and the analyses that use its output.";
   if (mode === "saved") {
-    $("completion").textContent = "16 saved outputs";
+    $("completion").textContent = `${Object.keys(records).length} saved outputs`;
     $("reuse-message").textContent = "";
   } else if (plan) {
     $("completion").textContent = completedRun

@@ -72,7 +72,7 @@ with hosted_docs() as url, sync_playwright() as playwright:
             return problems;
         }""")
         assert not problems, (width, zoom, problems)
-        checks.append({"viewport": width, "zoom": zoom, "nodes": 16})
+        checks.append({"viewport": width, "zoom": zoom, "nodes": page.locator(".workflow-node").count()})
     page.set_viewport_size({"width": 1440, "height": 1050})
     page.evaluate("document.body.style.zoom = '1'")
     node = page.locator('.job[data-job="cpue_a"]')
@@ -85,13 +85,25 @@ with hosted_docs() as url, sync_playwright() as playwright:
     page.locator('.job[data-job="prepare_a"]').press("Enter")
     assert page.locator("#selection-title").inner_text() == "Prepare inputs A"
     page.locator('[data-tab="jobs"]').click()
-    assert page.locator('#tasks .task').count() == 3
+    assert page.locator('#tasks .task').count() == page.evaluate('taskGroups.length')
     assert page.locator('#workspace-activity').bounding_box()['height'] < 50
     page.locator('#tasks .assessment').click()
     assert page.locator('#job-table-body tr').count() == 8
     page.locator('#job-table-body tr[data-job="assessment_a1"] .open-output').click()
     assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'Assessment A1'
     page.locator('#output-close').click()
+    page.locator('#show-tasks').click()
+    page.locator('#tasks .mse').click()
+    assert page.locator('#job-table-body tr').count() == 6
+    page.locator('#job-table-body tr[data-job="mse_report"] .open-output').click()
+    assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'MSE report'
+    page.locator('#output-close').click()
+    page.locator('[data-tab="workflow"]').click()
+    page.locator('[data-reference="assessment_a1"]').press('Enter')
+    assert page.locator('#output-record').is_visible()
+    assert page.locator('#output-title').inner_text() == 'Assessment A1'
+    page.locator('#output-close').click()
+    page.locator('[data-tab="jobs"]').click()
     page.locator('#running-jobs').click()
     assert page.locator('#job-table-body').inner_text() == 'No jobs in this state.'
     page.locator('#show-tasks').click()

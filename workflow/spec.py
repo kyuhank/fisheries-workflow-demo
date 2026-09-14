@@ -34,11 +34,25 @@ JOBS = [
      'Compare the four fitted cases in plots and tables.'),
     ('assessment_report', 'Assessment report', 'assessment', 'Assessment analyst', ['assessment_summary'],
      'Write a short report and preserve its analytical record.'),
+    ('mse_prepare', 'Prepare MSE', 'mse', 'MSE analyst',
+     ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'],
+     'Use the four assessment cases to prepare stocks for simulated management trials.'),
+    ('mse_constant', 'Constant catch', 'mse', 'MSE analyst', ['mse_prepare'],
+     'Test a fixed annual catch under the same simulated future conditions.'),
+    ('mse_index', 'Index rule', 'mse', 'MSE analyst', ['mse_prepare'],
+     'Update annual catch using a simulated abundance index.'),
+    ('mse_buffered', 'Buffered rule', 'mse', 'MSE analyst', ['mse_prepare'],
+     'Test a more cautious response to the simulated abundance index.'),
+    ('mse_summary', 'Compare strategies', 'mse', 'MSE analyst',
+     ['mse_constant', 'mse_index', 'mse_buffered'],
+     'Compare catch, stock levels and catch stability across the management trials.'),
+    ('mse_report', 'MSE report', 'mse', 'MSE analyst', ['mse_summary'],
+     'Report the tested procedures, their trade-offs and the limits of the example.'),
 ]
 SPEC = {key: dict(key=key, title=title, module=module, owner=owner, parents=parents,
                   description=description)
         for key, title, module, owner, parents, description in JOBS}
-DEFAULTS = {'last_year': 2023, 'min_hooks_a': 0, 'mortality_2': 0.30}
+DEFAULTS = {'last_year': 2023, 'min_hooks_a': 0, 'mortality_2': 0.30, 'mse': True}
 
 # Complete each peer group before its dependent groups; independent paths continue.
 # These barriers coordinate execution without adding scientific input dependencies.
@@ -48,6 +62,8 @@ STAGES = [
     ['prepare_a', 'prepare_b'], ['cpue_summary'], ['cpue_report'],
     ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'],
     ['assessment_summary'], ['assessment_report'],
+    ['mse_prepare'], ['mse_constant', 'mse_index', 'mse_buffered'],
+    ['mse_summary'], ['mse_report'],
 ]
 
 # These are file-transfer boundaries, separate from calculation dependencies.
@@ -66,9 +82,16 @@ def handover_groups(stage, active):
             yield {'boundary': boundary, 'group': group}
 
 
-def downstream(roots):
+def active_spec(settings):
+    """Keep the assessment-only graph available to older downloaded demos."""
+    return {key: job for key, job in SPEC.items()
+            if settings.get('mse', True) or job['module'] != 'mse'}
+
+
+def downstream(roots, spec=None):
+    spec = SPEC if spec is None else spec
     selected = set(roots)
-    for key, job in SPEC.items():
+    for key, job in spec.items():
         if selected.intersection(job['parents']):
             selected.add(key)
-    return [key for key in SPEC if key in selected]
+    return [key for key in spec if key in selected]

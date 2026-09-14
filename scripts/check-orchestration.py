@@ -1,8 +1,6 @@
-"""Exercise current UI sources against the preserved offline runtime, without rebuilding docs."""
+"""Check the built offline demo, shared job views and recorded input links."""
 from pathlib import Path
-import base64
 import json
-import re
 import tempfile
 
 from playwright.sync_api import sync_playwright
@@ -13,22 +11,8 @@ ARTIFACTS.mkdir(exist_ok=True)
 
 
 def preview():
-    saved = (ROOT / 'docs/offline.html').read_text()
-    payload = json.loads(re.search(r'<script id="demo-payload" type="application/json">(.*?)</script>',
-                                  saved, re.S).group(1))
-    for name in payload['files']:
-        if (ROOT / name).is_file():
-            payload['files'][name] = base64.b64encode((ROOT / name).read_bytes()).decode()
-    html = (ROOT / 'app/index.html').read_text()
-    for key, source in {
-        'PAYLOAD': json.dumps(payload, separators=(',', ':')).replace('</', '<\\/'),
-        'CSS': (ROOT / 'app/style.css').read_text(),
-        'WORKER': (ROOT / 'app/worker.js').read_text(),
-        'APP': '\n'.join((ROOT / 'app' / name).read_text()
-                         for name in ['cloud.js', 'lineage.js', 'app.js', 'record.js']),
-    }.items():
-        html = html.replace('/*__' + key + '__*/', source)
-    return html
+    # Build first: the graph, saved examples and executable code must match.
+    return (ROOT / 'docs/offline.html').read_text()
 
 
 with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright:
@@ -42,7 +26,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.wait_for_function("document.querySelector('#mode').value === 'live'")
     page.locator('#mode').select_option('saved')
     page.locator('[data-tab="jobs"]').click()
-    assert page.locator('.task-responsibility').count() == 3
+    assert page.locator('.task-responsibility').count() == page.evaluate('taskGroups.length')
     page.locator('#tasks .cpue').click()
     assert page.locator('#job-table-body tr').count() == 4
     page.locator('tr[data-job="cpue_a"] .open-output').click()
@@ -121,5 +105,5 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#jobs-view').screenshot(path=str(ARTIFACTS / 'orchestration-mobile.png'))
     assert not errors, errors
     browser.close()
-print('PASS: current orchestration UI, owners/readiness, linked input records, output/record actions, '
+print('PASS: built orchestration UI, owners/readiness, linked input records, output/record actions, '
       'manual transfers, active rows, reused run identities and mobile reflow.')

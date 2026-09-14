@@ -16,7 +16,7 @@ def request(path,body=None,session=None):
  except urllib.error.HTTPError as e:raise RuntimeError(str(e.code)+' '+json.load(e).get('error','Request failed'))
 
 session=None
-settings={'last_year':2023,'min_hooks_a':0,'mortality_2':.3}
+settings={'last_year':2023,'min_hooks_a':0,'mortality_2':.3,'mse':True}
 checks=[]
 
 def execute(start,handover='connected',previous=None):
@@ -70,13 +70,13 @@ def main():
  (ROOT/'.state').mkdir(exist_ok=True)
  session=request('/session',{})
  p=ROOT/'.state/test-reader.json';p.write_text(json.dumps(session));p.chmod(0o600)
- full=execute('submission','manual');assert len(full['run'])==16
+ full=execute('submission','manual');assert len(full['run'])==22
  partial=execute('cpue_summary');assert partial['run']==['cpue_summary','cpue_report']
  assert full['records']['assessment_report']==partial['records']['assessment_report']
- prep=execute('prepare_a');assert len(prep['run'])==5
+ prep=execute('prepare_a');assert len(prep['run'])==11
  assert full['records']['cpue_a']==prep['records']['cpue_a']
  settings['min_hooks_a']=1200
- manual=execute('cpue_a','manual',prep);assert len(manual['run'])==8
+ manual=execute('cpue_a','manual',prep);assert len(manual['run'])==14
  bundle=request('/bundle',session=session);assert bundle['bundle']
  import base64
  (ROOT/'.state/online-run.zip').write_bytes(base64.b64decode(bundle['bundle']))

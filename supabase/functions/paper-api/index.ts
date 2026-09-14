@@ -2,6 +2,7 @@ import { createGitHub, REPOSITORY as REPO, WORKFLOW } from "./github.ts";
 import { setup } from "./setup.ts";
 import { createDatabase, DatabaseError } from "./database.ts";
 import { validateRunnerWrite } from "./runner-write.ts";
+import { runSettings } from "./request.ts";
 const jobs = [
   "submission",
   "qc",
@@ -19,6 +20,12 @@ const jobs = [
   "assessment_b2",
   "assessment_summary",
   "assessment_report",
+  "mse_prepare",
+  "mse_constant",
+  "mse_index",
+  "mse_buffered",
+  "mse_summary",
+  "mse_report",
 ];
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -312,24 +319,15 @@ export async function handle(request: Request) {
     if (text.length > 2048) throw Error("Request too large.");
     const b = JSON.parse(text);
     if (path === "/run") {
+      const settings = runSettings(b, jobs);
       await connection.installationToken();
-      if (
-        !jobs.includes(b.start) ||
-        !["connected", "manual"].includes(b.handover) || !b.settings ||
-        Object.keys(b).sort().join(",") !== "handover,settings,start" ||
-        Object.keys(b.settings).sort().join(",") !==
-          "last_year,min_hooks_a,mortality_2" ||
-        ![2021, 2022, 2023, 2024].includes(b.settings.last_year) ||
-        ![0, 1200].includes(b.settings.min_hooks_a) ||
-        ![.25, .30, .35].includes(b.settings.mortality_2)
-      ) throw Error("Select the supplied demonstration settings.");
       const id = crypto.randomUUID();
       const head = await github("commits/main");
       await db("rpc/paper_start", "POST", {
         p_session: sid,
         p_request: id,
         p_start: b.start,
-        p_settings: b.settings,
+        p_settings: settings,
         p_handover: b.handover,
       });
       await db("paper_runs?id=eq." + id, "PATCH", { commit_sha: head.sha });

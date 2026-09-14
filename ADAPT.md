@@ -4,6 +4,7 @@
 | --- | --- |
 | `workflow/spec.py` | Jobs, owners, dependencies and parallel groups. |
 | `workflow/models.py` | The example analyses. |
+| `workflow/mse.py` | Assessment-conditioned stocks, management trials and their comparison. |
 | `workflow/engine.py` | Execution, input checks, saved results and run records. |
 | `app/diagram.json` | Diagram nodes, positions and connections. |
 | `app/app.js` | Controls, progress and workflow views. |

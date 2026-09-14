@@ -1,6 +1,6 @@
 {
   "width": 1690,
-  "height": 638,
+  "height": 1070,
   "groups": [
     {
       "key": "data",
@@ -25,6 +25,16 @@
       "width": 830,
       "colour": "#765397",
       "fill": "#f6f2fa"
+    },
+    {
+      "key": "mse",
+      "title": "Management strategy evaluation (MSE)",
+      "x": 8,
+      "y": 706,
+      "width": 1674,
+      "height": 350,
+      "colour": "#246f76",
+      "fill": "#eff7f7"
     }
   ],
   "nodes": [
@@ -170,6 +180,60 @@
       "width": 152,
       "height": 114,
       "title": "Assessment report",
+      "subtitle": ""
+    },
+    {
+      "key": "mse_prepare",
+      "x": 365,
+      "y": 837,
+      "width": 190,
+      "height": 106,
+      "title": "Prepare MSE",
+      "subtitle": ""
+    },
+    {
+      "key": "mse_constant",
+      "x": 712,
+      "y": 750,
+      "width": 200,
+      "height": 84,
+      "title": "Constant catch",
+      "subtitle": ""
+    },
+    {
+      "key": "mse_index",
+      "x": 712,
+      "y": 850,
+      "width": 200,
+      "height": 84,
+      "title": "Index rule",
+      "subtitle": ""
+    },
+    {
+      "key": "mse_buffered",
+      "x": 712,
+      "y": 950,
+      "width": 200,
+      "height": 84,
+      "title": "Buffered rule",
+      "subtitle": ""
+    },
+    {
+      "key": "mse_summary",
+      "x": 1120,
+      "y": 838,
+      "width": 235,
+      "height": 108,
+      "title": "Compare strategies",
+      "subtitle": "Plots + tables"
+    },
+    {
+      "key": "mse_report",
+      "x": 1462,
+      "y": 838,
+      "width": 190,
+      "height": 108,
+      "title": "MSE report",
       "subtitle": ""
     }
   ],
@@ -600,6 +664,255 @@
         ]
       ],
       "kind": "dependency"
+    },
+    {
+      "from": "assessment_a1",
+      "to": "mse_prepare",
+      "points": [
+        [
+          248,
+          770
+        ],
+        [
+          284,
+          770
+        ],
+        [
+          284,
+          857
+        ],
+        [
+          365,
+          857
+        ]
+      ],
+      "kind": "dependency",
+      "reference": true
+    },
+    {
+      "from": "assessment_a2",
+      "to": "mse_prepare",
+      "points": [
+        [
+          248,
+          834
+        ],
+        [
+          302,
+          834
+        ],
+        [
+          302,
+          879
+        ],
+        [
+          365,
+          879
+        ]
+      ],
+      "kind": "dependency",
+      "reference": true
+    },
+    {
+      "from": "assessment_b1",
+      "to": "mse_prepare",
+      "points": [
+        [
+          248,
+          898
+        ],
+        [
+          320,
+          898
+        ],
+        [
+          320,
+          901
+        ],
+        [
+          365,
+          901
+        ]
+      ],
+      "kind": "dependency",
+      "reference": true
+    },
+    {
+      "from": "assessment_b2",
+      "to": "mse_prepare",
+      "points": [
+        [
+          248,
+          962
+        ],
+        [
+          338,
+          962
+        ],
+        [
+          338,
+          923
+        ],
+        [
+          365,
+          923
+        ]
+      ],
+      "kind": "dependency",
+      "reference": true
+    },
+    {
+      "from": "mse_prepare",
+      "to": "mse_constant",
+      "points": [
+        [
+          555,
+          890
+        ],
+        [
+          640,
+          890
+        ],
+        [
+          640,
+          792
+        ],
+        [
+          712,
+          792
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "mse_constant",
+      "to": "mse_summary",
+      "points": [
+        [
+          912,
+          792
+        ],
+        [
+          982,
+          792
+        ],
+        [
+          982,
+          860
+        ],
+        [
+          1120,
+          860
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "mse_prepare",
+      "to": "mse_index",
+      "points": [
+        [
+          555,
+          890
+        ],
+        [
+          640,
+          890
+        ],
+        [
+          640,
+          892
+        ],
+        [
+          712,
+          892
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "mse_index",
+      "to": "mse_summary",
+      "points": [
+        [
+          912,
+          892
+        ],
+        [
+          1004,
+          892
+        ],
+        [
+          1004,
+          891
+        ],
+        [
+          1120,
+          891
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "mse_prepare",
+      "to": "mse_buffered",
+      "points": [
+        [
+          555,
+          890
+        ],
+        [
+          640,
+          890
+        ],
+        [
+          640,
+          992
+        ],
+        [
+          712,
+          992
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "mse_buffered",
+      "to": "mse_summary",
+      "points": [
+        [
+          912,
+          992
+        ],
+        [
+          1026,
+          992
+        ],
+        [
+          1026,
+          922
+        ],
+        [
+          1120,
+          922
+        ]
+      ],
+      "kind": "dependency"
+    },
+    {
+      "from": "mse_summary",
+      "to": "mse_report",
+      "points": [
+        [
+          1355,
+          892
+        ],
+        [
+          1462,
+          892
+        ]
+      ],
+      "kind": "dependency"
     }
   ],
   "return": {
@@ -633,6 +946,53 @@
       "x": 510,
       "y": 631,
       "text": "Other assessment data"
+    },
+    {
+      "x": 34,
+      "y": 733,
+      "text": "Assessment results"
+    }
+  ],
+  "references": [
+    {
+      "key": "assessment_a1",
+      "label": "Assessment A1",
+      "x": 34,
+      "y": 750,
+      "width": 214,
+      "height": 40
+    },
+    {
+      "key": "assessment_a2",
+      "label": "Assessment A2",
+      "x": 34,
+      "y": 814,
+      "width": 214,
+      "height": 40
+    },
+    {
+      "key": "assessment_b1",
+      "label": "Assessment B1",
+      "x": 34,
+      "y": 878,
+      "width": 214,
+      "height": 40
+    },
+    {
+      "key": "assessment_b2",
+      "label": "Assessment B2",
+      "x": 34,
+      "y": 942,
+      "width": 214,
+      "height": 40
+    }
+  ],
+  "notes": [
+    {
+      "x": 1682,
+      "y": 684,
+      "text": "Repeat observation \u2192 management rule \u2192 stock response",
+      "anchor": "end"
     }
   ]
 }

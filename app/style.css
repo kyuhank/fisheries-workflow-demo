@@ -6,6 +6,7 @@
   --blue: #1779a0;
   --green: #347e60;
   --purple: #77549b;
+  --teal: #246f76;
   --gold: #a96f16;
   --gold-bg: #fff6e4;
   font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -585,7 +586,7 @@ dialog iframe {
 
 .task-list {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(2,minmax(0,1fr));
   gap: 16px;
   margin: 0 0 24px;
 }
@@ -609,6 +610,9 @@ dialog iframe {
 }
 .task.assessment {
   --task-colour: var(--purple);
+}
+.task.mse {
+  --task-colour: var(--teal);
 }
 .task.active {
   border-color: var(--task-colour);
@@ -1658,3 +1662,12 @@ dialog iframe {
     animation: none;
   }
 }
+
+/* Reference chips keep the assessment inputs visible beside the MSE extension. */
+.input-reference { cursor: pointer; }
+.input-reference rect { fill: #fff; stroke: #b7a8c4; stroke-width: 1.3; }
+.input-reference text { fill: #71518e; font-size: 16px; font-weight: 600; }
+.input-reference:hover rect, .input-reference:focus rect { fill: #f7f2fb; stroke: #765397; stroke-width: 2; }
+.input-reference.running rect { fill: #fff6e4; stroke: #bb821f; }
+.input-reference.waiting { opacity: .6; }
+.diagram-note { fill: #637485; font-size: 15px; }

@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#mode').select_option('saved')
     page.wait_for_function('offlineReady === true', timeout=90000)
     page.locator('.job[data-job="cpue_a"]').click()
-    assert page.locator('.workflow-node.complete').count() == 16
+    assert page.locator('.workflow-node.complete').count() == 22
     assert page.locator('#download').is_enabled()
     page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for(timeout=90000)
@@ -79,10 +79,10 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     verify(directory/'browser/reference', directory/'native')
     page.locator('[data-tab="workflow"]').click()
     page.locator('.job[data-job="prepare_a"]').click()
-    page.wait_for_function("document.querySelector('#completion').textContent.includes('5 jobs')")
+    page.wait_for_function("document.querySelector('#completion').textContent.includes('11 jobs')")
     for _ in range(2):
         page.locator('#run').click(); complete(page)
-        assert '5 jobs completed' in page.locator('#status-message').text_content()
+        assert '11 jobs completed' in page.locator('#status-message').text_content()
     page.locator('.job[data-job="cpue_summary"]').click()
     page.wait_for_function("document.querySelector('#completion').textContent.includes('2 jobs')")
     page.locator('#run').click(); complete(page)
@@ -175,7 +175,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#connect-workflow').click()
     complete(page)
     assert page.locator('#handover').input_value() == 'connected'
-    assert '8 jobs completed' in page.locator('#status-message').inner_text()
+    assert '14 jobs completed' in page.locator('#status-message').inner_text()
     page.set_viewport_size({'width':390,'height':844})
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert not errors, errors
