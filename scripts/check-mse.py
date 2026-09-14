@@ -59,6 +59,19 @@ with sync_playwright() as playwright:
     assert page.locator('#output-record .record-input').count() == 4
     page.locator('#output-close').click()
 
+    for key in PEERS:
+        page.locator(f'tr[data-job="{key}"] .open-output').click()
+        frame = page.frame_locator('#output-frame')
+        trial = frame.locator('.trial-table').first
+        expect(trial).to_be_visible()
+        assert trial.locator('tbody tr').count() == 5
+        first = page.evaluate('currentOutput.output.example.rows[0]')
+        cells = trial.locator('tbody tr').first.locator('td').all_text_contents()
+        assert cells == [str(first['year']), f'{first["index_ratio"]:.4g}',
+                         f'{first["requested_catch_t"]:.4g}', f'{first["catch_t"]:.4g}',
+                         f'{first["start_SB_over_SB0"]:.2f} → {first["SB_over_SB0"]:.2f}']
+        page.locator('#output-close').click()
+
     reports = {}
     for key in ['mse_summary', 'mse_report']:
         page.locator(f'tr[data-job="{key}"] .open-output').click()
@@ -66,6 +79,9 @@ with sync_playwright() as playwright:
         expect(frame.locator('h1')).to_have_text('MSE report' if key == 'mse_report' else 'MSE results summary')
         reports[key] = frame.locator('body').inner_text()
         assert reports[key].strip()
+        if key == 'mse_summary':
+            assert frame.locator('.mp-rule h3').all_text_contents() == [
+                'Constant catch', 'Index rule', 'Buffered rule']
         page.locator('#output-close').click()
     assert reports['mse_report'] != reports['mse_summary'], 'MSE report repeats the summary'
     assert 'MSE report' in reports['mse_report']
