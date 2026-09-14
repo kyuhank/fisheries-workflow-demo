@@ -328,7 +328,7 @@ def cloud_checks(page, mock, baseline):
         assert mock.dispatches[-1]['handover'] == 'connected'
         assert mock.dispatches[-1]['settings'] == {
             'last_year': 2023, 'min_hooks_a': int(controls.get('filter', '0')),
-            'mortality_2': float(controls.get('mortality', '0.30')),
+            'mortality_2': float(controls.get('mortality', '0.30')), 'mse': True,
         }
     assert len(mock.dispatches) == 3
 

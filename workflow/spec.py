@@ -43,7 +43,7 @@ JOBS = [
      'Update annual catch using a simulated abundance index.'),
     ('mse_buffered', 'Buffered rule', 'mse', 'MSE analyst', ['mse_prepare'],
      'Test a more cautious response to the simulated abundance index.'),
-    ('mse_summary', 'Compare strategies', 'mse', 'MSE analyst',
+    ('mse_summary', 'MSE results summary', 'mse', 'MSE analyst',
      ['mse_constant', 'mse_index', 'mse_buffered'],
      'Compare catch, stock levels and catch stability across the management trials.'),
     ('mse_report', 'MSE report', 'mse', 'MSE analyst', ['mse_summary'],

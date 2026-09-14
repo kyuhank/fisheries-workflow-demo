@@ -184,54 +184,54 @@
     },
     {
       "key": "mse_prepare",
-      "x": 365,
-      "y": 837,
-      "width": 190,
-      "height": 106,
+      "x": 60,
+      "y": 838,
+      "width": 210,
+      "height": 108,
       "title": "Prepare MSE",
       "subtitle": ""
     },
     {
       "key": "mse_constant",
-      "x": 712,
+      "x": 530,
       "y": 750,
-      "width": 200,
+      "width": 210,
       "height": 84,
       "title": "Constant catch",
       "subtitle": ""
     },
     {
       "key": "mse_index",
-      "x": 712,
+      "x": 530,
       "y": 850,
-      "width": 200,
+      "width": 210,
       "height": 84,
       "title": "Index rule",
       "subtitle": ""
     },
     {
       "key": "mse_buffered",
-      "x": 712,
+      "x": 530,
       "y": 950,
-      "width": 200,
+      "width": 210,
       "height": 84,
       "title": "Buffered rule",
       "subtitle": ""
     },
     {
       "key": "mse_summary",
-      "x": 1120,
+      "x": 1060,
       "y": 838,
-      "width": 235,
+      "width": 240,
       "height": 108,
-      "title": "Compare strategies",
+      "title": "Results summary",
       "subtitle": "Plots + tables"
     },
     {
       "key": "mse_report",
-      "x": 1462,
+      "x": 1450,
       "y": 838,
-      "width": 190,
+      "width": 200,
       "height": 108,
       "title": "MSE report",
       "subtitle": ""
@@ -564,19 +564,19 @@
       "points": [
         [
           1252,
-          128
+          128.0
         ],
         [
-          1294,
-          128
+          1282,
+          128.0
         ],
         [
-          1294,
-          318
+          1282,
+          354
         ],
         [
           1316,
-          318
+          354
         ]
       ],
       "kind": "dependency"
@@ -587,19 +587,19 @@
       "points": [
         [
           1252,
-          246
+          246.0
         ],
         [
-          1274,
-          246
+          1282,
+          246.0
         ],
         [
-          1274,
-          342
+          1282,
+          354
         ],
         [
           1316,
-          342
+          354
         ]
       ],
       "kind": "dependency"
@@ -610,19 +610,19 @@
       "points": [
         [
           1252,
-          439
+          439.0
         ],
         [
-          1274,
-          439
+          1282,
+          439.0
         ],
         [
-          1274,
-          366
+          1282,
+          354
         ],
         [
           1316,
-          366
+          354
         ]
       ],
       "kind": "dependency"
@@ -633,19 +633,19 @@
       "points": [
         [
           1252,
-          557
+          557.0
         ],
         [
-          1294,
-          557
+          1282,
+          557.0
         ],
         [
-          1294,
-          390
+          1282,
+          354
         ],
         [
           1316,
-          390
+          354
         ]
       ],
       "kind": "dependency"
@@ -670,116 +670,128 @@
       "to": "mse_prepare",
       "points": [
         [
-          248,
-          770
+          1252,
+          128.0
         ],
         [
-          284,
-          770
+          1282,
+          128.0
         ],
         [
-          284,
-          857
+          1282,
+          730
         ],
         [
-          365,
-          857
+          165,
+          730
+        ],
+        [
+          165,
+          838
         ]
       ],
-      "kind": "dependency",
-      "reference": true
+      "kind": "dependency"
     },
     {
       "from": "assessment_a2",
       "to": "mse_prepare",
       "points": [
         [
-          248,
-          834
+          1252,
+          246.0
         ],
         [
-          302,
-          834
+          1282,
+          246.0
         ],
         [
-          302,
-          879
+          1282,
+          730
         ],
         [
-          365,
-          879
+          165,
+          730
+        ],
+        [
+          165,
+          838
         ]
       ],
-      "kind": "dependency",
-      "reference": true
+      "kind": "dependency"
     },
     {
       "from": "assessment_b1",
       "to": "mse_prepare",
       "points": [
         [
-          248,
-          898
+          1252,
+          439.0
         ],
         [
-          320,
-          898
+          1282,
+          439.0
         ],
         [
-          320,
-          901
+          1282,
+          730
         ],
         [
-          365,
-          901
+          165,
+          730
+        ],
+        [
+          165,
+          838
         ]
       ],
-      "kind": "dependency",
-      "reference": true
+      "kind": "dependency"
     },
     {
       "from": "assessment_b2",
       "to": "mse_prepare",
       "points": [
         [
-          248,
-          962
+          1252,
+          557.0
         ],
         [
-          338,
-          962
+          1282,
+          557.0
         ],
         [
-          338,
-          923
+          1282,
+          730
         ],
         [
-          365,
-          923
+          165,
+          730
+        ],
+        [
+          165,
+          838
         ]
       ],
-      "kind": "dependency",
-      "reference": true
+      "kind": "dependency"
     },
     {
       "from": "mse_prepare",
       "to": "mse_constant",
       "points": [
         [
-          555,
-          890
+          270,
+          892
         ],
         [
-          640,
-          890
+          402,
+          892
         ],
         [
-          640,
-          792
+          402,
+          792.0
         ],
         [
-          712,
-          792
+          530,
+          792.0
         ]
       ],
       "kind": "dependency"
@@ -789,20 +801,20 @@
       "to": "mse_summary",
       "points": [
         [
-          912,
-          792
+          740,
+          792.0
         ],
         [
-          982,
-          792
+          900,
+          792.0
         ],
         [
-          982,
-          860
+          900,
+          892
         ],
         [
-          1120,
-          860
+          1060,
+          892
         ]
       ],
       "kind": "dependency"
@@ -812,20 +824,20 @@
       "to": "mse_index",
       "points": [
         [
-          555,
-          890
-        ],
-        [
-          640,
-          890
-        ],
-        [
-          640,
+          270,
           892
         ],
         [
-          712,
+          402,
           892
+        ],
+        [
+          402,
+          892.0
+        ],
+        [
+          530,
+          892.0
         ]
       ],
       "kind": "dependency"
@@ -835,20 +847,20 @@
       "to": "mse_summary",
       "points": [
         [
-          912,
+          740,
+          892.0
+        ],
+        [
+          900,
+          892.0
+        ],
+        [
+          900,
           892
         ],
         [
-          1004,
+          1060,
           892
-        ],
-        [
-          1004,
-          891
-        ],
-        [
-          1120,
-          891
         ]
       ],
       "kind": "dependency"
@@ -858,20 +870,20 @@
       "to": "mse_buffered",
       "points": [
         [
-          555,
-          890
+          270,
+          892
         ],
         [
-          640,
-          890
+          402,
+          892
         ],
         [
-          640,
-          992
+          402,
+          992.0
         ],
         [
-          712,
-          992
+          530,
+          992.0
         ]
       ],
       "kind": "dependency"
@@ -881,20 +893,20 @@
       "to": "mse_summary",
       "points": [
         [
-          912,
-          992
+          740,
+          992.0
         ],
         [
-          1026,
-          992
+          900,
+          992.0
         ],
         [
-          1026,
-          922
+          900,
+          892
         ],
         [
-          1120,
-          922
+          1060,
+          892
         ]
       ],
       "kind": "dependency"
@@ -904,11 +916,11 @@
       "to": "mse_report",
       "points": [
         [
-          1355,
+          1300,
           892
         ],
         [
-          1462,
+          1450,
           892
         ]
       ],
@@ -940,58 +952,24 @@
     {
       "x": 510,
       "y": 60,
-      "text": "Other assessment data"
+      "text": "Other data"
     },
     {
       "x": 510,
       "y": 631,
-      "text": "Other assessment data"
+      "text": "Other data"
     },
     {
-      "x": 34,
-      "y": 733,
-      "text": "Assessment results"
-    }
-  ],
-  "references": [
-    {
-      "key": "assessment_a1",
-      "label": "Assessment A1",
-      "x": 34,
-      "y": 750,
-      "width": 214,
-      "height": 40
-    },
-    {
-      "key": "assessment_a2",
-      "label": "Assessment A2",
-      "x": 34,
-      "y": 814,
-      "width": 214,
-      "height": 40
-    },
-    {
-      "key": "assessment_b1",
-      "label": "Assessment B1",
-      "x": 34,
-      "y": 878,
-      "width": 214,
-      "height": 40
-    },
-    {
-      "key": "assessment_b2",
-      "label": "Assessment B2",
-      "x": 34,
-      "y": 942,
-      "width": 214,
-      "height": 40
+      "x": 1300,
+      "y": 650,
+      "text": "Assessment outputs"
     }
   ],
   "notes": [
     {
-      "x": 1682,
-      "y": 684,
-      "text": "Repeat observation \u2192 management rule \u2192 stock response",
+      "x": 1662,
+      "y": 1035,
+      "text": "Observation \u2192 management rule \u2192 stock response, repeated each year",
       "anchor": "end"
     }
   ]

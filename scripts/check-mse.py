@@ -63,7 +63,7 @@ with sync_playwright() as playwright:
     for key in ['mse_summary', 'mse_report']:
         page.locator(f'tr[data-job="{key}"] .open-output').click()
         frame = page.frame_locator('#output-frame')
-        expect(frame.locator('h1')).to_have_text('MSE report' if key == 'mse_report' else 'Compare strategies')
+        expect(frame.locator('h1')).to_have_text('MSE report' if key == 'mse_report' else 'MSE results summary')
         reports[key] = frame.locator('body').inner_text()
         assert reports[key].strip()
         page.locator('#output-close').click()

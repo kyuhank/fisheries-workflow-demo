@@ -496,7 +496,7 @@ function renderDiagram() {
     title.textContent = group.title;
     svg.append(title);
   }
-  for (const edge of layout.edges) {
+  const connections = layout.edges.map((edge) => {
     const inPath = path?.run.includes(edge.from) && path?.run.includes(edge.to);
     const receiving = busy && stageStatus(edge.to) === "running";
     const retained = path?.retained.includes(edge.from) &&
@@ -513,6 +513,13 @@ function renderDiagram() {
       : !busy && inPath && mode !== "saved"
       ? "selected"
       : "muted";
+    return { ...edge, displayKind: kind };
+  });
+  // Shared routes stay visible when one contributing job is being rerun.
+  const priority = { muted: 0, saved: 1, selected: 2, running: 3, handover: 4 };
+  connections.sort((left, right) => priority[left.displayKind] - priority[right.displayKind]);
+  for (const edge of connections) {
+    const kind = edge.displayKind;
     svg.append(
       svgElement("path", {
         d: roundedRoute(edge.points),
@@ -556,30 +563,6 @@ function renderDiagram() {
     });
     text.textContent = note.text;
     svg.append(text);
-  }
-  for (const reference of layout.references || []) {
-    const available = Boolean(records[reference.key]);
-    const link = svgElement("g", {
-      class: "input-reference " + stageStatus(reference.key),
-      transform: `translate(${reference.x} ${reference.y})`,
-      role: "button", tabindex: 0, "data-reference": reference.key,
-      "aria-label": `${reference.label}: ${available ? "inspect recorded input" : "select assessment job"}`,
-    });
-    link.append(svgElement("rect", { width: reference.width, height: reference.height, rx: 7 }));
-    const text = svgElement("text", { x: 12, y: 25 });
-    text.textContent = reference.label;
-    const action = svgElement("text", { x: reference.width - 12, y: 25, "text-anchor": "end" });
-    action.textContent = "›";
-    link.append(text, action);
-    const open = () => available ? openJobRecord(reference.key) : selectJob(reference.key);
-    link.onclick = open;
-    link.onkeydown = (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        open();
-      }
-    };
-    svg.append(link);
   }
   for (const node of layout.nodes) {
     const group = layout.groups.find((group) =>

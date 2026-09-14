@@ -99,9 +99,20 @@ with hosted_docs() as url, sync_playwright() as playwright:
     assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'MSE report'
     page.locator('#output-close').click()
     page.locator('[data-tab="workflow"]').click()
-    page.locator('[data-reference="assessment_a1"]').press('Enter')
+    assert page.locator('[data-reference]').count() == 0
+    page.locator('.workflow-node[data-job="mse_prepare"] .node-view').press('Enter')
+    page.locator('[data-output="record"]').click()
     assert page.locator('#output-record').is_visible()
-    assert page.locator('#output-title').inner_text() == 'Assessment A1'
+    assert page.locator('#output-title').inner_text() == 'Prepare MSE'
+    assert page.locator('#output-record .record-input').count() == 4
+    edges = page.evaluate('payload.diagram.edges.filter(edge => edge.to === "mse_prepare")')
+    nodes = page.evaluate('Object.fromEntries(payload.diagram.nodes.map(node => [node.key, node]))')
+    assert {edge['from'] for edge in edges} == {
+        'assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'}
+    for edge in edges:
+        source, target = nodes[edge['from']], nodes[edge['to']]
+        assert edge['points'][0] == [source['x'] + source['width'], source['y'] + source['height'] / 2]
+        assert edge['points'][-1] == [target['x'] + target['width'] / 2, target['y']]
     page.locator('#output-close').click()
     page.locator('[data-tab="jobs"]').click()
     page.locator('#running-jobs').click()

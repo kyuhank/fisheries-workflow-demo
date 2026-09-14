@@ -1664,10 +1664,4 @@ dialog iframe {
 }
 
 /* Reference chips keep the assessment inputs visible beside the MSE extension. */
-.input-reference { cursor: pointer; }
-.input-reference rect { fill: #fff; stroke: #b7a8c4; stroke-width: 1.3; }
-.input-reference text { fill: #71518e; font-size: 16px; font-weight: 600; }
-.input-reference:hover rect, .input-reference:focus rect { fill: #f7f2fb; stroke: #765397; stroke-width: 2; }
-.input-reference.running rect { fill: #fff6e4; stroke: #bb821f; }
-.input-reference.waiting { opacity: .6; }
 .diagram-note { fill: #637485; font-size: 15px; }
