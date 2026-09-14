@@ -1,0 +1,44 @@
+{
+  "job": "mse_index",
+  "owner": "MSE analyst",
+  "run_id": "Run 001",
+  "signature": "bd0c9e5db414a686db4ad65ba927490130e03bfbd5860ee862e41e9b83565357",
+  "settings": {},
+  "snapshot": 2023,
+  "code": {
+    "workflow/engine.py": "8c223a414b9d8c6955b54db1776fb613477e36c891a99926b5c48c685f0d6282",
+    "workflow/spec.py": "6a7fd61c63d70295c643c760a0406e10b03625458bc85b94f5bcc045e9a96749",
+    "workflow/reports.py": "4a3c225fe138dd2f7dd64ea96cf2ae1bb741675f9a82ed0dd998f63f6c2254cb",
+    "workflow/mse.py": "1a28108dac91a5fa5919d8d834d8aadecd037466f833f30668ac004429553d48",
+    "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
+  },
+  "software": {
+    "python": "3.10.12",
+    "platform": "linux",
+    "runtime": "CPython",
+    "sqlite": "3.37.2"
+  },
+  "outputs": {
+    "output.json": "62f41404bc501c97fc2041511c0e2dc2ac3eaa42abff96fff522ea328160fd13",
+    "report.html": "406c8c706b8bd109fc950836a3ea300d66b1cb32b5d61f7dcf1f18f91f7c0258"
+  },
+  "log": [
+    "Update annual catch using a simulated abundance index.",
+    "Index rule complete."
+  ],
+  "inputs": {
+    "mse_prepare": {
+      "run_id": "Run 001",
+      "checksum": "d89a7b7d7c2986418ea3ce1c66d73b21daf7d9021af7f52515c0e0f58248b9c0"
+    }
+  },
+  "source": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "commit": "85fda8f6864d573bcdd9b79d5da6269e8f14808a",
+    "version": "1.7.0"
+  },
+  "data_files": {
+    "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
+    "submission.json": "96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5"
+  }
+}
