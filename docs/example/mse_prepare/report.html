@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prepare MSE</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}</style><body><p class="muted">Fisheries workflow · illustrative analysis</p><h1>Prepare MSE</h1><p>Use the four assessment cases to prepare stocks for simulated management trials.</p><p class="note">Four assessment cases → three catch rules → one comparison.</p><h2>From stock assessment to MSE</h2><p>Each fitted assessment supplies a starting stock and its estimated parameters. Preparation reconstructs numbers at age after the last observed year, so simulation begins in the following year. The four cases are deliberately included in this example.</p><table><thead><tr><th>Assessment result used</th><th>Role in MSE</th></tr></thead><tbody><tr><td>Fitted model and catch history</td><td>Reconstruct the starting numbers at age.</td></tr><tr><td>Natural mortality and recruitment</td><td>Set survival and the baseline number of new fish.</td></tr><tr><td>Catchability and recent CPUE indices</td><td>Simulate future indices and define the reference index.</td></tr><tr><td>Recent annual catches</td><td>Set the reference catch for the management rules.</td></tr></tbody></table><h2>Starting stocks</h2><table><thead><tr><th>Assessment case</th><th>First future year</th><th>Starting SB / SB₀</th><th>Reference catch (t/year)</th></tr></thead><tbody><tr><td>Assessment A1</td><td>2024</td><td>0.5586</td><td>478.6</td></tr><tr><td>Assessment A2</td><td>2024</td><td>0.5825</td><td>478.6</td></tr><tr><td>Assessment B1</td><td>2024</td><td>0.651</td><td>478.6</td></tr><tr><td>Assessment B2</td><td>2024</td><td>0.667</td><td>478.6</td></tr></tbody></table><p>Open <strong>Inputs &amp; versions</strong> to follow each case to the exact assessment run used. Full starting states and parameters are in the Data tab.</p><h2>Added for the future trials</h2><p>The example specifies two recruitment scenarios, observation error and three management rules. These are additional assumptions; they are not estimated by the assessments. Every rule faces the same scenarios and random trials.</p><h2>Management procedures (MPs)</h2><p>Three catch rules face the same stock cases, recruitment scenarios and observation errors.</p><div class="mp-rules"><section class="mp-rule"><h3>Constant catch</h3><p>Keep catch at its recent mean.</p></section><section class="mp-rule"><h3>Index rule</h3><p>Adjust catch in proportion to the three-year mean observed index.</p></section><section class="mp-rule"><h3>Buffered rule</h3><p>Apply the selected catch fraction and an annual advice limit.</p></section></div><p>The MSE catch buffer belongs to the Buffered rule job. Changing it reuses these prepared stocks and common trial conditions; the MP output and MSE comparison record the fraction actually tested.</p><h2>What is compared?</h2><p>Catch, spawning biomass and annual catch changes. These are illustrative objectives for demonstrating the connected workflow.</p><details><summary>Simulation assumptions</summary><p>Four fitted assessment cases supply the simulated stocks. Each rule is tested for 15 years under two recruitment scenarios, with 20 repeated trials per case and scenario. The same random errors are used when comparing rules.</p><p>Each year, an index is observed with error, a catch rule is applied, and the stock responds to that catch. The next observation comes from the updated stock. The index-based rules use a three-year mean; they do not see the true stock size.</p><p>Fixed biology and selectivity; no spatial structure. Future recruitment varies around a fixed scenario mean, without a stock–recruitment relationship. Index-based rules use noisy observations; no assessment is refitted during the simulations. The cases and scenarios have equal weight for comparison, not estimated probabilities.</p><pre>{
+<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prepare MSE</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}</style><body><p class="muted">Fisheries workflow · illustrative analysis</p><h1>Prepare MSE</h1><p>Use the four assessment cases to prepare stocks for simulated management trials.</p><p class="note">Four assessment cases → three catch rules → one comparison.</p><h2>From stock assessment to MSE</h2><p>Each fitted assessment supplies a starting stock and its estimated parameters. Preparation reconstructs numbers at age after the last observed year, so simulation begins in the following year. The four cases are deliberately included in this example.</p><table><thead><tr><th>Assessment result used</th><th>Role in MSE</th></tr></thead><tbody><tr><td>Fitted model and catch history</td><td>Reconstruct the starting numbers at age.</td></tr><tr><td>Natural mortality and recruitment</td><td>Set survival and the baseline number of new fish.</td></tr><tr><td>Catchability and recent CPUE indices</td><td>Simulate future indices and define the reference index.</td></tr><tr><td>Recent annual catches</td><td>Set the reference catch for the management rules.</td></tr></tbody></table><h2>Starting stocks</h2><table><thead><tr><th>Assessment case</th><th>First future year</th><th>Starting SB / SB₀</th><th>Reference catch (t/year)</th></tr></thead><tbody><tr><td>Assessment A1</td><td>2024</td><td>0.5867</td><td>396</td></tr><tr><td>Assessment A2</td><td>2024</td><td>0.6488</td><td>396</td></tr><tr><td>Assessment B1</td><td>2024</td><td>0.6444</td><td>396</td></tr><tr><td>Assessment B2</td><td>2024</td><td>0.6922</td><td>396</td></tr></tbody></table><p>Open <strong>Inputs &amp; versions</strong> to follow each case to the exact assessment run used. Full starting states and parameters are in the Data tab.</p><h2>Added for the future trials</h2><p>The example specifies two recruitment scenarios, observation error and three management rules. These are additional assumptions; they are not estimated by the assessments. Every rule faces the same scenarios and random trials.</p><h2>Management procedures (MPs)</h2><p>Three catch rules face the same stock cases, recruitment scenarios and observation errors.</p><div class="mp-rules"><section class="mp-rule"><h3>Constant catch</h3><p>Keep catch at its recent mean.</p></section><section class="mp-rule"><h3>Index rule</h3><p>Adjust catch in proportion to the three-year mean observed index.</p></section><section class="mp-rule"><h3>Buffered rule</h3><p>Set a stepped catch target from the observed index, apply the selected buffer, then limit annual advice changes.</p></section></div><p>The MSE catch buffer belongs to the Buffered rule job. Changing it reuses these prepared stocks and common trial conditions; the MP output and MSE comparison record the fraction actually tested.</p><h2>What is compared?</h2><p>Catch, spawning biomass and annual catch changes. These are illustrative objectives for demonstrating the connected workflow.</p><details><summary>Simulation assumptions</summary><p>Four fitted assessment cases supply the simulated stocks. Each rule is tested for 15 years under two recruitment scenarios, with 20 repeated trials per case and scenario. The same random errors are used when comparing rules.</p><p>Each year, an index is observed with error, a catch rule is applied, and the stock responds to that catch. The next observation comes from the updated stock. The index-based rules use a three-year mean; they do not see the true stock size.</p><p>Recruitment stays at its baseline mean, or falls to half that mean for six years before recovering. Year-to-year recruitment still varies in both scenarios.</p><p>Fixed biology and selectivity; no spatial structure. Future recruitment varies around declared annual scenario means, without a stock–recruitment relationship. Index-based rules use noisy observations; no assessment is refitted during the simulations. The cases and scenarios have equal weight for comparison, not estimated probabilities.</p><pre>{
   &quot;seed&quot;: 20260915,
   &quot;years&quot;: 15,
   &quot;replicates&quot;: 20,
@@ -7,8 +7,24 @@
   &quot;index_window&quot;: 3,
   &quot;maximum_catch_multiple&quot;: 2.0,
   &quot;annual_change_limit&quot;: 0.15,
+  &quot;buffered_steps&quot;: {
+    &quot;thresholds&quot;: [
+      0.8,
+      1.1
+    ],
+    &quot;multipliers&quot;: [
+      0.5,
+      1.0,
+      1.25
+    ]
+  },
   &quot;maximum_fishing_mortality&quot;: 2.0,
   &quot;depletion_threshold&quot;: 0.2,
+  &quot;example_trial&quot;: {
+    &quot;case&quot;: &quot;assessment_a1&quot;,
+    &quot;scenario&quot;: &quot;lower&quot;,
+    &quot;replicate&quot;: 1
+  },
   &quot;scenarios&quot;: [
     {
       &quot;key&quot;: &quot;baseline&quot;,
@@ -17,22 +33,38 @@
     },
     {
       &quot;key&quot;: &quot;lower&quot;,
-      &quot;name&quot;: &quot;Lower recruitment&quot;,
-      &quot;recruitment_multiplier&quot;: 0.7
+      &quot;name&quot;: &quot;Recruitment dip and recovery&quot;,
+      &quot;recruitment_multipliers&quot;: [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
     }
   ]
-}</pre></details><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Checksum prefix</th></tr></thead><tbody><tr><td>Assessment A1</td><td>Run 001</td><td>76757b84658f</td></tr><tr><td>Assessment A2</td><td>Run 001</td><td>0cd6875e20ee</td></tr><tr><td>Assessment B1</td><td>Run 001</td><td>a700f42d2dd9</td></tr><tr><td>Assessment B2</td><td>Run 001</td><td>32c09c236c66</td></tr></tbody></table><details><summary>Data, code, settings and software</summary><pre>{
+}</pre></details><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Checksum prefix</th></tr></thead><tbody><tr><td>Assessment A1</td><td>Run 001</td><td>25484a93c5c6</td></tr><tr><td>Assessment A2</td><td>Run 001</td><td>cd211b75c643</td></tr><tr><td>Assessment B1</td><td>Run 001</td><td>ce9f1c9d0f03</td></tr><tr><td>Assessment B2</td><td>Run 001</td><td>f7157cb0c7bc</td></tr></tbody></table><details><summary>Data, code, settings and software</summary><pre>{
   &quot;job&quot;: &quot;mse_prepare&quot;,
   &quot;owner&quot;: &quot;MSE analyst&quot;,
   &quot;run_id&quot;: &quot;Run 001&quot;,
-  &quot;signature&quot;: &quot;755b2a93f424317a77836886444f842b7ea4ef87e55acb51cc26b2ef755d5f56&quot;,
+  &quot;signature&quot;: &quot;e54ef82975cb9127ac29ecf95f69224675d640fbc3590e66254bb95c318b99d0&quot;,
   &quot;settings&quot;: {},
   &quot;snapshot&quot;: 2023,
   &quot;code&quot;: {
     &quot;workflow/engine.py&quot;: &quot;b97c8bd7f0ad7f444c16c8eabe4c3934592a22e4eb09cfdc0b87c9e6fe133f64&quot;,
-    &quot;workflow/spec.py&quot;: &quot;bb59d99a89a352db7901b0ebac82dfe3376fa4ad3f6daa2a68f1f2b884d5c15d&quot;,
-    &quot;workflow/reports.py&quot;: &quot;8d3bd722e63a7bec4e7796bc9ff0814e5bae1579a044a22ae98d3fef8cdf6163&quot;,
-    &quot;workflow/mse.py&quot;: &quot;7a4ec08d5a9b8abbb12c2e386c697d692e0a1d5989d7b61d1c364cd777ce1d7c&quot;,
+    &quot;workflow/spec.py&quot;: &quot;49244dc5a20b2aabd84836df812497be21aad43b1e238f4ef9625bb972087744&quot;,
+    &quot;workflow/reports.py&quot;: &quot;9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284&quot;,
+    &quot;workflow/mse.py&quot;: &quot;173f6f3145d62c52ad42930a9635fe4eafc619dd84a8504b2bd70a290eb12940&quot;,
     &quot;workflow/age_model.py&quot;: &quot;16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33&quot;
   },
   &quot;software&quot;: {
@@ -42,7 +74,7 @@
     &quot;sqlite&quot;: &quot;3.37.2&quot;
   },
   &quot;outputs&quot;: {
-    &quot;output.json&quot;: &quot;c709c68dc0e1fc81a3467fbbf4cc42283e1477824503beb0cf58b15cfdb6b6ba&quot;
+    &quot;output.json&quot;: &quot;e71f3c18113f3270c6311f2534ff6f64cee60396f77b576a40ae17b4982bb06a&quot;
   },
   &quot;log&quot;: [
     &quot;Use the four assessment cases to prepare stocks for simulated management trials.&quot;,
@@ -51,28 +83,28 @@
   &quot;inputs&quot;: {
     &quot;assessment_a1&quot;: {
       &quot;run_id&quot;: &quot;Run 001&quot;,
-      &quot;checksum&quot;: &quot;76757b84658f49ac99f6183316482249dd5496eaa5c653a14b8abcf21f84ceac&quot;
+      &quot;checksum&quot;: &quot;25484a93c5c60fc3e28ea0184d95d7a23b3b1ed11c1e1b81c3df82b449581cc0&quot;
     },
     &quot;assessment_a2&quot;: {
       &quot;run_id&quot;: &quot;Run 001&quot;,
-      &quot;checksum&quot;: &quot;0cd6875e20ee8845c142d9bf44fc280f9b378a41a727d4260b2683e3c44d964c&quot;
+      &quot;checksum&quot;: &quot;cd211b75c64300ecbaa1192320616f10d82209c82c20c15b3e09014fd9b2fbd8&quot;
     },
     &quot;assessment_b1&quot;: {
       &quot;run_id&quot;: &quot;Run 001&quot;,
-      &quot;checksum&quot;: &quot;a700f42d2dd90f5f400803c15dcae8a8fd7274ad2330feaab6212cd64e50897c&quot;
+      &quot;checksum&quot;: &quot;ce9f1c9d0f03718aefc52f0cd7dd3cd0a20ef6a5251543f8b3803c42d683d9b1&quot;
     },
     &quot;assessment_b2&quot;: {
       &quot;run_id&quot;: &quot;Run 001&quot;,
-      &quot;checksum&quot;: &quot;32c09c236c6622da490aa3b4a00c691caa9c8d9e128f3d2809b155971526d7e4&quot;
+      &quot;checksum&quot;: &quot;f7157cb0c7bcb915d14f8d7165cb6249469859153676be4a729297c1b4a43506&quot;
     }
   },
   &quot;source&quot;: {
     &quot;repository&quot;: &quot;https://github.com/kyuhank/fisheries-workflow-demo&quot;,
-    &quot;commit&quot;: &quot;3bfdd22f9842b44d8561ec9bc82cd3dd8c231383&quot;,
-    &quot;version&quot;: &quot;1.7.3&quot;
+    &quot;commit&quot;: &quot;6a23e347980215a2f44f70dbe8ea2e879bee521a&quot;,
+    &quot;version&quot;: &quot;1.7.4&quot;
   },
   &quot;data_files&quot;: {
-    &quot;fishery.sqlite&quot;: &quot;707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e&quot;,
-    &quot;submission.json&quot;: &quot;96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5&quot;
+    &quot;fishery.sqlite&quot;: &quot;48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b&quot;,
+    &quot;submission.json&quot;: &quot;a610844d7e80a607f372b112ed5af87dcd97d66a0dcd35c361beea859bc56590&quot;
   }
 }</pre></details><footer>Synthetic data and simplified models. The downloadable run bundle preserves the inputs, code, settings and results.</footer></body></html>

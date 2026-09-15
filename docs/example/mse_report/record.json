@@ -2,14 +2,14 @@
   "job": "mse_report",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "619b71953c9375270ef698823ea1947d3890c31c7f3ac031f23928b5836a0384",
+  "signature": "2f95352b29979fd25a7be60dea4e0482c2e19af62fd5b99702f6f8981ff09e2e",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "workflow/engine.py": "b97c8bd7f0ad7f444c16c8eabe4c3934592a22e4eb09cfdc0b87c9e6fe133f64",
-    "workflow/spec.py": "bb59d99a89a352db7901b0ebac82dfe3376fa4ad3f6daa2a68f1f2b884d5c15d",
-    "workflow/reports.py": "8d3bd722e63a7bec4e7796bc9ff0814e5bae1579a044a22ae98d3fef8cdf6163",
-    "workflow/mse.py": "7a4ec08d5a9b8abbb12c2e386c697d692e0a1d5989d7b61d1c364cd777ce1d7c",
+    "workflow/spec.py": "49244dc5a20b2aabd84836df812497be21aad43b1e238f4ef9625bb972087744",
+    "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
+    "workflow/mse.py": "173f6f3145d62c52ad42930a9635fe4eafc619dd84a8504b2bd70a290eb12940",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
@@ -19,8 +19,8 @@
     "sqlite": "3.37.2"
   },
   "outputs": {
-    "output.json": "b9448f2aa46df01356a76eadaafbc43c2d16ea58c333cb459384839992591937",
-    "report.html": "15c48b08339fa84c95f55d9bb4e885c9358fad806983b8c0bc7c0996be41abc3"
+    "output.json": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581",
+    "report.html": "9cde55ea92469b64b1dab39f5d22d97a50347f76cf991298bf43483f48727d86"
   },
   "log": [
     "Report the tested procedures, their trade-offs and the limits of the example.",
@@ -29,16 +29,16 @@
   "inputs": {
     "mse_summary": {
       "run_id": "Run 001",
-      "checksum": "b9448f2aa46df01356a76eadaafbc43c2d16ea58c333cb459384839992591937"
+      "checksum": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "3bfdd22f9842b44d8561ec9bc82cd3dd8c231383",
-    "version": "1.7.3"
+    "commit": "6a23e347980215a2f44f70dbe8ea2e879bee521a",
+    "version": "1.7.4"
   },
   "data_files": {
-    "fishery.sqlite": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
-    "submission.json": "96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5"
+    "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
+    "submission.json": "a610844d7e80a607f372b112ed5af87dcd97d66a0dcd35c361beea859bc56590"
   }
 }
