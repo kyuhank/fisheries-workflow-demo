@@ -2,11 +2,11 @@
   "job": "mse_report",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "068fadcbc558ec7394bf3d13541d2c3be29318c102350d01180b640ef142aa8d",
+  "signature": "4e1aa99fe3f564ceb6a9b42378dd763222d606878027accbe7dc4d89b1901f7e",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "b3be9d10850deceac3f03ea94ec0ec993c9317fc8544aacd03459c1b2cb12770",
+    "workflow/engine.py": "14edaacde86dcb85e19020669218d0ede2161e44f1b428d43a7e871cde18df51",
     "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
     "workflow/mse.py": "173f6f3145d62c52ad42930a9635fe4eafc619dd84a8504b2bd70a290eb12940",
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581",
-    "report.html": "5c53c93d0eafbdc397761ade116d17d97cc4908c5fd0c2efc2a29f37e8b38248"
+    "report.html": "f93b3e7986e00db8b5048b5d005c27352d4669570e0112038661914600586c12"
   },
   "log": [
     "Report the tested procedures, their trade-offs and the limits of the example.",
@@ -34,8 +34,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "47bab260aa3a2b4410e0373d0071c67563b8316e",
-    "version": "1.7.7"
+    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
+    "version": "1.7.8"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

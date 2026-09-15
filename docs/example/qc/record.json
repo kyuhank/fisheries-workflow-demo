@@ -2,11 +2,11 @@
   "job": "qc",
   "owner": "Data curator",
   "run_id": "Run 001",
-  "signature": "ea67c8c19edcb1259b0941fcf49184b037a266985e09bb3b5737507030e7ebac",
+  "signature": "08e7d79eae7e417af00908de39784e5457db3c95b4e55e8eb032c1a8a278bedf",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "b3be9d10850deceac3f03ea94ec0ec993c9317fc8544aacd03459c1b2cb12770",
+    "workflow/engine.py": "14edaacde86dcb85e19020669218d0ede2161e44f1b428d43a7e871cde18df51",
     "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284"
   },
@@ -18,7 +18,7 @@
   },
   "outputs": {
     "output.json": "8d3e46ad7625155a04f8f7207051a07b09d6b57dc6b321bf393536af32504268",
-    "report.html": "f45d9e0d7273773f9dab77d6d51ac454edb989005d8934c1f8f50649e4aaf886"
+    "report.html": "5c3949b724434bf6a4e07fb08f6a263a4086cd84c240c4b56a53fa74937d45ec"
   },
   "log": [
     "Check records and return invalid effort for correction.",
@@ -34,8 +34,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "47bab260aa3a2b4410e0373d0071c67563b8316e",
-    "version": "1.7.7"
+    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
+    "version": "1.7.8"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

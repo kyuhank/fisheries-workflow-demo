@@ -2,11 +2,11 @@
   "job": "prepare_a",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "ab653b38c24e20e92c4a34fdc99e4248d9495c6fd8e03570fc136abe8547cf81",
+  "signature": "f713ee3f558cf3e6faf2ff1596b534fdd97ff7d1be10a343a14ffb9dc42fa082",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "b3be9d10850deceac3f03ea94ec0ec993c9317fc8544aacd03459c1b2cb12770",
+    "workflow/engine.py": "14edaacde86dcb85e19020669218d0ede2161e44f1b428d43a7e871cde18df51",
     "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284"
   },
@@ -18,7 +18,7 @@
   },
   "outputs": {
     "output.json": "73200024e675a57cb33ac5af9cc5791a4e0415f5ccd3e7aca0243947a68275e7",
-    "report.html": "994c7c297e01fdc434857c9430665c9d906efc3cb64ea1b6b637ad49c34c7852"
+    "report.html": "532aa61935083675bf940761a74ada34d42ebc27b580b825acc294a77f9ac15c"
   },
   "log": [
     "Join index A to annual catches and check the model inputs.",
@@ -36,8 +36,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "47bab260aa3a2b4410e0373d0071c67563b8316e",
-    "version": "1.7.7"
+    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
+    "version": "1.7.8"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

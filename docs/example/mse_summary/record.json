@@ -2,11 +2,11 @@
   "job": "mse_summary",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "43d8c6b4c21886a1818e03384e5f789afb08bed3358b5c0bf46b1f6d967d845a",
+  "signature": "480dda9c091a161031610cce75cb0c6499336518f0d23702043c962bc091fbb9",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "b3be9d10850deceac3f03ea94ec0ec993c9317fc8544aacd03459c1b2cb12770",
+    "workflow/engine.py": "14edaacde86dcb85e19020669218d0ede2161e44f1b428d43a7e871cde18df51",
     "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
     "workflow/mse.py": "173f6f3145d62c52ad42930a9635fe4eafc619dd84a8504b2bd70a290eb12940",
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581",
-    "report.html": "0605ad25ee3c696e4313bd0f87acafce86737074b0ba1b19da36be452776b35e"
+    "report.html": "c48803d4199e5988d2d9112f024d6177d837b1aad7f725b2579ae9a60894b49e"
   },
   "log": [
     "Compare catch, stock levels and catch stability across the management trials.",
@@ -42,8 +42,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "47bab260aa3a2b4410e0373d0071c67563b8316e",
-    "version": "1.7.7"
+    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
+    "version": "1.7.8"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

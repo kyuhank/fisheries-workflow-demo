@@ -2,11 +2,11 @@
   "job": "assessment_summary",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "9fcd9ea2165840e478a03d6d5d4dcb6edba83d97cd2fc4b00a9102aba242b3a9",
+  "signature": "1f03f1bebae9927d05839b8769bc6252dbfe0ed51eb8e9820ab1f9501f0a5d41",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "b3be9d10850deceac3f03ea94ec0ec993c9317fc8544aacd03459c1b2cb12770",
+    "workflow/engine.py": "14edaacde86dcb85e19020669218d0ede2161e44f1b428d43a7e871cde18df51",
     "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
     "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "321bc00223e9ee0a0ec734930767b55cc6e53243dbedced5f9656934b9693c69",
-    "report.html": "85887927ccc6b4978239123ad995e81deabfbd131e09d4847944f0f246c8d6d0"
+    "report.html": "ed7503f493959b77d9c0cd72944c4840bbd806b87ea4351e16f58be9bb935f4b"
   },
   "log": [
     "Compare the four fitted cases in plots and tables.",
@@ -46,8 +46,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "47bab260aa3a2b4410e0373d0071c67563b8316e",
-    "version": "1.7.7"
+    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
+    "version": "1.7.8"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
