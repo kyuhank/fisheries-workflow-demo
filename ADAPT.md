@@ -4,6 +4,7 @@
 | --- | --- |
 | `workflow/spec.py` | Jobs, owners, dependencies and parallel groups. |
 | `workflow/models.py` | The example analyses. |
+| `scripts/generate-data.py` | Synthetic catch history and fishing observations. |
 | `workflow/mse.py` | Assessment-conditioned stocks, management trials and their comparison. |
 | `workflow/engine.py` | Execution, input checks, saved results and run records. |
 | `app/diagram.json` | Diagram nodes, positions and connections. |
@@ -49,12 +50,17 @@ change limit stays at 0.15. Older settings files without the control use 0.8.
 The UI, cloud planner and hosted request allowlist must agree with the Python
 settings validation; redeploy `paper-api` when that allowlist changes.
 
+To revise the synthetic data, edit `scripts/generate-data.py` and run
+`python3 scripts/generate-data.py` before `make html`. This refreshes local data
+and their recorded checksums. A hosted copy must load the same revision into
+PostgreSQL.
+
 To change **Prepare MSE**, edit `prepare()` and `ASSUMPTIONS` in `workflow/mse.py`.
 `CASES` selects the four fitted assessment inputs; `prepare()` reconstructs their
 future starting numbers and derives reference catches and indices from the last
 three years. `ASSUMPTIONS` defines the seed, horizon, trial count, recruitment
 scenarios and observation errors. Fixed biology is in `workflow/age_model.py`.
 These common trial conditions are separate from the Buffered rule's catch
-fraction, so changing that fraction retains the prepared operating models and
+fraction of its stepped catch target, so changing that fraction retains the prepared operating models and
 the other MPs. Adapting the common assumptions requires rerunning preparation
 and all management trials.

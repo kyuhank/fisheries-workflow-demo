@@ -5,6 +5,7 @@ import json
 import math
 import random
 import unittest
+from unittest.mock import patch
 from statistics import mean, median
 
 from workflow import age_model, mse
@@ -71,6 +72,45 @@ class MSETest(unittest.TestCase):
         unaltered = mse.trial(model, 'index', scenario, a, [(1, 1)] * 15)
         self.assertLess(altered['rows'][0]['requested_catch_t'], unaltered['rows'][0]['requested_catch_t'])
 
+    def test_step_thresholds_and_catch_limits_are_separate_recorded_decisions(self):
+        for buffer in (.6, .8, 1):
+            a = {**self.prepared['assumptions'], 'buffer': buffer}
+            for ratio, multiplier, band in ((.79, .5, 'low'), (.8, 1, 'middle'),
+                                             (1.09, 1, 'middle'), (1.1, 1.25, 'high')):
+                with self.subTest(buffer=buffer, ratio=ratio):
+                    target = 100 * multiplier * buffer
+                    decision = mse.catch_decision('buffered', [ratio] * 3, 1, 100, target, a)
+                    self.assertEqual(decision['decision_band'], band)
+                    self.assertEqual(decision['target_catch_t'], target)
+                    self.assertEqual(decision['requested_catch_t'], target)
+        a = self.prepared['assumptions']
+        low = mse.catch_decision('buffered', [.5] * 3, 1, 100, 100, a)
+        high = mse.catch_decision('buffered', [1.5] * 3, 1, 100, 50, a)
+        self.assertEqual(low['target_catch_t'], 40)
+        self.assertEqual(low['requested_catch_t'], 85)
+        self.assertEqual(high['target_catch_t'], 100)
+        self.assertAlmostEqual(high['requested_catch_t'], 57.5)
+
+    def test_recruitment_dip_is_applied_by_year_and_stock_responds_after_ageing(self):
+        a = self.prepared['assumptions']
+        model = self.prepared['operating_models'][0]
+        errors = [(1, 1)] * a['years']
+        baseline = mse.trial(model, 'constant', a['scenarios'][0], a, errors)
+        dip = mse.trial(model, 'constant', a['scenarios'][1], a, errors)
+        self.assertEqual([row['recruitment_multiplier'] for row in dip['rows']], [.5] * 6 + [1] * 9)
+        self.assertEqual([row['recruitment'] for row in dip['rows']],
+                         [model['recruitment'] * .5] * 6 + [model['recruitment']] * 9)
+        self.assertEqual([row['SB_over_SB0'] for row in dip['rows'][:3]],
+                         [row['SB_over_SB0'] for row in baseline['rows'][:3]])
+        self.assertLess(dip['rows'][3]['SB_over_SB0'], baseline['rows'][3]['SB_over_SB0'])
+        self.assertGreater(dip['final_SB_over_SB0'], min(row['SB_over_SB0'] for row in dip['rows']))
+        self.assertEqual(mse.recruitment_profile({'recruitment_multiplier': .7}, 15), [.7] * 15)
+        for values in ([.5] * 14, [.5] * 16, [float('nan')] * 15, [-.1] * 15, [True] * 15):
+            with self.subTest(profile=values), self.assertRaisesRegex(ValueError, 'multiplier per future year'):
+                mse.trial(model, 'constant', {'recruitment_multipliers': values}, a, errors)
+        with self.assertRaisesRegex(ValueError, 'every future year'):
+            mse.trial(model, 'constant', a['scenarios'][0], a, errors[:-1])
+
     def test_overlarge_advice_is_limited_to_feasible_catch_and_recorded(self):
         model = copy.deepcopy(self.prepared['operating_models'][0])
         model['reference_catch_t'] = model['B0'] * 10
@@ -102,6 +142,71 @@ class MSETest(unittest.TestCase):
         self.assertEqual(first['random_stream'], hashlib.sha256(state.encode()).hexdigest())
         self.assertNotIn('.', state)
 
+    def test_recorded_examples_are_paired_and_selected_before_results_are_known(self):
+        a = self.prepared['assumptions']
+        self.assertEqual(a['example_trial'], {'case': 'assessment_a1', 'scenario': 'lower', 'replicate': 1})
+        expected_seed = a['seed'] + 1000
+        examples = [result['example'] for result in self.results.values()]
+        for example in examples:
+            self.assertEqual(example['case_key'], 'assessment_a1')
+            self.assertEqual(example['scenario_key'], 'lower')
+            self.assertEqual(example['replicate'], 1)
+            self.assertEqual(example['seed'], expected_seed)
+            self.assertEqual(example['reference_catch_t'], self.prepared['operating_models'][0]['reference_catch_t'])
+            self.assertEqual([row['recruitment'] for row in example['rows']],
+                             [row['recruitment'] for row in examples[0]['rows']])
+            self.assertEqual(example['rows'][0]['observed_index'], examples[0]['rows'][0]['observed_index'])
+        self.assertNotEqual(examples[0]['rows'][1]['observed_index'], examples[-1]['rows'][1]['observed_index'])
+        self.assertEqual(self.summary['examples'], {result['name']: result['example'] for result in self.results.values()})
+        invalid = copy.deepcopy(self.prepared)
+        invalid['assumptions']['example_trial']['replicate'] = a['replicates'] + 1
+        with self.assertRaisesRegex(ValueError, 'specified example trial'):
+            mse.simulate(invalid, 'index')
+
+    def test_scenario_paths_and_metrics_are_calculated_from_their_own_trials(self):
+        result = self.results['buffered']
+        a = {**result['assumptions'], **result['rule_settings']}
+        for number, scenario in enumerate(a['scenarios']):
+            expected_paths = []
+            for case_number, model in enumerate(result['operating_models']):
+                for replicate in range(a['replicates']):
+                    seed = a['seed'] + case_number * 10000 + number * 1000 + replicate
+                    errors = mse._errors(seed, a['years'], a['recruitment_cv'], a['observation_cv'])
+                    expected_paths.append(mse.trial(model, 'buffered', scenario, a, errors))
+            recorded = result['scenarios'][number]
+            self.assertEqual(recorded['key'], scenario['key'])
+            self.assertEqual(recorded['metrics']['trials'], 4 * a['replicates'])
+            self.assertEqual(recorded['metrics']['mean_catch_t'], mean(path['mean_catch_t'] for path in expected_paths))
+            for year, row in enumerate(recorded['series']):
+                for field in ('catch_t', 'SB_over_SB0', 'index_ratio', 'target_catch_t', 'requested_catch_t'):
+                    self.assertEqual(row[field], median(path['rows'][year][field] for path in expected_paths))
+            self.assertEqual(self.summary['scenarios'][number]['series'][result['name']], recorded['series'])
+            self.assertEqual(self.summary['scenarios'][number]['metrics'][-1],
+                             {'rule': 'buffered', 'name': result['name'], **recorded['metrics']})
+        with patch.object(mse, 'trial', side_effect=AssertionError('Summary must use recorded outputs')):
+            self.assertEqual(mse.summarise(self.results), self.summary)
+
+    def test_legacy_prepared_inputs_and_completed_outputs_keep_their_meaning(self):
+        # Construct the previous shape independently of the generated example.
+        legacy = copy.deepcopy(self.prepared)
+        legacy['assumptions'].pop('buffered_steps')
+        legacy['assumptions'].pop('example_trial')
+        legacy['assumptions']['scenarios'][1] = {
+            'key': 'lower', 'name': 'Lower recruitment', 'recruitment_multiplier': .7}
+        result = mse.simulate(legacy, 'buffered')
+        self.assertIn('80% of index-based catch advice', result['description'])
+        self.assertEqual(result['example']['scenario_key'], 'baseline')
+        self.assertTrue(all(row['decision_band'] == 'proportional' for row in result['example']['rows']))
+        self.assertEqual(mse.catch_advice('buffered', [.5] * 3, 1, 100, 40, legacy['assumptions']), 40)
+        # Historical MP snapshots have no scenario paths; summarising cannot invent them.
+        old_shape = copy.deepcopy(self.results)
+        for item in old_shape.values():
+            item.pop('scenarios')
+        summary = mse.summarise(old_shape)
+        self.assertNotIn('scenarios', summary)
+        self.assertNotIn('examples', summary)
+        self.assertEqual(summary['series'], self.summary['series'])
+
     def test_metrics_match_trials_and_stock_state(self):
         for result in self.results.values():
             trials, metric = result['trials'], result['metrics']
@@ -132,6 +237,10 @@ class MSETest(unittest.TestCase):
         results['buffered']['assumptions']['observation_cv'] = 0.2
         with self.assertRaisesRegex(ValueError, 'same operating models'):
             mse.summarise(results)
+        results = copy.deepcopy(self.results)
+        results['index']['example']['replicate'] += 1
+        with self.assertRaisesRegex(ValueError, 'matching scenarios and example trials'):
+            mse.summarise(results)
         invalid = copy.deepcopy(self.assessments)
         invalid['assessment_a1']['series'][-1]['year'] += 1
         with self.assertRaisesRegex(ValueError, 'consecutive annual'):
@@ -148,7 +257,7 @@ class MSETest(unittest.TestCase):
                 changed = mse.simulate(self.prepared, 'buffered', buffer=buffer)
                 self.assertEqual(changed['rule_settings'], {'buffer': buffer})
                 self.assertEqual(changed['assumptions'], self.results['index']['assumptions'])
-                expected = f'{100 * buffer:g}% of index-based catch advice'
+                expected = f'apply the {100 * buffer:g}% buffer'
                 self.assertIn(expected, changed['description'])
                 self.assertIn('15%', changed['description'])
                 if buffer != .8:
@@ -165,7 +274,7 @@ class MSETest(unittest.TestCase):
                     page = self.page(key, result)
                     self.assertIn(expected, page)
                     if buffer != .8:
-                        self.assertNotIn('80% of', page)
+                        self.assertNotIn('apply the 80% buffer', page)
         self.assertEqual(self.prepared, original)
 
     def test_buffer_rejects_unavailable_choices_and_other_rules(self):
@@ -187,15 +296,18 @@ class MSETest(unittest.TestCase):
         report = self.page('mse_report', self.summary)
         self.assertIn('Four assessment cases', preparation)
         self.assertIn('Follow one trial', rule)
-        self.assertIn('Requested catch', rule)
+        self.assertIn('Target catch', rule)
+        self.assertIn('Catch advice', rule)
         self.assertIn('Realised catch', rule)
+        for page in (rule, summary, report):
+            self.assertIn('Recruitment dip and recovery', page)
         self.assertNotIn('narrative-report', summary)
         self.assertIn('data-report="mse_report"', report)
         self.assertIn('<h2>Methods</h2>', report)
         self.assertIn('<h2>Results</h2>', report)
         self.assertIn('<h2>Interpretation</h2>', report)
-        self.assertEqual(summary.count('<svg '), 2)
-        self.assertEqual(report.count('<svg '), 1)
+        self.assertGreaterEqual(summary.count('<svg '), 2)
+        self.assertGreaterEqual(report.count('<svg '), 1)
         saved = json.loads(json.dumps(self.summary, sort_keys=True))
         saved_report = self.page('mse_report', saved)
         self.assertEqual(report, saved_report)

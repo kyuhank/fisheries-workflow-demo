@@ -62,12 +62,15 @@ with sync_playwright() as playwright:
     for key in PEERS:
         page.locator(f'tr[data-job="{key}"] .open-output').click()
         frame = page.frame_locator('#output-frame')
+        expect(frame.locator('svg').first).to_be_visible()
+        frame.get_by_text('All years in this trial', exact=True).click()
         trial = frame.locator('.trial-table').first
         expect(trial).to_be_visible()
-        assert trial.locator('tbody tr').count() == 5
+        assert trial.locator('tbody tr').count() == 15
         first = page.evaluate('currentOutput.output.example.rows[0]')
         cells = trial.locator('tbody tr').first.locator('td').all_text_contents()
         assert cells == [str(first['year']), f'{first["index_ratio"]:.4g}',
+                         f'{first["target_catch_t"]:.4g}',
                          f'{first["requested_catch_t"]:.4g}', f'{first["catch_t"]:.4g}',
                          f'{first["start_SB_over_SB0"]:.2f} → {first["SB_over_SB0"]:.2f}']
         page.locator('#output-close').click()

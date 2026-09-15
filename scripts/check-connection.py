@@ -71,6 +71,50 @@ try:
         }""")
         assert unit.evaluate("calls.length === 2 && !calls[0].headers['Content-Type']")
         assert unit.evaluate("cloud.session.id === 'test-session'")
+
+        # Once a run is acknowledged, even an explicit expiry must not replay it.
+        unit.evaluate("""async () => {
+          calls.length = 0;
+          window.fetch = async (url, options) => {
+            calls.push({url, headers: options.headers});
+            return url.includes('/run?')
+              ? Response.json({id: 'accepted'})
+              : Response.json({code: 'session_expired', error: 'Expired'}, {status: 410});
+          };
+          window.expired = await cloud.call('run', {start: 'submission', settings: {}})
+            .then(() => false, error => error.sessionUnavailable);
+        }""")
+        assert unit.evaluate("expired && calls.length === 2 && cloud.session === null")
+
+        # A lost or malformed dispatch response has an unknown outcome. Do not
+        # silently create a replacement session or send another dispatch.
+        for failure in ["throw new TypeError('Lost response')", "return new Response('{')"]:
+            unit.evaluate("""async failure => {
+              calls.length = 0;
+              cloud.session = {id: 'current', token: 'token'};
+              window.fetch = async url => { calls.push(url); return new Function(failure)(); };
+              window.unknown = await cloud.call('run', {start: 'submission', settings: {}})
+                .then(() => false, error => error.executionUnknown);
+            }""", failure)
+            assert unit.evaluate("unknown && calls.length === 1 && cloud.session.id === 'current'")
+        # Support the already deployed expiry response, but never repeat a lost
+        # dispatch response from the replacement session.
+        unit.evaluate("""async () => {
+          calls.length = 0;
+          cloud.session = {id: 'old', token: 'old'};
+          window.fetch = async url => {
+            calls.push(url);
+            if (url.includes('/run?session=old')) return Response.json({
+              error: 'This demonstration session is unavailable. Select Start afresh.'
+            }, {status: 400});
+            if (url.endsWith('/info')) return Response.json({configured: true});
+            if (url.endsWith('/session')) return Response.json({id: 'replacement', token: 'new'});
+            throw new TypeError('Lost replacement response');
+          };
+          window.unknown = await cloud.call('run', {start: 'submission', settings: {}})
+            .then(() => false, error => error.executionUnknown);
+        }""")
+        assert unit.evaluate("unknown && calls.length === 4 && cloud.session.id === 'replacement'")
         unit.close()
 
         state = {'available': True, 'runtime_failure': True, 'runtime_requests': 0}
@@ -105,6 +149,104 @@ try:
         assert page.locator('#offline-download').is_visible()
         assert page.locator('#offline-download').get_attribute('href') == 'offline.html'
         assert page.locator('#mode-notice').is_hidden()
+
+        # A ten-minute cleanup is simulated by rejecting the old credential.
+        # No real runner is dispatched and no wall-clock retention wait is needed.
+        expiry = {'expired': True, 'renewal_failure': False, 'sessions': 0,
+                  'accepted': 0, 'bodies': [], 'snapshots': []}
+        fixture = page.evaluate("""() => {
+          records = structuredClone(payload.saved.records);
+          cloud.records = records;
+          states = Object.fromEntries(jobs.map(job => [job.key, 'complete']));
+          completedRun = {run: jobs.map(job => job.key), retained: []};
+          latestRun = 'expired-run';
+          return {records: structuredClone(records), keys: jobs.map(job => job.key)};
+        }""")
+        page.locator('#mse-buffer').select_option('0.6')
+        page.locator('#handover').select_option('manual')
+        page.evaluate("selectJob('mse_buffered')")
+        page.wait_for_function('plan.run.length === 3 && plan.retained.length === 19')
+
+        def expiring_service(route):
+            path = urlsplit(route.request.url).path.rsplit('/', 1)[-1]
+            code = 200
+            if path == 'info':
+                code = 503 if expiry['renewal_failure'] else 200
+                value = {'error': 'Unavailable'} if code == 503 else {'configured': True}
+            elif path == 'session':
+                expiry['snapshots'].append(page.evaluate("""() => ({
+                  records: Object.keys(records).length,
+                  cloudRecords: Object.keys(cloud.records).length,
+                  plan, selected, settings: settings(), busy,
+                  runId: $('run-id').textContent, executionHidden: $('github-run').hidden,
+                  downloadDisabled: $('download').disabled, completedRun
+                })"""))
+                expiry['sessions'] += 1
+                expiry['expired'] = False
+                value = {'id': 'renewed-' + str(expiry['sessions']), 'token': 'new-token'}
+            elif path == 'run':
+                expiry['bodies'].append(route.request.post_data_json)
+                if expiry['expired']:
+                    code = 410
+                    value = {'code': 'session_expired', 'error': 'Temporary results expired'}
+                else:
+                    expiry['accepted'] += 1
+                    value = {'id': 'fresh-request'}
+            elif path == 'state':
+                result_records = json.loads(json.dumps(fixture['records']))
+                for record in result_records.values():
+                    record['run_id'] = 'fresh-run'
+                result_records['mse_buffered']['settings']['buffer'] = 0.6
+                result = {'run_id': 'fresh-run', 'run': fixture['keys'], 'retained': [],
+                          'records': result_records}
+                value = {'run': {'id': 'fresh-request', 'status': 'complete', 'result': result},
+                         'state': {'records': result_records},
+                         'events': [{'id': 1, 'event': {
+                             'state': 'plan', 'start': 'mse_buffered', 'changed': fixture['keys'],
+                             'run': fixture['keys'], 'retained': [], 'run_id': 'fresh-run'}}]}
+            else:
+                raise AssertionError('Unexpected expiry route: ' + path)
+            route.fulfill(status=code, content_type='application/json', body=json.dumps(value))
+
+        page.route('**/functions/v1/paper-api/**', expiring_service)
+        page.evaluate("() => { $('run').click(); $('run').click(); }")
+        page.wait_for_function("$('status-title').textContent === 'Results are ready'")
+        assert expiry['sessions'] == 1 and expiry['accepted'] == 1
+        assert len(expiry['bodies']) == 2 and expiry['bodies'][0] == expiry['bodies'][1]
+        assert expiry['bodies'][1]['start'] == 'mse_buffered'
+        assert expiry['bodies'][1]['settings']['mse_buffer'] == 0.6
+        assert expiry['bodies'][1]['handover'] == 'manual'
+        snapshot = expiry['snapshots'][0]
+        assert snapshot['records'] == snapshot['cloudRecords'] == 0
+        assert snapshot['plan']['run'] == fixture['keys'] and snapshot['plan']['retained'] == []
+        assert snapshot['selected'] == 'mse_buffered' and snapshot['settings']['mse_buffer'] == 0.6
+        assert snapshot['busy'] and snapshot['downloadDisabled'] and snapshot['executionHidden']
+        assert snapshot['runId'] == '' and snapshot['completedRun'] is None
+        assert page.evaluate("!busy && !dispatchPending && completedRun.retained.length === 0")
+        assert page.evaluate("Object.values(records).every(record => record.run_id === 'fresh-run')")
+        assert page.locator('#run').is_enabled()
+
+        # Failure to renew clears the busy state, and an explicit retry keeps the
+        # same chosen analysis while starting just one accepted run.
+        expiry['expired'] = True
+        expiry['renewal_failure'] = True
+        page.locator('#run').click()
+        page.wait_for_function("$('status-title').textContent === 'The analysis stopped'")
+        assert page.evaluate("!busy && !dispatchPending && cloud.session === null && Object.keys(records).length === 0")
+        assert page.locator('#run').is_enabled()
+        assert page.evaluate("selected === 'mse_buffered' && settings().mse_buffer === 0.6")
+        assert expiry['accepted'] == 1
+        expiry['renewal_failure'] = False
+        page.locator('#run').click()
+        page.wait_for_function("$('status-title').textContent === 'Results are ready'")
+        assert expiry['sessions'] == 2 and expiry['accepted'] == 2
+        assert expiry['bodies'][-1] == expiry['bodies'][0]
+        page.unroute('**/functions/v1/paper-api/**', expiring_service)
+        # Leave the original connection scenarios with their original empty state.
+        page.evaluate("""() => {
+          records = {}; cloud.records = {}; states = {}; completedRun = null;
+          latestRun = ''; $('mse-buffer').value = '0.8'; render();
+        }""")
 
         # A failed reconnect switches mode, preserves chosen settings, and does
         # not claim readiness if the Python download also fails.
@@ -222,8 +364,9 @@ try:
         race.close()
         assert (ROOT/'docs/index.html').stat().st_size < (ROOT/'docs/offline.html').stat().st_size / 5
         browser.close()
-    print('PASS: live default, bounded connection, automatic offline fallback, failed runtime recovery, '
-          'settings/records retained, no duplicate run after status loss, late-response races and mobile layout.')
+    print('PASS: live default, bounded connection, idle-session renewal and missing-input rebuild, '
+          'renewal retry, settings/records retained, no duplicate dispatch after expiry or status loss, '
+          'automatic offline fallback, failed runtime recovery, late-response races and mobile layout.')
 finally:
     server.shutdown()
     server.server_close()

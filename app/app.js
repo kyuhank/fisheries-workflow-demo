@@ -1018,6 +1018,28 @@ function log(event) {
 }
 
 function handleEvent(event) {
+  if (event.state === "session_expired") {
+    // Only the live session loses its files; settings and job selection survive.
+    if (modeStates.cloud) Object.assign(modeStates.cloud, {
+      records: {}, states: {}, latestRun: "", completedRun: null, messages: [],
+    });
+    if (mode !== "cloud") return;
+    records = {};
+    completedRun = null;
+    latestRun = "";
+    waitingTransfer = null;
+    confirmingTransfer = false;
+    activities = {};
+    plan = cloud.plan(currentStart(), settings());
+    states = busy ? runStates(plan.run, "waiting") : {};
+    $("run-id").textContent = "";
+    $("github-run").hidden = true;
+    log({ message: "Temporary live results expired. Missing inputs will be rebuilt." });
+    status("running", "Renewing the live session",
+      "Your selected job and settings are kept. Expired inputs must be rebuilt.");
+    render();
+    return;
+  }
   if (event.state === "plan") {
     correctionPending = false;
     activities = {};
@@ -1475,9 +1497,13 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     render();
     try {
       if (mode === "cloud" && !cloudReady) {
-        await cloud.initialise();
+        const result = await cloud.initialise();
         cloudReady = true;
         if (version !== modeVersion) return;
+        records = result.records;
+        states = {};
+        latestRun = "";
+        completedRun = null;
       }
       if (mode === "live" && !offlineReady) {
         const result = await initialiseOffline();

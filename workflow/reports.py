@@ -19,12 +19,14 @@ def table(rows, columns, limit=None):
     return ''.join(parts) + '</tbody></table>'
 
 
-def plot(series, value, label, points=(), colour_by_name=None):
+def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     colours = ['#1378a3', '#b56435', '#7357a8', '#328363', '#a7526d', '#93761e', '#277f88', '#66748b']
     all_rows = [r for rows in series.values() for r in rows]
     xs = [r['year'] for r in all_rows]; ys = [r[value] for r in all_rows]
     xmin, xmax = min(xs), max(xs)
     ymin, ymax = min(0, min(ys) * 1.1), max(0, max(ys) * 1.1)
+    if upper is not None:
+        ymax = max(ymax, upper * 1.1)
     scale = 10 ** math.floor(math.log10(max(ymax - ymin, 1e-12) / 4))
     step = next(size * scale for size in [1, 2, 2.5, 5, 10] if size * scale >= (ymax-ymin) / 4)
     ymin, ymax = math.floor(ymin / step) * step, math.ceil(ymax / step) * step
@@ -138,11 +140,67 @@ def mse_trial(rows):
     """Display recorded annual decisions and stock changes from one trial."""
     display = [{**row, 'stock_change':
                 f'{row["start_SB_over_SB0"]:.2f} → {row["SB_over_SB0"]:.2f}'} for row in rows]
-    return '<div class="table-scroll"><div class="trial-table">' + table(display, [
+    columns = [
         ('year', 'Year'), ('index_ratio', '3-year index / reference'),
-        ('requested_catch_t', 'Requested catch (t)'), ('catch_t', 'Realised catch (t)'),
+    ]
+    if rows and 'target_catch_t' in rows[0]:
+        columns.append(('target_catch_t', 'Target catch (t)'))
+    columns += [
+        ('requested_catch_t', 'Catch advice (t)'), ('catch_t', 'Realised catch (t)'),
         ('stock_change', 'Stock before → after (SB / SB₀)'),
-    ]) + '</div></div>'
+    ]
+    return '<div class="table-scroll"><div class="trial-table">' + table(display, columns) + '</div></div>'
+
+
+def mse_trial_plots(example):
+    rows = example['rows']
+    indicators = {
+        'Observed index': [{'year': r['year'], 'value': r['index_ratio']} for r in rows],
+        'Spawning biomass': [{'year': r['year'], 'value': r['SB_over_SB0']} for r in rows],
+    }
+    catches = {name: [{'year': r['year'], 'value': r[key]} for r in rows]
+               for key, name in [('target_catch_t', 'Target catch'),
+                                 ('requested_catch_t', 'Catch advice'), ('catch_t', 'Realised catch')]
+               if key in rows[0]}
+    return (plot(indicators, 'value', 'Observed index / reference; spawning biomass / unfished level')
+            + plot(catches, 'value', 'One trial: annual catch (tonnes)'))
+
+
+def mse_steps(result):
+    steps = result['assumptions'].get('buffered_steps')
+    if not steps:
+        return ''
+    lower, upper = steps['thresholds']
+    bands = [f'Below {lower:g}', f'{lower:g} to below {upper:g}', f'{upper:g} or above']
+    rows = [{'index': band, 'target': f'{100 * fraction:g}% of reference catch'}
+            for band, fraction in zip(bands, steps['multipliers'])]
+    return table(rows, [('index', 'Observed index / reference'), ('target', 'Target before buffer')])
+
+
+def mse_scenario_plots(result):
+    """Compare scenarios separately, using the same axes and rule colours."""
+    scenarios = result.get('scenarios')
+    if not scenarios:
+        series = mse_series(result) if isinstance(result['series'], dict) else {result['name']: result['series']}
+        scenarios = [{'name': 'All trials', 'series': series}]
+    else:
+        scenarios = [{**s, 'series': {row['name']: s['series'][row['name']] for row in s['metrics']}
+                      if isinstance(s['series'], dict)
+                      else {result['name']: s['series']}} for s in scenarios]
+    colours = {'Constant catch': '#1378a3', 'Index rule': '#b56435', 'Buffered rule': '#7357a8'}
+    axes = [('SB_over_SB0', 'Median end-of-year spawning biomass / unfished level'),
+            ('catch_t', 'Median annual realised catch (tonnes)')]
+    ceilings = {key: max(r[key] for s in scenarios for rows in s['series'].values() for r in rows)
+                for key, _ in axes}
+    panels = []
+    for scenario in reversed(scenarios):
+        charts = ''.join(plot(scenario['series'], key, label, colour_by_name=colours,
+                              upper=ceilings[key]) for key, label in axes)
+        if scenario.get('key') == 'baseline' and len(scenarios) > 1:
+            panels.append('<details><summary>' + esc(scenario['name']) + '</summary>' + charts + '</details>')
+        else:
+            panels.append('<h2>' + esc(scenario['name']) + '</h2>' + charts)
+    return ''.join(panels)
 
 
 def mse_metric_note():
@@ -155,13 +213,18 @@ def mse_metric_note():
 
 def mse_methods(result):
     assumptions = result['assumptions']
+    scenarios = ('<p>Recruitment stays at its baseline mean, or falls to half that mean '
+                 'for six years before recovering. Year-to-year recruitment still varies '
+                 'in both scenarios.</p>' if any('recruitment_multipliers' in s
+                 for s in assumptions['scenarios']) else '')
     return (f'<p>Four fitted assessment cases supply the simulated stocks. Each rule is tested '
             f'for {assumptions["years"]} years under two recruitment scenarios, with '
             f'{assumptions["replicates"]} repeated trials per case and scenario. The same '
             'random errors are used when comparing rules.</p>'
             '<p>Each year, an index is observed with error, a catch rule is applied, and the '
             'stock responds to that catch. The next observation comes from the updated stock. '
-            'The index-based rules use a three-year mean; they do not see the true stock size.</p>')
+            'The index-based rules use a three-year mean; they do not see the true stock size.</p>'
+            + scenarios)
 
 
 def mse_limits(result):
@@ -193,7 +256,7 @@ def mse_report(result):
                                + esc(result['rules'][rule]['description'])
                                for rule in ('constant', 'index', 'buffered'))
             + '</p><h2>Results</h2><p class="note">' + findings + '</p>'
-            + plot(mse_series(result), 'SB_over_SB0', 'Median end-of-year spawning biomass / unfished level')
+            + mse_scenario_plots(result)
             + '<p>' + changes + catch_note + '</p>'
             '<h2>Interpretation</h2><p>The comparison shows how management decisions feed back '
             'into future stock conditions and catches. Catch, stock condition and stability '
@@ -293,22 +356,21 @@ def output_page(job, result, record, lineage):
         body += '<pre>' + esc(json.dumps(result['assumptions'], indent=2)) + '</pre></details>'
     elif key in ('mse_constant', 'mse_index', 'mse_buffered'):
         body = '<p class="muted">Management procedure (MP)</p><p class="note">' + esc(result['description']) + '</p>'
+        if key == 'mse_buffered':
+            body += mse_steps(result)
         body += '<p class="feedback-flow">Observe index → Set catch → Update stock → Repeat</p>'
         example = result['example']
         body += ('<h2>Follow one trial</h2><p>' + esc(example['case']) + ' · '
                  + esc(example['scenario']) + ' · trial ' + str(example['replicate'])
-                 + '. First five years of the calculated simulation.</p>')
-        body += mse_trial(example['rows'][:5])
+                 + '. The same case and random errors are used for each rule.</p>')
+        body += mse_trial_plots(example)
         body += ('<p class="muted">The index-based MPs use the three-year observed index; '
                  'constant catch keeps the reference catch. Stock change includes fishing, '
                  'natural mortality and recruitment. SB / SB₀ is spawning biomass relative '
                  'to its unfished level.</p>')
         body += '<details><summary>All years in this trial</summary>' + mse_trial(example['rows']) + '</details>'
+        body += '<details><summary>Median results across all trials</summary>' + mse_scenario_plots(result) + '</details>'
         body += '<h2>Across all trials</h2>'
-        body += plot({result['name']: result['series']}, 'SB_over_SB0',
-                     'Median end-of-year spawning biomass / unfished level',
-                     colour_by_name={'Constant catch': '#1378a3', 'Index rule': '#b56435',
-                                     'Buffered rule': '#7357a8'})
         body += mse_metrics([{'name': result['name'], **result['metrics']}]) + mse_metric_note()
         body += '<details><summary>Results by stock case and scenario</summary>' + table(
             result['cases'], [('case', 'Stock case'), ('scenario', 'Recruitment'),
@@ -319,8 +381,7 @@ def output_page(job, result, record, lineage):
         body = mse_rules(result)
         body += '<h2>Results across all trials</h2>'
         body += mse_metrics(result['metrics']) + mse_metric_note()
-        body += plot(mse_series(result), 'SB_over_SB0', 'Median end-of-year spawning biomass / unfished level')
-        body += plot(mse_series(result), 'catch_t', 'Median annual realised catch (tonnes)')
+        body += mse_scenario_plots(result)
         body += '<details><summary>Results by stock case and scenario</summary>' + table(
             result['cases'], [('rule', 'Rule'), ('case', 'Stock case'), ('scenario', 'Recruitment'),
                               ('mean_catch_t', 'Mean catch (t/year)'),

@@ -17,7 +17,9 @@ The API accepts supplied settings, not arbitrary commands, repositories or queri
 - Each session keeps its latest outputs and checkpoint. A subsequent run replaces
   the previous temporary execution record.
 - PostgreSQL removes inactive sessions and their outputs after 10 minutes. Active
-  calculations have an eight-minute deadline.
+  calculations have an eight-minute deadline. Running again after expiry opens
+  a fresh session with the selected job and settings, rebuilding missing inputs.
+  An uncertain dispatch response is never automatically repeated.
 - `cleanup.yml` removes completed demo and cleanup runs older than 10 minutes.
   It runs twice an hour; GitHub may delay scheduled jobs. CI history and releases
   are outside this deletion rule. No site deployment or source commit is made

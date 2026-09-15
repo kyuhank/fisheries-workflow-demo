@@ -41,8 +41,11 @@ def inspect(page, key, report=False):
     assert article.count() == int(report), key
     if report:
         assert article.get_attribute('data-report') == key
-        assert article.locator('h2').all_text_contents() == ['Methods', 'Results', 'Interpretation']
-        assert article.locator('svg').count() == 1
+        headings = article.locator('h2').all_text_contents()
+        assert headings.index('Methods') < headings.index('Results') < headings.index('Interpretation')
+        assert article.locator('svg').count() >= 1
+        if key == 'mse_report':
+            assert 'Recruitment dip and recovery' in headings
         assert article.locator('table').count() == 0
     body = frame.locator('body').inner_text()
     assert 'Analysis record' in body and 'Synthetic' in body

@@ -1,73 +1,60 @@
 # Fisheries workflow demonstration
 
-[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download for offline use](https://github.com/kyuhank/fisheries-workflow-demo/releases)
+[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
-Follow a change from fisheries data through assessment to management strategy evaluation. See which jobs
-need to run again, which results can be kept, and where each output came from.
-Synthetic data and simplified models demonstrate how these analyses can be connected.
+Follow a change from data preparation through CPUE analysis, stock assessment and
+management strategy evaluation (MSE). Inspect each result's inputs, code and
+software, then rerun the analyses affected by a revision.
 
-## Choose a mode
+Synthetic data and simple models illustrate the workflow. They provide no advice
+for a real fishery.
+
+## Run the demo
 
 | Mode | What happens |
 | --- | --- |
-| **Live run** | GitHub downloads the recorded Docker image and calculates new results, using synthetic data from PostgreSQL. No login is needed. |
-| **Offline run** | The same Python analysis runs in your browser. The website downloads Python when first needed; the offline HTML already includes it. |
-| **View example** | Open completed reports and their input records. No code runs. |
+| **Live run** | GitHub Actions runs Python in the recorded Docker image, using synthetic records from PostgreSQL. No login is needed. |
+| **Offline run** | The same Python analysis runs in your browser. The downloaded HTML includes Python and the data. |
+| **View example** | Open saved outputs and records without running code. |
 
-If the live service cannot connect, the page switches to **Offline run** and
-explains the change. Press **Run** to start; no analysis starts automatically.
-For use without an internet connection, select **Download offline demo** on the website, or use
-`index.html` from a published release. These files include Python, data and saved
-reports; saving the lightweight website page alone does not include Python.
+Run once, then change **CPUE A records**, **Mortality setting 2** or **MSE catch
+buffer**. Run again to update affected jobs; unchanged results keep their original
+records. **Orchestration tool** groups jobs by task and shows responsibilities,
+progress and dependencies. Open a job's **Record** to trace its inputs or select
+**Reproduce & compare**.
 
-## Follow the connections
+MSE compares three catch rules using the four fitted assessment cases. A scenario
+with reduced recruitment followed by recovery shows how observed indices, catch
+decisions and stock changes interact. The Buffered rule uses index thresholds and
+a catch buffer, with advice changes limited to 15% per year. Changing the buffer
+reruns that rule, the MSE summary and the report.
 
-Run the workflow, then change the **CPUE A records** selection. Follow the revised
-analysis into the assessments that use it; unaffected results keep their original
-files and run records. **Orchestration tool** shows each job's owner, progress,
-inputs and outputs. Open **Inputs & versions** to trace the data, code and software
-behind a result, or use **Reproduce & compare** to check it again.
+**Manual handover** represents separate workspaces without shared orchestration.
+Click **Confirm file transfer** to release waiting analyses. Independent work,
+such as CPUE reporting, continues while a transfer is pending. No file upload is
+required.
 
-Summaries compare results in plots and tables. Reports provide a short account
-of the methods and findings, linked to the results used to write them.
+If the live service cannot connect, a notice explains the switch to **Offline
+run**. Press **Run** to start. For use without internet access, download
+`fisheries-workflow.html` from a release; saving the website page alone does not
+include Python.
 
-The MSE task uses the four fitted assessment cases to test three simple catch
-rules under two future recruitment scenarios. **Prepare MSE** shows what comes
-from each assessment. Simulated observations inform catch decisions, which affect
-the stock and its next observation. **MSE results summary** summarises the trials;
-**MSE report** describes the results and their limits.
-
-Change **MSE catch buffer** to test the Buffered rule at 60%, 80% (default), or
-100% of index-based catch advice, keeping the annual advice change limit at ±15%.
-Only **Buffered rule → MSE results summary → MSE report** reruns. Prepared stocks,
-random trial conditions, and the other two MPs keep their original outputs and
-run records. Each revised output records the fraction tested.
-
-Parallel CPUE analyses, input preparations, assessment fits and management trials finish their
-peer group before dependent stages start. Partial reruns retain unaffected peers.
-
-**Manual handover** represents separate analyst workspaces without shared
-orchestration. Receiving analyses wait for updated files, while independent work
-can continue: CPUE summaries and reports run while assessment preparation waits
-for the CPUE files. Click **Confirm file transfer** to release the highlighted
-branches. The click represents an analyst's handover; it does not upload files
-or measure staff time.
-
-**Download this run** keeps its code, data, settings and results. Live sessions are
-separate; temporary results expire after 10 minutes and are replaced by later runs.
-Scheduled maintenance removes old execution logs. Published versions are retained.
+**Download this run** saves its code, data, settings and outputs. Live results
+expire after ten minutes of inactivity; the next run can rebuild missing inputs.
+Releases and downloaded files remain available independently of the live service.
 
 ## Run locally
+
+Use Python 3.12 or later; no extra Python packages are required.
 
 ```bash
 python3 run.py
 python3 run.py --from prepare_a
-make container
 ```
 
-Open `runs/assessment_report/report.html` or `runs/mse_report/report.html`. Use Python 3.12 or later; no additional
-Python packages are needed. Docker needs its image locally or a connection to
-download it. `make check` runs the checks; `make html` rebuilds the page.
+Open `runs/assessment_report/report.html` or `runs/mse_report/report.html`.
+`make container` runs in Docker, `make check` checks the workflow, and `make html`
+builds the website and offline download.
 
-See [ADAPT.md](ADAPT.md) to adapt the workflow, [cloud/README.md](cloud/README.md)
+See [ADAPT.md](ADAPT.md) for the code structure, [cloud/README.md](cloud/README.md)
 for hosting, and [THIRD_PARTY.md](THIRD_PARTY.md) for software sources and licences.

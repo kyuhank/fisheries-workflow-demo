@@ -3,6 +3,7 @@ import { setup } from "./setup.ts";
 import { createDatabase, DatabaseError } from "./database.ts";
 import { validateRunnerWrite } from "./runner-write.ts";
 import { runSettings } from "./request.ts";
+import { checkSession, SessionExpired, startInSession } from "./session.ts";
 const jobs = [
   "submission",
   "qc",
@@ -54,14 +55,9 @@ const bearer = (r: Request) =>
 async function session(request: Request, id: string) {
   if (!uuid(id)) throw Error("Select a demonstration session.");
   const rows = await db(
-    "paper_sessions?id=eq." + id + "&select=id,token_hash,state",
+    "paper_sessions?id=eq." + id + "&select=id,token_hash,state,touched_at",
   );
-  if (rows.length !== 1 || await hash(bearer(request)) !== rows[0].token_hash) {
-    throw Error(
-      "This demonstration session is unavailable. Select Start afresh.",
-    );
-  }
-  return rows[0];
+  return checkSession(rows, await hash(bearer(request)));
 }
 const bytes = (s: string) =>
   Uint8Array.from(
@@ -323,13 +319,16 @@ export async function handle(request: Request) {
       await connection.installationToken();
       const id = crypto.randomUUID();
       const head = await github("commits/main");
-      await db("rpc/paper_start", "POST", {
-        p_session: sid,
-        p_request: id,
-        p_start: b.start,
-        p_settings: settings,
-        p_handover: b.handover,
-      });
+      await startInSession(
+        () => db("rpc/paper_start", "POST", {
+          p_session: sid,
+          p_request: id,
+          p_start: b.start,
+          p_settings: settings,
+          p_handover: b.handover,
+        }),
+        () => session(request, sid),
+      );
       await db("paper_runs?id=eq." + id, "PATCH", { commit_sha: head.sha });
       try {
         await github("actions/workflows/live.yml/dispatches", "POST", {
@@ -380,6 +379,9 @@ export async function handle(request: Request) {
     }
     return reply({ error: "Unknown operation." }, 404);
   } catch (e) {
+    if (e instanceof SessionExpired) {
+      return reply({ error: e.message, code: "session_expired" }, 410);
+    }
     return reply(
       { error: e instanceof Error ? e.message : "Request failed." },
       e instanceof DatabaseError && e.retryable ? 503 : 400,

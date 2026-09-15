@@ -10,6 +10,11 @@ class CloudRun {
   }
 
   async request(path, body, anonymous = false, signal) {
+    if (!anonymous && !this.session) {
+      throw Object.assign(Error("This temporary session has expired."), {
+        sessionUnavailable: true,
+      });
+    }
     const suffix = anonymous
       ? ""
       : (path.includes("?") ? "&" : "?") + "session=" + this.session.id;
@@ -24,7 +29,16 @@ class CloudRun {
     });
     const value = await response.json();
     if (!response.ok) {
-      throw Error(value.error || "The online demonstration is unavailable.");
+      throw Object.assign(
+        Error(value.error || "The online demonstration is unavailable."),
+        {
+          // The legacy response also rejects the request before any dispatch.
+          sessionUnavailable: [400, 410].includes(response.status) &&
+            (value.code === "session_expired" ||
+              value.error ===
+                "This demonstration session is unavailable. Select Start afresh."),
+        },
+      );
     }
     return value;
   }
@@ -43,11 +57,23 @@ class CloudRun {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
     try {
-      const info = await this.request("/info", undefined, true, controller.signal);
+      const info = await this.request(
+        "/info",
+        undefined,
+        true,
+        controller.signal,
+      );
       if (!info.configured) {
         throw Error("The live service is unavailable.");
       }
-      this.session = await this.request("/session", {}, true, controller.signal);
+      this.session = await this.request(
+        "/session",
+        {},
+        true,
+        controller.signal,
+      );
+      this.records = {};
+      this.run = null;
       return { records: {} };
     } catch (error) {
       if (controller.signal.aborted) {
@@ -57,6 +83,13 @@ class CloudRun {
     } finally {
       clearTimeout(timeout);
     }
+  }
+
+  forgetSession() {
+    this.session = null;
+    this.records = {};
+    this.run = null;
+    this.onEvent({ state: "session_expired" });
   }
 
   plan(start, settings) {
@@ -91,15 +124,33 @@ class CloudRun {
     };
   }
 
-  async execute(input) {
-    let request;
+  async dispatch(input) {
     try {
-      request = await this.request("/run", input);
+      return await this.request("/run", input);
     } catch (error) {
-      if (["TypeError", "AbortError", "TimeoutError"].includes(error.name)) {
+      if (
+        ["TypeError", "AbortError", "TimeoutError", "SyntaxError"].includes(
+          error.name,
+        )
+      ) {
         error.executionUnknown = true;
       }
       throw error;
+    }
+  }
+
+  async execute(input) {
+    if (!this.session) await this.initialise();
+    let request;
+    try {
+      request = await this.dispatch(input);
+    } catch (error) {
+      if (!error.sessionUnavailable) throw error;
+      this.forgetSession();
+      await this.initialise();
+      // Retry once, only after the server confirms no run was dispatched.
+      // Keep the selected job, settings and handover mode unchanged.
+      request = await this.dispatch(input);
     }
     let cursor = 0, failures = 0, holdUntil = 0, shownGroup = "";
     const deadline = Date.now() + 10 * 60 * 1000;
@@ -109,9 +160,12 @@ class CloudRun {
         update = await this.request("/state?after=" + cursor);
         failures = 0;
       } catch (error) {
+        if (error.sessionUnavailable) throw error;
         if (++failures >= 4) {
-          throw Object.assign(Error("The connection to the live run was interrupted."),
-            { executionUnknown: true });
+          throw Object.assign(
+            Error("The connection to the live run was interrupted."),
+            { executionUnknown: true },
+          );
         }
         this.onPhase(
           "Reconnecting",
@@ -172,28 +226,40 @@ class CloudRun {
       }
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    throw Object.assign(Error("The live run has not reported completion."),
-      { executionUnknown: true });
+    throw Object.assign(Error("The live run has not reported completion."), {
+      executionUnknown: true,
+    });
   }
 
   async call(type, data = {}) {
-    if (type === "plan") return this.plan(data.start, data.settings);
-    if (type === "run") return this.execute(data);
-    if (type === "view") {
-      return this.request("/output?job=" + encodeURIComponent(data.job));
-    }
-    if (type === "transfer") return this.request("/transfer", data);
-    if (type === "download") return (await this.request("/bundle")).bundle;
-    if (type === "reset") {
-      try {
-        await this.request("/reset", {});
-      } catch (error) {
-        if (!error.message.includes("session is unavailable")) throw error;
+    try {
+      if (type === "plan") return this.plan(data.start, data.settings);
+      if (type === "run") return await this.execute(data);
+      if (type === "view") {
+        return await this.request(
+          "/output?job=" + encodeURIComponent(data.job),
+        );
       }
-      this.records = {};
-      this.session = await this.request("/session", {}, true);
-      return { records: {} };
+      if (type === "transfer") return await this.request("/transfer", data);
+      if (type === "download") return (await this.request("/bundle")).bundle;
+      if (type === "reset") {
+        try {
+          await this.request("/reset", {});
+        } catch (error) {
+          if (!error.sessionUnavailable) throw error;
+        }
+        this.records = {};
+        this.session = await this.request("/session", {}, true);
+        return { records: {} };
+      }
+      throw Error("Unknown online operation.");
+    } catch (error) {
+      if (error.sessionUnavailable) {
+        this.forgetSession();
+        error.message =
+          "The temporary live results have expired. Press Run to rebuild the missing inputs with your selected settings.";
+      }
+      throw error;
     }
-    throw Error("Unknown online operation.");
   }
 }

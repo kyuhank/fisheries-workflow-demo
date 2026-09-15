@@ -22,7 +22,7 @@
   },
   {
     "file": "data/fishery.sqlite",
-    "sha256": "707a3d610b08712664b005ebbb7612b288a3a02050fc0235662cdb0bfa6ef30e",
+    "sha256": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
     "origin": "Generated within this repository",
     "generator": "scripts/generate-data.py",
     "scenario": "data/scenario.json",
@@ -30,7 +30,7 @@
   },
   {
     "file": "data/submission.json",
-    "sha256": "96034f939991e5c36b36124fcd1a0485793527cb09b31fbd207b9184eacbb6e5",
+    "sha256": "a610844d7e80a607f372b112ed5af87dcd97d66a0dcd35c361beea859bc56590",
     "origin": "Generated within this repository",
     "generator": "scripts/generate-data.py",
     "scenario": "data/scenario.json",

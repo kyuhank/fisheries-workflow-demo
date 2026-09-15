@@ -4,5 +4,6 @@ COPY workflow/ workflow/
 COPY cloud/ cloud/
 COPY data/ data/
 COPY tests/ tests/
+COPY scripts/generate-data.py scripts/generate-data.py
 COPY run.py verify.py build-info.json ./
 CMD ["python", "run.py", "--output", "/outputs"]

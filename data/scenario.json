@@ -2,7 +2,7 @@
   "seed": 20260913,
   "generator": "scripts/generate-data.py",
   "purpose": "Illustrate a connected workflow, not infer stock status.",
-  "scenario": "Catches increase, then ease; biomass declines and partially recovers. The sample shifts towards vessels with higher catchability.",
+  "scenario": "Catches rise to a 2010\u20132013 peak, then fall; biomass declines and partially recovers with constant recruitment. The sample shifts towards vessels with higher catchability.",
   "years": [
     2000,
     2001,
@@ -37,19 +37,19 @@
     ],
     [
       2005,
-      650
+      850
     ],
     [
       2010,
-      1000
+      1250
     ],
     [
-      2015,
-      1000
+      2013,
+      1250
     ],
     [
-      2019,
-      650
+      2018,
+      450
     ],
     [
       2024,

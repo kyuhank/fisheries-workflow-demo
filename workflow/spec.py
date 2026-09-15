@@ -42,7 +42,7 @@ JOBS = [
     ('mse_index', 'Index rule', 'mse', 'MSE analyst', ['mse_prepare'],
      'Update annual catch using a simulated abundance index.'),
     ('mse_buffered', 'Buffered rule', 'mse', 'MSE analyst', ['mse_prepare'],
-     'Apply the selected fraction of index-based catch advice, with annual advice changes limited to 15%.'),
+     'Set catch from index thresholds and the selected buffer; limit annual advice changes to 15%.'),
     ('mse_summary', 'MSE results summary', 'mse', 'MSE analyst',
      ['mse_constant', 'mse_index', 'mse_buffered'],
      'Compare catch, stock levels and catch stability across the management trials.'),

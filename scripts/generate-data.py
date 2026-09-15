@@ -1,4 +1,5 @@
 """Create a fixed synthetic fishery with changing catches and vessel composition."""
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -13,7 +14,7 @@ from workflow.age_model import trajectory
 SEED = 20260913
 random_source = random.Random(SEED)
 YEARS = list(range(2000, 2025))
-KNOTS = [(2000,300), (2005,650), (2010,1000), (2015,1000), (2019,650), (2024,380)]
+KNOTS = [(2000,300), (2005,850), (2010,1250), (2013,1250), (2018,450), (2024,380)]
 VESSELS = [f'v{i+1:02d}' for i in range(8)]
 CATCHABILITY = [0.65, 0.78, 0.87, 0.99, 1.10, 1.23, 1.39, 1.58]
 
@@ -35,6 +36,7 @@ def annual_catch(year):
 
 
 def generate():
+    random_source.seed(SEED)
     catches = [annual_catch(year) for year in YEARS]
     population = trajectory(14000, 0.20, catches)
     initial = population['rows'][0]['vulnerable_biomass']
@@ -60,11 +62,18 @@ def generate():
     (ROOT/'data/submission.json').write_text(json.dumps({'sets':[r for r in observations if r[1] == 2024], 'catch':catches[-1]},separators=(',',':'))+'\n')
     scenario = {'seed':SEED, 'generator':'scripts/generate-data.py',
                 'purpose':'Illustrate a connected workflow, not infer stock status.',
-                'scenario':'Catches increase, then ease; biomass declines and partially recovers. The sample shifts towards vessels with higher catchability.',
+                'scenario':'Catches rise to a 2010–2013 peak, then fall; biomass declines and partially recovers with constant recruitment. The sample shifts towards vessels with higher catchability.',
                 'years':YEARS, 'catch_knots':KNOTS, 'vessel_catchability':CATCHABILITY,
                 'generating_B0':14000, 'generating_M':0.20,
                 'observation_model':'Poisson catch with gamma variation, vessel effects and a small correlated annual deviation.'}
     (ROOT/'data/scenario.json').write_text(json.dumps(scenario,indent=2)+'\n')
+    sources_path = ROOT/'data/sources.json'
+    sources = json.loads(sources_path.read_text())
+    for source in sources:
+        if source.get('generator') == scenario['generator']:
+            source['sha256'] = hashlib.sha256((ROOT/source['file']).read_bytes()).hexdigest()
+            source['seed'] = SEED
+    sources_path.write_text(json.dumps(sources,indent=2)+'\n')
     print(f'Generated {len(observations)} observations for 2000–2024; seed {SEED}.')
 
 
