@@ -71,6 +71,7 @@ STAGES = [
 HANDOVERS = {
     'data': {'cpue_a': ['extract'], 'cpue_b': ['extract']},
     'cpue': {'prepare_a': ['extract', 'cpue_a'], 'prepare_b': ['extract', 'cpue_b']},
+    'assessment': {'mse_prepare': SPEC['mse_prepare']['parents']},
 }
 
 

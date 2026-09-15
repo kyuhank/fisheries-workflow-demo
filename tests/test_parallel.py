@@ -32,7 +32,8 @@ class HostedProcessesTest(unittest.TestCase):
                 handover = next(item['event'] for item in reversed(delivered)
                                 if item['event']['state'] == 'handover')
                 boundary = handover['boundary']
-                if boundary == 'data' or any(item['event'].get('job') == 'cpue_report'
+                report = {'cpue': 'cpue_report', 'assessment': 'assessment_report'}.get(boundary)
+                if boundary == 'data' or any(item['event'].get('job') == report
                                              and item['event']['state'] == 'complete'
                                              for item in delivered):
                     confirmed.add(boundary)
@@ -44,7 +45,7 @@ class HostedProcessesTest(unittest.TestCase):
                             ['cpue_b', 'prepare_b', 'assessment_b1', 'assessment_b2']}
                 self.assertEqual([item['event']['group'] for item in delivered
                                   if item['event']['state'] == 'handover'],
-                                 [['cpue_a', 'cpue_b'], ['prepare_a', 'prepare_b']])
+                                 [['cpue_a', 'cpue_b'], ['prepare_a', 'prepare_b'], ['mse_prepare']])
                 self.assert_event_barriers(full['events'])
                 self.assert_reporting_before_transfer(full['events'])
                 for _ in range(2):
@@ -53,7 +54,8 @@ class HostedProcessesTest(unittest.TestCase):
                     runner.configure({'min_hooks_a': 1200})
                     partial = asyncio.run(runner.run('cpue_a'))
                     self.assertEqual([item['event']['group'] for item in delivered
-                                      if item['event']['state'] == 'handover'], [['prepare_a']])
+                                      if item['event']['state'] == 'handover'],
+                                     [['prepare_a'], ['mse_prepare']])
                     self.assertEqual({key: runner.records[key] for key in retained}, retained)
                     self.assertEqual(len(partial['run']), 14)
                     self.assert_event_barriers(partial['events'])
@@ -61,11 +63,12 @@ class HostedProcessesTest(unittest.TestCase):
                     self.assertTrue(all(runner.valid(key) for key in SPEC))
 
     def assert_reporting_before_transfer(self, events):
-        report = next(i for i, event in enumerate(events)
-                      if event['job'] == 'cpue_report' and event['state'] == 'complete')
-        confirmed = next(i for i, event in enumerate(events)
-                         if event['state'] == 'received' and event['boundary'] == 'cpue')
-        self.assertLess(report, confirmed)
+        for boundary in ('cpue', 'assessment'):
+            report = next(i for i, event in enumerate(events)
+                          if event['job'] == boundary + '_report' and event['state'] == 'complete')
+            confirmed = next(i for i, event in enumerate(events)
+                             if event['state'] == 'received' and event['boundary'] == boundary)
+            self.assertLess(report, confirmed)
 
     def assert_event_barriers(self, events):
         positions = {(event['job'], event['state']): i for i, event in enumerate(events)}

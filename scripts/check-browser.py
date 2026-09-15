@@ -132,7 +132,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#handover').select_option('manual')
     assert page.locator('[data-tab="jobs"]').inner_text() == 'Job outputs'
     assert 'This mode represents work without shared orchestration.' in page.locator('#handover-note').inner_text()
-    assert page.locator('.handover-marker').count() == 4
+    assert page.locator('.handover-marker').count() == 5
     page.locator('#run').click()
     page.locator('#handover-panel:visible').wait_for(timeout=90000)
     assert page.locator('#handover-title').inner_text() == 'Data manager → CPUE analyst'
@@ -162,6 +162,24 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert 'click to continue' in page.locator('#status-title').inner_text()
     page.screenshot(path=str(ROOT/'.test-output/manual-cpue-handover.png'), full_page=True)
     page.locator('#transfer-files').click()
+    page.wait_for_function("waitingTransfer?.boundary === 'assessment' && states.assessment_report === 'complete'", timeout=30000)
+    assert page.locator('#handover-title').inner_text() == 'Assessment analyst → MSE analyst'
+    assert page.locator('#handover-panel').is_visible()
+    assert page.locator('#transfer-files').is_enabled()
+    assert 'Assessment summaries and reports can continue' in page.locator('#status-message').inner_text()
+    assert page.locator('.job.handover').count() == 1
+    assert page.locator('.job[data-job="mse_prepare"].handover').count() == 1
+    assert page.locator('.handover-marker.active').count() == 1
+    assert page.locator('.handover-marker.active[data-boundary="assessment"][data-to="mse_prepare"]').count() == 1
+    assert page.locator('.connection.handover[data-to="mse_prepare"]').count() == 4
+    for key in ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2', 'assessment_summary', 'assessment_report']:
+        assert page.locator(f'.job[data-job="{key}"].complete').count() == 1
+    for key in ['mse_constant', 'mse_index', 'mse_buffered', 'mse_summary', 'mse_report']:
+        assert page.locator(f'.job[data-job="{key}"].waiting').count() == 1
+    page.wait_for_timeout(1200)
+    assert page.evaluate("busy && waitingTransfer?.boundary === 'assessment' && !records.mse_prepare")
+    page.screenshot(path=str(ROOT/'.test-output/manual-assessment-handover.png'), full_page=True)
+    page.locator('#transfer-files').click()
     complete(page)
     page.locator('#revise-cpue').click()
     page.locator('.job[data-job="assessment_a1"].outdated').wait_for()
@@ -182,10 +200,11 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#connect-workflow').click()
     complete(page)
     assert page.locator('#handover').input_value() == 'connected'
+    assert page.locator('.handover-marker').count() == 0
     assert '14 jobs completed' in page.locator('#status-message').inner_text()
     page.set_viewport_size({'width':390,'height':844})
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert not errors, errors
     assert not [url for url in requests if '/functions/v1/paper-api/info' not in url], requests
     browser.close()
-print('Passed: offline calculations, output comparison, repeated partial runs, peer barriers, grouped manual transfers, independent CPUE reporting, task views and saved example.')
+print('Passed: offline calculations, output comparison, repeated partial runs, peer barriers, three manual boundaries, independent CPUE/assessment reporting, task views and saved example.')

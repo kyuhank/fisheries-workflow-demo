@@ -286,24 +286,28 @@ class Workflow:
             stages = [keys for keys in stages if keys]
             stage_for = {key: index for index, keys in enumerate(stages) for key in keys}
             tasks = {}
+            transfer_lock = asyncio.Lock()
 
             async def run_stage(index, keys):
                 parents = {stage_for[parent] for key in keys for parent in SPEC[key]['parents']
                            if parent in stage_for and stage_for[parent] != index}
                 await asyncio.gather(*(tasks[parent] for parent in parents))
                 for handover in handover_groups(keys, plan['run']):
-                    if self.manual_transfer is None:
-                        break
-                    recipients = ' and '.join(SPEC[key]['title'] for key in handover['group'])
-                    key = handover['group'][0]
-                    self.record_event(key, 'handover',
-                                      f'Updated inputs are ready for {recipients}. '
-                                      'Click Confirm file transfer to continue.', **handover)
-                    connected = await self.manual_transfer(handover)
-                    await self.emit(key, 'received',
-                                    f'File transfer confirmed for {recipients}.', **handover)
-                    if connected:
-                        self.manual_transfer = None
+                    # Only transfers share this gate; independent reporting keeps
+                    # running while a recipient waits for its input files.
+                    async with transfer_lock:
+                        if self.manual_transfer is None:
+                            break
+                        recipients = ' and '.join(SPEC[key]['title'] for key in handover['group'])
+                        key = handover['group'][0]
+                        self.record_event(key, 'handover',
+                                          f'Updated inputs are ready for {recipients}. '
+                                          'Click Confirm file transfer to continue.', **handover)
+                        connected = await self.manual_transfer(handover)
+                        await self.emit(key, 'received',
+                                        f'File transfer confirmed for {recipients}.', **handover)
+                        if connected:
+                            self.manual_transfer = None
                 for key in keys:
                     if self.before_job:
                         await self.before_job(key)

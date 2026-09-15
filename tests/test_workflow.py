@@ -40,6 +40,7 @@ class WorkflowTest(unittest.TestCase):
                     ('database','running')]
         self.assertEqual(events[:len(sequence)], sequence)
         self.assertEqual(len(self.full['run']), 22)
+        self.assertFalse(any(state in ('handover', 'received') for _, state in events))
         self.assertTrue(all(self.runner.valid(key) for key in SPEC))
 
     def test_input_preparation_reruns_only_its_dependants(self):
@@ -134,50 +135,75 @@ class WorkflowTest(unittest.TestCase):
 
                 asyncio.run(exercise())
 
-    def test_manual_groups_pause_together_while_cpue_reporting_continues(self):
-        runner = self.clone()
-        previous = {key: record.copy() for key, record in runner.records.items()}
+    def test_manual_groups_pause_together_while_independent_reporting_continues(self):
+        for fresh in (True, False):
+            with self.subTest(fresh=fresh):
+                if fresh:
+                    folder = tempfile.TemporaryDirectory()
+                    self.addCleanup(folder.cleanup)
+                    runner = Workflow(folder.name)
+                else:
+                    runner = self.clone()
+                previous = {key: record.copy() for key, record in runner.records.items()}
 
-        async def exercise():
-            waiting = asyncio.Queue()
-            report_ready = asyncio.Event()
+                async def exercise():
+                    waiting = asyncio.Queue()
+                    reports = {key: asyncio.Event() for key in ('cpue_report', 'assessment_report')}
 
-            def notify(event):
-                if event.get('job') == 'cpue_report' and event['state'] == 'complete':
-                    report_ready.set()
+                    def notify(event):
+                        if event.get('job') in reports and event['state'] == 'complete':
+                            reports[event['job']].set()
 
-            async def transfer(handover):
-                acknowledgement = asyncio.Event()
-                await waiting.put((handover, acknowledgement))
-                await acknowledgement.wait()
-                return False
+                    async def transfer(handover):
+                        acknowledgement = asyncio.Event()
+                        await waiting.put((handover, acknowledgement))
+                        await acknowledgement.wait()
+                        return False
 
-            runner.notify, runner.manual_transfer = notify, transfer
-            execution = asyncio.create_task(runner.run('extract'))
-            first, acknowledge_data = await asyncio.wait_for(waiting.get(), 5)
-            self.assertEqual(first, {'boundary': 'data', 'group': ['cpue_a', 'cpue_b']})
-            self.assertFalse(any(event['job'].startswith('cpue_') and event['state'] == 'running'
-                                 for event in runner.events))
-            self.assertEqual(runner.records['cpue_a'], previous['cpue_a'])
-            self.assertEqual(runner.records['cpue_b'], previous['cpue_b'])
-            acknowledge_data.set()
-            second, acknowledge_cpue = await asyncio.wait_for(waiting.get(), 5)
-            self.assertEqual(second, {'boundary': 'cpue', 'group': ['prepare_a', 'prepare_b']})
-            await asyncio.wait_for(report_ready.wait(), 5)
-            self.assertFalse(execution.done())
-            self.assertEqual(runner.records['prepare_a'], previous['prepare_a'])
-            self.assertEqual(runner.records['prepare_b'], previous['prepare_b'])
-            self.assertEqual(runner.records['assessment_a1'], previous['assessment_a1'])
-            self.assertEqual(runner.records['cpue_report']['run_id'], 'Run 002')
-            acknowledge_cpue.set()
-            await execution
-            self.assertTrue(all(runner.valid(key) for key in SPEC))
-            self.assertEqual(len([event for event in runner.events if event['state'] == 'handover']), 2)
-            self.assertEqual(len([event for event in runner.events if event['state'] == 'received']), 2)
-            for key in ['cpue_a', 'cpue_b', 'prepare_a', 'prepare_b']:
-                self.assertTrue(any('File transfer confirmed' in line for line in runner.records[key]['log']))
+                    runner.notify, runner.manual_transfer = notify, transfer
+                    execution = asyncio.create_task(runner.run('submission' if fresh else 'extract'))
+                    first, acknowledge_data = await asyncio.wait_for(waiting.get(), 5)
+                    self.assertEqual(first, {'boundary': 'data', 'group': ['cpue_a', 'cpue_b']})
+                    self.assertFalse(any(event['job'].startswith('cpue_') and event['state'] == 'running'
+                                         for event in runner.events))
+                    for key in first['group']:
+                        self.assertEqual(runner.records.get(key), previous.get(key))
+                    acknowledge_data.set()
+                    second, acknowledge_cpue = await asyncio.wait_for(waiting.get(), 5)
+                    self.assertEqual(second, {'boundary': 'cpue', 'group': ['prepare_a', 'prepare_b']})
+                    await asyncio.wait_for(reports['cpue_report'].wait(), 5)
+                    self.assertFalse(execution.done())
+                    for key in [*second['group'], 'assessment_a1']:
+                        self.assertEqual(runner.records.get(key), previous.get(key))
+                    run_id = 'Run 001' if fresh else 'Run 002'
+                    self.assertEqual(runner.records['cpue_report']['run_id'], run_id)
+                    acknowledge_cpue.set()
+                    third, acknowledge_assessment = await asyncio.wait_for(waiting.get(), 5)
+                    self.assertEqual(third, {'boundary': 'assessment', 'group': ['mse_prepare']})
+                    await asyncio.wait_for(reports['assessment_report'].wait(), 5)
+                    self.assertFalse(execution.done())
+                    for key in ['assessment_summary', 'assessment_report', *SPEC['mse_prepare']['parents']]:
+                        self.assertEqual(runner.records[key]['run_id'], run_id)
+                    for key in MSE_JOBS:
+                        self.assertEqual(runner.records.get(key), previous.get(key))
+                    self.assertFalse(any(event['job'] in MSE_JOBS and event['state'] == 'running'
+                                         for event in runner.events))
+                    gate = next(i for i, event in enumerate(runner.events)
+                                if event['state'] == 'handover' and event['boundary'] == 'assessment')
+                    self.assertTrue(all(i < gate for i, event in enumerate(runner.events)
+                                        if event['job'] in SPEC['mse_prepare']['parents']
+                                        and event['state'] == 'complete'))
+                    acknowledge_assessment.set()
+                    await execution
+                    self.assertTrue(all(runner.valid(key) for key in SPEC))
+                    self.assertEqual(len([event for event in runner.events if event['state'] == 'handover']), 3)
+                    self.assertEqual(len([event for event in runner.events if event['state'] == 'received']), 3)
+                    for key in ['cpue_a', 'cpue_b', 'prepare_a', 'prepare_b', 'mse_prepare']:
+                        self.assertTrue(any('File transfer confirmed' in line for line in runner.records[key]['log']))
+                    for key in SPEC:
+                        compare(runner.output(key), self.runner.output(key), key)
 
-        asyncio.run(exercise())
+                asyncio.run(exercise())
 
     def test_partial_manual_reruns_transfer_only_changed_branches(self):
         runner = self.clone()
@@ -191,14 +217,102 @@ class WorkflowTest(unittest.TestCase):
 
         runner.manual_transfer = transfer
         for _ in range(2):
+            transfers.clear()
             result = asyncio.run(runner.run('cpue_a'))
-            self.assertEqual(transfers[-1], {'boundary': 'cpue', 'group': ['prepare_a']})
+            self.assertEqual(transfers, [
+                {'boundary': 'cpue', 'group': ['prepare_a']},
+                {'boundary': 'assessment', 'group': ['mse_prepare']},
+            ])
             self.assertEqual(len(result['run']), 14)
             self.assertEqual({key: runner.records[key] for key in retained_b}, retained_b)
-        self.assertEqual(len(transfers), 2)
+        transfers.clear()
         asyncio.run(runner.run('prepare_a'))
+        self.assertEqual(transfers, [{'boundary': 'assessment', 'group': ['mse_prepare']}])
+        transfers.clear()
         asyncio.run(runner.run('cpue_summary'))
-        self.assertEqual(len(transfers), 2)
+        self.assertEqual(transfers, [])
+
+    def test_manual_assessment_revisions_wait_for_all_results_and_preserve_retained_inputs(self):
+        for start, settings, revised in [
+            ('assessment_a1', {}, ['assessment_a1']),
+            ('assessment_report', {'mortality_2': 0.35}, ['assessment_a2', 'assessment_b2']),
+        ]:
+            with self.subTest(revised=revised):
+                runner = self.clone()
+                previous = {key: record.copy() for key, record in runner.records.items()}
+                runner.configure(settings)
+                original = runner.calculate
+
+                async def exercise():
+                    fitting, finish_fit = asyncio.Event(), asyncio.Event()
+                    waiting, confirmed, report_ready = asyncio.Event(), asyncio.Event(), asyncio.Event()
+                    transfers = []
+
+                    async def calculate(key, run_id):
+                        if key == revised[-1]:
+                            fitting.set()
+                            await finish_fit.wait()
+                        return await original(key, run_id)
+
+                    async def transfer(handover):
+                        transfers.append(handover)
+                        waiting.set()
+                        await confirmed.wait()
+                        return False
+
+                    def notify(event):
+                        if event.get('job') == 'assessment_report' and event['state'] == 'complete':
+                            report_ready.set()
+
+                    runner.calculate, runner.manual_transfer, runner.notify = calculate, transfer, notify
+                    execution = asyncio.create_task(runner.run(start))
+                    await asyncio.wait_for(fitting.wait(), 5)
+                    self.assertEqual(transfers, [])
+                    self.assertEqual(runner.records['mse_prepare'], previous['mse_prepare'])
+                    finish_fit.set()
+                    await asyncio.wait_for(waiting.wait(), 5)
+                    await asyncio.wait_for(report_ready.wait(), 5)
+                    self.assertEqual(transfers, [{'boundary': 'assessment', 'group': ['mse_prepare']}])
+                    self.assertFalse(execution.done())
+                    for key in MSE_JOBS:
+                        self.assertEqual(runner.records[key], previous[key])
+                    self.assertFalse(any(event['job'] in MSE_JOBS and event['state'] == 'running'
+                                         for event in runner.events))
+                    self.assertEqual(runner.records['assessment_report']['run_id'], 'Run 002')
+                    confirmed.set()
+                    result = await execution
+                    self.assertEqual(result['run'], revised + ['assessment_summary', 'assessment_report'] + MSE_JOBS)
+                    for key in result['retained']:
+                        self.assertEqual(runner.records[key], previous[key])
+                    for key, details in runner.records['mse_prepare']['inputs'].items():
+                        self.assertEqual(details, {
+                            'run_id': 'Run 002' if key in revised else 'Run 001',
+                            'checksum': runner.records[key]['outputs']['output.json'],
+                        })
+                    self.assertTrue(all(runner.valid(key) for key in SPEC))
+
+                asyncio.run(exercise())
+
+    def test_manual_report_and_mse_buffer_updates_do_not_transfer_unchanged_inputs(self):
+        runner = self.clone()
+        transfers = []
+
+        async def transfer(handover):
+            transfers.append(handover)
+            return False
+
+        runner.manual_transfer = transfer
+        previous = {key: record.copy() for key, record in runner.records.items()}
+        result = asyncio.run(runner.run('assessment_report'))
+        self.assertEqual(result['run'], ['assessment_report'])
+        for key in MSE_JOBS:
+            self.assertEqual(runner.records[key], previous[key])
+        runner.configure({'mse_buffer': 0.6})
+        result = asyncio.run(runner.run('mse_report'))
+        self.assertEqual(result['run'], ['mse_buffered', 'mse_summary', 'mse_report'])
+        self.assertEqual(runner.records['mse_prepare'], previous['mse_prepare'])
+        self.assertEqual(transfers, [])
+        self.assertTrue(all(runner.valid(key) for key in SPEC))
 
     def test_connecting_at_first_transfer_releases_later_boundaries(self):
         runner = self.clone()
@@ -212,6 +326,7 @@ class WorkflowTest(unittest.TestCase):
         asyncio.run(runner.run('extract'))
         self.assertEqual(transfers, [{'boundary': 'data', 'group': ['cpue_a', 'cpue_b']}])
         self.assertTrue(runner.valid('assessment_report'))
+        self.assertTrue(runner.valid('mse_report'))
 
     def test_cpue_reporting_does_not_run_assessment(self):
         runner = self.clone()

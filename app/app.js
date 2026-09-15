@@ -26,6 +26,8 @@ let completedRun = null, modeVersion = 0;
 let correctionPending = false;
 let activities = {}, dispatchPending = false;
 let workspaceView = "tasks", jobStatusFilter = "";
+// Dependency browsing is independent of the starting job and its execution plan.
+let dependencySelection = "prepare_a";
 let waitingTransfer = null;
 let confirmingTransfer = false;
 const byKey = Object.fromEntries(jobs.map((job) => [job.key, job]));
@@ -510,7 +512,9 @@ function renderDiagram() {
       ((waitingTransfer.boundary === "data" && edge.from === "extract" &&
         edge.to.startsWith("cpue_")) ||
         (waitingTransfer.boundary === "cpue" && edge.from.startsWith("cpue_") &&
-          edge.to.startsWith("prepare_")));
+          edge.to.startsWith("prepare_")) ||
+        (waitingTransfer.boundary === "assessment" && edge.to === "mse_prepare" &&
+          byKey.mse_prepare.parents.includes(edge.from)));
     const kind = awaiting
       ? "handover"
       : receiving
@@ -579,6 +583,7 @@ function renderDiagram() {
     for (const [boundary, x, y, to] of [
       ["data", 383, 175, "cpue_a"], ["data", 383, 487, "cpue_b"],
       ["cpue", 846, 175, "prepare_a"], ["cpue", 846, 487, "prepare_b"],
+      ["assessment", 1282, 670, "mse_prepare"],
     ]) {
       const active = waitingTransfer?.boundary === boundary &&
         waitingTransfer.group.includes(to);
@@ -647,6 +652,7 @@ function lineIcon(name) {
   const paths = {
     folder: "M3 6h7l2 3h9v11H3Z M3 6V4h7l2 2h9v3",
     list: "M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1",
+    dependencies: "M3 9h6v6H3ZM15 3h6v6h-6ZM15 15h6v6h-6ZM9 12h3m0-6v12m0-12h3m-3 12h3",
     database:
       "M4 6c0-4 16-4 16 0s-16 4-16 0m0 0v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0",
     chart: "M4 4v16h16M7 15l4-5 4 2 5-7",
@@ -774,18 +780,23 @@ function renderTasks() {
   $("workspace-activity").classList.toggle("handover", Boolean(waitingTransfer));
   $("tasks").hidden = workspaceView !== "tasks";
   $("task-jobs").hidden = workspaceView !== "jobs";
+  $("dependencies-view").hidden = workspaceView !== "dependencies";
   $("workspace-breadcrumb").textContent = workspaceView === "tasks"
     ? "Task overview"
+    : workspaceView === "dependencies" ? "Job dependencies"
     : "Task overview / Jobs";
   $("workspace-title").textContent = workspaceView === "tasks"
     ? "Follow the work across teams"
+    : workspaceView === "dependencies" ? "Follow a job’s connections"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
     ? "This view illustrates shared job coordination, using example roles and linked job records."
+    : workspaceView === "dependencies" ? "Required inputs connect each job to the analyses that use its output."
     : "Follow required inputs; open the output or its recorded inputs and versions.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
   $("show-tasks").classList.toggle("active", workspaceView === "tasks");
+  $("show-dependencies").classList.toggle("active", workspaceView === "dependencies");
   $("all-tasks").classList.toggle(
     "active",
     workspaceView === "jobs" && !jobStatusFilter,
@@ -819,6 +830,114 @@ async function openJobRecord(key) {
   if (currentOutput?.record?.job === key && $("output-dialog").open) {
     document.querySelector('[data-output="record"]').click();
   }
+}
+
+function inspectDependencies(key) {
+  if (!byKey[key]) return;
+  dependencySelection = key;
+  renderDependencies();
+}
+
+function dependencyCard(key, current) {
+  const job = byKey[key], progress = jobProgress(job);
+  const task = taskGroups.find((task) => task.key === job.module);
+  const colour = payload.diagram.groups.find((group) => group.key === job.module).colour;
+  const card = uiElement("article", "dependency-card " + progress.state + (current ? " current" : ""));
+  card.dataset.job = key;
+  card.dataset.module = job.module;
+  card.style.setProperty("--accent", colour);
+  card.append(uiElement("p", "dependency-module", task.title));
+  const heading = uiElement("h4", "dependency-title");
+  if (current) heading.textContent = job.title;
+  else {
+    const inspect = uiElement("button", "dependency-inspect", job.title);
+    inspect.setAttribute("aria-label", "Inspect dependencies of " + job.title);
+    inspect.onclick = () => {
+      inspectDependencies(key);
+      $("dependency-job").focus({ preventScroll: true });
+    };
+    heading.append(inspect);
+  }
+  card.append(heading);
+  if (current) card.append(uiElement("p", "dependency-description", job.description));
+  const progressBadge = badge(key);
+  progressBadge.lastChild.textContent = progress.label;
+  if (progress.label === "Ready") progressBadge.classList.add("ready");
+  card.append(progressBadge);
+  if (progress.detail) card.append(uiElement("p", "dependency-progress", progress.detail));
+  const owner = uiElement("p", "dependency-owner");
+  owner.append(lineIcon("person"), document.createTextNode(job.owner));
+  owner.setAttribute("aria-label", "Responsible: " + job.owner);
+  card.append(owner);
+  const origin = uiElement("div", "dependency-origin");
+  origin.append(uiElement("span", "", "Output from"),
+    uiElement("span", "run-label", records[key]?.run_id || "No output yet"));
+  card.append(origin);
+  const actions = uiElement("div", "dependency-actions");
+  const output = uiElement("button", "open-output");
+  output.append(lineIcon("file"), document.createTextNode("Output"));
+  output.disabled = !records[key];
+  output.setAttribute("aria-label", "Open " + job.title + " output");
+  output.onclick = () => openOutput(key);
+  const record = uiElement("button", "open-job-record", "Record");
+  record.disabled = !records[key];
+  record.setAttribute("aria-label", "Inspect " + job.title + " recorded inputs and versions");
+  record.onclick = () => openJobRecord(key);
+  actions.append(output, record);
+  card.append(actions);
+  return card;
+}
+
+function renderDependencies() {
+  const picker = $("dependency-job");
+  if (!picker.options.length) {
+    for (const task of taskGroups) {
+      const group = document.createElement("optgroup");
+      group.label = task.title;
+      for (const job of jobs.filter((job) => job.module === task.key)) {
+        const option = uiElement("option", "", job.title);
+        option.value = job.key;
+        group.append(option);
+      }
+      picker.append(group);
+    }
+  }
+  const job = byKey[dependencySelection] || jobs[0];
+  dependencySelection = job.key;
+  picker.value = job.key;
+  // These are declared input relationships, not execution-stage barriers or a
+  // claim that the latest parent record was consumed by a previous job run.
+  const children = jobs.filter((candidate) => candidate.parents.includes(job.key));
+  const groups = [
+    { role: "inputs", title: "Required inputs", keys: job.parents, empty: "No upstream jobs. This job starts with supplied data." },
+    { role: "current", title: "This job", keys: [job.key] },
+    { role: "outputs", title: "Uses this output", keys: children.map((child) => child.key), empty: "No downstream jobs. Review or download the output when it is available." },
+  ];
+  const flow = $("dependency-flow");
+  flow.replaceChildren();
+  for (const [index, group] of groups.entries()) {
+    if (index) {
+      const arrow = uiElement("span", "dependency-arrow", "→");
+      arrow.setAttribute("aria-hidden", "true");
+      flow.append(arrow);
+    }
+    const section = uiElement("section", "dependency-group dependency-" + group.role);
+    section.dataset.group = group.role;
+    const heading = uiElement("h3", "dependency-heading", group.title);
+    heading.id = "dependency-" + group.role + "-heading";
+    if (group.role !== "current") heading.append(uiElement("span", "", group.keys.length));
+    section.setAttribute("aria-labelledby", heading.id);
+    section.append(heading);
+    const cards = uiElement("div", "dependency-cards");
+    for (const key of group.keys) cards.append(dependencyCard(key, group.role === "current"));
+    if (!group.keys.length) cards.append(uiElement("p", "dependency-empty", group.empty));
+    section.append(cards);
+    flow.append(section);
+  }
+  $("dependency-rule").textContent = job.parents.length
+    ? `${job.title} needs ${job.parents.length === 1 ? "the required input" : `all ${job.parents.length} required inputs`}. ` +
+      (children.length ? `${children.length} ${children.length === 1 ? "job uses" : "jobs use"} its output directly.` : "No jobs use its output directly.")
+    : `${job.title} starts this workflow from supplied catch and effort records.`;
 }
 
 function renderJobTable() {
@@ -906,6 +1025,7 @@ function render() {
   renderDiagram();
   renderTasks();
   renderJobTable();
+  renderDependencies();
   $("selection-title").textContent = byKey[start].title;
   $("selection-description").textContent = byKey[start].description;
   $("run").disabled = !ready || busy || !plan || mode === "saved";
@@ -937,8 +1057,9 @@ function render() {
   document.querySelector('.workspace-brand strong').textContent = manual ? "Job outputs" : "Analysis workspace";
   document.querySelector('.workspace-nav').setAttribute('aria-label', manual
     ? "Job outputs navigation" : "Orchestration navigation");
-  if (manual) $("workspace-description").textContent =
-    "This view represents separate workspaces without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
+  if (manual) $("workspace-description").textContent = workspaceView === "dependencies"
+    ? "These connections show which files each analyst needs across separate workspaces. Transfers require confirmation."
+    : "This view represents separate workspaces without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
   for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
   }
@@ -1063,6 +1184,7 @@ function handleEvent(event) {
       confirmingTransfer = false;
       $("handover-title").textContent = event.boundary === "data"
         ? "Data manager → CPUE analyst"
+        : event.boundary === "assessment" ? "Assessment analyst → MSE analyst"
         : "CPUE analyst → Assessment analyst";
       $("handover-message").textContent = "This simulates a file transfer between separate workspaces with no shared orchestration. No upload is needed.";
     } else if (event.state === "received") {
@@ -1101,6 +1223,8 @@ function handleEvent(event) {
       waitingTransfer
         ? waitingTransfer.boundary === "cpue"
           ? "Assessment preparation waits for revised CPUE files. CPUE summaries and reports can continue; confirm the transfer below."
+          : waitingTransfer.boundary === "assessment"
+          ? "MSE preparation waits for assessment files. Assessment summaries and reports can continue; confirm the transfer below."
           : "CPUE analysis waits for extracted data. Confirm the transfer below to continue."
         : groupTitle
         ? active.map((job) => job.title).join(" · ") +
@@ -1280,6 +1404,11 @@ $("show-tasks").onclick = () => {
   workspaceView = "tasks";
   render();
 };
+$("show-dependencies").onclick = () => {
+  workspaceView = "dependencies";
+  render();
+};
+$("dependency-job").onchange = () => inspectDependencies($("dependency-job").value);
 $("running-jobs").onclick = () => {
   workspaceView = "jobs";
   selectedTask = "";

@@ -20,7 +20,8 @@ for a real fishery.
 Run once, then change **CPUE A records**, **Mortality setting 2** or **MSE catch
 buffer**. Run again to update affected jobs; unchanged results keep their original
 records. **Orchestration tool** groups jobs by task and shows responsibilities,
-progress and dependencies. Open a job's **Record** to trace its inputs or select
+progress and dependencies. Select **Dependencies** to follow the inputs and
+subsequent jobs around an analysis. Open its **Record** to trace the saved inputs or select
 **Reproduce & compare**.
 
 MSE compares three catch rules using the four fitted assessment cases. A scenario
@@ -31,7 +32,7 @@ reruns that rule, the MSE summary and the report.
 
 **Manual handover** represents separate workspaces without shared orchestration.
 Click **Confirm file transfer** to release waiting analyses. Independent work,
-such as CPUE reporting, continues while a transfer is pending. No file upload is
+such as CPUE or assessment reporting, continues while a transfer is pending. No file upload is
 required.
 
 If the live service cannot connect, a notice explains the switch to **Offline

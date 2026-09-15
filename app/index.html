@@ -52,11 +52,19 @@
               class="workspace-link"><span data-workspace-icon="list"></span>All jobs<span class="nav-count" id="job-count"></span></button>
             <button id="running-jobs"
               class="workspace-link"><span data-workspace-icon="clock"></span>Running<span class="nav-count" id="running-count">0</span></button>
+            <button id="show-dependencies"
+              class="workspace-link"><span data-workspace-icon="dependencies"></span>Dependencies</button>
           </aside>
           <div class="workspace-content">
             <div
               class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Task overview</p><h2 id="workspace-title">Follow the work across teams</h2><p id="workspace-description">This view illustrates shared job coordination, using example roles and linked job records.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
             <div id="tasks" class="task-list"></div>
+            <section id="dependencies-view" aria-label="Direct job dependencies" hidden>
+              <div class="dependency-toolbar"><label for="dependency-job">Inspect a job<select id="dependency-job" aria-describedby="dependency-help"></select></label><p id="dependency-help">Browse the jobs that provide inputs and use the result. Your run selection stays the same.</p></div>
+              <div id="dependency-flow" class="dependency-flow"></div>
+              <p id="dependency-rule" class="dependency-rule"></p>
+              <p class="dependency-record-note"><span data-workspace-icon="file"></span><span>Cards show each job’s current state and latest available output. Open a job’s <strong>Record</strong> for the exact input versions it used.</span></p>
+            </section>
             <section id="task-jobs" hidden>
               <div
                 class="task-heading"><h3 id="task-title">Data management</h3><span id="task-subtitle"></span><label>Task<select id="task-filter" aria-label="Filter jobs by task"><option value="">All tasks</option><option value="data">Data management</option><option value="cpue">CPUE analysis</option><option value="assessment">Stock assessment</option><option value="mse">Management strategy evaluation</option></select></label><label>Status<select id="job-status-filter" aria-label="Filter jobs by status"><option value="">All states</option><option value="running">Running</option><option value="waiting">Waiting</option><option value="handover">Awaiting file</option><option value="complete">Complete</option><option value="retained">Reused</option><option value="outdated">Inputs changed</option><option value="failed">Failed</option></select></label></div>
