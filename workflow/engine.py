@@ -345,6 +345,7 @@ class Workflow:
             files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*')]
             files += list(ROOT.glob('tests/*.py'))
             files += list(ROOT.glob('cloud/*.py'))
+            files += list(ROOT.glob('scripts/generate-data.py'))
             files += [ROOT / name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json'] if (ROOT / name).exists()]
             files += list(ROOT.glob('vendor/analysis/*'))
             checksums = {}

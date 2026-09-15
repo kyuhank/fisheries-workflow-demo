@@ -42,6 +42,7 @@ def build():
     files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*'),
              *ROOT.glob('tests/*.py'), *ROOT.glob('vendor/analysis/*')]
     files += [ROOT/name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json']]
+    files += [ROOT/'scripts/generate-data.py']
     runtime_names = ['pyodide.js','pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json',
                      'sqlite3-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl']
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE','vendor/pyodide/LICENSE','vendor/pyodide/PYTHON-LICENSE'])
