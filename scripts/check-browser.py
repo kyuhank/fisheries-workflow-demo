@@ -73,6 +73,13 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
         page.locator('#download').click()
     download.value.save_as(directory/'browser.zip')
     with zipfile.ZipFile(directory/'browser.zip') as archive:
+        names = archive.namelist()
+        assert 'scripts/generate-data.py' in names
+        for line in archive.read('Dockerfile').decode().splitlines():
+            if line.startswith('COPY '):
+                for source in line.split()[1:-1]:
+                    assert source in names or any(name.startswith(source.rstrip('/') + '/')
+                                                  for name in names), f'Missing Docker input: {source}'
         archive.extractall(directory/'browser')
     subprocess.run([sys.executable, str(ROOT/'run.py'), '--output', str(directory/'native')],
                    check=True, stdout=subprocess.DEVNULL)

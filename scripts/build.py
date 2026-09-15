@@ -40,7 +40,7 @@ def build():
         shutil.copytree(runner.directory, example_dir)
         (example_dir/'index.html').write_text('<!doctype html><html lang="en-NZ"><meta charset="utf-8"><title>Saved workflow example</title><style>body{font:17px/1.6 system-ui;max-width:850px;margin:50px auto;padding:0 24px}a{color:#1779a0}li{margin:12px 0}</style><h1>Saved workflow example</h1><p>These outputs were calculated when this version was built. Open them without running code or connecting to the internet.</p><ol>' + ''.join(f'<li><a href="{key}/report.html">{job["title"]}</a> — {job["description"]}</li>' for key, job in SPEC.items()) + '</ol><p><a href="../index.html">Open the interactive demo</a></p></html>')
     files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*'),
-             *ROOT.glob('tests/*.py'), *ROOT.glob('vendor/analysis/*')]
+             *ROOT.glob('tests/*.py'), *ROOT.glob('cloud/*.py'), *ROOT.glob('vendor/analysis/*')]
     files += [ROOT/name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json']]
     files += [ROOT/'scripts/generate-data.py']
     runtime_names = ['pyodide.js','pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json',
