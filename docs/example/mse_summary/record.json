@@ -2,7 +2,7 @@
   "job": "mse_summary",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "b57471298eb5754cc70285576607f4278d7017d1059d5125e8e2b0d71c157e97",
+  "signature": "43d8c6b4c21886a1818e03384e5f789afb08bed3358b5c0bf46b1f6d967d845a",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581",
-    "report.html": "52b64d397da84f1ea979472c13265fee999470dd5231095cd046e7a35760b4c5"
+    "report.html": "0605ad25ee3c696e4313bd0f87acafce86737074b0ba1b19da36be452776b35e"
   },
   "log": [
     "Compare catch, stock levels and catch stability across the management trials.",
@@ -42,8 +42,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "5fb4f0b529f492c84ec1342ef161e01c9173e8c3",
-    "version": "1.7.6"
+    "commit": "47bab260aa3a2b4410e0373d0071c67563b8316e",
+    "version": "1.7.7"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
