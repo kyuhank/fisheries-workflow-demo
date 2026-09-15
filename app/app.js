@@ -13,6 +13,7 @@ let sequence = 0,
   states = {},
   plan = null;
 let selected = "submission",
+  executionScope = "workflow",
   settingsIntent = false,
   busy = false,
   ready = false,
@@ -180,7 +181,7 @@ function displayedPlan() {
 
 function runStates(run, state) {
   return Object.fromEntries(jobs.map((job) =>
-    [job.key, run.includes(job.key) ? state : "retained"]));
+    [job.key, run.includes(job.key) ? state : records[job.key] ? "retained" : "waiting"]));
 }
 
 function status(kind, title, message) {
@@ -263,8 +264,9 @@ function badge(key) {
   return span;
 }
 
-function selectJob(key) {
+function selectJob(key, scope = "workflow") {
   selected = key;
+  executionScope = scope;
   settingsIntent = false;
   selectedTask = byKey[key].module;
   if (!busy && mode !== "saved") {
@@ -277,14 +279,14 @@ function canRequestRun() {
   return ready && !busy && !runRequested && mode !== "saved";
 }
 
-async function runFromJob(key) {
+async function runFromJob(key, scope = "job") {
   if (!byKey[key] || !canRequestRun()) return;
   const executionMode = mode;
   runRequested = true;
   render();
-  const planned = await selectJob(key);
+  const planned = await selectJob(key, scope);
   runRequested = false;
-  if (!planned || mode !== executionMode || currentStart() !== key) {
+  if (!planned || mode !== executionMode || currentStart() !== key || executionScope !== scope) {
     render();
     return;
   }
@@ -297,8 +299,8 @@ function jobRunButton(key) {
   button.dataset.runJob = key;
   button.disabled = !canRequestRun();
   button.hidden = mode === "saved";
-  button.setAttribute("aria-label", "Run from " + byKey[key].title);
-  button.title = "Run this job and the analyses that use its output";
+  button.setAttribute("aria-label", "Run " + byKey[key].title);
+  button.title = "Run only this job. Prepare missing or changed inputs first.";
   button.onclick = () => runFromJob(key);
   return button;
 }
@@ -1074,12 +1076,15 @@ function render() {
   $("selection-description").textContent = byKey[start].description;
   $("run").disabled = !ready || busy || !plan || mode === "saved";
   $("run").hidden = mode === "saved";
-  $("run-workflow").hidden = mode === "saved" || start === "submission";
+  $("run-workflow").hidden = mode === "saved" || (start === "submission" && executionScope === "workflow");
   $("run-workflow").disabled = !canRequestRun();
-  $("run-workflow").textContent = settingsChanges().length ? "Update workflow" : "Run workflow";
+  $("run-workflow").textContent = Object.keys(records).length && plan?.changed.length
+    ? "Update workflow" : "Run workflow";
   renderOutputRun();
   $("run").textContent = busy
     ? "Running…"
+    : executionScope === "job"
+    ? "Run this job"
     : start === "submission"
     ? "Run full workflow →"
     : "Run from this job →";
@@ -1111,10 +1116,10 @@ function render() {
   for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
   }
-  $("selection-label").textContent = mode === "saved" ? "Selected job" : "Start from";
+  $("selection-label").textContent = mode === "saved" || executionScope === "job" ? "Selected job" : "Start from";
   $("hint").textContent = mode === "saved"
     ? "Open a job’s output, then use Inputs & versions to trace its inputs."
-    : "Select a job to rerun it and the analyses that use its output.";
+    : "Job Run prepares required inputs and stops at that job. Run workflow also updates dependent analyses.";
   if (mode === "saved") {
     $("completion").textContent = `${Object.keys(records).length} saved outputs`;
     $("reuse-message").textContent = "";
@@ -1142,7 +1147,7 @@ async function refreshPlan() {
   const version = ++planVersion, executionMode = mode;
   $("run").disabled = true;
   try {
-    const next = await call("plan", { start: currentStart(), settings: settings() });
+    const next = await call("plan", { start: currentStart(), settings: settings(), scope: executionScope });
     if (version === planVersion && executionMode === mode) {
       plan = next;
       explainChanges();
@@ -1201,7 +1206,7 @@ function handleEvent(event) {
     waitingTransfer = null;
     confirmingTransfer = false;
     activities = {};
-    plan = cloud.plan(currentStart(), settings());
+    plan = cloud.plan(currentStart(), settings(), executionScope);
     states = busy ? runStates(plan.run, "waiting") : {};
     $("run-id").textContent = "";
     $("github-run").hidden = true;
@@ -1308,6 +1313,7 @@ worker.onerror = (event) => {
 $("run").onclick = async () => {
   if (!canRequestRun() || !plan || $("run").disabled) return;
   const start = currentStart(), runSettings = settings();
+  const scope = executionScope;
   // Once dispatched, repeating Run should repeat this stage even after its
   // settings have been saved and no longer differ from the current records.
   selected = start;
@@ -1330,6 +1336,7 @@ $("run").onclick = async () => {
   try {
     const result = await call("run", {
       start,
+      scope,
       settings: runSettings,
       handover: $("handover").value,
     });
@@ -1353,10 +1360,11 @@ $("run").onclick = async () => {
     await refreshPlan();
   }
 };
-$("run-workflow").onclick = () => runFromJob(settingsChanges()[0]?.start || "submission");
+$("run-workflow").onclick = () => runFromJob(plan?.changed[0] || "submission", "workflow");
 for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
   $(id).onchange = () => {
     settingsIntent = true;
+    executionScope = "workflow";
     completedRun = null;
     refreshPlan();
   };
@@ -1560,8 +1568,8 @@ function renderOutputRun() {
   const key = currentOutput?.record?.job || currentOutput?.job;
   $("output-run").hidden = !key || mode === "saved";
   $("output-run").disabled = !canRequestRun();
-  $("output-run").textContent = busy ? "Running…" : "Run from this job";
-  $("output-run").title = "Run this job and the analyses that use its output";
+  $("output-run").textContent = busy ? "Running…" : "Run this job";
+  $("output-run").title = "Run only this job. Prepare missing or changed inputs first.";
 }
 $("output-run").onclick = () => runFromJob(currentOutput?.record?.job || currentOutput?.job);
 $("example").onclick = () =>
@@ -1629,7 +1637,7 @@ function explainMode() {
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
   const version = ++modeVersion;
   ++planVersion;
-  const selection = { settings: settings(), selected, settingsIntent, handover: $("handover").value };
+  const selection = { settings: settings(), selected, settingsIntent, executionScope, handover: $("handover").value };
   $("mode-notice").hidden = !fallbackReason;
   if (fallbackReason) $("mode-notice-message").textContent =
     fallbackReason + " Preparing Python for analysis in this browser.";
@@ -1638,6 +1646,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     states,
     latestRun,
     selected,
+    executionScope,
     settingsIntent,
     completedRun,
     messages: [...messages],
@@ -1659,6 +1668,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   states = saved?.states || {};
   latestRun = saved?.latestRun || "";
   selected = saved?.selected || "submission";
+  executionScope = saved?.executionScope || "workflow";
   settingsIntent = saved?.settingsIntent || false;
   $("handover").value = saved?.handover || "connected";
   completedRun = saved?.completedRun || null;
@@ -1672,6 +1682,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   }
   if (preserveSelection) {
     selected = selection.selected;
+    executionScope = selection.executionScope;
     settingsIntent = selection.settingsIntent;
     $("handover").value = selection.handover;
     $("snapshot").value = selection.settings.last_year;

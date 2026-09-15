@@ -19,6 +19,25 @@ def run_selection(page):
     return page.evaluate('({selected, settingsIntent, completedRun, plan, settings: settings()})')
 
 
+def expect_run(page, previous, expected, scope):
+    page.wait_for_function("""previous => !busy && orchestrationRuns.length === previous + 1 &&
+      document.querySelector('#status-title').textContent === 'Results are ready'
+    """, arg=previous, timeout=90000)
+    page.locator('#run:enabled').wait_for()
+    run = page.evaluate('orchestrationRuns.at(-1)')
+    assert run['input']['scope'] == scope, run['input']
+    assert run['result']['run'] == expected, run['result']['run']
+    assert page.evaluate('completedRun.run') == expected
+    return run
+
+
+def unchanged_records(page, before, executed):
+    after = page.evaluate('records')
+    for key, record in before.items():
+        if key not in executed:
+            assert after[key] == record, f'Unexpected change to {key}'
+
+
 def connections(page, key, parents, children):
     page.locator('#dependency-job').select_option(key)
     for group, expected in [('inputs', parents), ('current', [key]), ('outputs', children)]:
@@ -55,6 +74,16 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.goto(path.as_uri() + '#orchestration')
+    page.evaluate("""() => {
+      window.orchestrationRuns = [];
+      const originalCall = call;
+      call = async (type, data) => {
+        const input = type === 'run' ? structuredClone(data) : null;
+        const result = await originalCall(type, data);
+        if (input) orchestrationRuns.push({input, result: structuredClone(result)});
+        return result;
+      };
+    }""")
     assert page.locator('#jobs-view').is_visible()
     assert page.locator('#workflow-view').is_hidden()
     assert page.locator('#jobs-view #run').count() == 1
@@ -160,6 +189,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#jobs-view').screenshot(path=str(ARTIFACTS / 'orchestration-dependencies-handover.png'))
     page.locator('#transfer-files').click()
     page.wait_for_function("document.querySelector('#status-title').textContent === 'Results are ready'", timeout=30000)
+    assert page.evaluate('orchestrationRuns.at(-1).input.scope') == 'workflow'
 
     page.locator('#handover').select_option('connected')
     page.locator('#all-tasks').click()
@@ -169,6 +199,9 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#output-dialog:visible').wait_for()
     assert page.locator('#output-title').inner_text() == 'Compare CPUE results'
     assert 'Job 07' in page.locator('#output-kind').text_content()
+    assert page.locator('#output-run').inner_text() == 'Run this job'
+    previous = page.evaluate('orchestrationRuns.length')
+    before = page.evaluate('records')
     page.locator('#output-run').click()
     page.wait_for_function("busy && selected === 'cpue_summary'")
     assert page.locator('#output-dialog').is_hidden()
@@ -177,11 +210,13 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('[data-tab="workflow"]').click()
     assert page.locator('#run-controls').locator('#run').count() == 1
     assert page.locator('#workflow-view').is_visible()
-    assert set(page.locator('.workflow-node.in-path').evaluate_all('nodes => nodes.map(n => n.dataset.job)')) == {'cpue_summary', 'cpue_report'}
+    assert set(page.locator('.workflow-node.in-path').evaluate_all('nodes => nodes.map(n => n.dataset.job)')) == {'cpue_summary'}
     page.go_back()
     assert page.locator('#jobs-view').is_visible()
     assert page.locator('#jobs-view #run').count() == 1
-    page.wait_for_function("document.querySelector('#status-title').textContent === 'Results are ready'", timeout=30000)
+    expect_run(page, previous, ['cpue_summary'], 'job')
+    unchanged_records(page, before, ['cpue_summary'])
+    assert page.evaluate('records.cpue_report.run_id') == 'Run 001'
     assert page.locator('tr[data-job="cpue_a"] .state').inner_text() == 'Reused'
     assert page.locator('tr[data-job="cpue_summary"] .state').inner_text() == 'Complete'
     assert page.locator('tr[data-job="cpue_a"] .run-label').inner_text() == 'Run 001'
@@ -196,14 +231,30 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     (ARTIFACTS / 'paper-screenshot-record.json').write_text(page.evaluate('JSON.stringify(currentOutput.record, null, 2)'))
     page.locator('#output-close').click()
 
-    assert page.evaluate('completedRun !== null && completedRun.run.length === 2')
+    assert page.evaluate('completedRun !== null && completedRun.run.length === 1')
+    previous = page.evaluate('orchestrationRuns.length')
     page.locator('tr[data-job="cpue_report"] .run-job').click()
-    page.wait_for_function("!busy && completedRun?.run.length === 1 && latestRun === 'Run 003'")
-    assert page.evaluate('completedRun.run') == ['cpue_report']
+    expect_run(page, previous, ['cpue_report'], 'job')
     assert page.evaluate("records.cpue_summary.run_id") == 'Run 002'
+    assert page.evaluate("records.cpue_report.inputs.cpue_summary.run_id") == 'Run 002'
+    previous = page.evaluate('orchestrationRuns.length')
+    before = page.evaluate('records')
     page.locator('tr[data-job="cpue_summary"] .run-job').click()
-    page.wait_for_function("!busy && completedRun?.run.length === 2 && latestRun === 'Run 004'")
+    expect_run(page, previous, ['cpue_summary'], 'job')
+    unchanged_records(page, before, ['cpue_summary'])
+    browse_dependencies(page)
+    assert page.evaluate('completedRun !== null && completedRun.run.length === 1')
+
+    # Selecting the diagram's starting job requests a workflow update, preserving
+    # the separate behaviour of the main controls and their shared view state.
+    page.locator('[data-tab="workflow"]').click()
+    page.locator('.workflow-node[data-job="cpue_summary"]').click()
+    page.wait_for_function("plan?.scope === 'workflow' && plan.run.length === 2")
     page.locator('#run:enabled').wait_for()
+    page.locator('[data-tab="jobs"]').click()
+    previous = page.evaluate('orchestrationRuns.length')
+    page.locator('#run').click()
+    expect_run(page, previous, ['cpue_summary', 'cpue_report'], 'workflow')
     browse_dependencies(page)
     assert page.evaluate('completedRun !== null && completedRun.run.length === 2')
     page.locator('#mortality').select_option('0.35')
@@ -238,8 +289,65 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
             page.locator('#jobs-view').screenshot(path=str(ARTIFACTS / 'orchestration-dependencies-mse.png'))
         if width == 390:
             page.locator('#jobs-view').screenshot(path=str(ARTIFACTS / 'orchestration-dependencies-mobile.png'))
+
+    # A job request must not apply unrelated changes elsewhere in the workflow.
+    page.set_viewport_size({'width': 1440, 'height': 1000})
+    page.locator('#all-tasks').click()
+    page.locator('#mortality').select_option('0.35')
+    page.wait_for_function("plan.changed.includes('assessment_a2')")
+    previous = page.evaluate('orchestrationRuns.length')
+    before = page.evaluate('records')
+    page.locator('tr[data-job="cpue_a"] .run-job').click()
+    expect_run(page, previous, ['cpue_a'], 'job')
+    unchanged_records(page, before, ['cpue_a'])
+
+    # Revised inputs leave dependent records in place and mark their jobs stale.
+    page.locator('#mortality').select_option('0.30')
+    page.locator('#filter').select_option('1200')
+    page.wait_for_function("plan.changed.includes('cpue_a')")
+    previous = page.evaluate('orchestrationRuns.length')
+    before = page.evaluate('records')
+    page.locator('tr[data-job="cpue_a"] .run-job').click()
+    expect_run(page, previous, ['cpue_a'], 'job')
+    unchanged_records(page, before, ['cpue_a'])
+    for key in ['cpue_summary', 'prepare_a', 'assessment_a1', 'mse_prepare']:
+        assert page.locator(f'.workflow-node[data-job="{key}"].outdated').count() == 1, key
+    assert page.locator('#run-workflow').inner_text() == 'Update workflow'
+    previous = page.evaluate('orchestrationRuns.length')
+    before = page.evaluate('records')
+    page.locator('#run-workflow').click()
+    descendants = ['cpue_summary', 'cpue_report', 'prepare_a', 'assessment_a1',
+                   'assessment_a2', 'assessment_summary', 'assessment_report',
+                   'mse_prepare', 'mse_constant', 'mse_index', 'mse_buffered',
+                   'mse_summary', 'mse_report']
+    expect_run(page, previous, descendants, 'workflow')
+    unchanged_records(page, before, descendants)
+
+    # On a fresh workspace, build only the selected job's missing ancestors.
+    page.locator('#reset').click()
+    page.locator('#run:enabled').wait_for()
+    page.locator('#all-tasks').click()
+    previous = page.evaluate('orchestrationRuns.length')
+    page.locator('tr[data-job="prepare_a"] .run-job').click()
+    ancestors = ['submission', 'qc', 'database', 'extract', 'cpue_a', 'prepare_a']
+    expect_run(page, previous, ancestors, 'job')
+    assert set(page.evaluate('Object.keys(records)')) == set(ancestors)
+    assert page.locator('.workflow-node.retained').count() == 0
+
+    # A selected job also rebuilds a stale ancestor without running its peers,
+    # reports or descendants, including other jobs still missing in this workspace.
+    page.locator('#filter').select_option('1200')
+    page.wait_for_function("plan.changed.includes('cpue_a')")
+    page.locator('#all-tasks').click()
+    previous = page.evaluate('orchestrationRuns.length')
+    before = page.evaluate('records')
+    page.locator('tr[data-job="prepare_a"] .run-job').click()
+    expect_run(page, previous, ['cpue_a', 'prepare_a'], 'job')
+    unchanged_records(page, before, ['cpue_a', 'prepare_a'])
+    assert set(page.evaluate('Object.keys(records)')) == set(ancestors)
     assert not errors, errors
     browser.close()
 print('PASS: built orchestration UI, owners/readiness, linked input records, output/record actions, '
       'three manual boundaries, independent assessment reporting, dependency browsing without changing '
-      'run selection/settings/completion/plans, source/terminal jobs, reused run identities and mobile reflow.')
+      'run selection/settings/completion/plans, single-job runs with missing/stale ancestors, explicit '
+      'workflow updates, source/terminal jobs, reused run identities and mobile reflow.')

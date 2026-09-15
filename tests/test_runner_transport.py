@@ -1,4 +1,5 @@
 """Runner transport failures, without network access or credentials."""
+import asyncio
 import importlib.util
 import io
 import json
@@ -8,7 +9,7 @@ import runpy
 import sys
 import types
 import unittest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from urllib.error import HTTPError, URLError
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +27,33 @@ class RunnerTransportTest(unittest.TestCase):
     def error(self, code, message):
         return HTTPError('https://example.invalid', code, 'test', {},
                          io.BytesIO(json.dumps({'error': message}).encode()))
+
+    def test_hosted_runner_forwards_job_scope_to_the_calculation_engine(self):
+        runner = self.module.HostedWorkflow.__new__(self.module.HostedWorkflow)
+        runner.pool = None
+        with patch.object(self.module.Workflow, 'run', new_callable=AsyncMock,
+                          return_value={'scope': 'job'}) as run:
+            result = asyncio.run(runner.run('prepare_a', 'job'))
+        run.assert_awaited_once_with('prepare_a', 'job')
+        self.assertEqual(result, {'scope': 'job'})
+
+    def test_registered_scope_reaches_runner_and_legacy_context_keeps_workflow_scope(self):
+        for supplied, expected in [({}, 'workflow'), ({'scope': 'job'}, 'job'),
+                                   ({'scope': 'workflow'}, 'workflow')]:
+            with self.subTest(context=supplied):
+                context = {'checkpoint': 'saved inputs', 'start_job': 'prepare_a', **supplied}
+                runner = MagicMock()
+                runner.run = AsyncMock(return_value={'scope': expected})
+                runner.bundle.return_value = b'bundle'
+                runner.state.return_value = {'records': {}}
+                runner.delivery.pending = []
+                with patch.object(self.module, 'api', side_effect=[context, {'ok': True}]), \
+                        patch.object(self.module, 'Path'), \
+                        patch.object(self.module, 'restore'), \
+                        patch.object(self.module, 'checkpoint', return_value='checkpoint'), \
+                        patch.object(self.module, 'HostedWorkflow', return_value=runner):
+                    asyncio.run(self.module.main())
+                runner.run.assert_awaited_once_with('prepare_a', expected)
 
     def test_event_retry_preserves_operation_and_payload(self):
         calls = []

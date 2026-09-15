@@ -42,6 +42,10 @@ class RunnerDatabaseTest(unittest.TestCase):
                 "for name in select unnest(array['anon','authenticated','service_role']) loop "
                 "if not exists(select 1 from pg_roles where rolname=name) then "
                 "execute format('create role %I',name); end if; end loop; end $$;")
+        cls.apply_schema()
+
+    @classmethod
+    def apply_schema(cls):
         # The vanilla image lacks pg_cron. Test all tables and functions from the
         # production schema; leave its unrelated scheduling setup out of this DB.
         schema = (ROOT / 'cloud/schema.sql').read_text().split('create extension if not exists pg_cron;')[0]
@@ -75,6 +79,53 @@ class RunnerDatabaseTest(unittest.TestCase):
         return {'checkpoint': 'retained-checkpoint', 'bundle': 'actual-bundle', 'state': {'step': 'final'},
                 'result': None if error else {'run_id': 'Run 001'}, 'error': error,
                 'pending_events': pending or []}
+
+    def test_run_scope_migration_can_be_reapplied_without_changing_saved_scope(self):
+        # Recreate the pre-scope table with an existing run in this disposable DB.
+        self.sql('alter table public.paper_runs drop column scope;')
+        self.apply_schema()
+        self.assertEqual(self.value('scope', 'paper_runs'), 'workflow')
+        self.sql(f"update public.paper_runs set scope='job' where id='{self.request}';")
+        self.apply_schema()
+        self.apply_schema()
+        self.assertEqual(self.value('scope', 'paper_runs'), 'job')
+
+    def test_legacy_and_scoped_start_calls_keep_scope_separate_from_settings(self):
+        for scope in (None, 'workflow', 'job'):
+            with self.subTest(scope=scope):
+                self.sql(f"update public.paper_runs set status='complete' where id='{self.request}';")
+                argument = '' if scope is None else f",p_scope=>'{scope}'"
+                self.sql("set role service_role; select public.paper_start("
+                         f"p_session=>'{self.session}',p_request=>'{self.request}',"
+                         "p_start=>'cpue_a',p_settings=>'{\"last_year\":2024}'::jsonb,"
+                         f"p_handover=>'connected'{argument});")
+                self.assertEqual(self.value('scope', 'paper_runs'), scope or 'workflow')
+                self.assertEqual(json.loads(self.value('settings', 'paper_runs')), {'last_year': 2024})
+                self.assertEqual(self.value('status', 'paper_runs'), 'queued')
+
+    def test_invalid_scope_cannot_replace_a_run_or_spend_quota(self):
+        self.sql(f"update public.paper_runs set status='complete' where id='{self.request}';")
+        count = self.sql('select count from public.paper_limits where id;')
+        for scope in ("'all'", "''", 'null'):
+            with self.subTest(scope=scope):
+                error = self.sql("set role service_role; select public.paper_start("
+                                 f"'{self.session}','{self.request}','cpue_a',"
+                                 f"'{{\"last_year\":2024}}','connected',{scope});", success=False)
+                self.assertIn('Invalid run scope', error)
+                self.assertEqual(self.value('status', 'paper_runs'), 'complete')
+                self.assertEqual(self.value('start_job', 'paper_runs'), 'submission')
+                self.assertEqual(self.sql('select count from public.paper_limits where id;'), count)
+                self.sql(f"update public.paper_runs set scope={scope} where id='{self.request}';",
+                         success=False)
+                self.assertEqual(self.value('scope', 'paper_runs'), 'workflow')
+
+    def test_public_roles_cannot_start_either_run_scope(self):
+        for role in ('anon', 'authenticated'):
+            for argument in ('', ",'workflow'", ",'job'"):
+                error = self.sql(f"set role {role}; select public.paper_start("
+                                 f"'{self.session}','{self.request}','submission',"
+                                 f"'{{\"last_year\":2024}}','connected'{argument});", success=False)
+                self.assertIn('permission denied', error)
 
     def test_duplicate_and_delayed_event_cannot_repeat_or_reorder_state(self):
         first, second = str(uuid.uuid4()), str(uuid.uuid4())

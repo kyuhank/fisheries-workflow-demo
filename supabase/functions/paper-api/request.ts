@@ -1,11 +1,25 @@
+/** Omitted scope keeps already downloaded demonstrations on workflow execution. */
+export function runScope(body: any): "workflow" | "job" {
+  if (!Object.prototype.hasOwnProperty.call(body ?? {}, "scope")) {
+    return "workflow";
+  }
+  if (body.scope !== "workflow" && body.scope !== "job") {
+    throw Error("Select workflow or job execution.");
+  }
+  return body.scope;
+}
+
 /** Accept only the supplied demonstration; older downloads omit MSE settings. */
 export function runSettings(body: any, jobs: string[]) {
+  runScope(body);
   const settings = body?.settings;
   const keys = settings && Object.keys(settings).sort().join(",");
   if (
     !jobs.includes(body?.start) ||
     !["connected", "manual"].includes(body?.handover) ||
-    Object.keys(body || {}).sort().join(",") !== "handover,settings,start" ||
+    !["handover,settings,start", "handover,scope,settings,start"].includes(
+      Object.keys(body || {}).sort().join(","),
+    ) ||
     ![
       "last_year,min_hooks_a,mortality_2",
       "last_year,min_hooks_a,mortality_2,mse",

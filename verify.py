@@ -4,7 +4,7 @@ import json
 import math
 from pathlib import Path
 
-from workflow.spec import DEFAULTS, active_spec
+from workflow.spec import DEFAULTS, SPEC, active_spec
 
 
 def compare(expected, actual, path='output'):
@@ -22,10 +22,13 @@ def compare(expected, actual, path='output'):
         assert expected == actual, (path, expected, actual)
 
 
-def verify(reference, result):
+def verify(reference, result, job=None):
     state = json.loads((reference / 'state.json').read_text())
     spec = active_spec({**DEFAULTS, 'mse': False, **state['settings']})
-    for key in spec:
+    if job is not None and job not in spec:
+        raise ValueError('Unknown job to compare.')
+    selected = [job] if job is not None else spec
+    for key in selected:
         left = json.loads((reference / key / 'output.json').read_text())
         right = json.loads((result / key / 'output.json').read_text())
         # A resubmission can pass immediately when it uses already corrected data.
@@ -33,13 +36,14 @@ def verify(reference, result):
             left.pop('returned', None)
             right.pop('returned', None)
         compare(left, right, key)
-    return len(spec)
+    return len(selected)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('reference', type=Path)
     parser.add_argument('result', type=Path)
+    parser.add_argument('--job', choices=SPEC, help='Compare only this saved job output.')
     args = parser.parse_args()
-    count = verify(args.reference, args.result)
+    count = verify(args.reference, args.result, args.job)
     print(f'{count} job outputs agree (relative tolerance 1e-6; absolute tolerance 1e-9).')

@@ -2,7 +2,7 @@ import { createGitHub, REPOSITORY as REPO, WORKFLOW } from "./github.ts";
 import { setup } from "./setup.ts";
 import { createDatabase, DatabaseError } from "./database.ts";
 import { validateRunnerWrite } from "./runner-write.ts";
-import { runSettings } from "./request.ts";
+import { runScope, runSettings } from "./request.ts";
 import { checkSession, SessionExpired, startInSession } from "./session.ts";
 const jobs = [
   "submission",
@@ -320,13 +320,15 @@ export async function handle(request: Request) {
       const id = crypto.randomUUID();
       const head = await github("commits/main");
       await startInSession(
-        () => db("rpc/paper_start", "POST", {
-          p_session: sid,
-          p_request: id,
-          p_start: b.start,
-          p_settings: settings,
-          p_handover: b.handover,
-        }),
+        () =>
+          db("rpc/paper_start", "POST", {
+            p_session: sid,
+            p_request: id,
+            p_start: b.start,
+            p_settings: settings,
+            p_handover: b.handover,
+            p_scope: runScope(b),
+          }),
         () => session(request, sid),
       );
       await db("paper_runs?id=eq." + id, "PATCH", { commit_sha: head.sha });

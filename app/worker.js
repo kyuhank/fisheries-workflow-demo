@@ -74,7 +74,7 @@ async function request(type, payload) {
   if (type === "plan") {
     return JSON.parse(
       python.runPython(
-        'runner.configure(request["settings"]); json.dumps(runner.plan(request["start"]))',
+        'runner.configure(request["settings"]); json.dumps(runner.plan(request["start"], scope=request.get("scope", "workflow")))',
       ),
     );
   }
@@ -85,7 +85,7 @@ runner.manual_transfer = _transfer if request.get('handover') == 'manual' else N
 `);
     return JSON.parse(
       await python.runPythonAsync(
-        'json.dumps(await runner.run(request["start"]))',
+        'json.dumps(await runner.run(request["start"], scope=request.get("scope", "workflow")))',
       ),
     );
   }

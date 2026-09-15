@@ -1,4 +1,4 @@
-import { runSettings } from "./request.ts";
+import { runScope, runSettings } from "./request.ts";
 
 const body = {
   start: "submission",
@@ -6,6 +6,69 @@ const body = {
   settings: { last_year: 2023, min_hooks_a: 0, mortality_2: .3 },
 };
 const jobs = ["submission", "mse_report"];
+
+Deno.test("execution scope defaults to workflow and stays outside analysis settings", () => {
+  if (runScope(body) !== "workflow") throw Error("Legacy run scope changed.");
+  for (const scope of ["workflow", "job"]) {
+    const scoped = { ...body, scope };
+    if (runScope(scoped) !== scope) throw Error("Run scope changed.");
+    if (
+      JSON.stringify(runSettings(scoped, jobs)) !==
+        JSON.stringify(body.settings)
+    ) {
+      throw Error("Run scope changed the analysis settings.");
+    }
+    const mse = {
+      ...scoped,
+      start: "mse_report",
+      settings: { ...body.settings, mse: true, mse_buffer: .8 },
+    };
+    if (runScope(mse) !== scope || runSettings(mse, jobs).mse !== true) {
+      throw Error("MSE run scope changed.");
+    }
+  }
+});
+
+Deno.test("execution scope accepts only the two supplied choices", () => {
+  for (
+    const scope of [
+      "",
+      "all",
+      "JOB",
+      null,
+      undefined,
+      true,
+      false,
+      0,
+      1,
+      [],
+      {},
+    ]
+  ) {
+    let rejected = false;
+    try {
+      runSettings({ ...body, scope }, jobs);
+    } catch {
+      rejected = true;
+    }
+    if (!rejected) throw Error("Invalid execution scope accepted.");
+  }
+  for (
+    const invalid of [
+      { ...body, scope: "job", command: "anything" },
+      { ...body, scope: "job", settings: { ...body.settings, scope: "job" } },
+      { ...body, scope: "job", start: "mse_report" },
+    ]
+  ) {
+    let rejected = false;
+    try {
+      runSettings(invalid, jobs);
+    } catch {
+      rejected = true;
+    }
+    if (!rejected) throw Error("Scope weakened the request allowlist.");
+  }
+});
 
 Deno.test("old downloads retain assessment-only execution; current demos include MSE", () => {
   const legacy = runSettings(body, jobs);

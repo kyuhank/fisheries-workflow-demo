@@ -92,10 +92,18 @@ class CloudRun {
     this.onEvent({ state: "session_expired" });
   }
 
-  plan(start, settings) {
+  plan(start, settings, scope = "workflow") {
+    if (!["job", "workflow"].includes(scope) || !this.jobs.some((job) => job.key === start)) {
+      throw Error("Select a job and execution scope.");
+    }
     const changed = this.jobs.filter((job) => {
       const record = this.records[job.key];
       if (!record) return true;
+      if (job.parents.some((parent) => {
+        const input = record.inputs?.[parent], saved = this.records[parent];
+        return !input || !saved || input.run_id !== saved.run_id ||
+          input.checksum !== saved.outputs?.["output.json"];
+      })) return true;
       if (job.key === "submission") {
         return record.settings.last_year !== settings.last_year;
       }
@@ -110,15 +118,28 @@ class CloudRun {
       }
       return false;
     }).map((job) => job.key);
-    const run = new Set([start, ...changed]);
-    for (const job of this.jobs) {
-      if (job.parents.some((parent) => run.has(parent))) run.add(job.key);
+    const run = new Set();
+    if (scope === "job") {
+      const required = new Set([start]);
+      for (const job of [...this.jobs].reverse()) {
+        if (required.has(job.key)) job.parents.forEach((parent) => required.add(parent));
+      }
+      for (const job of this.jobs) {
+        if (required.has(job.key) && (job.key === start || changed.includes(job.key) ||
+            job.parents.some((parent) => run.has(parent)))) run.add(job.key);
+      }
+    } else {
+      [start, ...changed].forEach((key) => run.add(key));
+      for (const job of this.jobs) {
+        if (job.parents.some((parent) => run.has(parent))) run.add(job.key);
+      }
     }
     return {
       start,
+      scope,
       changed,
       run: this.jobs.filter((job) => run.has(job.key)).map((job) => job.key),
-      retained: this.jobs.filter((job) => !run.has(job.key)).map((job) =>
+      retained: this.jobs.filter((job) => !run.has(job.key) && this.records[job.key]).map((job) =>
         job.key
       ),
     };
@@ -233,7 +254,7 @@ class CloudRun {
 
   async call(type, data = {}) {
     try {
-      if (type === "plan") return this.plan(data.start, data.settings);
+      if (type === "plan") return this.plan(data.start, data.settings, data.scope);
       if (type === "run") return await this.execute(data);
       if (type === "view") {
         return await this.request(

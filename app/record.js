@@ -20,8 +20,7 @@ function recordContext(output = currentOutput) {
     comparison: output.comparison || null,
     reproduction: [
       "Download this run to retain its code, data, software details and reference outputs.",
-      "python3 run.py --settings settings.json --output reproduced",
-      "python3 verify.py reference reproduced",
+      "Follow REPRODUCE.txt in the downloaded run. For a single-job run, it reproduces and compares that job; other saved outputs are kept as earlier results.",
       "Inspect code and software versions before comparing results. A job ID or checksum alone does not contain the underlying files.",
     ],
   };
@@ -212,6 +211,7 @@ async function reproduceOutput(reference, context) {
   $("mse-buffer").value = context.settings.mse_buffer ?? 0.8;
   $("handover").value = "connected";
   selected = "submission";
+  executionScope = "workflow";
   settingsIntent = false;
   await refreshPlan();
   const result = await $("run").onclick();

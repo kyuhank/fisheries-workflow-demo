@@ -41,6 +41,7 @@ class Workflow:
         self.records = {}
         self.events = []
         self.run_number = 0
+        self.last_plan = None
         self.running = False
         self.execution = {}
         state = self.directory / 'state.json'
@@ -49,6 +50,7 @@ class Workflow:
             self.records = previous['records']
             self.settings = {**DEFAULTS, 'mse': False, **previous['settings']}
             self.run_number = previous['run_number']
+            self.last_plan = previous.get('last_plan')
 
     def configure(self, settings):
         candidate = {**self.settings, **settings}
@@ -122,14 +124,34 @@ class Workflow:
                    and digest((self.directory / key / name).read_bytes()) == checksum
                    for name, checksum in record['outputs'].items())
 
-    def plan(self, start):
+    def plan(self, start, scope='workflow'):
         spec = self.spec
         if start not in spec:
             raise ValueError('Unknown starting job.')
+        if scope not in ('workflow', 'job'):
+            raise ValueError('Select job or workflow execution.')
         changed = [key for key in spec if not self.valid(key)]
-        selected = downstream([start, *changed], spec)
-        return {'run': selected, 'retained': [key for key in spec if key not in selected],
-                'changed': changed, 'start': start}
+        if scope == 'workflow':
+            selected = downstream([start, *changed], spec)
+        else:
+            required = set()
+
+            def include_inputs(key):
+                if key in required:
+                    return
+                required.add(key)
+                for parent in spec[key]['parents']:
+                    include_inputs(parent)
+
+            include_inputs(start)
+            selected = []
+            for key, job in spec.items():
+                if key in required and (key == start or key in changed or
+                                        any(parent in selected for parent in job['parents'])):
+                    selected.append(key)
+        return {'run': selected,
+                'retained': [key for key in spec if key not in selected and key in self.records],
+                'changed': changed, 'start': start, 'scope': scope}
 
     def record_event(self, key, state, message, **details):
         event = {'job': key, 'state': state, 'message': message, **details}
@@ -193,7 +215,8 @@ class Workflow:
 
     def state(self):
         return {'settings': self.settings, 'records': self.records,
-                'run_number': self.run_number, 'jobs': list(self.spec.values()), 'events': self.events}
+                'run_number': self.run_number, 'last_plan': self.last_plan,
+                'jobs': list(self.spec.values()), 'events': self.events}
 
     async def calculate(self, key, run_id):
         if key == 'submission':
@@ -272,13 +295,14 @@ class Workflow:
                 return self.output('mse_summary')
         raise ValueError('No calculation registered for this job.')
 
-    async def run(self, start='submission'):
+    async def run(self, start='submission', scope='workflow'):
         if self.running:
             raise ValueError('An execution is already in progress.')
         self.running = True
         self.events = []
         try:
-            plan = self.plan(start)
+            plan = self.plan(start, scope)
+            self.last_plan = plan
             self.run_number += 1
             run_id = f'Run {self.run_number:03d}'
             self.notify({'state':'plan', **plan, 'run_id':run_id})
@@ -361,7 +385,11 @@ class Workflow:
                     name = 'reference/' + str(path.relative_to(self.directory))
                     data = path.read_bytes()
                     archive.writestr(name, data); checksums[name] = digest(data)
+            job_target = (self.last_plan or {}).get('start') if (self.last_plan or {}).get('scope') == 'job' else None
             bundle_settings = dict(self.settings)
+            if job_target:
+                # Form changes made after execution do not change the saved job.
+                bundle_settings = read_json(self.directory / 'state.json')['settings']
             if 'mse_buffered' in self.records:
                 # A planned but unexecuted control change is not the setting of
                 # the downloaded result. Historical records used the default.
@@ -371,5 +399,15 @@ class Workflow:
             archive.writestr('settings.json', settings)
             checksums['settings.json'] = digest(settings)
             archive.writestr('SHA256SUMS.json', json.dumps(checksums, indent=2))
-            archive.writestr('REPRODUCE.txt', 'Run: python3 run.py --settings settings.json --output reproduced\nCheck: python3 verify.py reference reproduced\nThe same Python code runs in the browser and container. Software details and original run identities are in reference/state.json.\n')
+            run = 'python3 run.py --settings settings.json --output reproduced'
+            check = 'python3 verify.py reference reproduced'
+            note = ''
+            if job_target:
+                run += f' --from {job_target} --scope job'
+                check += f' --job {job_target}'
+                note = (f'This check compares only {job_target}. Other saved results retain their earlier '
+                        'records and may use earlier inputs; they are not reproduced by this command.\n')
+            archive.writestr('REPRODUCE.txt', f'Run: {run}\nCheck: {check}\n{note}'
+                            'The same Python code runs in the browser and container. Software details '
+                            'and original run identities are in reference/state.json.\n')
         return buffer.getvalue()

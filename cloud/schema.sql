@@ -4,6 +4,7 @@ create table if not exists public.paper_catches (year integer primary key, catch
 create table if not exists public.paper_sessions (id uuid primary key, token_hash text not null, created_at timestamptz default now(), touched_at timestamptz default now(), checkpoint text, state jsonb, accepted_year integer);
 alter table public.paper_sessions add column if not exists bundle text;
 create table if not exists public.paper_runs (id uuid primary key, session_id uuid references public.paper_sessions on delete cascade, created_at timestamptz default now(), status text default 'queued', start_job text not null, settings jsonb not null, handover text not null, transfer_count integer default 0, connected boolean default false, github_run text, commit_sha text, error text, result jsonb);
+alter table public.paper_runs add column if not exists scope text not null default 'workflow' check(scope in ('workflow','job'));
 create unique index if not exists paper_one_active_per_session on public.paper_runs(session_id) where status in ('queued','running','handover');
 create table if not exists public.paper_events (id bigint generated always as identity primary key, request_id uuid references public.paper_runs on delete cascade, event jsonb not null);
 create table if not exists public.paper_outputs (session_id uuid references public.paper_sessions on delete cascade, job text, output jsonb not null, primary key(session_id,job));
@@ -32,8 +33,19 @@ begin
  update public.paper_limits set count=count+1,last_request=now() where id;
  update public.paper_sessions set touched_at=now() where id=p_session;
 end $$;
-revoke all on function public.paper_start from public,anon,authenticated;
-grant execute on function public.paper_start to service_role;
+revoke all on function public.paper_start(uuid,uuid,text,jsonb,text) from public,anon,authenticated;
+grant execute on function public.paper_start(uuid,uuid,text,jsonb,text) to service_role;
+
+-- Keep the original RPC for already deployed API versions. The required sixth
+-- argument selects this overload, and both writes commit in one transaction.
+create or replace function public.paper_start(p_session uuid,p_request uuid,p_start text,p_settings jsonb,p_handover text,p_scope text) returns void language plpgsql security definer set search_path='' as $$
+begin
+ if p_scope is null or p_scope not in ('workflow','job') then raise exception 'Invalid run scope'; end if;
+ perform public.paper_start(p_session,p_request,p_start,p_settings,p_handover);
+ update public.paper_runs set scope=p_scope where id=p_request;
+end $$;
+revoke all on function public.paper_start(uuid,uuid,text,jsonb,text,text) from public,anon,authenticated;
+grant execute on function public.paper_start(uuid,uuid,text,jsonb,text,text) to service_role;
 
 
 create table if not exists public.paper_app (

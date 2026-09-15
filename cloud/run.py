@@ -166,9 +166,9 @@ class HostedWorkflow(Workflow):
         return await asyncio.get_running_loop().run_in_executor(
             self.pool, calculate_independent_job, str(self.directory), key, self.settings, run_id)
 
-    async def run(self, start='submission'):
+    async def run(self, start='submission', scope='workflow'):
         try:
-            return await super().run(start)
+            return await super().run(start, scope)
         finally:
             if self.pool is not None:
                 self.pool.shutdown(wait=True, cancel_futures=True)
@@ -207,7 +207,7 @@ async def main():
     runner = HostedWorkflow(context)
     result, error = None, None
     try:
-        result = await runner.run(context['start_job'])
+        result = await runner.run(context['start_job'], context.get('scope', 'workflow'))
     except Exception as caught:
         error = str(caught)
     api('finish', {'checkpoint':checkpoint(directory), 'bundle':base64.b64encode(runner.bundle()).decode(),
