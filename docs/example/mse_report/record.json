@@ -2,7 +2,7 @@
   "job": "mse_report",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "badc43f4c073de4ae8d5549595308458573e487d472a1181ad6690b101031197",
+  "signature": "12d4e56a81dc4f8de1927400e24dd7a104a93757661f61facd699ea24e066c3a",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581",
-    "report.html": "4ae84301dc3378bd25636d411ad993b7d853bc5cb74b0c83b3755d65dd58817c"
+    "report.html": "e8f2fb8a0b75e13fd35ba874ed11abb735e099313e1729f12ca9c0028ca45bd9"
   },
   "log": [
     "Report the tested procedures, their trade-offs and the limits of the example.",
@@ -34,8 +34,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "36b52b24c1295a9350ede54d93166279d6dfb71c",
-    "version": "1.7.4"
+    "commit": "fd56221ad6d7144752a338c40e52b9f2efb6211b",
+    "version": "1.7.5"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
