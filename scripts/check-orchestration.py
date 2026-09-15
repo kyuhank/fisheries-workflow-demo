@@ -25,6 +25,9 @@ def connections(page, key, parents, children):
         actual = page.locator(f'[data-group="{group}"] .dependency-card').evaluate_all(
             'cards => cards.map(card => card.dataset.job)')
         assert actual == expected, (key, group, actual)
+        for member in expected:
+            number = page.evaluate('(key) => jobNumber(key)', member)
+            assert page.locator(f'[data-group="{group}"] [data-job="{member}"] .job-number').inner_text() == number
     assert not page.locator('#output-dialog').is_visible()
 
 
@@ -51,19 +54,28 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page = browser.new_page(offline=True, viewport={'width': 1440, 'height': 1000}, device_scale_factor=2)
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
-    page.goto(path.as_uri())
+    page.goto(path.as_uri() + '#orchestration')
+    assert page.locator('#jobs-view').is_visible()
+    assert page.locator('#workflow-view').is_hidden()
+    assert page.locator('#jobs-view #run').count() == 1
     page.wait_for_function("document.querySelector('#mode').value === 'live'")
     page.locator('#mode').select_option('saved')
     page.locator('[data-tab="jobs"]').click()
+    assert page.locator('#show-tasks').inner_text().startswith('Tasks')
+    assert page.locator('#workspace-title').inner_text() == 'Tasks'
     assert page.locator('.task-responsibility').count() == page.evaluate('taskGroups.length')
     page.locator('#tasks .cpue').click()
     assert page.locator('#job-table-body tr').count() == 4
+    assert page.locator('tr[data-job="cpue_a"] .job-number').inner_text() == 'Job 05'
+    assert page.locator('tr[data-job="cpue_report"] .job-number').inner_text() == 'Job 08'
     page.locator('tr[data-job="cpue_a"] .open-output').click()
+    assert page.locator('#output-kind').text_content().startswith('Job 05 · ')
     assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'CPUE analysis A'
     page.locator('#output-close').click()
     page.locator('tr[data-job="cpue_a"] .open-job-record').click()
     page.locator('#output-record:visible').wait_for()
     assert page.locator('#output-record').is_visible()
+    assert page.locator('#output-record .record-heading h3').inner_text() == 'Job 05 · CPUE analysis A · Run 001'
     assert page.locator('#output-record .record-input').count() == 1
     page.locator('#output-close').click()
     page.locator('tr[data-job="cpue_report"] [data-input-job="cpue_summary"]').click()
@@ -75,6 +87,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     browse_dependencies(page)
     page.locator('#dependency-job').select_option('mse_prepare')
     card = page.locator('[data-group="current"] .dependency-card')
+    assert card.locator('.job-number').inner_text() == 'Job 17'
     assert card.locator('.dependency-owner').inner_text() == 'MSE analyst'
     assert card.locator('.run-label').inner_text() == 'Run 001'
     assert card.locator('.state').inner_text() == 'Complete'
@@ -97,6 +110,11 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.locator('[data-group="current"] .state').inner_text() == 'Waiting'
     page.locator('#all-tasks').click()
     assert page.locator('tr[data-job="submission"] .state').inner_text() == 'Ready'
+    page.locator('tr[data-job="cpue_a"] .job-name').click()
+    assert 'Job 05' in page.locator('#output-kind').text_content()
+    assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'No output yet'
+    assert page.locator('#output-run').is_enabled()
+    page.locator('#output-close').click()
     assert 'Extract data' in page.locator('tr[data-job="cpue_a"] .progress-detail').inner_text()
     page.locator('#handover').select_option('manual')
     assert page.locator('[data-tab="jobs"]').inner_text() == 'Job outputs'
@@ -148,8 +166,21 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#job-status-filter').select_option('')
     page.locator('#task-filter').select_option('cpue')
     page.locator('tr[data-job="cpue_summary"] .job-name').click()
-    page.wait_for_function("plan.run.length === 2")
-    page.locator('#run').click()
+    page.locator('#output-dialog:visible').wait_for()
+    assert page.locator('#output-title').inner_text() == 'Compare CPUE results'
+    assert 'Job 07' in page.locator('#output-kind').text_content()
+    page.locator('#output-run').click()
+    page.wait_for_function("busy && selected === 'cpue_summary'")
+    assert page.locator('#output-dialog').is_hidden()
+    assert page.locator('#jobs-view').is_visible()
+    assert page.locator('tr[data-job="cpue_summary"] .run-job').is_disabled()
+    page.locator('[data-tab="workflow"]').click()
+    assert page.locator('#run-controls').locator('#run').count() == 1
+    assert page.locator('#workflow-view').is_visible()
+    assert set(page.locator('.workflow-node.in-path').evaluate_all('nodes => nodes.map(n => n.dataset.job)')) == {'cpue_summary', 'cpue_report'}
+    page.go_back()
+    assert page.locator('#jobs-view').is_visible()
+    assert page.locator('#jobs-view #run').count() == 1
     page.wait_for_function("document.querySelector('#status-title').textContent === 'Results are ready'", timeout=30000)
     assert page.locator('tr[data-job="cpue_a"] .state').inner_text() == 'Reused'
     assert page.locator('tr[data-job="cpue_summary"] .state').inner_text() == 'Complete'
@@ -160,12 +191,19 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('tr[data-job="cpue_summary"] .open-job-record').click()
     page.locator('#output-record:visible').wait_for()
     assert page.locator('#output-title').inner_text() == 'Compare CPUE results'
-    assert page.locator('#output-record .record-heading h3').inner_text() == 'cpue_summary · Run 002'
+    assert page.locator('#output-record .record-heading h3').inner_text() == 'Job 07 · Compare CPUE results · Run 002'
     page.locator('#output-record').screenshot(path=str(ARTIFACTS / 'paper-record.png'))
     (ARTIFACTS / 'paper-screenshot-record.json').write_text(page.evaluate('JSON.stringify(currentOutput.record, null, 2)'))
     page.locator('#output-close').click()
 
     assert page.evaluate('completedRun !== null && completedRun.run.length === 2')
+    page.locator('tr[data-job="cpue_report"] .run-job').click()
+    page.wait_for_function("!busy && completedRun?.run.length === 1 && latestRun === 'Run 003'")
+    assert page.evaluate('completedRun.run') == ['cpue_report']
+    assert page.evaluate("records.cpue_summary.run_id") == 'Run 002'
+    page.locator('tr[data-job="cpue_summary"] .run-job').click()
+    page.wait_for_function("!busy && completedRun?.run.length === 2 && latestRun === 'Run 004'")
+    page.locator('#run:enabled').wait_for()
     browse_dependencies(page)
     assert page.evaluate('completedRun !== null && completedRun.run.length === 2')
     page.locator('#mortality').select_option('0.35')

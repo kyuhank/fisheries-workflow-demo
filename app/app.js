@@ -30,7 +30,17 @@ let workspaceView = "tasks", jobStatusFilter = "";
 let dependencySelection = "prepare_a";
 let waitingTransfer = null;
 let confirmingTransfer = false;
+let runRequested = false;
 const byKey = Object.fromEntries(jobs.map((job) => [job.key, job]));
+const jobNumbers = Object.freeze(Object.fromEntries(
+  jobs.map((job, index) => [job.key, String(index + 1).padStart(2, "0")]),
+));
+function jobNumber(key) {
+  return jobNumbers[key] ? "Job " + jobNumbers[key] : "";
+}
+function jobLabel(key) {
+  return [jobNumber(key), byKey[key]?.title].filter(Boolean).join(" · ");
+}
 const messages = [];
 
 function localCall(type, data = {}) {
@@ -259,8 +269,38 @@ function selectJob(key) {
   selectedTask = byKey[key].module;
   if (!busy && mode !== "saved") {
     completedRun = null;
-    refreshPlan();
+    return refreshPlan();
   } else render();
+}
+
+function canRequestRun() {
+  return ready && !busy && !runRequested && mode !== "saved";
+}
+
+async function runFromJob(key) {
+  if (!byKey[key] || !canRequestRun()) return;
+  const executionMode = mode;
+  runRequested = true;
+  render();
+  const planned = await selectJob(key);
+  runRequested = false;
+  if (!planned || mode !== executionMode || currentStart() !== key) {
+    render();
+    return;
+  }
+  if ($("output-dialog").open) $("output-dialog").close();
+  return $("run").onclick();
+}
+
+function jobRunButton(key) {
+  const button = uiElement("button", "run-job", "Run");
+  button.dataset.runJob = key;
+  button.disabled = !canRequestRun();
+  button.hidden = mode === "saved";
+  button.setAttribute("aria-label", "Run from " + byKey[key].title);
+  button.title = "Run this job and the analyses that use its output";
+  button.onclick = () => runFromJob(key);
+  return button;
 }
 
 function jobNode(node, colour, path) {
@@ -782,11 +822,11 @@ function renderTasks() {
   $("task-jobs").hidden = workspaceView !== "jobs";
   $("dependencies-view").hidden = workspaceView !== "dependencies";
   $("workspace-breadcrumb").textContent = workspaceView === "tasks"
-    ? "Task overview"
+    ? "Tasks"
     : workspaceView === "dependencies" ? "Job dependencies"
-    : "Task overview / Jobs";
+    : "Tasks / Jobs";
   $("workspace-title").textContent = workspaceView === "tasks"
-    ? "Follow the work across teams"
+    ? "Tasks"
     : workspaceView === "dependencies" ? "Follow a job’s connections"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
@@ -846,7 +886,10 @@ function dependencyCard(key, current) {
   card.dataset.job = key;
   card.dataset.module = job.module;
   card.style.setProperty("--accent", colour);
-  card.append(uiElement("p", "dependency-module", task.title));
+  const module = uiElement("p", "dependency-module");
+  module.append(uiElement("span", "job-number", jobNumber(key)),
+    document.createTextNode(" · " + task.title));
+  card.append(module);
   const heading = uiElement("h4", "dependency-title");
   if (current) heading.textContent = job.title;
   else {
@@ -884,6 +927,7 @@ function dependencyCard(key, current) {
   record.setAttribute("aria-label", "Inspect " + job.title + " recorded inputs and versions");
   record.onclick = () => openJobRecord(key);
   actions.append(output, record);
+  actions.append(jobRunButton(key));
   card.append(actions);
   return card;
 }
@@ -895,7 +939,7 @@ function renderDependencies() {
       const group = document.createElement("optgroup");
       group.label = task.title;
       for (const job of jobs.filter((job) => job.module === task.key)) {
-        const option = uiElement("option", "", job.title);
+        const option = uiElement("option", "", jobLabel(job.key));
         option.value = job.key;
         group.append(option);
       }
@@ -954,9 +998,9 @@ function renderJobTable() {
     const name = document.createElement("td");
     name.className = "job-name-cell";
     const select = uiElement("button", "job-name", job.title);
-    select.onclick = () => selectJob(job.key);
-    select.setAttribute("aria-label", "Run from " + job.title);
-    name.append(select);
+    select.onclick = () => openOutput(job.key);
+    select.setAttribute("aria-label", "Open " + job.title);
+    name.append(uiElement("span", "job-number", jobNumber(job.key)), select);
     const owner = uiElement("td", "job-owner");
     owner.dataset.label = "Responsible";
     const ownerLabel = uiElement("span", "owner-label");
@@ -969,12 +1013,12 @@ function renderJobTable() {
       const input = records[job.key]?.inputs?.[key];
       const earlierVersion = input && (input.run_id !== records[key]?.run_id ||
         input.checksum !== records[key]?.outputs?.["output.json"]);
-      const link = uiElement("button", "input-link", byKey[key].title);
+      const link = uiElement("button", "input-link", jobLabel(key));
       link.dataset.inputJob = key;
       link.disabled = Boolean(earlierVersion);
       link.title = earlierVersion ? "Earlier input version · open this job’s Record"
         : records[key] ? `Inspect input record · ${records[key].run_id}` : "Select this input job";
-      link.onclick = () => records[key] ? openJobRecord(key) : selectJob(key);
+      link.onclick = () => records[key] ? openJobRecord(key) : openOutput(key);
       inputs.append(link);
     }
     row.firstChild.append(inputs);
@@ -1005,7 +1049,7 @@ function renderJobTable() {
     recordButton.setAttribute("aria-label", "Inspect " + job.title + " recorded inputs and versions");
     recordButton.onclick = () => openJobRecord(job.key);
     output.className = "job-inspect";
-    output.append(button, recordButton);
+    output.append(button, recordButton, jobRunButton(job.key));
     row.append(output);
     $("job-table-body").append(row);
   }
@@ -1030,6 +1074,10 @@ function render() {
   $("selection-description").textContent = byKey[start].description;
   $("run").disabled = !ready || busy || !plan || mode === "saved";
   $("run").hidden = mode === "saved";
+  $("run-workflow").hidden = mode === "saved" || start === "submission";
+  $("run-workflow").disabled = !canRequestRun();
+  $("run-workflow").textContent = settingsChanges().length ? "Update workflow" : "Run workflow";
+  renderOutputRun();
   $("run").textContent = busy
     ? "Running…"
     : start === "submission"
@@ -1090,7 +1138,7 @@ function render() {
 }
 
 async function refreshPlan() {
-  if (!ready || busy || mode === "saved") return;
+  if (!ready || busy || mode === "saved") return false;
   const version = ++planVersion, executionMode = mode;
   $("run").disabled = true;
   try {
@@ -1099,10 +1147,12 @@ async function refreshPlan() {
       plan = next;
       explainChanges();
       render();
+      return true;
     }
   } catch (error) {
     if (version === planVersion && executionMode === mode) showError(error);
   }
+  return false;
 }
 
 function explainChanges() {
@@ -1256,7 +1306,7 @@ worker.onerror = (event) => {
 };
 
 $("run").onclick = async () => {
-  if (!ready || busy || !plan || $("run").disabled) return;
+  if (!canRequestRun() || !plan || $("run").disabled) return;
   const start = currentStart(), runSettings = settings();
   // Once dispatched, repeating Run should repeat this stage even after its
   // settings have been saved and no longer differ from the current records.
@@ -1303,6 +1353,7 @@ $("run").onclick = async () => {
     await refreshPlan();
   }
 };
+$("run-workflow").onclick = () => runFromJob(settingsChanges()[0]?.start || "submission");
 for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
   $(id).onchange = () => {
     settingsIntent = true;
@@ -1375,17 +1426,29 @@ $("reset").onclick = async () => {
     status("failed", "Reset unavailable", error.message);
   }
 };
+function showTab(tab) {
+  const orchestration = tab === "jobs";
+  for (const button of document.querySelectorAll("[data-tab]")) {
+    const active = button.dataset.tab === tab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  }
+  $("workflow-view").hidden = orchestration;
+  $("jobs-view").hidden = !orchestration;
+  // One set of controls operates the same workflow from either view.
+  if (orchestration) $("workspace-run-controls").append($("run-controls"));
+  else $("workflow-view").before($("run-controls"));
+}
+function showLinkedTab() {
+  showTab(location.hash === "#orchestration" ? "jobs" : "workflow");
+}
 for (const button of document.querySelectorAll("[data-tab]")) {
   button.onclick = () => {
-    for (const other of document.querySelectorAll("[data-tab]")) {
-      const active = other === button;
-      other.classList.toggle("active", active);
-      other.setAttribute("aria-selected", active);
-    }
-    $("workflow-view").hidden = button.dataset.tab !== "workflow";
-    $("jobs-view").hidden = button.dataset.tab !== "jobs";
+    location.hash = button.dataset.tab === "jobs" ? "orchestration" : "workflow";
+    showTab(button.dataset.tab);
   };
 }
+window.addEventListener("hashchange", showLinkedTab);
 function showRecord(show) {
   $("record-panel").hidden = !show;
   $("record-toggle").textContent = show ? "Hide record" : "Show record";
@@ -1451,8 +1514,10 @@ function displayOutput(title, output, kind = "Job output") {
     output.comparison = reproductionChecks.get(checkKey(output.record));
   }
   currentOutput = output;
+  renderOutputRun();
   $("output-title").textContent = title;
-  $("output-kind").textContent = kind;
+  $("output-kind").textContent = [jobNumber(output.record?.job || output.job), kind]
+    .filter(Boolean).join(" · ");
   $("output-frame").srcdoc = output.html;
   $("output-frame").hidden = false;
   $("output-json").hidden = true;
@@ -1464,6 +1529,21 @@ function displayOutput(title, output, kind = "Job output") {
   $("output-dialog").showModal();
 }
 async function openOutput(key) {
+  if (!records[key]) {
+    const job = byKey[key];
+    const page = document.implementation.createHTMLDocument(job.title);
+    const content = uiElement("main");
+    content.style.cssText = "font:16px/1.6 system-ui;color:#233649;max-width:720px;margin:32px auto;padding:0 24px";
+    content.append(uiElement("h1", "", "No output yet"),
+      uiElement("p", "", job.description),
+      uiElement("p", "", job.parents.length
+        ? "Required inputs: " + job.parents.map(jobLabel).join("; ") + "."
+        : "Starts with the supplied synthetic data."),
+      uiElement("p", "", "Run this job to produce its output. Missing inputs are prepared first."));
+    page.body.append(content);
+    displayOutput(job.title, { job: key, html: "<!doctype html>" + page.documentElement.outerHTML }, "Job details");
+    return;
+  }
   try {
     displayOutput(
       byKey[key].title,
@@ -1476,6 +1556,14 @@ async function openOutput(key) {
     status("failed", "This output is unavailable", error.message);
   }
 }
+function renderOutputRun() {
+  const key = currentOutput?.record?.job || currentOutput?.job;
+  $("output-run").hidden = !key || mode === "saved";
+  $("output-run").disabled = !canRequestRun();
+  $("output-run").textContent = busy ? "Running…" : "Run from this job";
+  $("output-run").title = "Run this job and the analyses that use its output";
+}
+$("output-run").onclick = () => runFromJob(currentOutput?.record?.job || currentOutput?.job);
 $("example").onclick = () =>
   displayOutput(
     "Assessment report",
@@ -1689,4 +1777,5 @@ $("offline-fallback").onclick = () => activateMode("live");
 $("retry-connection").onclick = () => activateMode(mode);
 if (!payload.runtimeUrl) $("offline-download").hidden = true;
 render();
+showLinkedTab();
 activateMode("cloud");

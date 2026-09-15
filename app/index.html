@@ -38,16 +38,17 @@
       <section id="handover-panel" class="handover-panel" hidden
         aria-live="polite"><div><strong id="handover-title">Waiting for a file transfer</strong><p id="handover-message">Click Confirm file transfer to continue.</p></div><button id="transfer-files">Confirm file transfer →</button><button id="connect-workflow" class="quiet">Connect automatically</button></section>
       <section
-        class="selection"><div><span class="eyebrow" id="selection-label">Start from</span><h2 id="selection-title">Data submission</h2><p id="selection-description">Submit records, check them and run the connected analyses.</p><p id="reuse-message" class="reuse"></p></div><button id="run" class="primary" disabled>Run full workflow <span aria-hidden="true">→</span></button></section>
+        class="selection" id="run-controls"><div><span class="eyebrow" id="selection-label">Start from</span><h2 id="selection-title">Data submission</h2><p id="selection-description">Submit records, check them and run the connected analyses.</p><p id="reuse-message" class="reuse"></p></div><div class="run-actions"><button id="run" class="primary" disabled>Run full workflow <span aria-hidden="true">→</span></button><button id="run-workflow" class="quiet" hidden>Run workflow</button></div></section>
       <section id="workflow-view" class="modules"
         aria-label="Connected workflow"></section>
       <section id="jobs-view" hidden>
+        <div id="workspace-run-controls"></div>
         <div class="orchestration-workspace">
           <aside class="workspace-nav" aria-label="Orchestration navigation">
             <div
               class="workspace-brand"><span class="eyebrow">Orchestration</span><strong>Analysis workspace</strong></div>
             <button id="show-tasks"
-              class="workspace-link active"><span data-workspace-icon="folder"></span>Overview<span class="nav-count" id="task-count"></span></button>
+              class="workspace-link active"><span data-workspace-icon="folder"></span>Tasks<span class="nav-count" id="task-count"></span></button>
             <button id="all-tasks"
               class="workspace-link"><span data-workspace-icon="list"></span>All jobs<span class="nav-count" id="job-count"></span></button>
             <button id="running-jobs"
@@ -57,7 +58,7 @@
           </aside>
           <div class="workspace-content">
             <div
-              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Task overview</p><h2 id="workspace-title">Follow the work across teams</h2><p id="workspace-description">This view illustrates shared job coordination, using example roles and linked job records.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
+              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Tasks</h2><p id="workspace-description">This view illustrates shared job coordination, using example roles and linked job records.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
             <div id="tasks" class="task-list"></div>
             <section id="dependencies-view" aria-label="Direct job dependencies" hidden>
               <div class="dependency-toolbar"><label for="dependency-job">Inspect a job<select id="dependency-job" aria-describedby="dependency-help"></select></label><p id="dependency-help">Browse the jobs that provide inputs and use the result. Your run selection stays the same.</p></div>
@@ -76,7 +77,7 @@
                       <th scope="col">Responsible</th>
                       <th scope="col">Progress</th>
                       <th scope="col">Output from</th>
-                      <th scope="col">Inspect</th>
+                      <th scope="col">Actions</th>
                     </tr>
                   </thead>
                   <tbody id="job-table-body"></tbody>
@@ -95,7 +96,7 @@
       <footer><p>Synthetic data · simplified analyses</p><p id="execution-note">Online results expire after 10 minutes. Offline calculation works without an internet connection.</p><button id="licences" class="quiet">Sources &amp; licences</button><a href="https://github.com/kyuhank/fisheries-workflow-demo/releases" target="_blank" rel="noopener">Preserved versions ↗</a></footer>
     </main>
     <dialog id="output-dialog">
-      <header><div><span class="eyebrow" id="output-kind">Job output</span><h2 id="output-title"></h2></div><button id="output-close" class="quiet" aria-label="Close output">Close ×</button></header>
+      <header><div><span class="eyebrow" id="output-kind">Job output</span><h2 id="output-title"></h2></div><div class="output-actions"><button id="output-run" class="primary" hidden>Run from this job</button><button id="output-close" class="quiet" aria-label="Close output">Close ×</button></div></header>
       <nav><button class="active" data-output="report">Report</button><button data-output="data">Data</button><button data-output="log">Log</button><button data-output="record">Inputs &amp; versions</button><button id="save-output" class="quiet">Save HTML</button></nav>
       <section id="output-record" hidden aria-label="Recorded inputs and versions"></section>
       <iframe id="output-frame" sandbox="allow-same-origin"

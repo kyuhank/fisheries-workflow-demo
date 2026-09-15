@@ -35,7 +35,7 @@ function renderRecord() {
   const title = uiElement("div");
   title.append(
     uiElement("p", "eyebrow", "Recorded execution"),
-    uiElement("h3", "", `${key} · ${record.run_id}`),
+    uiElement("h3", "", `${jobLabel(key)} · ${record.run_id}`),
     uiElement("p", "", byKey[key].description),
   );
   heading.append(title);

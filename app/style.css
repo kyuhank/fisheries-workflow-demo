@@ -366,6 +366,43 @@ dialog nav .active {
   color: var(--muted);
   margin: 0;
 }
+.run-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.output-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.run-job {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border: 1px solid #b6d0dc;
+  border-radius: 6px;
+  background: #edf5f8;
+  color: #1a6383;
+  font-size: 12px;
+  font-weight: 600;
+}
+.run-job:hover {
+  background: #dcecf3;
+}
+.job-inspect .run-job {
+  display: block;
+  margin-top: 8px;
+}
+@media (max-width: 650px) {
+  .run-actions { width: 100%; }
+  dialog > header { flex-wrap: wrap; }
+  .output-actions { justify-content: flex-start; }
+}
 .primary {
   background: #1a6383;
   color: white;
@@ -939,6 +976,17 @@ dialog iframe {
 .job-table .job-name:hover {
   color: var(--blue);
   text-decoration: underline;
+}
+.job-number {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.job-name-cell > .job-number {
+  display: block;
+  margin-bottom: 4px;
 }
 .job-table .state {
   display: inline-flex;

@@ -1,6 +1,6 @@
 # Fisheries workflow demonstration
 
-[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Download](https://github.com/kyuhank/fisheries-workflow-demo/releases)
+[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Orchestration tool](https://kyuhank.github.io/fisheries-workflow-demo/#orchestration) · [Download](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
 Follow a change from data preparation through CPUE analysis, stock assessment and
 management strategy evaluation (MSE). Inspect each result's inputs, code and
@@ -19,10 +19,10 @@ for a real fishery.
 
 Run once, then change **CPUE A records**, **Mortality setting 2** or **MSE catch
 buffer**. Run again to update affected jobs; unchanged results keep their original
-records. **Orchestration tool** groups jobs by task and shows responsibilities,
-progress and dependencies. Select **Dependencies** to follow the inputs and
-subsequent jobs around an analysis. Open its **Record** to trace the saved inputs or select
-**Reproduce & compare**.
+records. **Orchestration tool** groups numbered jobs under **Tasks**. Click a job
+to open its output; use **Run** to rerun it and the analyses that use its result.
+Both views follow the same execution. **Dependencies** shows connected jobs;
+**Record** shows saved inputs and versions, with **Reproduce & compare** to check a result.
 
 MSE compares three catch rules using the four fitted assessment cases. A scenario
 with reduced recruitment followed by recovery shows how observed indices, catch

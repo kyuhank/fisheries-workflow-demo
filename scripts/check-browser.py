@@ -118,8 +118,8 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#tasks .cpue').click()
     assert page.locator('#job-table-body tr').count() == 4
     page.locator('#job-table-body tr[data-job="cpue_a"] .job-name').click()
-    assert page.locator('#selection-title').inner_text() == 'CPUE analysis A'
-    page.locator('#job-table-body tr[data-job="cpue_a"] .open-output').click()
+    assert page.locator('#output-title').inner_text() == 'CPUE analysis A'
+    assert 'Job 05' in page.locator('#output-kind').text_content()
     assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'CPUE analysis A'
     page.locator('[data-output="log"]').click()
     assert 'Fit a CPUE index' in page.locator('#output-json').text_content()

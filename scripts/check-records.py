@@ -31,7 +31,7 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     page.locator('#all-tasks').click()
     page.locator('tr[data-job="assessment_a2"] .open-output').click()
     page.locator('[data-output="record"]').click()
-    assert 'assessment_a2 · Run 001' in page.locator('.record-heading').inner_text()
+    assert 'Job 12 · Assessment A2 · Run 001' in page.locator('.record-heading').inner_text()
     assert 'Prepare inputs A' in page.locator('.record-input').inner_text()
     if args.online:
         assert 'Docker image' in page.locator('.record-cards').inner_text()
@@ -39,9 +39,9 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
         assert page.locator('.record-image-digest').inner_text() == page.evaluate('currentOutput.record.execution.container.split("@")[1]')
         assert page.get_by_role('link', name='Open actual run').get_attribute('href').endswith(str(page.evaluate('currentOutput.record.execution.github_run')))
     page.locator('.record-input').click()
-    expect(page.locator('.record-heading')).to_contain_text('prepare_a · Run 001')
+    expect(page.locator('.record-heading')).to_contain_text('Job 09 · Prepare inputs A · Run 001')
     page.get_by_role('button', name='CPUE analysis A Run 001').click()
-    expect(page.locator('.record-heading')).to_contain_text('cpue_a · Run 001')
+    expect(page.locator('.record-heading')).to_contain_text('Job 05 · CPUE analysis A · Run 001')
     with page.expect_download() as transfer:
         page.locator('#download-job-record').click()
     path = Path(directory) / 'record.json'
