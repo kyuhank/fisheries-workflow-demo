@@ -2,12 +2,12 @@
   "job": "mse_index",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "2636ec1a77eb4e8d62962704615b41a5ffa2b45b4b831ec8cd295227ac3d6840",
+  "signature": "e730728d7f9f37c370ebbb548ed82812a202dafbdef43a2d5102c93b6f0f2404",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "2f190abfcb7d29ed56313d2a83c81cd7e5607520099604526c7b3b019361bb0d",
-    "workflow/spec.py": "49244dc5a20b2aabd84836df812497be21aad43b1e238f4ef9625bb972087744",
+    "workflow/engine.py": "b3be9d10850deceac3f03ea94ec0ec993c9317fc8544aacd03459c1b2cb12770",
+    "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
     "workflow/mse.py": "173f6f3145d62c52ad42930a9635fe4eafc619dd84a8504b2bd70a290eb12940",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
@@ -20,7 +20,7 @@
   },
   "outputs": {
     "output.json": "17b3ab39d1dac879b18c8fcda672c919098d314ff795cdc16cc3ff7e87c6b678",
-    "report.html": "8504e0929a9e646ed0aeead3e03ccccb622c5cf84b6573aa2e63cf19c0fed566"
+    "report.html": "ed89607b156c9fac03f6305149afea4c3a02f55331067aee829652bef530242c"
   },
   "log": [
     "Update annual catch using a simulated abundance index.",
@@ -34,8 +34,8 @@
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "fd56221ad6d7144752a338c40e52b9f2efb6211b",
-    "version": "1.7.5"
+    "commit": "5fb4f0b529f492c84ec1342ef161e01c9173e8c3",
+    "version": "1.7.6"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
