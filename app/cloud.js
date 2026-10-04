@@ -34,10 +34,12 @@ class CloudRun {
         Error(value.error || "The online demonstration is unavailable."),
         {
           // The legacy response also rejects the request before any dispatch.
-          sessionUnavailable: [400, 410].includes(response.status) &&
-            (value.code === "session_expired" ||
-              value.error ===
-                "This demonstration session is unavailable. Select Start afresh."),
+          sessionUnavailable: (response.status === 403 &&
+              value.code === "session_denied") ||
+            ([400, 410].includes(response.status) &&
+              (value.code === "session_expired" ||
+                value.error ===
+                  "This demonstration session is unavailable. Select Start afresh.")),
         },
       );
     }

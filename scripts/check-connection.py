@@ -87,19 +87,48 @@ try:
         assert unit.evaluate("mismatch && calls.length === 1 && cloud.session === null")
         unit.evaluate("cloud.session = {id: 'test-session', token: 'test-token'}")
 
-        # Once a run is acknowledged, even an explicit expiry must not replay it.
+        # Once a run is acknowledged, expiry or denial must never replay it.
+        for status, code in [(410, 'session_expired'), (403, 'session_denied')]:
+            unit.evaluate("""async ({status, code}) => {
+              calls.length = 0;
+              cloud.session = {id: 'test-session', token: 'test-token'};
+              window.fetch = async (url, options) => {
+                calls.push({url, headers: options.headers});
+                return url.includes('/run?')
+                  ? Response.json({id: 'accepted'})
+                  : Response.json({code, error: 'Unavailable'}, {status});
+              };
+              window.expired = await cloud.call('run', {start: 'submission', settings: {}})
+                .then(() => false, error => error.sessionUnavailable);
+            }""", {'status': status, 'code': code})
+            assert unit.evaluate("expired && calls.length === 2 && cloud.session === null")
+
+        # Start afresh can discard a denied capability and create a new own session.
         unit.evaluate("""async () => {
           calls.length = 0;
-          window.fetch = async (url, options) => {
-            calls.push({url, headers: options.headers});
-            return url.includes('/run?')
-              ? Response.json({id: 'accepted'})
-              : Response.json({code: 'session_expired', error: 'Expired'}, {status: 410});
+          cloud.session = {id: 'denied', token: 'wrong-token'};
+          cloud.records = {old: {}};
+          window.fetch = async url => {
+            calls.push(url);
+            return url.includes('/reset?')
+              ? Response.json({code: 'session_denied', error: 'Denied'}, {status: 403})
+              : Response.json({id: 'replacement', token: 'new-token'});
           };
-          window.expired = await cloud.call('run', {start: 'submission', settings: {}})
-            .then(() => false, error => error.sessionUnavailable);
+          await cloud.call('reset');
         }""")
-        assert unit.evaluate("expired && calls.length === 2 && cloud.session === null")
+        assert unit.evaluate("calls.length === 2 && cloud.session.id === 'replacement' && Object.keys(cloud.records).length === 0")
+
+        # Other forbidden responses must not silently discard or renew a capability.
+        unit.evaluate("""async () => {
+          calls.length = 0;
+          window.fetch = async url => {
+            calls.push(url);
+            return Response.json({code: 'permission_denied', error: 'Forbidden'}, {status: 403});
+          };
+          window.forbidden = await cloud.call('reset')
+            .then(() => false, error => !error.sessionUnavailable);
+        }""")
+        assert unit.evaluate("forbidden && calls.length === 1 && cloud.session.id === 'replacement'")
 
         # A lost or malformed dispatch response has an unknown outcome. Do not
         # silently create a replacement session or send another dispatch.
