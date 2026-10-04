@@ -26,6 +26,10 @@ def switch_with_guide(page, target):
     page.locator('#view-guide-link').click()
     page.wait_for_url('**#' + target)
     active, inactive = ('jobs', 'workflow') if target == 'orchestration' else ('workflow', 'jobs')
+    # The URL changes before the hashchange handler updates the shared view.
+    # Wait for that observable UI transition, then retain the invariant checks.
+    page.locator(f'#{active}-view').wait_for(state='visible')
+    page.locator(f'#{inactive}-view').wait_for(state='hidden')
     assert page.locator(f'#{active}-view').is_visible()
     assert page.locator(f'#{inactive}-view').is_hidden()
     assert page.locator(f'[data-tab="{active}"]').get_attribute('aria-selected') == 'true'
