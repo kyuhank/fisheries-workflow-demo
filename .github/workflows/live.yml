@@ -42,4 +42,4 @@ jobs:
             --env ACTIONS_ID_TOKEN_REQUEST_URL \
             --env ACTIONS_ID_TOKEN_REQUEST_TOKEN \
             --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
-            --entrypoint python3 "$IMAGE" cloud/run.py
+            --entrypoint make "$IMAGE" --no-print-directory --silent inside-live

@@ -1,9 +1,9 @@
 name: Check calculations
 on:
   push:
-    paths: ['jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   pull_request:
-    paths: ['jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,7 +25,7 @@ jobs:
             --env PAPER_NATIVE_INTEGRATION=1 \
             --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID \
             --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
-            "$IMAGE" sh -c 'Rscript --vanilla tests/test-r-models.R && python3 -m unittest discover -s tests -v'
+            "$IMAGE" make --no-print-directory --silent inside-check
   server:
     runs-on: ubuntu-latest
     timeout-minutes: 5

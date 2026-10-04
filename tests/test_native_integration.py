@@ -1,4 +1,4 @@
-"""Seven actual container R/RTMB/Quarto integration cases, explicitly enabled in CI.
+"""Actual container R/RTMB/Quarto integration cases, explicitly enabled in CI.
 
 This is execution consistency and workflow custody evidence. The separate R
 science script owns mathematical and declared synthetic-data checks.
@@ -12,7 +12,6 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
 import tempfile
 import unittest
 import zipfile
@@ -157,15 +156,17 @@ class NativeIntegrationTest(unittest.TestCase):
                 for name, checksum in json.loads(archive.read('SHA256SUMS.json')).items():
                     self.assertEqual(hashlib.sha256(archive.read(name)).hexdigest(), checksum)
                 recipe = archive.read('REPRODUCE.txt').decode()
-                self.assertIn('docker run --rm --network none', recipe)
+                self.assertIn('make reproduce', recipe)
                 self.assertIn(os.environ['PAPER_RUNTIME_IMAGE'], recipe)
                 archive.extractall(extracted)
             # This test is already inside that declared container; no nested Docker daemon.
-            process = subprocess.run([sys.executable, 'run.py', '--settings', 'settings.json',
-                                      '--output', 'reproduced'], cwd=extracted,
+            process = subprocess.run(['make', '--no-print-directory', '--silent', 'inside-reproduce'], cwd=extracted,
                                      capture_output=True, text=True, timeout=360)
             self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
             self.assertEqual(verify(extracted / 'reference', extracted / 'reproduced'), 22)
+            check = subprocess.run(['make', '--no-print-directory', '--silent', 'inside-compare'],
+                                   cwd=extracted, capture_output=True, text=True, timeout=30)
+            self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
             state = json.loads((extracted / 'reference/state.json').read_text())
             self.assertEqual(state['records'], records)
             for key in REPORTS:
@@ -211,12 +212,42 @@ class NativeIntegrationTest(unittest.TestCase):
                 self.assertEqual(manifest[FROZEN_SOURCE],
                                  runner.records['submission']['execution']['data_checksum'])
                 archive.extractall(extracted)
-            process = subprocess.run([sys.executable, 'run.py', '--settings', 'settings.json',
-                                      '--output', 'reproduced'], cwd=extracted,
+            process = subprocess.run(['make', '--no-print-directory', '--silent', 'inside-reproduce'], cwd=extracted,
                                      capture_output=True, text=True, timeout=360)
             self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
             self.assertEqual(verify(extracted / 'reference', extracted / 'reproduced'), 22)
+            check = subprocess.run(['make', '--no-print-directory', '--silent', 'inside-compare'],
+                                   cwd=extracted, capture_output=True, text=True, timeout=30)
+            self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
             reproduced = json.loads((extracted / 'reproduced/submission/output.json').read_text())
             self.assertEqual(reproduced, runner.output('submission'))
             record = json.loads((extracted / 'reproduced/submission/record.json').read_text())
             self.assertEqual(record['data_files']['frozen-source.json'], digest(frozen))
+
+
+    def test_8_single_job_download_repeats_only_its_required_inputs(self):
+        runner = self.clone()
+        runner.configure({'min_hooks_a': 1200})
+        asyncio.run(runner.run('cpue_a', 'job'))
+        original = copy.deepcopy(runner.records)
+        runner.configure({'min_hooks_a': 0})
+        with tempfile.TemporaryDirectory() as directory:
+            extracted = Path(directory)
+            with zipfile.ZipFile(io.BytesIO(runner.bundle())) as archive:
+                recipe = archive.read('REPRODUCE.txt').decode()
+                self.assertIn('Run: make reproduce', recipe)
+                self.assertIn('Check: make compare', recipe)
+                self.assertEqual(recipe.count('JOB=cpue_a'), 2)
+                self.assertIn('Other saved results retain their earlier records', recipe)
+                self.assertEqual(json.loads(archive.read('settings.json'))['min_hooks_a'], 1200)
+                archive.extractall(extracted)
+            preserved = (extracted / 'reference/cpue_b/record.json').read_bytes()
+            for target in ('inside-reproduce', 'inside-compare'):
+                process = subprocess.run(['make', '--no-print-directory', '--silent', target,
+                                          'JOB=cpue_a'], cwd=extracted,
+                                         capture_output=True, text=True, timeout=360)
+                self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+            self.assertEqual(verify(extracted / 'reference', extracted / 'reproduced', 'cpue_a'), 1)
+            self.assertFalse((extracted / 'reproduced/cpue_b').exists())
+            self.assertEqual((extracted / 'reference/cpue_b/record.json').read_bytes(), preserved)
+            self.assertEqual(json.loads((extracted / 'reference/state.json').read_text())['records'], original)

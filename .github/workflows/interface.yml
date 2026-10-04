@@ -1,9 +1,9 @@
 name: Check diagram
 on:
   push:
-    paths: ['jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
+    paths: ['Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
   pull_request:
-    paths: ['jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
+    paths: ['Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
             --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID --env GITHUB_RUN_ATTEMPT \
             --user "$(id -u):$(id -g)" \
             --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
-            "$IMAGE" sh -c 'python scripts/build.py && python scripts/release.py'
+            "$IMAGE" make --no-print-directory --silent inside-html
       - name: Install browser checks
         run: |
           python3 -m venv .browser-check

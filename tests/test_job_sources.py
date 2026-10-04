@@ -69,7 +69,10 @@ class JobSourceTests(unittest.TestCase):
             before = {key: runner.code_record(key) for key in ('cpue_a', 'cpue_b')}
             original = Path.read_bytes
             for name, affected in [('jobs/cpue_a/run.R', {'cpue_a'}),
-                                   ('workflow/r/models.R', {'cpue_a', 'cpue_b'})]:
+                                   ('workflow/r/models.R', {'cpue_a', 'cpue_b'}),
+                                   ('Makefile', {'cpue_a', 'cpue_b'}),
+                                   ('workflow/Makefile', {'cpue_a', 'cpue_b'}),
+                                   ('workflow/jobs.json', {'cpue_a', 'cpue_b'})]:
                 target = ROOT / name
                 def changed(path):
                     return original(path) + b'\n# changed source\n' if path == target else original(path)
@@ -92,20 +95,19 @@ class JobSourceTests(unittest.TestCase):
                     self.assertEqual(archive.read(name), path.read_bytes())
                     self.assertEqual(checksums[name], hashlib.sha256(path.read_bytes()).hexdigest())
                 recipe = archive.read('REPRODUCE.txt').decode()
-                self.assertIn('docker run --rm --network none', recipe)
+                self.assertIn('make reproduce', recipe)
                 commands = {name: shlex.split(command) for name, command in
                             (line.split(': ', 1) for line in recipe.splitlines()
                              if line.startswith(('Pull: ', 'Run: ', 'Check: ')))}
                 self.assertEqual(commands['Pull'],
                                  ['docker', 'pull', '--platform', 'linux/amd64', image])
+                self.assertEqual(commands['Run'][:2], ['make', 'reproduce'])
+                self.assertEqual(commands['Check'][:2], ['make', 'compare'])
                 for name in ('Run', 'Check'):
-                    command = commands[name]
-                    self.assertEqual(command[:7], ['docker', 'run', '--rm', '--network',
-                                                  'none', '--platform', 'linux/amd64'])
-                    self.assertIn('PAPER_RUNTIME_IMAGE=' + image, command)
-                    self.assertEqual(command[command.index('python3') - 1], image)
-                self.assertIn('PAPER_RUNTIME_IMAGE=' + image, recipe)
-                self.assertIn('python3 run.py', recipe)
+                    self.assertIn('IMAGE=' + image, commands[name])
+                for name in ('Makefile', 'workflow/Makefile'):
+                    self.assertEqual(archive.read(name), (ROOT / name).read_bytes())
+                    self.assertEqual(checksums[name], hashlib.sha256((ROOT / name).read_bytes()).hexdigest())
                 self.assertIn('scripts/generate-data.R', archive.namelist())
                 self.assertFalse(any(name.startswith('jobs/') and name.endswith('run.py')
                                      for name in archive.namelist()))

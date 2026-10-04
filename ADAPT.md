@@ -2,28 +2,37 @@
 
 | File | Responsibility |
 | --- | --- |
-| `workflow/spec.py` | Jobs, responsible analysts, dependencies and parallel groups. |
+| `workflow/jobs.json` | Jobs, responsible analysts, input links and parallel groups. |
+| `workflow/spec.py` | Load and check these declarations; select jobs and downstream paths. |
 | `jobs/<job_id>/run.R` | The selected job's R entry point. |
 | `jobs/<job_id>/README.md` | Inputs, settings, outputs and connected jobs. |
 | `workflow/r/` | Shared GLM, RTMB surplus-production and management-trial functions. |
 | `jobs/*_report/report.qmd` | Three concise Quarto reports rendered from saved results. |
 | `scripts/generate-data.R` | Declared synthetic catch history and observations. |
 | `workflow/engine.py` | Coordination, SQLite/file adapters and execution records. |
-| `workflow/r_bridge.py` | Container guard and Rscript job interface. |
+| `Makefile` | Reader commands for container runs and reproduction. |
+| `workflow/Makefile` | R calculation and Quarto report recipes inside the container. |
+| `workflow/r_bridge.py` | Container guard, JSON interface and process control. |
 | `app/diagram.json` | The same job graph shown as a dependency diagram. |
 
 ## Add a job
 
-1. Define its inputs, analyst and stage in `workflow/spec.py`, placing parents before children.
+1. Define its inputs, analyst and stage in `workflow/jobs.json`, placing parents before children.
 2. Create `jobs/<job_id>/run.R` with `calculate(context)`. Select named inputs from `context$parents` and return a named result list. Reusable R functions belong in `workflow/r/`.
 3. Record settings and contributing files in `job_settings()` and `code_record()`. Check input names, units and coverage before fitting.
 4. Add the node and connections to `app/diagram.json`; the build verifies these against the calculation graph. Write a concise job guide.
 5. Check the change inside the declared container. Edit page sources in `app/`; `docs/` is generated from accepted source and saved calculations.
 
-The hosted coordinator runs independent jobs in separate container processes and
-waits for required peer outputs before later stages advance. The orchestration
-view groups these jobs by task; the diagram maps their required inputs. Both
-views describe the same execution.
+The coordinator reads these declarations, checks the saved inputs and selects
+the ready jobs. `workflow/Makefile` calls their R entrypoints; the coordinator
+records the outputs before releasing dependent jobs. Independent jobs can run
+together, while declared peer groups finish before later stages advance. The
+orchestration view and dependency diagram show the same job connections.
+
+A Live request uses the existing [hosted service](cloud/README.md): it starts
+`.github/workflows/live.yml`, pulls the recorded image and calls `make inside-live`
+there. This starts `cloud/run.py`, which retrieves the request and uses the same
+coordinator. Editing job declarations does not deploy or create the hosted service.
 
 ## Separate analyst repositories
 
@@ -57,8 +66,8 @@ result reader. Code, inputs and results remain separate from the software image.
 ## Numerical comparisons
 
 `verify.py` compares output values at relative tolerance 1e-6 or absolute tolerance
-1e-9. Assessment log-index residuals use absolute tolerance 1e-8 after checking
-them against the observed and fitted indices. Two near-zero assessment gradient
+1e-9. Assessment log-index residuals retain relative tolerance 1e-6 with absolute
+tolerance 1e-8 after checking them against the observed and fitted indices. Two near-zero assessment gradient
 diagnostics have magnitude and difference caps of 1e-7, conditional on matching
 successful fit diagnostics. These are comparison policies, not model-accuracy
 guarantees. Summary and report copies must match their own source assessments

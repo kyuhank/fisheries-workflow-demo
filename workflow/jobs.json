@@ -1,0 +1,155 @@
+{
+  "jobs": [
+    {
+      "key": "submission", "title": "Data submission",
+      "module": "data", "owner": "Data provider",
+      "parents": [], "run": "jobs/submission/run.R",
+      "description": "Submit catch and effort records for checking."
+    },
+    {
+      "key": "qc", "title": "Quality check",
+      "module": "data", "owner": "Data curator",
+      "parents": ["submission"], "run": "jobs/qc/run.R",
+      "description": "Check records and return invalid effort for correction."
+    },
+    {
+      "key": "database", "title": "Prepare and load",
+      "module": "data", "owner": "Data curator",
+      "parents": ["qc"], "run": "jobs/database/run.R",
+      "description": "Store the accepted records in a fixed database snapshot."
+    },
+    {
+      "key": "extract", "title": "Extract data",
+      "module": "data", "owner": "Data analyst",
+      "parents": ["database"], "run": "jobs/extract/run.R",
+      "description": "Use saved SQL to select observations and annual catches."
+    },
+    {
+      "key": "cpue_a", "title": "CPUE analysis A",
+      "module": "cpue", "owner": "CPUE analyst",
+      "parents": ["extract"], "run": "jobs/cpue_a/run.R",
+      "description": "Fit a CPUE index with year and vessel effects."
+    },
+    {
+      "key": "cpue_b", "title": "CPUE analysis B",
+      "module": "cpue", "owner": "CPUE analyst",
+      "parents": ["extract"], "run": "jobs/cpue_b/run.R",
+      "description": "Fit an alternative index with year effects only."
+    },
+    {
+      "key": "cpue_summary", "title": "Compare CPUE results",
+      "module": "cpue", "owner": "CPUE analyst",
+      "parents": ["cpue_a", "cpue_b"], "run": "jobs/cpue_summary/run.R",
+      "description": "Compare both indices in a plot and table."
+    },
+    {
+      "key": "cpue_report", "title": "CPUE report",
+      "module": "cpue", "owner": "CPUE analyst",
+      "parents": ["cpue_summary"], "run": "jobs/cpue_report/run.R",
+      "description": "Write a short account of the CPUE methods and results."
+    },
+    {
+      "key": "prepare_a", "title": "Prepare inputs A",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["extract", "cpue_a"], "run": "jobs/prepare_a/run.R",
+      "description": "Join index A to annual catches and check the model inputs."
+    },
+    {
+      "key": "prepare_b", "title": "Prepare inputs B",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["extract", "cpue_b"], "run": "jobs/prepare_b/run.R",
+      "description": "Join index B to annual catches and check the model inputs."
+    },
+    {
+      "key": "assessment_a1", "title": "Assessment A1",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["prepare_a"], "run": "jobs/assessment_a1/run.R",
+      "description": "Fit the illustrative model to index A with growth-rate setting 1."
+    },
+    {
+      "key": "assessment_a2", "title": "Assessment A2",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["prepare_a"], "run": "jobs/assessment_a2/run.R",
+      "description": "Fit the illustrative model to index A with growth-rate setting 2."
+    },
+    {
+      "key": "assessment_b1", "title": "Assessment B1",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["prepare_b"], "run": "jobs/assessment_b1/run.R",
+      "description": "Fit the illustrative model to index B with growth-rate setting 1."
+    },
+    {
+      "key": "assessment_b2", "title": "Assessment B2",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["prepare_b"], "run": "jobs/assessment_b2/run.R",
+      "description": "Fit the illustrative model to index B with growth-rate setting 2."
+    },
+    {
+      "key": "assessment_summary", "title": "Compare assessments",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["assessment_a1", "assessment_a2", "assessment_b1", "assessment_b2"], "run": "jobs/assessment_summary/run.R",
+      "description": "Compare the four fitted cases in plots and tables."
+    },
+    {
+      "key": "assessment_report", "title": "Assessment report",
+      "module": "assessment", "owner": "Assessment analyst",
+      "parents": ["assessment_summary"], "run": "jobs/assessment_report/run.R",
+      "description": "Write a short report and preserve its analytical record."
+    },
+    {
+      "key": "mse_prepare", "title": "Prepare MSE",
+      "module": "mse", "owner": "MSE analyst",
+      "parents": ["assessment_a1", "assessment_a2", "assessment_b1", "assessment_b2"], "run": "jobs/mse_prepare/run.R",
+      "description": "Use the four assessment cases to prepare stocks for simulated management trials."
+    },
+    {
+      "key": "mse_constant", "title": "Constant catch",
+      "module": "mse", "owner": "MSE analyst",
+      "parents": ["mse_prepare"], "run": "jobs/mse_constant/run.R",
+      "description": "Test a fixed annual catch under the same simulated future conditions."
+    },
+    {
+      "key": "mse_index", "title": "Index rule",
+      "module": "mse", "owner": "MSE analyst",
+      "parents": ["mse_prepare"], "run": "jobs/mse_index/run.R",
+      "description": "Update annual catch using a simulated abundance index."
+    },
+    {
+      "key": "mse_buffered", "title": "Buffered rule",
+      "module": "mse", "owner": "MSE analyst",
+      "parents": ["mse_prepare"], "run": "jobs/mse_buffered/run.R",
+      "description": "Set catch from index thresholds and the selected buffer; limit annual advice changes to 15%."
+    },
+    {
+      "key": "mse_summary", "title": "MSE results summary",
+      "module": "mse", "owner": "MSE analyst",
+      "parents": ["mse_constant", "mse_index", "mse_buffered"], "run": "jobs/mse_summary/run.R",
+      "description": "Compare catch, stock levels and catch stability across the management trials."
+    },
+    {
+      "key": "mse_report", "title": "MSE report",
+      "module": "mse", "owner": "MSE analyst",
+      "parents": ["mse_summary"], "run": "jobs/mse_report/run.R",
+      "description": "Report the tested procedures, their trade-offs and the limits of the example."
+    }
+  ],
+  "defaults": {"last_year": 2023, "min_hooks_a": 0, "growth_rate_2": 0.3, "mse": true, "mse_buffer": 0.8},
+  "stages": [
+    ["submission"],
+    ["qc"],
+    ["database"],
+    ["extract"],
+    ["cpue_a", "cpue_b"],
+    ["prepare_a", "prepare_b"],
+    ["cpue_summary"],
+    ["cpue_report"],
+    ["assessment_a1", "assessment_a2", "assessment_b1", "assessment_b2"],
+    ["assessment_summary"],
+    ["assessment_report"],
+    ["mse_prepare"],
+    ["mse_constant", "mse_index", "mse_buffered"],
+    ["mse_summary"],
+    ["mse_report"]
+  ],
+  "handovers": {"data": {"cpue_a": ["extract"], "cpue_b": ["extract"]}, "cpue": {"prepare_a": ["extract", "cpue_a"], "prepare_b": ["extract", "cpue_b"]}, "assessment": {"mse_prepare": ["assessment_a1", "assessment_a2", "assessment_b1", "assessment_b2"]}}
+}

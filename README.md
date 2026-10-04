@@ -80,9 +80,14 @@ digest, the pull and run instructions, and a comparison with the saved results.
 Docker on an ARM computer requires AMD64 emulation. After the image has been
 pulled, the downloaded analysis can run without network access.
 
-For a checkout, `make container` runs the workflow, `make check` checks calculations
-and coordination, and `make html` builds the pages and saved offline reader.
-These targets execute the analysis inside the pinned container. Open
+From the repository root, `make run` runs the workflow and `make job JOB=cpue_a`
+runs one job with its required inputs. In an extracted run download, use
+`make reproduce` and `make compare`; its `REPRODUCE.txt` gives any single-job
+selection and the recorded image. `make check` checks calculations and coordination,
+and `make html` builds the pages and offline reader. Docker and Make are required
+on the host; Python, R and Quarto are supplied by the image. All calculations
+execute inside that container. The root Makefile provides these reader commands;
+`workflow/Makefile` contains the short R and report recipes. Open
 `runs/assessment_report/report.html` or `runs/mse_report/report.html`.
 
 See [ADAPT.md](ADAPT.md) for the code structure, [cloud/README.md](cloud/README.md)

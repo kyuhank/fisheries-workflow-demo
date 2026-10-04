@@ -1,11 +1,9 @@
 """Render report jobs from real QMD source inside the same calculation container."""
 import json
-import os
 from pathlib import Path
 import shutil
-import subprocess
 import tempfile
-from .r_bridge import RBridge
+from .r_bridge import RBridge, make_command, process_environment, run_command
 
 REPORT_JOBS = {'cpue_report', 'assessment_report', 'mse_report'}
 
@@ -28,15 +26,17 @@ def render_report(root, key, result, record, folder, result_html):
     # Quarto's pinned appdirs implementation writes XDG cache/config/data paths.
     # A non-root Docker UID may not write the image's inherited user directory.
     with tempfile.TemporaryDirectory(prefix='fisheries-quarto-') as temporary:
-        environment = dict(os.environ)
+        environment = process_environment()
+        environment['PAPER_REPORT_DIR'] = str(folder.resolve())
         for name, suffix in [('XDG_CACHE_HOME', 'cache'), ('XDG_DATA_HOME', 'data'),
                              ('XDG_CONFIG_HOME', 'config')]:
             environment[name] = str(Path(temporary) / suffix)
-        process = subprocess.run([executable, 'render', 'report.qmd', '--to', 'html',
-                                  '--output', 'report.html'], cwd=folder, env=environment,
-                                 capture_output=True, text=True, timeout=120)
+        process = run_command(make_command('report'), timeout=120, environment=environment)
     if process.returncode or not destination.is_file():
         raise RuntimeError('Quarto report failed: ' + (process.stderr or process.stdout).strip()[-2000:])
-    version = subprocess.check_output([executable, '--version'], text=True, timeout=10).strip()
+    version_check = run_command(make_command('quarto-version'), timeout=10)
+    if version_check.returncode:
+        raise RuntimeError('Quarto version check failed: ' + version_check.stderr.strip()[-2000:])
+    version = version_check.stdout.strip()
     return {'engine': 'Quarto', 'version': version, 'calculation': 'R',
             'quarto_executed': True, 'source': f'jobs/{key}/report.qmd'}

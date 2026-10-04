@@ -7,4 +7,4 @@ COPY data/ data/
 COPY tests/ tests/
 COPY scripts/generate-data.R scripts/import-r-data.py scripts/
 COPY run.py verify.py build-info.json README.md ADAPT.md LICENSE THIRD_PARTY.md Makefile Dockerfile ./
-CMD ["python", "run.py", "--output", "/outputs"]
+CMD ["make", "--no-print-directory", "--silent", "inside-run", "OUTPUT=/outputs"]

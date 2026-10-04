@@ -17,10 +17,10 @@ Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved s
 Inside the declared container, from the repository root:
 
 ```sh
-python3 run.py --from prepare_b --scope job
+make inside-job JOB=prepare_b
 ```
 
-The coordinator and R run inside the declared R/RTMB/Quarto container; the coordinator refreshes required inputs before calling the job. The run record identifies the actual image and versions. `--output DIR` changes the default `runs` directory; `--settings FILE` supplies JSON setting overrides.
+The coordinator refreshes required inputs and calls the job through `workflow/Makefile`. The run record identifies the actual image and versions. `OUTPUT=DIR` changes the default `runs` directory; `SETTINGS=FILE` supplies JSON settings.
 
 ## Outputs and downstream jobs
 

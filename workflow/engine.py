@@ -41,8 +41,9 @@ def job_files():
 
 
 def calculation_files():
-    """The actual shared R sources and JSON driver shipped with the calculation container."""
-    return sorted([ROOT / 'workflow/r_driver.R', *(ROOT / 'workflow/r').glob('*.R')])
+    """Shared calculation sources, job declarations and execution recipes."""
+    return sorted([ROOT / 'workflow/jobs.json', ROOT / 'workflow/Makefile', ROOT / 'workflow/r_driver.R',
+                   *(ROOT / 'workflow/r').glob('*.R')])
 
 
 class Workflow:
@@ -111,7 +112,7 @@ class Workflow:
         return {}
 
     def code_record(self, key):
-        names = ['workflow/engine.py', 'workflow/spec.py', 'workflow/reports.py',
+        names = ['Makefile', 'workflow/Makefile', 'workflow/jobs.json', 'workflow/engine.py', 'workflow/spec.py', 'workflow/reports.py',
                  'workflow/r_bridge.py', 'workflow/r_driver.R',
                  'workflow/quarto_reports.py', f'jobs/{key}/run.R']
         names += [path.relative_to(ROOT).as_posix() for path in (ROOT / 'workflow/r').glob('*.R')]
@@ -409,24 +410,21 @@ class Workflow:
             archive.writestr('SHA256SUMS.json', json.dumps(checksums, indent=2))
             software = self.software()
             image = software['container']
-            url_env = (' --env ' + shlex.quote('PAPER_RUNTIME_IMAGE_URL=' + software['container_url'])
-                       if software.get('container_url') else '')
+            image_option = ' IMAGE=' + shlex.quote(image)
+            image_option += ' IMAGE_URL=' + shlex.quote(software.get('container_url', ''))
             pull = 'docker pull --platform linux/amd64 ' + image
-            run = ('docker run --rm --network none --platform linux/amd64 --env PAPER_RUNTIME_IMAGE=' + image
-                   + url_env + ' --volume "$PWD:/workspace" --workdir /workspace ' + image
-                   + ' python3 run.py --settings settings.json --output reproduced')
-            check = ('docker run --rm --network none --platform linux/amd64 --env PAPER_RUNTIME_IMAGE=' + image
-                     + url_env + ' --volume "$PWD:/workspace" --workdir /workspace ' + image
-                     + ' python3 verify.py reference reproduced')
+            selected = ' JOB=' + shlex.quote(job_target) if job_target else ''
+            run = 'make reproduce' + image_option + selected
+            check = 'make compare' + image_option + selected
             note = ''
             if job_target:
-                run += f' --from {job_target} --scope job'
-                check += f' --job {job_target}'
                 note = (f'This check compares only {job_target}. Other saved results retain their earlier '
                         'records and may use earlier inputs; they are not reproduced by this command.\n')
             archive.writestr('REPRODUCE.txt', f'Pull: {pull}\nRun: {run}\nCheck: {check}\n{note}'
-                            'New calculations run only in Docker: Rscript executes the R job scripts, Python '
-                            'coordinates jobs and SQLite, and Quarto renders the three report jobs. The offline '
-                            'page displays saved outputs. Software details, actual container digest and original '
-                            'run identities are in reference/state.json.\n')
+                            'Run these commands from the extracted folder with Docker and Make available. '
+                            'Make uses the recorded image, pulling it if needed, and starts the coordinator inside it; no host '
+                            'Python, R or Quarto is needed. The coordinator checks inputs and schedules jobs; '
+                            'workflow/Makefile launches the R calculations and three Quarto reports. The '
+                            'offline page displays saved outputs. Container digest and original run identities '
+                            'are in reference/state.json.\n')
         return buffer.getvalue()

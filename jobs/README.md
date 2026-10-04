@@ -14,6 +14,8 @@ jobs/*_report/report.qmd  concise reports rendered by native Quarto
 workflow/r/common.R    row checks, snapshot assembly and input joins
 workflow/r/models.R    GLMs, Schaefer objective and RTMB fitting
 workflow/r/mse.R       paired seeded management trials and comparisons
+workflow/jobs.json     job declarations and input links
+workflow/Makefile      R and report recipes inside the container
 workflow/engine.py     coordination, SQLite gates and saved records
 ```
 
@@ -21,6 +23,24 @@ The coordinator plans dependencies, moves artifacts and records execution. It
 runs inside the declared immutable R/RTMB/Quarto container and calls each R entrypoint there.
 No Python scientific fallback or offline browser calculation is used. Saved
 results remain readable without executing the workflow.
+
+## Declare the connections
+
+[`workflow/jobs.json`](../workflow/jobs.json) is the actual job configuration. This
+excerpt shows one CPUE-to-assessment path; titles and analyst metadata are omitted:
+
+```json
+[
+  {"key": "cpue_a", "parents": ["extract"], "run": "jobs/cpue_a/run.R"},
+  {"key": "prepare_a", "parents": ["extract", "cpue_a"], "run": "jobs/prepare_a/run.R"},
+  {"key": "assessment_a1", "parents": ["prepare_a"], "run": "jobs/assessment_a1/run.R"}
+]
+```
+
+`workflow/spec.py` checks the declarations. The coordinator prepares required
+inputs, starts ready jobs through `workflow/Makefile`, and saves their outputs and
+records before dependent jobs continue. The configuration also declares parallel
+groups and manual handovers. The demo reads JSON with Python's standard library.
 
 ## Follow the jobs
 
@@ -72,15 +92,17 @@ folder guide distinguishes this source artifact from its declared QC dependency.
 
 ## Run a job
 
-Inside the declared container, from the repository root:
+From the repository root:
 
 ```sh
-python3 run.py --from cpue_a --scope job
+make job JOB=cpue_a
 ```
 
-The coordinator prepares missing or outdated inputs and calls
-`jobs/cpue_a/run.R` in the same container. `--output DIR` selects an output directory;
-`--settings FILE` overrides current settings. Container identity and actual
+Make uses the declared image, pulling it if needed, and starts the coordinator there. It prepares
+missing or outdated inputs and uses `workflow/Makefile` to call
+`jobs/cpue_a/run.R` in that container. `OUTPUT=DIR` selects an output directory;
+`SETTINGS=FILE` supplies settings. When already inside the container, use
+`make inside-job JOB=cpue_a` to avoid starting another Docker container. Container identity and actual
 R/package versions belong to the run record, so a moving image tag alone is not
 its execution identity.
 

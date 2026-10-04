@@ -306,11 +306,11 @@ def reproduce(session, value, job=None):
                 for name, checksum in record['outputs'].items():
                     assert manifest['reference/' + key + '/' + name] == checksum, 'Recorded output checksum differs.'
             archive.extractall(destination)
-        command = [sys.executable, 'run.py', '--settings', 'settings.json', '--output', 'reproduced']
-        comparison = [sys.executable, 'verify.py', 'reference', 'reproduced']
+        command = ['make', '--no-print-directory', '--silent', 'inside-reproduce']
+        comparison = ['make', '--no-print-directory', '--silent', 'inside-compare']
         if job:
-            command += ['--from', job, '--scope', 'job']
-            comparison += ['--job', job]
+            command += ['JOB=' + job]
+            comparison += ['JOB=' + job]
         diagnostics = REPORT.setdefault('reproduction_diagnostics', [])
         for stage, argv in (('calculate', command), ('compare', comparison)):
             detail = {'selected_job': job, 'stage': stage, 'bundle_sha256': hashlib.sha256(data).hexdigest()}

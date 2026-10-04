@@ -24,7 +24,7 @@ def main():
     result = unittest.TextTestRunner(resultclass=RecordResult, verbosity=1).run(suite)
     if not result.wasSuccessful():
         raise SystemExit(1)
-    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('tests/*.py'), *ROOT.glob('cloud/*.py'),
+    files = [ROOT/'Makefile', ROOT/'workflow/Makefile', ROOT/'workflow/jobs.json', *ROOT.glob('workflow/*.py'), *ROOT.glob('tests/*.py'), *ROOT.glob('cloud/*.py'),
              *ROOT.glob('workflow/r/*.R'), *ROOT.glob('tests/*.R'),
              *(path for path in (ROOT/'jobs').rglob('*') if path.suffix in ('.R', '.qmd'))]
     record = {
