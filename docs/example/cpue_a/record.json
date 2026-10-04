@@ -2,15 +2,18 @@
   "job": "cpue_a",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "46efc0a1932d3571cd05dd2c9fe5b4e0d78563a4610cbc0d5fc7121795b425e1",
+  "signature": "0e67d9a8b10abb0ad16f4be2fe5ac3a6c07bfbf4e7ab550ae35899de50b27473",
   "settings": {
     "min_hooks": 0
   },
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "14edaacde86dcb85e19020669218d0ede2161e44f1b428d43a7e871cde18df51",
+    "workflow/engine.py": "6631ecf3e14968ff7ec46484c75a9c1f12cdf3a24dfb77c733a3aa7bbf17526c",
     "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
+    "jobs/__init__.py": "18959393726ef6f5e3453241a1e05cc5edad619c394c8334b6269150d8b8f8f5",
+    "jobs/cpue_a/__init__.py": "bb1b84ae26fcd1b0867d680014db7a59ab40fad7ea6d438722d2388427fb3a32",
+    "jobs/cpue_a/run.py": "92774dfe7546421ae0c1eacae2f9495d097f53312b626a03b4c82a758d88b95a",
     "workflow/models.py": "0fb85d28f6899e769b2a4c2afb5908d607782c5134606f260d069ffe1617f624",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
@@ -22,7 +25,7 @@
   },
   "outputs": {
     "output.json": "000d9a1264be8ad9cd440bdb0d05e579bf5f2eb7c18a30cc4726d462f70ea5b7",
-    "report.html": "ff6a00b3ba37127f9d9e2997f4c02f565ebfd95a4d91992080e05d5f6a2eff04"
+    "report.html": "781f131209b59b9247342a9d0666740da0059f5d461776387887c546eb58799d"
   },
   "log": [
     "Fit a CPUE index with year and vessel effects.",
@@ -37,7 +40,7 @@
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
     "commit": null,
-    "version": "1.7.11"
+    "version": "1.7.12"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

@@ -2,15 +2,18 @@
   "job": "mse_buffered",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "c04b6bafe5e180c4d590e19e46af92c31ba045bde93dab4a2581fbe557735536",
+  "signature": "f95da2f7c3e316d6a2f4756c2927afa78e2c53e5da81c36b6b741bb1b73761ce",
   "settings": {
     "buffer": 0.8
   },
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "14edaacde86dcb85e19020669218d0ede2161e44f1b428d43a7e871cde18df51",
+    "workflow/engine.py": "6631ecf3e14968ff7ec46484c75a9c1f12cdf3a24dfb77c733a3aa7bbf17526c",
     "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
     "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
+    "jobs/__init__.py": "18959393726ef6f5e3453241a1e05cc5edad619c394c8334b6269150d8b8f8f5",
+    "jobs/mse_buffered/__init__.py": "827e3a254e6c0c8bc632e490be01c83754d20da9dee1162c2418b7672028e265",
+    "jobs/mse_buffered/run.py": "449015222cf798bc6714bd9504291738422453a905d076bd5f325b8f81f5dabf",
     "workflow/mse.py": "173f6f3145d62c52ad42930a9635fe4eafc619dd84a8504b2bd70a290eb12940",
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
@@ -22,7 +25,7 @@
   },
   "outputs": {
     "output.json": "5475a091a4c94f3622e16870259d86ee05c0f673d423303200fd811051405e0d",
-    "report.html": "5a62c2226712c0e5a3a65f2fa2b143349cf8393b38bb07e62b523922df387e6a"
+    "report.html": "b5675d751977309d88f0bfaaf17addf260a190ba89962749992e43c4f6b40417"
   },
   "log": [
     "Set catch from index thresholds and the selected buffer; limit annual advice changes to 15%.",
@@ -37,7 +40,7 @@
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
     "commit": null,
-    "version": "1.7.11"
+    "version": "1.7.12"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
