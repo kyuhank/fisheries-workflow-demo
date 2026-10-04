@@ -263,8 +263,46 @@ def main():
         expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
         page.locator('#mse-buffer').select_option('0.6')
         expect_plan(page, 'mse_buffered', BUFFER)
+        # Hold actual HTTP reset responses to check the UI while they are in
+        # flight. A failed reset keeps the previous records and never replays.
+        pending_resets = []
+        def held_reset(route):
+            if route.request.url.split('?')[0].endswith('/reset'):
+                pending_resets.append(route)
+                route.request.frame.evaluate('window.resetHeld = true')
+            else:
+                mock.route(route)
+        page.route('**/functions/v1/paper-api/**', held_reset)
+        previous_records = page.evaluate('records')
+        previous_dispatches = len(mock.dispatches)
+        previous_session = page.evaluate('cloud.session')
         page.locator('#reset').click()
-        page.locator('#run:enabled').wait_for()
+        page.wait_for_function("busy && window.resetHeld && $('status-title').textContent === 'Starting afresh'")
+        assert len(pending_resets) == 1
+        assert page.locator('#run').is_disabled() and page.locator('#reset').is_disabled()
+        assert page.locator('#mode').is_disabled() and page.locator('#growth-rate').is_disabled()
+        assert page.evaluate('records') == previous_records
+        # Explicit direct invocation also obeys the guard; it sends no request.
+        page.evaluate("$('reset').onclick()")
+        assert len(pending_resets) == 1
+        pending_resets.pop().fulfill(status=503, content_type='application/json', body='{"error":"Reset unavailable"}')
+        page.wait_for_function("!busy && $('status-title').textContent === 'Reset unavailable'")
+        assert page.evaluate('records') == previous_records
+        assert page.evaluate('cloud.session') == previous_session
+        assert len(mock.dispatches) == previous_dispatches and mock.reset_count == 0
+        assert page.locator('#run').is_enabled() and page.locator('#mode').is_enabled()
+        resets = mock.reset_count
+        page.evaluate('window.resetHeld = false')
+        page.locator('#reset').click()
+        page.wait_for_function("busy && window.resetHeld && $('status-title').textContent === 'Starting afresh'")
+        assert len(pending_resets) == 1
+        assert page.evaluate('records') == previous_records
+        mock.route(pending_resets.pop())
+        page.wait_for_function("""() => !busy && Object.keys(records).length === 0 &&
+          selected === 'submission' && plan?.run.length === jobs.length &&
+          !$('run').disabled && $('status-title').textContent === 'Ready to run'
+        """)
+        assert mock.reset_count == resets + 1
         assert page.evaluate('Object.keys(records).length') == 0
         assert page.locator('#growth-rate').input_value() == '0.30'
         assert page.locator('#mse-buffer').input_value() == '0.8'

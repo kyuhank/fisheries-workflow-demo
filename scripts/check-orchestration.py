@@ -40,14 +40,21 @@ def switch_with_guide(page, target):
 
 
 def expect_run(page, previous, expected, scope):
-    page.wait_for_function("""previous => !busy && orchestrationRuns.length === previous + 1 &&
-      document.querySelector('#status-title').textContent === 'Results are ready'
-    """, arg=previous, timeout=90000)
+    # A completed single job may leave an unrelated setting pending, which
+    # refreshPlan correctly reports instead of the generic completion message.
+    page.wait_for_function("""({previous, expected}) => !busy &&
+      orchestrationRuns.length === previous + 1 && completedRun &&
+      JSON.stringify(completedRun.run) === JSON.stringify(expected)
+    """, arg={'previous': previous, 'expected': expected}, timeout=90000)
     page.locator('#run:enabled').wait_for()
     run = page.evaluate('orchestrationRuns.at(-1)')
     assert run['input']['scope'] == scope, run['input']
     assert run['result']['run'] == expected, run['result']['run']
     assert page.evaluate('completedRun.run') == expected
+    assert page.evaluate('records') == run['result']['records']
+    for key in expected:
+        assert run['result']['records'][key]['run_id'] == run['result']['run_id']
+        assert run['result']['records'][key]['outputs']['output.json']
     return run
 
 
@@ -251,6 +258,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     expect_run(page, previous, ['cpue_a'], 'job')
     unchanged_records(page, before, ['cpue_a'])
     assert page.evaluate('records.assessment_a2.settings.r') == .30
+    assert page.locator('#status-title').inner_text() == 'New settings · previous results kept'
 
     page.locator('#growth-rate').select_option('0.30')
     page.locator('#filter').select_option('1200')
@@ -268,8 +276,12 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#run-workflow').click()
     expect_run(page, previous, descendants, 'workflow')
 
+    resets = mock.reset_count
     page.locator('#reset').click()
-    page.locator('#run:enabled').wait_for()
+    page.wait_for_function("""() => !busy && Object.keys(records).length === 0 &&
+      selected === 'submission' && plan?.run.length === jobs.length && !$('run').disabled
+    """)
+    assert mock.reset_count == resets + 1
     page.locator('#all-tasks').click()
     previous = page.evaluate('orchestrationRuns.length')
     page.locator('tr[data-job="prepare_a"] .run-job').click()

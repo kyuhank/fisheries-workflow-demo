@@ -1333,6 +1333,11 @@ async function transferFiles(connect = false) {
 $("transfer-files").onclick = () => transferFiles();
 $("connect-workflow").onclick = () => transferFiles(true);
 $("reset").onclick = async () => {
+  if (!ready || busy || mode !== "cloud" || unresolvedLive) return;
+  ++planVersion;
+  busy = true;
+  status("running", "Starting afresh", "Clearing the live workspace. No new analysis has started.");
+  render();
   try {
     const result = await call("reset");
     reproductionChecks.clear();
@@ -1350,6 +1355,7 @@ $("reset").onclick = async () => {
     $("run-id").textContent = "";
     messages.length = 0;
     $("execution-log").textContent = "No execution yet.";
+    busy = false;
     status(
       "",
       "Ready to run",
@@ -1357,7 +1363,9 @@ $("reset").onclick = async () => {
     );
     selectJob("submission");
   } catch (error) {
-    status("failed", "Reset unavailable", error.message);
+    busy = false;
+    status("failed", "Reset unavailable", error.message + " No new analysis has started.");
+    render();
   }
 };
 function renderViewGuide() {
