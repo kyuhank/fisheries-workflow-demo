@@ -35,4 +35,5 @@ jobs:
           name: r-source-data-${{ github.sha }}
           path: .test-output/
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 7
