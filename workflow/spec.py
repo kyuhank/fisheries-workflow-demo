@@ -22,13 +22,13 @@ JOBS = [
     ('prepare_b', 'Prepare inputs B', 'assessment', 'Assessment analyst', ['extract', 'cpue_b'],
      'Join index B to annual catches and check the model inputs.'),
     ('assessment_a1', 'Assessment A1', 'assessment', 'Assessment analyst', ['prepare_a'],
-     'Fit the illustrative model to index A with mortality setting 1.'),
+     'Fit the illustrative model to index A with growth-rate setting 1.'),
     ('assessment_a2', 'Assessment A2', 'assessment', 'Assessment analyst', ['prepare_a'],
-     'Fit the illustrative model to index A with mortality setting 2.'),
+     'Fit the illustrative model to index A with growth-rate setting 2.'),
     ('assessment_b1', 'Assessment B1', 'assessment', 'Assessment analyst', ['prepare_b'],
-     'Fit the illustrative model to index B with mortality setting 1.'),
+     'Fit the illustrative model to index B with growth-rate setting 1.'),
     ('assessment_b2', 'Assessment B2', 'assessment', 'Assessment analyst', ['prepare_b'],
-     'Fit the illustrative model to index B with mortality setting 2.'),
+     'Fit the illustrative model to index B with growth-rate setting 2.'),
     ('assessment_summary', 'Compare assessments', 'assessment', 'Assessment analyst',
      ['assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'],
      'Compare the four fitted cases in plots and tables.'),
@@ -52,7 +52,7 @@ JOBS = [
 SPEC = {key: dict(key=key, title=title, module=module, owner=owner, parents=parents,
                   description=description)
         for key, title, module, owner, parents, description in JOBS}
-DEFAULTS = {'last_year': 2023, 'min_hooks_a': 0, 'mortality_2': 0.30,
+DEFAULTS = {'last_year': 2023, 'min_hooks_a': 0, 'growth_rate_2': 0.30,
             'mse': True, 'mse_buffer': 0.8}
 
 # Complete each peer group before its dependent groups; independent paths continue.

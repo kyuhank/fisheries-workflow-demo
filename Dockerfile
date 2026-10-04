@@ -1,10 +1,10 @@
-FROM ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc
+FROM ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
 WORKDIR /workspace
 COPY jobs/ jobs/
 COPY workflow/ workflow/
 COPY cloud/ cloud/
 COPY data/ data/
 COPY tests/ tests/
-COPY scripts/generate-data.py scripts/generate-data.py
+COPY scripts/generate-data.R scripts/import-r-data.py scripts/
 COPY run.py verify.py build-info.json README.md ADAPT.md LICENSE THIRD_PARTY.md Makefile Dockerfile ./
 CMD ["python", "run.py", "--output", "/outputs"]

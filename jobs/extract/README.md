@@ -1,33 +1,33 @@
 # Extract data (`extract`)
 
-Run the saved SQL against the database snapshot to select valid fishing observations and annual removals, retaining zero catches and vessel identity.
+Check and return observations and annual removals obtained through the real SQLite snapshot queries. Zero catches and vessel identity are retained.
 
-Owner: Data analyst.
+Owner: Data analyst. The readable entrypoint is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
 
 ## Inputs and settings
 
 Declared upstream jobs: [Prepare and load (`database`)](../database/README.md)
 
-Incoming artifacts: `runs/database/snapshot.sqlite`, plus [`workflow/extract.sql`](../../workflow/extract.sql) and [`workflow/extract-catch.sql`](../../workflow/extract-catch.sql). The calculation reads the SQLite snapshot rather than the database summary JSON.
+Incoming artifacts: `runs/database/snapshot.sqlite` queried using [`extract.sql`](../../workflow/extract.sql) and [`extract-catch.sql`](../../workflow/extract-catch.sql). The adapter supplies the actual query rows and SQL to R.
 
-Saved settings: No job-specific settings are saved (`record.json.settings` is `{}`). Every job also preserves snapshot lineage separately; `mse` controls which jobs are in the active graph.
+Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
 
-## Run
+## Run in the container
 
-From the repository root:
+Inside the declared container, from the repository root:
 
 ```sh
 python3 run.py --from extract --scope job
 ```
 
-This selects the job and refreshes required upstream inputs when needed. `--output DIR` replaces the default `runs` directory; `--settings FILE` overrides current settings with values from a JSON file.
+The coordinator and R run inside the declared R/RTMB/Quarto container; the coordinator refreshes required inputs before calling the job. The run record identifies the actual image and versions. `--output DIR` changes the default `runs` directory; `--settings FILE` supplies JSON setting overrides.
 
 ## Outputs and downstream jobs
 
-- `runs/extract/output.json`: selected observations, annual catches and the SQL used.
-- `runs/extract/report.html`: the page produced by the shared [report renderer](../../workflow/reports.py).
-- `runs/extract/record.json`: run identity, settings, input lineage and artifact checksums.
+- `runs/extract/output.json`: the R calculation result.
+- `runs/extract/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/extract/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These paths are generated run artifacts. Declared downstream jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md)
+These are generated run artifacts. Declared downstream jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/record.json).

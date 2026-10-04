@@ -2,16 +2,18 @@
 import asyncio
 import hashlib
 import io
-from importlib import import_module
 import json
 from pathlib import Path
 import platform
 import shutil
+import shlex
 import sqlite3
 import sys
 import zipfile
 
 from . import reports
+from .r_bridge import RBridge
+from .quarto_reports import render_report
 from .spec import DEFAULTS, SPEC, STAGES, active_spec, downstream, handover_groups
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,18 +34,24 @@ def read_json(path):
 def job_files():
     """Executable jobs and their reader guides, without cached bytecode or outputs."""
     return sorted(path for path in (ROOT / 'jobs').rglob('*')
-                  if path.is_file() and path.suffix in ('.py', '.md'))
+                  if path.is_file() and path.suffix in ('.md', '.R', '.qmd'))
+
+
+def calculation_files():
+    """The actual shared R sources and JSON driver shipped with the calculation container."""
+    return sorted([ROOT / 'workflow/r_driver.R', *(ROOT / 'workflow/r').glob('*.R')])
 
 
 class Workflow:
     def __init__(self, directory='runs', notify=None, pause=0, before_job=None,
-                 manual_transfer=None):
+                 manual_transfer=None, r_bridge=None):
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
         self.notify = notify or (lambda event: None)
         self.pause = pause
         self.before_job = before_job
         self.manual_transfer = manual_transfer
+        self.calculator = r_bridge or RBridge()
         self.settings = dict(DEFAULTS)
         self.records = {}
         self.events = []
@@ -54,6 +62,9 @@ class Workflow:
         state = self.directory / 'state.json'
         if state.exists():
             previous = read_json(state)
+            if 'mortality_2' in previous.get('settings', {}):
+                raise ValueError('This checkpoint uses the earlier age-model version. '
+                                 'Keep its saved results and start a fresh v1.8 R session.')
             self.records = previous['records']
             self.settings = {**DEFAULTS, 'mse': False, **previous['settings']}
             self.run_number = previous['run_number']
@@ -67,8 +78,8 @@ class Workflow:
             raise ValueError('Select a supplied data snapshot.')
         if candidate['min_hooks_a'] not in (0, 1200):
             raise ValueError('Select one of the supplied CPUE filters.')
-        if candidate['mortality_2'] not in (0.25, 0.30, 0.35):
-            raise ValueError('Select one of the supplied mortality settings.')
+        if candidate['growth_rate_2'] not in (0.25, 0.30, 0.35):
+            raise ValueError('Select one of the supplied intrinsic-growth settings.')
         if type(candidate['mse']) is not bool:
             raise ValueError('Select whether to include the MSE analyses.')
         if (type(candidate['mse_buffer']) not in (int, float) or
@@ -89,22 +100,22 @@ class Workflow:
         if key == 'cpue_a':
             return {'min_hooks': self.settings['min_hooks_a']}
         if key in ('assessment_a2', 'assessment_b2'):
-            return {'M': self.settings['mortality_2']}
+            return {'r': self.settings['growth_rate_2']}
         if key in ('assessment_a1', 'assessment_b1'):
-            return {'M': 0.20}
+            return {'r': 0.25}
         if key == 'mse_buffered':
             return {'buffer': self.settings['mse_buffer']}
         return {}
 
     def code_record(self, key):
         names = ['workflow/engine.py', 'workflow/spec.py', 'workflow/reports.py',
-                 'jobs/__init__.py', f'jobs/{key}/__init__.py', f'jobs/{key}/run.py']
-        if key.startswith(('cpue_', 'assessment_')) or key == 'database':
-            names += ['workflow/models.py', 'workflow/age_model.py']
+                 'workflow/r_bridge.py', 'workflow/r_driver.R',
+                 'workflow/quarto_reports.py', f'jobs/{key}/run.R']
+        names += [path.relative_to(ROOT).as_posix() for path in (ROOT / 'workflow/r').glob('*.R')]
+        if key in ('cpue_report', 'assessment_report', 'mse_report'):
+            names.append(f'jobs/{key}/report.qmd')
         if key == 'extract':
             names += ['workflow/extract.sql', 'workflow/extract-catch.sql']
-        if key.startswith('mse_'):
-            names += ['workflow/mse.py', 'workflow/age_model.py']
         return {name: digest((ROOT / name).read_bytes()) for name in names}
 
     def signature(self, key):
@@ -115,13 +126,13 @@ class Workflow:
                     'parents': parents, 'software': self.software()}
         if key == 'submission':
             material['data'] = {name: digest((ROOT / 'data' / name).read_bytes())
-                                for name in ['fishery.sqlite', 'submission.json']}
+                                for name in ['fishery.sqlite', 'submission.json', 'scenario.json', 'source-data.json', 'generation.json'] if (ROOT / 'data' / name).is_file()}
         return digest(encoded(material))
 
-    @staticmethod
-    def software():
-        return {'python': platform.python_version(), 'platform': sys.platform,
-                'runtime': 'Pyodide 0.27.7' if sys.platform == 'emscripten' else 'CPython',
+    def software(self):
+        return {**self.calculator.software(),
+                'python': platform.python_version(), 'platform': sys.platform,
+                'runtime': 'Rscript (container)', 'adapter_runtime': 'CPython',
                 'sqlite': sqlite3.sqlite_version}
 
     def valid(self, key):
@@ -171,18 +182,35 @@ class Workflow:
         if self.pause and state in ('running', 'failed', 'returned', 'received'):
             await asyncio.sleep(self.pause)
 
-    def source_rows(self):
+    def source_context(self):
+        """Read source bytes; year selection and the QC example are R jobs."""
+        if hasattr(self, 'hosted_data'):
+            return {**json.loads(json.dumps(self.hosted_data)), 'submission': None}
         with sqlite3.connect(f'file:{ROOT / "data/fishery.sqlite"}?mode=ro', uri=True) as db:
             db.row_factory = sqlite3.Row
             rows = [dict(r) for r in db.execute('SELECT * FROM sets ORDER BY year,set_id')]
             catch = [dict(r) for r in db.execute('SELECT * FROM removals ORDER BY year')]
-        if self.settings['last_year'] == 2024:
-            batch = read_json(ROOT / 'data/submission.json')
-            rows += [dict(zip(['set_id','year','vessel','hooks','catch_n'], row)) for row in batch['sets']]
-            catch.append({'year': 2024, 'catch_t': batch['catch']})
-        end = self.settings['last_year']
-        return {'sets': [r for r in rows if r['year'] <= end],
-                'catch': [r for r in catch if r['year'] <= end]}
+        return {'sets': rows, 'catch': catch, 'submission': read_json(ROOT / 'data/submission.json')}
+
+    def extracted_context(self):
+        sql = (ROOT / 'workflow/extract.sql').read_text()
+        catch_sql = (ROOT / 'workflow/extract-catch.sql').read_text()
+        with sqlite3.connect(self.directory / 'database/snapshot.sqlite') as db:
+            db.row_factory = sqlite3.Row
+            return {'sets': [dict(r) for r in db.execute(sql)],
+                    'catch': [dict(r) for r in db.execute(catch_sql)], 'sql': sql + '\n' + catch_sql}
+
+    def store_snapshot(self, data):
+        """The storage adapter loads accepted R-checked rows into real SQLite."""
+        folder = self.directory / 'database'
+        folder.mkdir(exist_ok=True)
+        dbfile = folder / 'snapshot.sqlite'
+        dbfile.unlink(missing_ok=True)
+        with sqlite3.connect(dbfile) as db:
+            db.execute('CREATE TABLE sets(set_id TEXT PRIMARY KEY,year INTEGER,vessel TEXT,hooks INTEGER CHECK(hooks>0),catch_n INTEGER CHECK(catch_n>=0))')
+            db.execute('CREATE TABLE removals(year INTEGER PRIMARY KEY,catch_t REAL CHECK(catch_t>=0))')
+            db.executemany('INSERT INTO sets VALUES(?,?,?,?,?)', [[row[name] for name in ('set_id','year','vessel','hooks','catch_n')] for row in data['sets']])
+            db.executemany('INSERT INTO removals VALUES(?,?)', [[row['year'],row['catch_t']] for row in data['catch']])
 
     def save(self, key, result, run_id):
         folder = self.directory / key
@@ -210,11 +238,16 @@ class Workflow:
             record['source'] = {'repository': 'https://github.com/' + self.execution['repository'],
                                 'commit': self.execution['commit']}
         record['data_files'] = {name: digest((ROOT / 'data' / name).read_bytes())
-                                for name in ['fishery.sqlite', 'submission.json']}
+                                for name in ['fishery.sqlite', 'submission.json', 'scenario.json', 'source-data.json', 'generation.json'] if (ROOT / 'data' / name).is_file()}
         self.records[key] = record
         lineage = [{'job': SPEC[parent]['title'], **details} for parent, details in record['inputs'].items()]
-        (folder / 'report.html').write_text(reports.output_page(SPEC[key], result, record, lineage))
+        page = reports.output_page(SPEC[key], result, record, lineage)
+        rendered = render_report(ROOT, key, result, record, folder, page)
+        record['report_rendering'] = rendered
         record['outputs']['report.html'] = digest((folder / 'report.html').read_bytes())
+        if rendered['quarto_executed']:
+            for name in ('report.qmd', 'report-data.json'):
+                record['outputs'][name] = digest((folder / name).read_bytes())
         (folder / 'record.json').write_text(json.dumps(record, indent=2) + '\n')
         self.persist()
 
@@ -229,8 +262,29 @@ class Workflow:
     async def calculate(self, key, run_id):
         if key not in SPEC:
             raise ValueError('No calculation registered for this job.')
-        job = import_module(f'jobs.{key}.run')
-        return await job.calculate(self, run_id)
+        parents = {parent: self.output(parent) for parent in SPEC[key]['parents']}
+        if key == 'database':
+            parents['submission'] = self.output('submission')
+        context = {'key': key, 'settings': self.settings, 'job_settings': self.job_settings(key),
+                   'run_id': run_id, 'parents': parents}
+        if key in ('submission', 'qc'):
+            context['source'] = self.source_context()
+        if key == 'extract':
+            context['extracted'] = self.extracted_context()
+        response = await self.calculator.calculate(context)
+        result, effects = response['result'], response['effects']
+        if effects:
+            if key != 'qc' or set(effects) != {'resubmit_submission'}:
+                raise ValueError('The R job requested undeclared workflow side effects.')
+            await self.emit('qc', 'failed', 'Zero effort found. Return the record to the data provider.')
+            await self.emit('submission', 'returned', 'The provider corrects the effort field.')
+            await self.emit('submission', 'running', 'The provider resubmits the corrected records.', activity='resubmit')
+            self.save('submission', effects['resubmit_submission'], run_id)
+            await self.emit('submission', 'complete', 'Corrected submission received.')
+            await self.emit('qc', 'running', 'Check the corrected submission.')
+        if key == 'database':
+            self.store_snapshot(parents['submission'])
+        return result
 
     async def run(self, start='submission', scope='workflow'):
         if self.running:
@@ -307,10 +361,11 @@ class Workflow:
     def bundle(self):
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as archive:
-            files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*')]
-            files += list(ROOT.glob('tests/*.py'))
+            files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*'),
+                     *calculation_files()]
+            files += list(ROOT.glob('tests/*.py')) + list(ROOT.glob('tests/*.R'))
             files += list(ROOT.glob('cloud/*.py'))
-            files += list(ROOT.glob('scripts/generate-data.py'))
+            files += [ROOT / 'scripts/generate-data.R', ROOT / 'scripts/import-r-data.py']
             files += job_files()
             files += [ROOT / 'ADAPT.md', ROOT / 'cloud/README.md']
             files += [ROOT / name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json'] if (ROOT / name).exists()]
@@ -338,8 +393,16 @@ class Workflow:
             archive.writestr('settings.json', settings)
             checksums['settings.json'] = digest(settings)
             archive.writestr('SHA256SUMS.json', json.dumps(checksums, indent=2))
-            run = 'python3 run.py --settings settings.json --output reproduced'
-            check = 'python3 verify.py reference reproduced'
+            software = self.software()
+            image = software['container']
+            url_env = (' --env ' + shlex.quote('PAPER_RUNTIME_IMAGE_URL=' + software['container_url'])
+                       if software.get('container_url') else '')
+            run = ('docker run --rm --network none --env PAPER_RUNTIME_IMAGE=' + image
+                   + url_env + ' --volume "$PWD:/workspace" --workdir /workspace ' + image
+                   + ' python3 run.py --settings settings.json --output reproduced')
+            check = ('docker run --rm --network none --env PAPER_RUNTIME_IMAGE=' + image
+                     + url_env + ' --volume "$PWD:/workspace" --workdir /workspace ' + image
+                     + ' python3 verify.py reference reproduced')
             note = ''
             if job_target:
                 run += f' --from {job_target} --scope job'
@@ -347,6 +410,8 @@ class Workflow:
                 note = (f'This check compares only {job_target}. Other saved results retain their earlier '
                         'records and may use earlier inputs; they are not reproduced by this command.\n')
             archive.writestr('REPRODUCE.txt', f'Run: {run}\nCheck: {check}\n{note}'
-                            'The same Python code runs in the browser and container. Software details '
-                            'and original run identities are in reference/state.json.\n')
+                            'New calculations run only in Docker: Rscript executes the R job scripts, Python '
+                            'coordinates jobs and SQLite, and Quarto renders the three report jobs. The offline '
+                            'page displays saved outputs. Software details, actual container digest and original '
+                            'run identities are in reference/state.json.\n')
         return buffer.getvalue()

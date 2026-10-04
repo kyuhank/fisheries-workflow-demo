@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from workflow.engine import Workflow
+from tests.coordinator_fixtures import CoordinatorBridge
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -20,7 +21,7 @@ class HostedDataTest(unittest.TestCase):
             spec.loader.exec_module(module)
         with tempfile.TemporaryDirectory() as directory:
             runner = module.HostedWorkflow.__new__(module.HostedWorkflow)
-            Workflow.__init__(runner, directory)
+            Workflow.__init__(runner, directory, r_bridge=CoordinatorBridge())
             runner.hosted_data = {'sets': [{'year': 2023, 'hooks': 1000, 'catch_n': 20}], 'catch': []}
             first = runner.signature('submission')
             self.assertEqual(first, runner.signature('submission'))

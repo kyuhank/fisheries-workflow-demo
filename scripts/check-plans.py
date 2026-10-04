@@ -9,7 +9,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from workflow.engine import Workflow
+from tests.coordinator_fixtures import CoordinatorWorkflow as Workflow
 
 
 async def scenarios(directory):
@@ -26,12 +26,12 @@ async def scenarios(directory):
     save('Only CPUE summary and its inputs exist')
     await runner.run()
     save('Complete workflow')
-    runner.configure({'mortality_2': .35, 'min_hooks_a': 1200})
+    runner.configure({'growth_rate_2': .35, 'min_hooks_a': 1200})
     save('Two independent settings changed')
     await runner.run('cpue_a', scope='job')
     save('CPUE updated; existing descendants need an update')
     await runner.run('assessment_a2', scope='job')
-    save('Only one revised mortality fit completed')
+    save('Only one revised growth fit completed')
     return cases
 
 

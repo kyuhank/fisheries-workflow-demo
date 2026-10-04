@@ -2,69 +2,54 @@
 
 | File | Responsibility |
 | --- | --- |
-| `workflow/spec.py` | Jobs, owners, dependencies and parallel groups. |
-| `jobs/<job_id>/run.py` | The selected job's calculation and input selection. |
-| `jobs/<job_id>/README.md` | Its incoming artifacts, settings, outputs and connected jobs. |
-| `workflow/models.py` | The example analyses. |
-| `scripts/generate-data.py` | Synthetic catch history and fishing observations. |
-| `workflow/mse.py` | Assessment-conditioned stocks, management trials and their comparison. |
-| `workflow/engine.py` | Execution, input checks, saved results and run records. |
-| `app/diagram.json` | Diagram nodes, positions and connections. |
-| `app/app.js` | Controls, progress and workflow views. |
+| `workflow/spec.py` | Jobs, responsible analysts, dependencies and parallel groups. |
+| `jobs/<job_id>/run.R` | The selected job's R entry point. |
+| `jobs/<job_id>/README.md` | Inputs, settings, outputs and connected jobs. |
+| `workflow/r/` | Shared GLM, RTMB surplus-production and management-trial functions. |
+| `jobs/*_report/report.qmd` | Three concise Quarto reports rendered from saved results. |
+| `scripts/generate-data.R` | Declared synthetic catch history and observations. |
+| `workflow/engine.py` | Coordination, SQLite/file adapters and execution records. |
+| `workflow/r_bridge.py` | Container guard and Rscript job interface. |
+| `app/diagram.json` | The same job graph shown as a dependency diagram. |
 
-1. Add a job in `workflow/spec.py`: give it a name, one owner role and its input jobs.
-   List parents before children in `JOBS`. Include the job in `STAGES`, in a group
-   after its parents; independent jobs can share a group.
-2. Create `jobs/<job_id>/run.py` with an async `calculate(workflow, run_id)`
-   function. `Workflow.calculate()` imports that entry point for the selected job.
-   Keep reusable model functions in `workflow/models.py` or a separate shared
-   module, and call them from the job's entry point. Add a concise folder guide.
-3. Record every setting and code file that can change the result in
-   `job_settings()` and `code_record()`.
-4. Check input names, units and coverage before calculating. Return an error if
-   the input is unsuitable.
-5. Add its node and input connections to `app/diagram.json`. The page build checks
-   that the diagram matches the workflow.
-6. Add a small check using fixed, shareable data. Run `make check` before adopting
-   the revised version.
+## Add a job
 
-Run `make html` to build the website in `docs/index.html` and the self-contained
-download in `docs/offline.html`. This also reruns the default synthetic example
-to generate the saved reports. Edit interface sources in `app/`; `docs/` is generated.
-The website loads its `runtime-*.json` file only
-when Offline run is selected. The calculation must work
-with the packages available in the preserved browser runtime. Other software can
-be run through the Python/container interface instead.
+1. Define its inputs, analyst and stage in `workflow/spec.py`, placing parents before children.
+2. Create `jobs/<job_id>/run.R` with `calculate(context)`. Select named inputs from `context$parents` and return a named result list. Reusable R functions belong in `workflow/r/`.
+3. Record settings and contributing files in `job_settings()` and `code_record()`. Check input names, units and coverage before fitting.
+4. Add the node and connections to `app/diagram.json`; the build verifies these against the calculation graph. Write a concise job guide.
+5. Check the change inside the declared container. Edit page sources in `app/`; `docs/` is generated from accepted source and saved calculations.
 
-The hosted container runs independent jobs in separate processes and waits for the
-whole peer group before its dependent stages advance. Independent reporting can
-continue during an assessment file handover. The offline browser uses one Python
-worker with the same barriers. Define peer groups and file-transfer boundaries
-in `workflow/spec.py`; calculation input dependencies remain separate. An operational
-orchestration service could submit the same dependency graph to approved HPC and
-provide shared access to authorised colleagues. Access controls, resource requests,
-storage and recovery must be implemented for that setting. Confidential data
-should not be embedded in a public HTML file.
+The hosted coordinator runs independent jobs in separate container processes and
+waits for required peer outputs before later stages advance. The orchestration
+view groups these jobs by task; the diagram maps their required inputs. Both
+views describe the same execution.
 
-The **MSE catch buffer** control maps to `mse_buffer` in `workflow/spec.py` defaults
-and downloaded `settings.json`. Only `mse_buffered` records that value as its
-`buffer` setting. `workflow/mse.py:simulate()` applies it and preserves it in the
-MP output and comparison. Allowed choices are 0.6, 0.8 and 1.0; the annual advice
-change limit stays at 0.15. Older settings files without the control use 0.8.
-The UI, cloud planner and hosted request allowlist must agree with the Python
-settings validation; redeploy `paper-api` when that allowlist changes.
+## Separate analyst repositories
 
-To revise the synthetic data, edit `scripts/generate-data.py` and run
-`python3 scripts/generate-data.py` before `make html`. This refreshes local data
-and their recorded checksums. A hosted copy must load the same revision into
-PostgreSQL.
+The demo keeps all jobs in one repository to make inspection and downloads easy.
+An assessment programme could maintain each analyst's task in its own repository.
+The coordinator would retrieve the selected source version for each job and pass
+identified outputs between repositories. Analysts would agree on input products,
+units, years and checks. Records would retain the contributing source versions,
+container digests and upstream runs. Repository separation alone does not supply
+these connections or the programme's access controls.
 
-To change **Prepare MSE**, edit `prepare()` and `ASSUMPTIONS` in `workflow/mse.py`.
-`CASES` selects the four fitted assessment inputs; `prepare()` reconstructs their
-future starting numbers and derives reference catches and indices from the last
-three years. `ASSUMPTIONS` defines the seed, horizon, trial count, recruitment
-scenarios and observation errors. Fixed biology is in `workflow/age_model.py`.
-These common trial conditions are separate from the Buffered rule's catch
-fraction of its stepped catch target, so changing that fraction retains the prepared operating models and
-the other MPs. Adapting the common assumptions requires rerunning preparation
-and all management trials.
+## Change the example
+
+The growth control maps to `growth_rate_2`; the second assessment cases record
+this fixed `r` value. Changing it invalidates those fits and their descendants.
+The MSE buffer maps to `mse_buffer`; only the Buffered rule uses it. A buffer
+revision retains the prepared cases, common errors and other rules. The summary
+checks that every rule uses the same operating models, assumptions and recorded
+random streams before producing a comparison.
+
+Generate synthetic data with `scripts/generate-data.R` inside the pinned image,
+then use `scripts/import-r-data.py` to store its JSON as SQLite and a submission.
+Preserve the JSON, generating source, seed and scenario. A hosted PostgreSQL copy
+must use those same generated observations and annual catches.
+
+The container includes all required R packages and Quarto. If requirements change,
+build and check a new image version before updating the immutable digest in the
+workflow. No new analysis runs in the browser; the downloaded HTML is a saved
+result reader. Code, inputs and results remain separate from the software image.

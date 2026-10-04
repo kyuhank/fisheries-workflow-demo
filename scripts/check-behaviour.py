@@ -25,10 +25,12 @@ def main():
     if not result.wasSuccessful():
         raise SystemExit(1)
     files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('tests/*.py'), *ROOT.glob('cloud/*.py'),
-             *(path for path in (ROOT/'jobs').rglob('*.py') if '__pycache__' not in path.parts)]
+             *ROOT.glob('workflow/r/*.R'), *ROOT.glob('tests/*.R'),
+             *(path for path in (ROOT/'jobs').rglob('*') if path.suffix in ('.R', '.qmd'))]
     record = {
-        'scope': 'Synthetic workflow implementation; no assessment-performance or scientific-validity claim.',
+        'scope': 'Coordinator doubles and source/runtime boundaries. Actual R/RTMB/Quarto integration runs only when PAPER_NATIVE_INTEGRATION=1. Scientific checks have a separate R report.',
         'checks_passed': result.passed,
+        'checks_skipped': [{'test': test.id(), 'reason': reason} for test, reason in result.skipped],
         'source_files': {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in files},
         'comparison_tolerances': {'relative': 1e-6, 'absolute': 1e-9},
     }

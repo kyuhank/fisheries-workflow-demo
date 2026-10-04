@@ -1,4 +1,4 @@
-"""Verify hosted process calculations against the preserved Python results."""
+"""Hosted event/transfer tests with explicit coordinator doubles; no scientific execution."""
 import asyncio
 import json
 import os
@@ -10,6 +10,7 @@ from unittest.mock import patch
 os.environ.setdefault('PAPER_REQUEST_ID', '00000000-0000-4000-8000-000000000001')
 from cloud.run import HostedWorkflow, PARALLEL_JOBS, EventDelivery
 from workflow.engine import Workflow
+from tests.coordinator_fixtures import CoordinatorBridge, test_report
 from workflow.spec import SPEC, STAGES
 from verify import compare
 
@@ -19,8 +20,9 @@ class HostedProcessesTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             runner = object.__new__(HostedWorkflow)
             Workflow.__init__(runner, directory, notify=runner.publish,
-                              manual_transfer=runner.handover)
-            runner.hosted_data = Workflow(directory).source_rows()
+                              manual_transfer=runner.handover, r_bridge=CoordinatorBridge())
+            runner.hosted_data = {'sets': [], 'catch': []}
+            runner.calculate = Workflow.calculate.__get__(runner)
             runner.pool, runner.transfer_count, runner.delivery = None, 0, EventDelivery()
             delivered, confirmed = [], set()
 
@@ -39,7 +41,9 @@ class HostedProcessesTest(unittest.TestCase):
                     confirmed.add(boundary)
                 return {'transfer_count': len(confirmed), 'connected': False}
 
-            with patch('cloud.run.api', side_effect=api), patch('builtins.print'):
+            with patch('cloud.run.api', side_effect=api), patch('builtins.print'), \
+                 patch('workflow.engine.reports.output_page', return_value='TEST DOUBLE'), \
+                 patch('workflow.engine.render_report', side_effect=test_report):
                 full = asyncio.run(runner.run())
                 retained = {key: runner.records[key].copy() for key in
                             ['cpue_b', 'prepare_b', 'assessment_b1', 'assessment_b2']}
@@ -79,27 +83,6 @@ class HostedProcessesTest(unittest.TestCase):
                 if completed and set(job['parents']).intersection(group) and (key, 'running') in positions:
                     self.assertLess(max(completed), positions[(key, 'running')])
 
-    def test_process_outputs_match_python(self):
-        with tempfile.TemporaryDirectory() as directory:
-            baseline = Workflow(Path(directory) / 'baseline')
-            asyncio.run(baseline.run())
-            hosted = object.__new__(HostedWorkflow)
-            Workflow.__init__(hosted, baseline.directory)
-            hosted.pool = None
-
-            async def exercise():
-                for stage in STAGES:
-                    keys = [key for key in stage if key in PARALLEL_JOBS]
-                    results = await asyncio.gather(
-                        *(hosted.calculate(key, 'Process check') for key in keys))
-                    for key, result in zip(keys, results):
-                        compare(baseline.output(key), result, key)
-
-            try:
-                asyncio.run(exercise())
-            finally:
-                if hosted.pool:
-                    hosted.pool.shutdown(wait=True, cancel_futures=True)
 
 
 if __name__ == '__main__':

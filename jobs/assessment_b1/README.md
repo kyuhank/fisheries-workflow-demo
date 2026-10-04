@@ -1,33 +1,36 @@
 # Assessment B1 (`assessment_b1`)
 
-Fit the illustrative age-structured assessment to index B and annual catches with mortality setting 1. Preserve the fitted series and catch-reproduction diagnostics.
+Fit the toy Schaefer model to index B with fixed intrinsic growth r = 0.25 and initial biomass equal to K. RTMB estimates one log(K) parameter; catchability q is profiled.
 
-Owner: Assessment analyst.
+Owner: Assessment analyst. The readable entrypoint is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
 
 ## Inputs and settings
 
 Declared upstream jobs: [Prepare inputs B (`prepare_b`)](../prepare_b/README.md)
 
-Incoming artifacts: `runs/prepare_b/output.json`: joined index and catch `rows`.
+Incoming artifacts: Joined index and catch `rows` in `runs/prepare_b/output.json`.
 
-Saved settings: Fixed natural mortality 0.20 is saved as `M`. Every job also preserves snapshot lineage separately; `mse` controls which jobs are in the active graph.
+Saved settings: Fixed `r = 0.25`. Snapshot lineage is preserved separately; `mse` controls the active graph.
 
-## Run
+Biomass is reported as B/K and catches in tonnes. Growth and initial depletion are fixed sensitivity assumptions; convergence does not establish real-stock validity or uncertainty.
+The result records feasibility, biomass recurrence balance, objective gradient and the projected gradient at a parameter bound. Balance uses the supplied catches; it is not an independent catch fit.
 
-From the repository root:
+## Run in the container
+
+Inside the declared container, from the repository root:
 
 ```sh
 python3 run.py --from assessment_b1 --scope job
 ```
 
-This selects the job and refreshes required upstream inputs when needed. `--output DIR` replaces the default `runs` directory; `--settings FILE` overrides current settings with values from a JSON file.
+The coordinator and R run inside the declared R/RTMB/Quarto container; the coordinator refreshes required inputs before calling the job. The run record identifies the actual image and versions. `--output DIR` changes the default `runs` directory; `--settings FILE` supplies JSON setting overrides.
 
 ## Outputs and downstream jobs
 
-- `runs/assessment_b1/output.json`: the fitted series, parameters and diagnostics.
-- `runs/assessment_b1/report.html`: the page produced by the shared [report renderer](../../workflow/reports.py).
-- `runs/assessment_b1/record.json`: run identity, settings, input lineage and artifact checksums.
+- `runs/assessment_b1/output.json`: the R calculation result.
+- `runs/assessment_b1/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/assessment_b1/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These paths are generated run artifacts. Declared downstream jobs: [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md)
+These are generated run artifacts. Declared downstream jobs: [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/record.json).

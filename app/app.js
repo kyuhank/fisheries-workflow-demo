@@ -1,13 +1,6 @@
 const payload = JSON.parse(document.getElementById("demo-payload").textContent);
 const $ = (id) => document.getElementById(id);
-const worker = new Worker(
-  URL.createObjectURL(
-    new Blob([$("worker-source").textContent], { type: "text/javascript" }),
-  ),
-);
-const pending = new Map();
-let sequence = 0,
-  planVersion = 0,
+let planVersion = 0,
   jobs = payload.jobs,
   records = {},
   states = {},
@@ -22,7 +15,8 @@ let selected = "submission",
   selectedTask = "data";
 let mode = "cloud";
 const modeStates = {};
-let offlineReady = false, cloudReady = false, offlineInit = null;
+let cloudReady = false, unresolvedLive = false;
+let liveExecutionLink = "";
 let completedRun = null, modeVersion = 0;
 let correctionPending = false;
 let activities = {}, dispatchPending = false;
@@ -44,14 +38,6 @@ function jobLabel(key) {
 }
 const messages = [];
 
-function localCall(type, data = {}) {
-  return new Promise((resolve, reject) => {
-    const id = ++sequence;
-    pending.set(id, { resolve, reject });
-    worker.postMessage({ id, type, payload: data });
-  });
-}
-
 const cloud = new CloudRun(
   payload.cloud,
   jobs,
@@ -61,79 +47,26 @@ const cloud = new CloudRun(
     if (id) {
       $("github-run").href = "https://github.com/" + payload.cloud.repository +
         "/actions/runs/" + id;
-      $("github-run").hidden = false;
+      liveExecutionLink = $("github-run").href;
+      $("github-run").hidden = mode !== "cloud";
     }
   },
 );
 function call(type, data = {}) {
-  return mode === "cloud" ? cloud.call(type, data) : localCall(type, data);
-}
-async function initialiseOffline() {
-  if (!offlineInit) {
-    offlineInit = loadOfflineRuntime()
-      .then(() => {
-        offlineLoading("Starting Python with the supplied code and data.");
-        return localCall("init", { runtime: payload.runtime, files: payload.files });
-      })
-      .then((result) => {
-        offlineReady = true;
-        return result;
-      })
-      .catch((error) => {
-        offlineInit = null;
-        throw error;
-      });
-  }
-  return offlineInit;
-}
-
-function offlineLoading(message) {
-  if (mode === "live" && !ready) status("running", "Preparing Offline run", message);
-}
-
-async function loadOfflineRuntime() {
-  if (payload.runtime) return;
-  const controller = new AbortController();
-  let timeout;
-  const watch = () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => controller.abort(), 20000);
-  };
-  watch();
-  try {
-    offlineLoading("Downloading Python once for this tab. Save the offline demo for use without internet.");
-    const response = await fetch(new URL(payload.runtimeUrl, location.href), {
-      signal: controller.signal,
+  if (mode !== "cloud") throw Error("Choose Live run for a new container execution.");
+  if (unresolvedLive && ["run", "reset"].includes(type)) {
+    throw Object.assign(Error("The previous live run has an unresolved outcome."), {
+      executionUnknown: true,
     });
-    if (!response.ok) throw Error("The offline runtime could not be downloaded. Try again when connected.");
-    const reader = response.body.getReader(), decoder = new TextDecoder();
-    const parts = [];
-    let received = 0;
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      received += value.byteLength;
-      parts.push(decoder.decode(value, { stream: true }));
-      watch();
-      offlineLoading(`Downloading Python · ${(received / 1e6).toFixed(1)} / ${(payload.runtimeBytes / 1e6).toFixed(1)} MB`);
-    }
-    parts.push(decoder.decode());
-    payload.runtime = JSON.parse(parts.join(""));
-  } catch (error) {
-    if (controller.signal.aborted) {
-      throw Error("The offline download stopped responding. Retry when connected, or open the downloaded offline demo.");
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeout);
   }
+  return cloud.call(type, data);
 }
 
 function settings() {
   return {
     last_year: Number($("snapshot").value),
     min_hooks_a: Number($("filter").value),
-    mortality_2: Number($("mortality").value),
+    growth_rate_2: Number($("growth-rate").value),
     mse_buffer: Number($("mse-buffer").value),
     mse: true,
   };
@@ -153,10 +86,10 @@ function settingsChanges() {
     changes.push({ start: "cpue_a", message: "CPUE A record selection changed" });
   }
   const assessment = ["assessment_a2", "assessment_b2"].find((key) =>
-    records[key] && records[key].settings.M !== current.mortality_2
+    records[key] && records[key].settings.r !== current.growth_rate_2
   );
   if (assessment) {
-    changes.push({ start: assessment, message: "Assessment mortality setting changed" });
+    changes.push({ start: assessment, message: "Assessment growth rate changed" });
   }
   if (records.mse_buffered &&
       (records.mse_buffered.settings.buffer ?? 0.8) !== current.mse_buffer) {
@@ -167,7 +100,7 @@ function settingsChanges() {
 
 function currentStart() {
   // Reverting settings restores the reader's explicit job selection. The planner
-  // still adds every changed or missing input, including the other mortality fit.
+  // still adds every changed or missing input, including the other growth-rate fit.
   return settingsIntent && mode !== "saved"
     ? settingsChanges()[0]?.start || selected
     : selected;
@@ -185,7 +118,7 @@ function runStates(run, state) {
 }
 
 function status(kind, title, message) {
-  $("offline-fallback").hidden = true;
+  $("saved-fallback").hidden = true;
   $("retry-connection").hidden = true;
   $("status").className = "status " + kind;
   $("status-title").textContent = title;
@@ -1121,7 +1054,7 @@ function render() {
     ? "These connections show which files each analyst needs across separate workspaces. Transfers require confirmation."
     : "This view represents separate workspaces without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
   renderViewGuide();
-  for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
+  for (const id of ["snapshot", "filter", "growth-rate", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
   }
   $("selection-label").textContent = mode === "saved" || executionScope === "job" ? "Selected job" : "Start from";
@@ -1183,14 +1116,17 @@ function showError(error) {
   dispatchPending = false;
   waitingTransfer = null;
   confirmingTransfer = false;
-  if (error.executionUnknown && mode === "cloud") ready = false;
+  if (error.executionUnknown && mode === "cloud") {
+    ready = false;
+    unresolvedLive = true;
+  }
   status("failed", error.executionUnknown ? "Live run status unavailable" : "The analysis stopped",
     error.executionUnknown
       ? "The live run may still be active. " +
         ($("github-run").hidden ? "" : "Open Execution to check it. ") +
-        "Choose Offline run, then press Run to start a separate analysis."
+        "Keep this page open. Check the execution before starting another run. You can inspect the saved example meanwhile."
       : String(error));
-  $("offline-fallback").hidden = mode !== "cloud";
+  $("saved-fallback").hidden = mode !== "cloud";
   render();
 }
 
@@ -1218,6 +1154,7 @@ function handleEvent(event) {
     states = busy ? runStates(plan.run, "waiting") : {};
     $("run-id").textContent = "";
     $("github-run").hidden = true;
+    liveExecutionLink = "";
     log({ message: "Temporary live results expired. Missing inputs will be rebuilt." });
     status("running", "Renewing the live session",
       "Your selected job and settings are kept. Expired inputs must be rebuilt.");
@@ -1297,27 +1234,6 @@ function handleEvent(event) {
   }
   render();
 }
-worker.onmessage = ({ data }) => {
-  if (data.type === "event") {
-    if (mode === "live") handleEvent(data.event);
-    return;
-  }
-  const request = pending.get(data.id);
-  if (!request) return;
-  pending.delete(data.id);
-  if (data.type === "error") request.reject(new Error(data.error));
-  else request.resolve(data.value);
-};
-worker.onerror = (event) => {
-  offlineReady = false;
-  for (const task of pending.values()) task.reject(new Error(event.message));
-  pending.clear();
-  if (mode === "live") {
-    ready = false;
-    showError(event.message);
-  }
-};
-
 $("run").onclick = async () => {
   if (!canRequestRun() || !plan || $("run").disabled) return;
   const start = currentStart(), runSettings = settings();
@@ -1369,7 +1285,7 @@ $("run").onclick = async () => {
   }
 };
 $("run-workflow").onclick = () => runFromJob(plan?.changed[0] || "submission", "workflow");
-for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
+for (const id of ["snapshot", "filter", "growth-rate", "mse-buffer"]) {
   $(id).onchange = () => {
     settingsIntent = true;
     executionScope = "workflow";
@@ -1424,10 +1340,12 @@ $("reset").onclick = async () => {
     records = result.records;
     states = {};
     latestRun = "";
+    liveExecutionLink = "";
+    $("github-run").hidden = true;
     selected = "submission";
     $("snapshot").value = "2023";
     $("filter").value = "0";
-    $("mortality").value = "0.30";
+    $("growth-rate").value = "0.30";
     $("mse-buffer").value = "0.8";
     $("run-id").textContent = "";
     messages.length = 0;
@@ -1658,31 +1576,22 @@ $("save-output").onclick = () =>
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"
-    ? "New results on GitHub · Docker."
-    : mode === "live"
-    ? payload.runtime
-      ? "New results here, without internet."
-      : "Download Python once; then run here."
-    : "Saved results; does not run code.";
+    ? "New results in the recorded container on GitHub."
+    : "Saved container results; does not run code.";
 }
 
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
+  if (!["cloud", "saved"].includes(next)) throw Error("Choose Live run or View example.");
+  if (location.protocol === "file:" && next === "cloud") next = "saved";
   const version = ++modeVersion;
   ++planVersion;
-  const selection = { settings: settings(), selected, settingsIntent, executionScope, handover: $("handover").value };
+  const selection = { selected, executionScope };
   $("mode-notice").hidden = !fallbackReason;
   if (fallbackReason) $("mode-notice-message").textContent =
-    fallbackReason + " Preparing Python for analysis in this browser.";
+    fallbackReason + " The saved example is available. No new analysis has started.";
   modeStates[mode] = {
-    records,
-    states,
-    latestRun,
-    selected,
-    executionScope,
-    settingsIntent,
-    completedRun,
-    messages: [...messages],
-    settings: settings(),
+    records, states, latestRun, selected, executionScope, settingsIntent,
+    completedRun, messages: [...messages], settings: settings(),
     handover: $("handover").value,
   };
   mode = next;
@@ -1694,69 +1603,52 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   activities = {};
   dispatchPending = false;
   $("mode").value = mode;
-  $("github-run").hidden = true;
+  $("github-run").hidden = mode !== "cloud" || !liveExecutionLink;
+  if (liveExecutionLink) $("github-run").href = liveExecutionLink;
   const saved = modeStates[mode];
   records = saved?.records || {};
   states = saved?.states || {};
   latestRun = saved?.latestRun || "";
-  selected = saved?.selected || "submission";
-  executionScope = saved?.executionScope || "workflow";
+  selected = preserveSelection ? selection.selected : saved?.selected || "submission";
+  executionScope = preserveSelection ? selection.executionScope : saved?.executionScope || "workflow";
   settingsIntent = saved?.settingsIntent || false;
   $("handover").value = saved?.handover || "connected";
   completedRun = saved?.completedRun || null;
   messages.splice(0, messages.length, ...(saved?.messages || []));
   $("execution-log").textContent = messages.join("\n") || "No execution yet.";
-  if (saved?.settings) {
-    $("snapshot").value = saved.settings.last_year;
-    $("filter").value = saved.settings.min_hooks_a;
-    $("mortality").value = Number(saved.settings.mortality_2).toFixed(2);
-    $("mse-buffer").value = saved.settings.mse_buffer ?? 0.8;
-  }
-  if (preserveSelection) {
-    selected = selection.selected;
-    executionScope = selection.executionScope;
-    settingsIntent = selection.settingsIntent;
-    $("handover").value = selection.handover;
-    $("snapshot").value = selection.settings.last_year;
-    $("filter").value = selection.settings.min_hooks_a;
-    $("mortality").value = Number(selection.settings.mortality_2).toFixed(2);
-    $("mse-buffer").value = selection.settings.mse_buffer ?? 0.8;
+  const values = mode === "saved" ? payload.saved.settings : saved?.settings;
+  if (values) {
+    $("snapshot").value = values.last_year;
+    $("filter").value = values.min_hooks_a;
+    $("growth-rate").value = Number(values.growth_rate_2).toFixed(2);
+    $("mse-buffer").value = values.mse_buffer ?? 0.8;
   }
   if (mode === "saved") {
     records = payload.saved.records;
-    $("snapshot").value = payload.saved.settings.last_year;
-    $("filter").value = payload.saved.settings.min_hooks_a;
-    $("mortality").value = Number(payload.saved.settings.mortality_2).toFixed(2);
-    $("mse-buffer").value = payload.saved.settings.mse_buffer ?? 0.8;
     states = Object.fromEntries(jobs.map((job) => [job.key, "complete"]));
     latestRun = "Saved example";
     messages.length = 0;
     payload.saved.events.forEach(log);
-    status(
-      "",
-      "Saved results",
-      "Open a job’s output, or choose a run mode to recalculate.",
-    );
+    status("", "Saved results", location.protocol === "file:"
+      ? "Browse the saved reports and records without internet. Open the website for a new container run."
+      : "Open a job’s report and record, or choose Live run for a new container execution.");
+  } else if (unresolvedLive) {
+    showError(Object.assign(Error("The previous live run has an unresolved outcome."), {
+      executionUnknown: true,
+    }));
   } else {
-    status(
-      "running",
-      mode === "cloud"
-        ? "Connecting to the live run"
-        : "Preparing Offline run",
-      mode === "cloud"
-        ? "Checking the live service. If it is unavailable, Offline run opens automatically."
-        : "Preparing the supplied Python code and data.",
-    );
-    $("offline-fallback").hidden = mode !== "cloud";
-    const slowConnection = mode === "cloud" ? setTimeout(() => {
+    status("running", "Connecting to the live run",
+      "Checking the live service. The saved example opens if the service is unavailable.");
+    $("saved-fallback").hidden = false;
+    const slowConnection = setTimeout(() => {
       if (version !== modeVersion || ready) return;
       status("running", "Waiting for the live service",
-        "Checking briefly before switching to Offline run. No analysis has started.");
-      $("offline-fallback").hidden = false;
-    }, 3000) : null;
+        "No analysis has started. You can inspect the saved example while waiting.");
+      $("saved-fallback").hidden = false;
+    }, 3000);
     render();
     try {
-      if (mode === "cloud" && !cloudReady) {
+      if (!cloudReady) {
         const result = await cloud.initialise();
         cloudReady = true;
         if (version !== modeVersion) return;
@@ -1765,43 +1657,18 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
         latestRun = "";
         completedRun = null;
       }
-      if (mode === "live" && !offlineReady) {
-        const result = await initialiseOffline();
-        if (version !== modeVersion) return;
-        records = result.records;
-      }
       if (version !== modeVersion) return;
-      ready = mode === "cloud" ? cloudReady : offlineReady;
+      ready = true;
       explainMode();
-      if (fallbackReason) $("mode-notice-message").textContent =
-        fallbackReason + " Use Run to calculate in this browser. No analysis has started automatically.";
-      status(
-        "",
-        Object.keys(records).length ? "Your results are still here" : "Ready to run",
-        mode === "cloud"
-          ? "No login needed. Run the workflow, then change a setting to compare updated and reused results."
-          : "Run the workflow here, then change a setting to compare updated and reused results.",
-      );
+      status("", Object.keys(records).length ? "Your results are still here" : "Ready to run",
+        "No login needed. Each run uses the recorded container. Change a setting to compare updated and reused results.");
       await refreshPlan();
     } catch (error) {
       if (version !== modeVersion) return;
-      if (mode === "cloud") {
-        const reason = /8 seconds/.test(error.message)
-          ? "The live service did not respond."
-          : "The live service is unavailable.";
-        await activateMode("live", { fallbackReason: reason, preserveSelection: true });
-        return;
-      }
-      ready = false;
-      if (fallbackReason) $("mode-notice-message").textContent =
-        fallbackReason + " Offline run could not load. Retry below or choose View example.";
-      status(
-        "failed",
-        "Offline run could not start",
-        error.message + " You can still choose View example to inspect the saved results.",
-      );
-      $("retry-connection").textContent = "Try Offline run again";
-      $("retry-connection").hidden = false;
+      const reason = /8 seconds/.test(error.message)
+        ? "The live service did not respond." : "The live service is unavailable.";
+      await activateMode("saved", { fallbackReason: reason, preserveSelection: true });
+      return;
     } finally {
       clearTimeout(slowConnection);
     }
@@ -1809,16 +1676,14 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   $("run-id").textContent = latestRun;
   $("execution-note").textContent = mode === "cloud"
     ? "Live results expire after 10 minutes. Download this run to keep them."
-    : mode === "live"
-    ? "Results stay in this tab. Download this run to keep them."
-    : "Example outputs are included in this HTML file.";
+    : "Saved container outputs are included in this HTML file. New runs use the live website.";
   render();
 }
 $("mode").onchange = () => activateMode($("mode").value);
 $("dismiss-mode-notice").onclick = () => { $("mode-notice").hidden = true; };
-$("offline-fallback").onclick = () => activateMode("live");
-$("retry-connection").onclick = () => activateMode(mode);
-if (!payload.runtimeUrl) $("offline-download").hidden = true;
+$("saved-fallback").onclick = () => activateMode("saved", { preserveSelection: true });
+$("retry-connection").onclick = () => activateMode("cloud");
+if (location.protocol === "file:") $("mode").querySelector('[value="cloud"]').disabled = true;
 render();
 showLinkedTab();
-activateMode("cloud");
+activateMode(location.protocol === "file:" ? "saved" : "cloud");

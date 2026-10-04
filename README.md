@@ -13,8 +13,7 @@ for a real fishery.
 
 | Mode | What happens |
 | --- | --- |
-| **Live run** | GitHub Actions runs Python in the recorded Docker image, using synthetic records from PostgreSQL. No login is needed. |
-| **Offline run** | The same Python analysis runs in your browser. The downloaded HTML includes Python and the data. |
+| **Live run** | GitHub Actions runs the R jobs inside the recorded Docker image, using synthetic records from PostgreSQL. No login is needed. |
 | **View example** | Open saved outputs and records without running code. |
 
 The **Workflow diagram** shows the analytical connections: each job receives
@@ -22,7 +21,7 @@ inputs from the jobs connected to it. **Orchestration tool** organises these sam
 jobs by task, with example analyst roles, progress and execution records. Switch
 between the views to follow the same execution.
 
-Run the workflow once, then change **CPUE A records**, **Mortality setting 2** or
+Run the workflow once, then change **CPUE A records**, **Growth-rate setting 2** or
 **MSE catch buffer**. Use **Update workflow** to update affected jobs; unchanged
 results keep their original records. **Orchestration tool** groups numbered jobs
 under **Tasks**. Click a job to open its output. Its **Run** action runs that job,
@@ -32,7 +31,7 @@ place; use **Update workflow** to update jobs that depend on the revised output.
 **Record** shows saved inputs and versions, with **Reproduce & compare** to check a result.
 
 MSE compares three catch rules using the four fitted assessment cases. A scenario
-with reduced recruitment followed by recovery shows how observed indices, catch
+with reduced growth followed by recovery shows how observed indices, catch
 decisions and stock changes interact. The Buffered rule uses index thresholds and
 a catch buffer, with advice changes limited to 15% per year. Changing the buffer
 updates that rule, the MSE summary and the report when **Update workflow** is used.
@@ -42,10 +41,7 @@ Click **Confirm file transfer** to release waiting analyses. Independent work,
 such as CPUE or assessment reporting, continues while a transfer is pending. No file upload is
 required.
 
-If the live service cannot connect, a notice explains the switch to **Offline
-run**. Press **Run** to start. For use without internet access, download
-`fisheries-workflow.html` from a release; saving the website page alone does not
-include Python.
+If the live service cannot connect, a notice offers **View example**. For use without internet access, download `fisheries-workflow.html` from a release. This portable reader displays saved results and records; new calculations require the container.
 
 **Download this run** saves its code, data, settings and outputs. Live results
 expire after ten minutes of inactivity; the next run can rebuild missing inputs.
@@ -56,7 +52,7 @@ run, it checks the selected output; other saved results keep their original reco
 ## Explore the jobs
 
 Open [jobs/](jobs/README.md) to follow the 22 jobs in execution order. Each folder
-contains its actual calculation entry point and a short guide to its inputs,
+contains its actual R calculation entry point and a short guide to its inputs,
 settings, outputs and connected jobs. For example,
 [CPUE A](jobs/cpue_a/README.md) reads the extracted observations, produces an
 index and supplies [assessment preparation A](jobs/prepare_a/README.md).
@@ -68,24 +64,23 @@ these jobs in separate repositories. The
 [repository guide](jobs/README.md#separate-repositories) explains how a shared
 orchestration service would connect their versioned inputs and outputs.
 
-## Run locally
+## Repeat a run with Docker
 
-Use Python 3.12 or later; no extra Python packages are required.
+All new calculations run inside the preserved Linux AMD64 container. It supplies
+R, RTMB, Quarto and the required packages. The Python coordinator schedules jobs,
+checks inputs and retains outputs. CPUE uses simple Poisson GLMs; assessment uses
+a small RTMB surplus-production model; management trials use the same prepared
+cases and recorded random errors. Each of the three reports is rendered from QMD.
 
-```bash
-python3 run.py
-python3 run.py --from prepare_a
-python3 run.py --from prepare_a --scope job
-```
+Use **Download this run** and follow its `REPRODUCE.txt`. It gives the exact image
+digest, the pull and run instructions, and a comparison with the saved results.
+Docker on an ARM computer requires AMD64 emulation. After the image has been
+pulled, the downloaded analysis can run without network access.
 
-By default, `--from` also reruns jobs that use the selected job's output.
-With `--scope job`, only the selected job and any missing or outdated upstream
-inputs run.
-
-Open `runs/assessment_report/report.html` or `runs/mse_report/report.html`.
-`make container` runs the preserved Linux AMD64 image in Docker (ARM computers
-require AMD64 emulation), `make check` checks the workflow, and `make html`
-builds the website and offline download.
+For a checkout, `make container` runs the workflow, `make check` checks calculations
+and coordination, and `make html` builds the pages and saved offline reader.
+These targets execute the analysis inside the pinned container. Open
+`runs/assessment_report/report.html` or `runs/mse_report/report.html`.
 
 See [ADAPT.md](ADAPT.md) for the code structure, [cloud/README.md](cloud/README.md)
 for hosting, and [THIRD_PARTY.md](THIRD_PARTY.md) for software sources and licences.

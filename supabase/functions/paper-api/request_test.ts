@@ -3,7 +3,7 @@ import { runScope, runSettings } from "./request.ts";
 const body = {
   start: "submission",
   handover: "connected",
-  settings: { last_year: 2023, min_hooks_a: 0, mortality_2: .3 },
+  settings: { last_year: 2023, min_hooks_a: 0, growth_rate_2: .3 },
 };
 const jobs = ["submission", "mse_report"];
 
@@ -126,7 +126,7 @@ Deno.test("MSE does not open arbitrary jobs or analysis settings", () => {
         ...body,
         settings: { ...body.settings, mse: true, mse_buffer: .8, seed: 3 },
       },
-      { ...body, settings: { ...body.settings, mortality_2: -1 } },
+      { ...body, settings: { ...body.settings, growth_rate_2: -1 } },
       ...[
         true,
         false,

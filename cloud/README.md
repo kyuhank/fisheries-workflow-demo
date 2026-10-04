@@ -6,7 +6,7 @@ is restricted to this repository, with Actions write and Contents read permissio
 no GitHub credential is returned to the visitor.
 
 The standard GitHub runner downloads the image pinned in `live.yml`. The container
-retrieves synthetic observations from PostgreSQL, executes `workflow/`, and saves
+retrieves synthetic observations from PostgreSQL, executes each `jobs/*/run.R` entry point and renders the three QMD reports, and saves
 reports and a portable run bundle. The runner authenticates with GitHub OIDC;
 the API verifies the repository, owner, workflow, branch, event, commit and run.
 A reader's random session capability permits access only to that temporary session.
@@ -27,7 +27,7 @@ The API accepts supplied settings, not arbitrary commands, repositories or queri
 - The service allows three active executions, 20 temporary sessions and 300 runs
   a day. The hosting uses Supabase Free and public standard GitHub runners.
   No paid runner or service upgrade is enabled. Free-service limits or inactivity
-  can make online execution unavailable; the downloaded offline modes remain usable.
+  can make online execution unavailable; the downloaded saved-result reader remains usable.
 
 ## Hosting another copy
 
@@ -41,7 +41,7 @@ This service is specific to the paper repository. For a separate installation:
 4. Register a private GitHub App and install it on that repository only. The owner
    registration page exchanges its one-use manifest code server-side. App keys
    reside in `paper_app`, which is accessible only to the service role.
-5. Test reader isolation, full and partial execution, cleanup and offline use
+5. Test reader isolation, full and partial execution, cleanup and saved-result viewing
    before sharing the new address.
 
 Changing the cloud provider does not require changing the scientific calculations.

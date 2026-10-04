@@ -1,25 +1,26 @@
-# Jobs: inputs, execution and outputs
+# Jobs: R calculations and recorded container runs
 
-The demo has 22 jobs. Each folder contains `run.py`, the calculation entry point
-used by the workflow, and a short README explaining its incoming artifacts,
-settings and outputs. Start with the table below, then follow the input and
-next-job links in a folder guide. The job names are the same as those used by
-the demo's workflow and orchestration views.
+The example has 22 jobs. Each folder contains a short [run.R](cpue_a/run.R)
+entrypoint and a guide to its inputs, settings and outputs. The scientific work
+is R: Poisson GLM CPUE, a one-parameter RTMB Schaefer assessment with fixed growth
+sensitivities, and small seeded closed-loop management trials.
 
 ```text
-jobs/
-  cpue_a/
-    README.md       inputs, settings, outputs and connected jobs
-    run.py          CPUE A calculation
-  prepare_a/
-    README.md       how index A and catch enter assessment preparation
-    run.py          the preparation calculation
-workflow/
-  spec.py           dependency graph, roles and execution groups
-  engine.py         planning, dispatch, saved outputs and execution records
-  models.py         shared CPUE and assessment functions
-  mse.py            shared management-trial functions
+jobs/cpue_a/run.R       readable CPUE A entrypoint
+jobs/assessment_a1/run.R  fixed-growth RTMB fit
+jobs/mse_index/run.R    index-based management trials
+jobs/*/README.md        job inputs, settings, outputs and connected jobs
+jobs/*_report/report.qmd  concise reports rendered by native Quarto
+workflow/r/common.R    row checks, snapshot assembly and input joins
+workflow/r/models.R    GLMs, Schaefer objective and RTMB fitting
+workflow/r/mse.R       paired seeded management trials and comparisons
+workflow/engine.py     coordination, SQLite gates and saved records
 ```
+
+The coordinator plans dependencies, moves artifacts and records execution. It
+runs inside the declared immutable R/RTMB/Quarto container and calls each R entrypoint there.
+No Python scientific fallback or offline browser calculation is used. Saved
+results remain readable without executing the workflow.
 
 ## Follow the jobs
 
@@ -71,38 +72,47 @@ folder guide distinguishes this source artifact from its declared QC dependency.
 
 ## Run a job
 
-From the repository root:
+Inside the declared container, from the repository root:
 
-```bash
+```sh
 python3 run.py --from cpue_a --scope job
 ```
 
-The coordinator prepares any missing or outdated upstream inputs, then calls
-`jobs/cpue_a/run.py`. Each calculation uses the same shared functions as the live
-and offline demo. The job folder therefore uses the surrounding `workflow/`
-package; copying that folder alone is not a standalone installation.
+The coordinator prepares missing or outdated inputs and calls
+`jobs/cpue_a/run.R` in the same container. `--output DIR` selects an output directory;
+`--settings FILE` overrides current settings. Container identity and actual
+R/package versions belong to the run record, so a moving image tag alone is not
+its execution identity.
 
-Outputs are saved by job under the selected output directory:
+The R bridge passes a named `context` containing settings, decoded parent
+results and raw source or genuine SQLite query rows. `calculate(context)` returns
+the result. QC can also return corrected submission rows for the coordinator to
+save. Database storage and SQL extraction use the real SQLite gate; the R jobs
+check and calculate their own results. Report jobs render their saved results
+and records through their concise `report.qmd` templates without refitting.
 
 ```text
-runs/cpue_a/
-  output.json       calculation result
-  report.html       readable result
-  record.json       inputs, settings, code hashes and software used
-runs/state.json     execution state for the whole workflow
+runs/cpue_a/output.json  R result
+runs/cpue_a/report.html  readable result
+runs/cpue_a/record.json  inputs, settings, source hashes and actual container/software
+runs/database/snapshot.sqlite  accepted fixed database snapshot
+runs/state.json         workflow execution state
 ```
 
-The database job also produces `snapshot.sqlite`. Use `--output` to choose another
-directory. Without `--scope job`, the selected job and affected downstream jobs
-are updated. The coordinator records the job's entry point alongside its shared
-code. A change to one job file makes that job's saved result outdated; dependencies
-carry the revision downstream. Shared-code changes affect the jobs using that code.
+Biomass uses B/K, intrinsic growth is fixed in each sensitivity case, and MSE
+fractions are conditional on the declared stocks, scenarios and seeded trials.
+This synthetic example supplies no confidence intervals or real-stock advice.
+Assessment records include objective and projected gradients, boundary status,
+positive-biomass feasibility and the annual biomass balance residual. The balance
+checks the declared recurrence using known catches rather than estimating catches.
+The generating truth and units are declared by
+[scripts/generate-data.R](../scripts/generate-data.R) and the saved data metadata.
 
-[Browse the saved results](https://kyuhank.github.io/fisheries-workflow-demo/example/)
-without running anything, or use **Record** in the
-[interactive demo](https://kyuhank.github.io/fisheries-workflow-demo/) to trace the
-inputs used by a particular result. **Download this run** includes these job folders,
-shared code, data and recorded outputs for reproduction.
+[Browse saved results](https://kyuhank.github.io/fisheries-workflow-demo/example/)
+or use **Record** in the [demo](https://kyuhank.github.io/fisheries-workflow-demo/)
+to inspect an actual result's inputs, R source and container. Downloaded runs
+include the shared R code, job folders, data and records; one copied job folder
+uses these surrounding dependencies.
 
 ## Separate repositories
 

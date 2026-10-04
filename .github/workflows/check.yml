@@ -10,15 +10,21 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Check native execution
-        run: python3 -m unittest discover -s tests -v
-      - name: Check the preserved container
+      - name: Check actual R calculations and Quarto reports in the preserved container
+        env:
+          IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
+          PAPER_RUNTIME_IMAGE_URL: https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow
         run: |
-          docker build -t fisheries-workflow .
-          docker run --rm --network none fisheries-workflow python -m unittest discover -s tests -v
+          docker pull "$IMAGE"
+          docker run --rm --network none \
+            --user "$(id -u):$(id -g)" \
+            --env PAPER_RUNTIME_IMAGE="$IMAGE" --env PAPER_RUNTIME_IMAGE_URL \
+            --env PAPER_NATIVE_INTEGRATION=1 \
+            --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
+            "$IMAGE" sh -c 'Rscript --vanilla tests/test-r-models.R && python3 -m unittest discover -s tests -v'
   server:
     runs-on: ubuntu-latest
     timeout-minutes: 5

@@ -1,12 +1,5 @@
 [
   {
-    "file": "workflow/age_model.py",
-    "sha256": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33",
-    "origin": "https://github.com/kyuhank/cpue-actions-demo",
-    "commit": "5c04eaf748de200cc8f5b60bee7901514f5b1e6a",
-    "original_path": "pipeline/age_model.py"
-  },
-  {
     "file": "workflow/extract.sql",
     "sha256": "808d90dd3057fe794f56b54ec094ebcee0daa741478d2e7d5e030cffd790fa9c",
     "origin": "https://github.com/kyuhank/cpue-demo-extract",
@@ -19,21 +12,5 @@
     "origin": "https://github.com/kyuhank/cpue-demo-extract",
     "commit": "a0716f589325a5576f5b9d97990e3977c17bad36",
     "original_path": "extract-catch.sql"
-  },
-  {
-    "file": "data/fishery.sqlite",
-    "sha256": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
-    "origin": "Generated within this repository",
-    "generator": "scripts/generate-data.py",
-    "scenario": "data/scenario.json",
-    "seed": 20260913
-  },
-  {
-    "file": "data/submission.json",
-    "sha256": "a610844d7e80a607f372b112ed5af87dcd97d66a0dcd35c361beea859bc56590",
-    "origin": "Generated within this repository",
-    "generator": "scripts/generate-data.py",
-    "scenario": "data/scenario.json",
-    "seed": 20260913
   }
 ]

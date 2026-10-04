@@ -1,18 +1,15 @@
-"""Check settings-only reruns offline and at the mocked cloud dispatch boundary.
+"""Check settings, reuse and highlighting at the mocked Live HTTP boundary.
 
-By default test docs/offline.html; --source embeds the current app and Python
-sources into its preserved runtime payload without rebuilding generated files.
-No live service or GitHub execution is contacted.
+All calculations now run in a recorded R container. These cases check UI request
+contracts only; native and hosted checks validate scientific outputs separately.
 """
 import argparse
-import base64
 from copy import deepcopy
 import json
 import os
 from pathlib import Path
 import re
-import tempfile
-from urllib.parse import urlsplit
+import runpy
 
 from playwright.sync_api import sync_playwright
 
@@ -25,12 +22,12 @@ JOBS = [
 ]
 CPUE = ['cpue_a', 'cpue_summary', 'cpue_report', 'prepare_a',
         'assessment_a1', 'assessment_a2', 'assessment_summary', 'assessment_report']
-MORTALITY = ['assessment_a2', 'assessment_b2', 'assessment_summary', 'assessment_report']
+GROWTH = ['assessment_a2', 'assessment_b2', 'assessment_summary', 'assessment_report']
 MSE = ['mse_prepare', 'mse_constant', 'mse_index', 'mse_buffered', 'mse_summary', 'mse_report']
 JOBS += MSE
 CPUE += MSE
-MORTALITY += MSE
-COMBINED = [key for key in JOBS if key in CPUE or key in MORTALITY]
+GROWTH += MSE
+COMBINED = [key for key in JOBS if key in CPUE or key in GROWTH]
 PREPARE_A = ['prepare_a', 'assessment_a1', 'assessment_a2',
              'assessment_summary', 'assessment_report']
 PREPARE_A += MSE
@@ -45,16 +42,11 @@ def preview():
     if not match:
         raise ValueError('docs/offline.html has no preserved demo payload')
     payload = json.loads(match.group(1))
-    for name in payload['files']:
-        source = ROOT / name
-        if source.is_file():
-            payload['files'][name] = base64.b64encode(source.read_bytes()).decode()
     html = (ROOT / 'app/index.html').read_text()
     for key, source in {
         'PAYLOAD': json.dumps(payload, separators=(',', ':')).replace('</', '<\\/'),
         'CSS': (ROOT / 'app/style.css').read_text(),
-        'WORKER': (ROOT / 'app/worker.js').read_text(),
-        'APP': '\n'.join((ROOT / 'app' / name).read_text()
+                'APP': '\n'.join((ROOT / 'app' / name).read_text()
                          for name in ['cloud.js', 'lineage.js', 'app.js', 'record.js']),
     }.items():
         html = html.replace('/*__' + key + '__*/', source)
@@ -176,10 +168,6 @@ def run_and_check(page, start, expected, label):
     assert any(view['pending'] for view in views), label + ': no pending dispatch observed'
     for view in views:
         expect_highlight(page, expected, label + ' executing', view)
-    if label.startswith('offline'):
-        running = {node['key'] for view in views for node in view['nodes']
-                   if node['state'] == 'running'}
-        assert running == set(expected), (label, 'observed running', running)
     for node in page.evaluate('checkedView().nodes'):
         assert node['state'] == ('complete' if node['key'] in expected else 'retained'), (label, node)
     assert f'{len(expected)} jobs completed' in page.locator('#status-message').inner_text()
@@ -188,186 +176,26 @@ def run_and_check(page, start, expected, label):
     return result
 
 
-def offline_checks(page):
-    page.wait_for_function("mode === 'live' && ready", timeout=90000)
-    observe_runs(page)
-    baseline = run_and_check(page, 'submission', JOBS, 'offline full baseline')['records']
-    buffered = page.evaluate("async () => (await call('view', {job: 'mse_buffered'})).output")
-
-    page.locator('#mse-buffer').select_option('0.6')
-    expect_plan(page, 'mse_buffered', BUFFER)
-    page.locator('#mse-buffer').select_option('0.8')
-    expect_plan(page, 'submission', JOBS)
-    assert page.evaluate('plan.changed') == []
-    page.locator('#mse-buffer').select_option('0.6')
-    page.locator('#mode').select_option('saved')
-    assert page.locator('#mse-buffer').input_value() == '0.8'
-    assert page.locator('#mse-buffer').is_disabled()
-    page.locator('#mode').select_option('live')
-    expect_plan(page, 'mse_buffered', BUFFER)
-    assert page.locator('#mse-buffer').input_value() == '0.6'
-    result = run_and_check(page, 'mse_buffered', BUFFER, 'offline dropdown-only MSE buffer')
-    assert result['records']['mse_buffered']['settings'] == {'buffer': .6}
-    assert result['records']['mse_buffered']['inputs']['mse_prepare']['run_id'] == baseline['mse_prepare']['run_id']
-    assert result['records']['mse_summary']['inputs']['mse_constant']['run_id'] == baseline['mse_constant']['run_id']
-
-    # Reproduction must recover the recorded MP setting, even with a different
-    # pending form value and inputs reused from an earlier run.
-    page.locator('#mse-buffer').select_option('1')
-    page.evaluate("() => openOutput('mse_report')")
-    page.locator('[data-output="record"]').click()
-    context = page.evaluate('recordContext()')
-    assert context['settings']['mse_buffer'] == .6
-    assert context['jobs']['mse_constant'] == baseline['mse_constant']
-    assert context['jobs']['mse_prepare'] == baseline['mse_prepare']
-    assert page.evaluate("""() => recordedSettings(
-      {mse_buffered: {settings: {}}}, {mse_buffer: .6}).mse_buffer""") == .8
-    page.locator('#reproduce-job').click()
-    page.wait_for_function("document.querySelector('.record-comparison') || (!busy && document.querySelector('#status').classList.contains('failed'))", timeout=90000)
-    assert page.locator('.record-comparison strong').inner_text() == 'Reproduced · output agrees'
-    assert page.locator('#mse-buffer').input_value() == '0.6'
-    assert page.evaluate('currentOutput.comparison.changed_materials') == []
-    assert page.evaluate('currentOutput.output.rules.buffered.settings.buffer') == .6
-    page.locator('#output-close').click()
-    for value in ('1', '0.8'):
-        page.locator('#mse-buffer').select_option(value)
-        run_and_check(page, 'mse_buffered', BUFFER, f'offline MSE buffer {value}')
-    restored = page.evaluate("async () => (await call('view', {job: 'mse_buffered'})).output")
-    assert restored == buffered
-    print('PASS: MSE setting reversion, saved/live restoration, exact retained lineage and real reproduction', flush=True)
-
-    # The controls alone must override the previous full-workflow starting job.
-    page.locator('#filter').select_option('1200')
-    result = run_and_check(page, 'cpue_a', CPUE, 'offline dropdown-only CPUE')
-    assert result['records']['cpue_a']['settings']['min_hooks'] == 1200
-    expect_plan(page, 'cpue_a', CPUE)
-
-    page.locator('#mortality').select_option('0.35')
-    result = run_and_check(page, 'assessment_a2', MORTALITY, 'offline dropdown-only mortality')
-    for key in ['assessment_a2', 'assessment_b2']:
-        assert result['records'][key]['settings']['M'] == 0.35
-    # The next executable plan has only A2; the completed diagram must retain B2.
-    expect_plan(page, 'assessment_a2', [key for key in MORTALITY if key != 'assessment_b2'])
-    expect_highlight(page, MORTALITY, 'completed mortality after next-plan refresh')
-    page.locator('#mode').select_option('saved')
-    page.locator('#mode').select_option('live')
-    expect_plan(page, 'assessment_a2', [key for key in MORTALITY if key != 'assessment_b2'])
-    expect_highlight(page, MORTALITY, 'completed mortality after mode restoration')
-
-    page.locator('#filter').select_option('0')
-    page.locator('#mortality').select_option('0.30')
-    run_and_check(page, 'cpue_a', COMBINED, 'offline combined setting changes')
-
-    select_job(page, 'cpue_summary', CPUE_SUMMARY)
-    page.locator('#filter').select_option('1200')
-    page.locator('#mortality').select_option('0.35')
-    expect_plan(page, 'cpue_a', COMBINED)
-    assert page.evaluate('selected') == 'cpue_summary'
-    page.locator('#filter').select_option('0')
-    expect_plan(page, 'assessment_a2', MORTALITY)
-
-    page.locator('#mode').select_option('saved')
-    assert page.locator('#run').is_hidden()
-    assert page.locator('#mortality').input_value() == '0.30'
-    page.locator('#mode').select_option('live')
-    expect_plan(page, 'assessment_a2', MORTALITY)
-    assert page.locator('#filter').input_value() == '0'
-    assert page.locator('#mortality').input_value() == '0.35'
-    assert page.evaluate('selected') == 'cpue_summary'
-
-    page.locator('#mortality').select_option('0.30')
-    expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
-    page.locator('#snapshot').select_option('2024')
-    expect_plan(page, 'submission', JOBS)
-    page.locator('#snapshot').select_option('2023')
-    expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
-    print('PASS: partial/all reversion, snapshot changes and saved/live intent restoration', flush=True)
-
-    page.locator('#filter').select_option('1200')
-    page.locator('#mortality').select_option('0.35')
-    expect_plan(page, 'cpue_a', COMBINED)
-    select_job(page, 'submission', JOBS)
-    run_and_check(page, 'submission', JOBS, 'offline explicit submission overrides settings')
-
-    select_job(page, 'prepare_a', PREPARE_A)
-    for number in range(1, 3):
-        run_and_check(page, 'prepare_a', PREPARE_A, f'offline repeated intermediate run {number}')
-
-    page.locator('#filter').select_option('0')
-    expect_plan(page, 'cpue_a', CPUE)
-    page.locator('#mse-buffer').select_option('0.6')
-    expect_plan(page, 'cpue_a', CPUE)
-    page.locator('#reset').click()
-    expect_plan(page, 'submission', JOBS)
-    assert page.evaluate('records') == {}
-    assert page.locator('#filter').input_value() == '0'
-    assert page.locator('#mortality').input_value() == '0.30'
-    assert page.locator('#mse-buffer').input_value() == '0.8'
-    return baseline
-
-
-class MockCloud:
-    """Supply completion responses; keep the real CloudRun HTTP client/loop."""
-    def __init__(self):
-        self.records = {}
-        self.dispatches = []
-        self.run = []
-        self.result = None
-
-    def route(self, route):
-        path = urlsplit(route.request.url).path.rsplit('/', 1)[-1]
-        if path == 'info':
-            value = {'configured': True, 'repository': json.loads((ROOT/'cloud/config.json').read_text())['repository']}
-        elif path == 'session':
-            value = {'id': 'settings-test-session', 'token': 'settings-test-token'}
-        elif path == 'run':
-            data = route.request.post_data_json
-            self.dispatches.append(data)
-            run_id = f'Mock {len(self.dispatches):03d}'
-            updated = deepcopy(self.records)
-            for key in self.run:
-                updated[key]['run_id'] = run_id
-            updated['submission']['settings']['last_year'] = data['settings']['last_year']
-            updated['cpue_a']['settings']['min_hooks'] = data['settings']['min_hooks_a']
-            for key in ['assessment_a2', 'assessment_b2']:
-                updated[key]['settings']['M'] = data['settings']['mortality_2']
-            updated['mse_buffered']['settings']['buffer'] = data['settings']['mse_buffer']
-            self.result = {
-                'run_id': run_id, 'start': data['start'], 'run': self.run,
-                'retained': [key for key in JOBS if key not in self.run], 'records': updated,
-            }
-            value = {'id': run_id}
-        elif path == 'state':
-            value = {
-                'run': {'id': self.result['run_id'], 'status': 'complete', 'result': self.result},
-                'events': [], 'state': {'records': self.result['records']},
-            }
-        else:
-            raise AssertionError(f'Unexpected mocked cloud endpoint: {path}')
-        route.fulfill(content_type='application/json', body=json.dumps(value))
-
-
 def cloud_checks(page, mock, baseline):
     page.wait_for_function("mode === 'cloud' && ready", timeout=30000)
     observe_runs(page)
     for controls, start, run in [
         ({'filter': '1200'}, 'cpue_a', CPUE),
-        ({'mortality': '0.35'}, 'assessment_a2', MORTALITY),
-        ({'filter': '1200', 'mortality': '0.35'}, 'cpue_a', COMBINED),
+        ({'growth-rate': '0.35'}, 'assessment_a2', GROWTH),
+        ({'filter': '1200', 'growth-rate': '0.35'}, 'cpue_a', COMBINED),
         ({'mse-buffer': '0.6'}, 'mse_buffered', BUFFER),
         ({'mse-buffer': '1'}, 'mse_buffered', BUFFER),
-        ({'mortality': '0.35', 'mse-buffer': '0.6'}, 'assessment_a2', MORTALITY),
+        ({'growth-rate': '0.35', 'mse-buffer': '0.6'}, 'assessment_a2', GROWTH),
     ]:
         # Supply already completed records without running a hosted calculation.
         mock.records = deepcopy(baseline)
-        mock.run = run
         page.evaluate("""async baseline => {
           records = structuredClone(baseline);
           cloud.records = structuredClone(baseline);
           states = {};
           document.querySelector('#snapshot').value = '2023';
           document.querySelector('#filter').value = '0';
-          document.querySelector('#mortality').value = '0.30';
+          document.querySelector('#growth-rate').value = '0.30';
           document.querySelector('#mse-buffer').value = '0.8';
           selectJob('submission');
           await refreshPlan();
@@ -380,7 +208,7 @@ def cloud_checks(page, mock, baseline):
         assert mock.dispatches[-1]['handover'] == 'connected'
         assert mock.dispatches[-1]['settings'] == {
             'last_year': 2023, 'min_hooks_a': int(controls.get('filter', '0')),
-            'mortality_2': float(controls.get('mortality', '0.30')), 'mse': True,
+            'growth_rate_2': float(controls.get('growth-rate', '0.30')), 'mse': True,
             'mse_buffer': float(controls.get('mse-buffer', '0.8')),
         }
     assert len(mock.dispatches) == 6
@@ -388,38 +216,62 @@ def cloud_checks(page, mock, baseline):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--source', action='store_true', help='embed current sources in the preserved runtime')
+    parser.add_argument('--source', action='store_true', help='embed current UI sources with saved results')
     args = parser.parse_args()
-    with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright:
-        path = ROOT / 'docs/offline.html'
-        if args.source:
-            path = Path(directory) / 'settings-preview.html'
-            path.write_text(preview())
-        options = {'headless': True}
-        if os.environ.get('CHROME_PATH'):
-            options['executable_path'] = os.environ['CHROME_PATH']
-        browser = playwright.chromium.launch(**options)
+    ui = runpy.run_path(str(ROOT / 'scripts/check-browser.py'))
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
         errors = []
-        offline = browser.new_context(offline=True, viewport={'width': 1440, 'height': 1000})
-        offline.route('https://**/*', lambda route: route.abort())
-        page = offline.new_page()
+        page = browser.new_page(viewport={'width': 1440, 'height': 1000})
         page.on('pageerror', lambda error: errors.append(str(error)))
-        page.goto(path.as_uri())
-        baseline = offline_checks(page)
-        offline.close()
-
-        online = browser.new_context(offline=True, viewport={'width': 1440, 'height': 1000})
-        online.route('https://**/*', lambda route: route.abort())
-        mock = MockCloud()
-        online.route('**/functions/v1/paper-api/**', mock.route)
-        page = online.new_page()
-        page.on('pageerror', lambda error: errors.append(str(error)))
-        page.goto(path.as_uri())
+        mock = ui['MockCloud']()
+        ui['open_live'](page, mock)
+        if args.source:
+            page.route('https://ui.example.test/demo', lambda route: route.fulfill(content_type='text/html', body=preview()))
+            page.reload()
+            page.wait_for_function("mode === 'cloud' && ready")
+        baseline = mock.fixture['saved']['records']
         cloud_checks(page, mock, baseline)
+
+        # Reverting settings restores explicit selection; Saved uses its actual
+        # baseline and Live restores its own pending intent and settings.
+        mock.records = deepcopy(baseline)
+        page.evaluate("""async baseline => {
+          records = structuredClone(baseline); cloud.records = structuredClone(baseline);
+          states = {}; completedRun = null; settingsIntent = false;
+          $('filter').value = '0'; $('growth-rate').value = '0.30'; $('mse-buffer').value = '0.8';
+          selectJob('cpue_summary'); await refreshPlan();
+        }""", baseline)
+        expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
+        page.locator('#filter').select_option('1200')
+        page.locator('#growth-rate').select_option('0.35')
+        expect_plan(page, 'cpue_a', COMBINED)
+        page.locator('#filter').select_option('0')
+        expect_plan(page, 'assessment_a2', GROWTH)
+        page.locator('#mode').select_option('saved')
+        assert page.locator('#run').is_hidden()
+        assert page.locator('#growth-rate').input_value() == '0.30'
+        page.locator('#mode').select_option('cloud')
+        expect_plan(page, 'assessment_a2', GROWTH)
+        assert page.locator('#growth-rate').input_value() == '0.35'
+        assert page.evaluate('selected') == 'cpue_summary'
+        page.locator('#growth-rate').select_option('0.30')
+        expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
+        page.locator('#snapshot').select_option('2024')
+        expect_plan(page, 'submission', JOBS)
+        page.locator('#snapshot').select_option('2023')
+        expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
+        page.locator('#mse-buffer').select_option('0.6')
+        expect_plan(page, 'mse_buffered', BUFFER)
+        page.locator('#reset').click()
+        page.locator('#run:enabled').wait_for()
+        assert page.evaluate('Object.keys(records).length') == 0
+        assert page.locator('#growth-rate').input_value() == '0.30'
+        assert page.locator('#mse-buffer').input_value() == '0.8'
         assert not errors, errors
         browser.close()
-    print('PASS: settings reruns, planned/executed highlighting, retained records, selection intent and cloud dispatch. '
-          + ('Current sources.' if args.source else 'Built offline artifact.'))
+    print('PASS: mocked Live settings propagation, planned/completed highlighting, exact retained '
+          'records, explicit selection, reversion, saved/Live restoration and reset. No model computation.')
 
 
 if __name__ == '__main__':

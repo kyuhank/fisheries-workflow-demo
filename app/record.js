@@ -55,7 +55,7 @@ function renderRecord() {
   const cards = uiElement("div", "record-cards");
   const source = record.source || {};
   const software = record.software || {};
-  const image = record.execution?.container;
+  const image = record.execution?.container || software.container;
   for (
     const [label, value, detail] of [
       [
@@ -70,11 +70,11 @@ function renderRecord() {
         "SHA-256 recorded for each file",
       ],
       [
-        "Software",
-        image ? "Docker image" : software.runtime,
+        "Container",
+        image ? image.split("@")[0].split("/").pop() : "Image not recorded",
         image
           ? image.split("@")[0]
-          : `Python ${software.python} · SQLite ${software.sqlite}`,
+          : "Use the original run record",
       ],
     ]
   ) {
@@ -84,8 +84,19 @@ function renderRecord() {
       uiElement("strong", "", value),
       uiElement("small", "", detail),
     );
-    if (label === "Software" && image?.includes("@sha256:")) {
+    if (label === "Container" && /^ghcr\.io\/[\w.-]+\/[\w.-]+@sha256:[a-f0-9]{64}$/.test(image || "")) {
+      const [owner, name] = image.split("@")[0].slice("ghcr.io/".length).split("/");
+      const link = uiElement("a", "record-image-link", "Container image ↗");
+      link.href = `https://github.com/orgs/${encodeURIComponent(owner)}/packages/container/package/${encodeURIComponent(name)}`;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      card.append(link);
       card.append(uiElement("code", "record-image-digest", image.split("@")[1]));
+      card.append(uiElement("small", "", [
+        software.r && `R ${software.r}`,
+        software.RTMB && `RTMB ${software.RTMB}`,
+        software.quarto && `Quarto ${software.quarto}`,
+      ].filter(Boolean).join(" · ")));
     }
     cards.append(card);
   }
@@ -93,7 +104,7 @@ function renderRecord() {
   const repository = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(source.repository || "")
     ? source.repository : "https://github.com/kyuhank/fisheries-workflow-demo";
   const recordedRevision = /^[a-f0-9]{40}$/.test(source.commit || "") &&
-      Object.hasOwn(record.code || {}, `jobs/${key}/run.py`) ? source.commit : null;
+      Object.hasOwn(record.code || {}, `jobs/${key}/run.R`) ? source.commit : null;
   const jobSource = uiElement("a", "record-source",
     recordedRevision ? "Job code & guide ↗" : "Current job code & guide ↗");
   const jobRepository = recordedRevision ? repository : "https://github.com/kyuhank/fisheries-workflow-demo";
@@ -218,7 +229,7 @@ async function reproduceOutput(reference, context) {
   $("output-dialog").close();
   $("snapshot").value = context.settings.last_year;
   $("filter").value = context.settings.min_hooks_a;
-  $("mortality").value = Number(context.settings.mortality_2).toFixed(2);
+  $("growth-rate").value = Number(context.settings.growth_rate_2).toFixed(2);
   $("mse-buffer").value = context.settings.mse_buffer ?? 0.8;
   $("handover").value = "connected";
   selected = "submission";

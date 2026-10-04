@@ -1,4 +1,4 @@
-"""Run the preserved calculations on GitHub, with hosted inputs and event records."""
+"""Run the container R calculations on GitHub, with hosted inputs and event records."""
 import asyncio
 import base64
 from concurrent.futures import ProcessPoolExecutor
@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from workflow.engine import Workflow, digest, encoded
 from workflow.spec import SPEC, STAGES
+from workflow.r_bridge import RBridge
 
 API = 'https://gvunwnpsfmylmqfqowzp.supabase.co/functions/v1/paper-api'
 REQUEST = str(uuid.UUID(os.environ['PAPER_REQUEST_ID']))
@@ -130,16 +131,17 @@ def checkpoint(directory):
 
 class HostedWorkflow(Workflow):
     def __init__(self, context):
+        container = RBridge.require_container()
         self.context = context
         self.hosted_data = api('data')
         self.transfer_count = 0
         self.delivery = EventDelivery()
-        super().__init__('/tmp/paper-results', notify=self.publish, pause=1,
+        super().__init__('/tmp/paper-results', notify=self.publish, pause=.1,
                          manual_transfer=self.handover if context['handover'] == 'manual' else None)
         self.pool = None
         self.execution = {'provider': 'GitHub Actions', 'repository': 'kyuhank/fisheries-workflow-demo',
                           'commit': context['commit_sha'], 'github_run': context['github_run'],
-                          'container': 'ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc',
+                          'container': container,
                           'data_source': 'Supabase PostgreSQL: fixed synthetic records',
                           'data_checksum': digest(encoded(self.hosted_data))}
         self.configure({'mse': False, **context['settings']})
@@ -152,10 +154,6 @@ class HostedWorkflow(Workflow):
         if key == 'submission':
             return digest(encoded({'calculation': value, 'hosted_data': digest(encoded(self.hosted_data))}))
         return value
-
-    def source_rows(self):
-        # Copy the PostgreSQL response: the first QC example modifies one field.
-        return json.loads(json.dumps(self.hosted_data))
 
     async def calculate(self, key, run_id):
         if key not in PARALLEL_JOBS:

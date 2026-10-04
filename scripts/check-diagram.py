@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 @contextmanager
 def hosted_docs():
-    """The lightweight page fetches its runtime from the same web origin."""
+    """Serve the current web page without any analysis execution."""
     class QuietHandler(SimpleHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -111,7 +111,8 @@ with hosted_docs() as url, sync_playwright() as playwright:
     page.locator('#tasks .mse').click()
     assert page.locator('#job-table-body tr').count() == 6
     page.locator('#job-table-body tr[data-job="mse_report"] .open-output').click()
-    assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'MSE report'
+    assert page.frame_locator('#output-frame').locator('h1').inner_text().strip()
+    assert page.evaluate('currentOutput.record.job') == 'mse_report'
     page.locator('#output-close').click()
     page.locator('[data-tab="workflow"]').click()
     assert page.locator('[data-reference]').count() == 0
@@ -124,10 +125,21 @@ with hosted_docs() as url, sync_playwright() as playwright:
     nodes = page.evaluate('Object.fromEntries(payload.diagram.nodes.map(node => [node.key, node]))')
     assert {edge['from'] for edge in edges} == {
         'assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'}
+    # Arrow routes may use distinct ports and a short clearance before the box.
+    # Check meaningful source/target proximity and routing, rather than forcing
+    # the old overlapping centreline layout.
     for edge in edges:
         source, target = nodes[edge['from']], nodes[edge['to']]
-        assert edge['points'][0] == [source['x'] + source['width'], source['y'] + source['height'] / 2]
-        assert edge['points'][-1] == [target['x'] + target['width'] / 2, target['y']]
+        first, last = edge['points'][0], edge['points'][-1]
+        assert abs(first[0] - source['x'] - source['width']) <= 4
+        assert source['y'] <= first[1] <= source['y'] + source['height']
+        assert target['x'] <= last[0] <= target['x'] + target['width']
+        assert abs(last[1] - target['y']) <= 4
+    for edge in page.evaluate('payload.diagram.edges'):
+        points = edge['points']
+        for start, end in zip(points, points[1:]):
+            assert start != end, edge
+            assert start[0] == end[0] or start[1] == end[1], edge
     page.locator('#output-close').click()
     page.locator('[data-tab="jobs"]').click()
     page.locator('#running-jobs').click()

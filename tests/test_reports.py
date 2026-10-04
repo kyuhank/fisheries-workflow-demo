@@ -58,14 +58,14 @@ class ReportTest(unittest.TestCase):
             'CPUE analysis B': [{'year': 2000, 'index': 1.0}, {'year': 2001, 'index': 0.7}],
         }}
         self.assessment = {'series': {}, 'diagnostics': []}
-        for name, value, mortality in [('A1', 0.4, 0.2), ('A2', 0.5, 0.35),
-                                       ('B1', 0.6, 0.2), ('B2', 0.7, 0.35)]:
+        for name, value, growth in [('A1', 0.4, 0.25), ('A2', 0.5, 0.35),
+                                       ('B1', 0.6, 0.25), ('B2', 0.7, 0.35)]:
             case = 'Assessment ' + name
             self.assessment['series'][case] = [
-                {'year': 2000, 'SB_over_SB0': 1.0, 'F': 0.02},
-                {'year': 2001, 'SB_over_SB0': value, 'F': 0.1}]
+                {'year': 2000, 'B_over_K': 1.0, 'harvest_rate': 0.02},
+                {'year': 2001, 'B_over_K': value, 'harvest_rate': 0.1}]
             self.assessment['diagnostics'].append(
-                {'case': case, 'M': mortality, 'boundary_fit': False, 'catch_check': 'Pass'})
+                {'case': case, 'r': growth, 'boundary_fit': False, 'catch_check': 'Pass'})
 
     def page(self, key, result):
         return output_page(SPEC[key], result, self.record, self.lineage)
@@ -99,22 +99,22 @@ class ReportTest(unittest.TestCase):
         self.assertNotIn('CPUE analysis A was 0.400', changed)
         self.assertNotIn('declin', changed)
 
-    def test_assessment_account_uses_supplied_year_values_mortality_and_checks(self):
+    def test_assessment_account_uses_supplied_year_values_growth_and_checks(self):
         initial = ReportReader(self.page('assessment_report', self.assessment)).text
-        self.assertIn('In 2001, spawning biomass ranged from 0.400 to 0.700', initial)
-        self.assertIn('natural mortality of 0.20 and 0.35 per year', initial)
-        self.assertIn('Annual catches were reproduced', initial)
+        self.assertIn('In 2001, biomass ranged from 0.400 to 0.700', initial)
+        self.assertIn('intrinsic growth rates of 0.25 and 0.35 per year', initial)
+        self.assertIn('The biomass recurrence and positive-stock feasibility checks passed', initial)
         for rows in self.assessment['series'].values():
             rows[-1]['year'] = 2024
-            rows[-1]['SB_over_SB0'] += 0.5
-        self.assessment['diagnostics'][1].update(M=0.25, boundary_fit=True, catch_check='Fail')
-        self.assessment['diagnostics'][3]['M'] = 0.25
+            rows[-1]['B_over_K'] += 0.5
+        self.assessment['diagnostics'][1].update(r=0.25, boundary_fit=True, catch_check='Fail')
+        self.assessment['diagnostics'][3]['r'] = 0.25
         changed = ReportReader(self.page('assessment_report', self.assessment)).text
-        self.assertIn('In 2024, spawning biomass ranged from 0.900 to 1.200', changed)
-        self.assertIn('natural mortality of 0.20 and 0.25 per year', changed)
-        self.assertIn('Catch matching needs review for Assessment A2.', changed)
+        self.assertIn('In 2024, biomass ranged from 0.900 to 1.200', changed)
+        self.assertIn('intrinsic growth rates of 0.25 per year', changed)
+        self.assertIn('Biomass balance or feasibility needs review for Assessment A2.', changed)
         self.assertIn('boundary was reached for Assessment A2', changed)
-        self.assertNotIn('Annual catches were reproduced', changed)
+        self.assertNotIn('The biomass recurrence and positive-stock feasibility checks passed', changed)
         self.assertNotIn('0.35 per year', changed)
         self.assertIn('not an uncertainty interval', changed)
         self.assertIn('no stock-management advice', changed)
@@ -122,8 +122,8 @@ class ReportTest(unittest.TestCase):
     def test_different_assessment_end_years_are_reported_separately(self):
         self.assessment['series']['Assessment A1'][-1]['year'] = 2024
         text = ReportReader(self.page('assessment_report', self.assessment)).text
-        self.assertIn('Spawning biomass in Assessment A1 was 0.400 of its unfished level in 2024.', text)
-        self.assertIn('Spawning biomass in Assessment B2 was 0.700 of its unfished level in 2001.', text)
+        self.assertIn('Biomass in Assessment A1 was 0.400 of its carrying capacity in 2024.', text)
+        self.assertIn('Biomass in Assessment B2 was 0.700 of its carrying capacity in 2001.', text)
         self.assertNotIn('ranged from', text)
 
     def test_report_names_and_records_remain_escaped_html(self):

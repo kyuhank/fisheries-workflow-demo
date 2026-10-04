@@ -64,7 +64,7 @@ def cpue_report(result):
     return (
         '<p>This report brings together the CPUE indices prepared for the assessment.</p>'
         '<h2>Methods</h2><p>Analysis A includes year and vessel effects; analysis B '
-        'includes year effects only. Both account for fishing effort. Each index is '
+        'includes year effects only. Both use R Poisson GLMs with a log hooks offset. Each index is '
         'scaled to one in its first year.</p>'
         '<h2>Results</h2><p class="note">' + findings + '</p>'
         + plot(series, 'index', 'CPUE relative to the first year')
@@ -78,36 +78,37 @@ def assessment_report(result):
     """Describe the supplied assessment cases and their recorded checks."""
     series = result['series']
     diagnostics = result['diagnostics']
-    mortalities = ' and '.join(f'{value:.2f}' for value in
-                             sorted({row['M'] for row in diagnostics}))
+    growth_rates = ' and '.join(f'{value:.2f}' for value in
+                              sorted({row['r'] for row in diagnostics}))
     final = [(name, rows[-1]) for name, rows in series.items()]
     years = {row['year'] for _, row in final}
     if len(years) == 1:
-        values = [row['SB_over_SB0'] for _, row in final]
-        findings = (f'In <strong>{esc(next(iter(years)))}</strong>, spawning biomass '
+        values = [row['B_over_K'] for _, row in final]
+        findings = (f'In <strong>{esc(next(iter(years)))}</strong>, biomass '
                     f'ranged from <strong>{min(values):.3f} to {max(values):.3f}</strong> '
-                    'of each case’s unfished level.')
+                    'of each case’s carrying capacity.')
     else:
         findings = ' '.join(
-            f'Spawning biomass in {esc(name)} was <strong>{row["SB_over_SB0"]:.3f}</strong> of its '
-            f'unfished level in {esc(row["year"])}.' for name, row in final)
+            f'Biomass in {esc(name)} was <strong>{row["B_over_K"]:.3f}</strong> of its '
+            f'carrying capacity in {esc(row["year"])}.' for name, row in final)
     boundary = [row['case'] for row in diagnostics if row['boundary_fit']]
-    catch_failures = [row['case'] for row in diagnostics if row['catch_check'] != 'Pass']
-    checks = ('Annual catches were reproduced within the numerical tolerance.'
+    catch_failures = [row['case'] for row in diagnostics if row.get('balance_check', row.get('catch_check')) != 'Pass' or row.get('feasibility_check', 'Pass') != 'Pass']
+    checks = ('The biomass recurrence and positive-stock feasibility checks passed.'
               if not catch_failures else
-              'Catch matching needs review for ' + ', '.join(map(esc, catch_failures)) + '.')
+              'Biomass balance or feasibility needs review for ' + ', '.join(map(esc, catch_failures)) + '.')
     checks += (' The biomass search boundary was reached for ' + ', '.join(map(esc, boundary))
                + '; these fits need review.' if boundary else
                ' The fits stayed within the biomass search bounds.')
     return (
         '<p>This report compares the assessment cases using CPUE indices A and B.</p>'
-        '<h2>Methods</h2><p>The simple age-structured model uses annual catch and a CPUE '
-        'index, with fixed biology and constant recruitment. The cases use natural '
-        'mortality of ' + mortalities + ' per year.</p>'
+        '<h2>Methods</h2><p>The annual Schaefer surplus-production model uses catch and '
+        'a CPUE index. R and RTMB estimate carrying capacity, profile catchability, '
+        'and start biomass at carrying capacity. The cases use intrinsic growth '
+        'rates of ' + growth_rates + ' per year.</p>'
         '<h2>Results</h2><p class="note">' + findings + '</p>'
-        + plot(series, 'SB_over_SB0', 'Spawning biomass / unfished level')
+        + plot(series, 'B_over_K', 'Biomass / carrying capacity')
         + '<p>' + checks + '</p>'
-        '<h2>Interpretation</h2><p>The cases show how CPUE inputs and mortality '
+        '<h2>Interpretation</h2><p>The cases show how CPUE inputs and growth '
         'assumptions carry through to assessment results. Differences between cases '
         'are not an uncertainty interval. These synthetic examples provide no '
         'stock-management advice.</p>')
@@ -115,7 +116,7 @@ def assessment_report(result):
 
 def mse_metrics(rows):
     return '<div class="table-scroll">' + table(rows, [('name', 'Management rule'), ('mean_catch_t', 'Mean catch (t/year)'),
-                        ('final_SB_over_SB0', 'Final SB / SB₀'),
+                        ('final_B_over_K', 'Final B / K'),
                         ('below_threshold_percent', 'Trials below 0.2 (%)'),
                         ('catch_change_percent', 'Catch change (%)')]) + '</div>'
 
@@ -129,7 +130,7 @@ def mse_rules(result):
     """Show the catch decisions beside their shared comparison conditions."""
     rules = result['rules']
     return ('<h2>Management procedures (MPs)</h2>'
-            '<p>Three catch rules face the same stock cases, recruitment scenarios and observation errors.</p>'
+            '<p>Three catch rules face the same stock cases, growth scenarios and observation errors.</p>'
             '<div class="mp-rules">' + ''.join(
                 '<section class="mp-rule"><h3>' + esc(rules[key]['name']) + '</h3><p>'
                 + esc(rules[key]['description']) + '</p></section>'
@@ -139,7 +140,7 @@ def mse_rules(result):
 def mse_trial(rows):
     """Display recorded annual decisions and stock changes from one trial."""
     display = [{**row, 'stock_change':
-                f'{row["start_SB_over_SB0"]:.2f} → {row["SB_over_SB0"]:.2f}'} for row in rows]
+                f'{row["start_B_over_K"]:.2f} → {row["B_over_K"]:.2f}'} for row in rows]
     columns = [
         ('year', 'Year'), ('index_ratio', '3-year index / reference'),
     ]
@@ -147,7 +148,7 @@ def mse_trial(rows):
         columns.append(('target_catch_t', 'Target catch (t)'))
     columns += [
         ('requested_catch_t', 'Catch advice (t)'), ('catch_t', 'Realised catch (t)'),
-        ('stock_change', 'Stock before → after (SB / SB₀)'),
+        ('stock_change', 'Stock before → after (B / K)'),
     ]
     return '<div class="table-scroll"><div class="trial-table">' + table(display, columns) + '</div></div>'
 
@@ -156,13 +157,13 @@ def mse_trial_plots(example):
     rows = example['rows']
     indicators = {
         'Observed index': [{'year': r['year'], 'value': r['index_ratio']} for r in rows],
-        'Spawning biomass': [{'year': r['year'], 'value': r['SB_over_SB0']} for r in rows],
+        'Biomass': [{'year': r['year'], 'value': r['B_over_K']} for r in rows],
     }
     catches = {name: [{'year': r['year'], 'value': r[key]} for r in rows]
                for key, name in [('target_catch_t', 'Target catch'),
                                  ('requested_catch_t', 'Catch advice'), ('catch_t', 'Realised catch')]
                if key in rows[0]}
-    return (plot(indicators, 'value', 'Observed index / reference; spawning biomass / unfished level')
+    return (plot(indicators, 'value', 'Observed index / reference; biomass / carrying capacity')
             + plot(catches, 'value', 'One trial: annual catch (tonnes)'))
 
 
@@ -188,7 +189,7 @@ def mse_scenario_plots(result):
                       if isinstance(s['series'], dict)
                       else {result['name']: s['series']}} for s in scenarios]
     colours = {'Constant catch': '#1378a3', 'Index rule': '#b56435', 'Buffered rule': '#7357a8'}
-    axes = [('SB_over_SB0', 'Median end-of-year spawning biomass / unfished level'),
+    axes = [('B_over_K', 'Median end-of-year biomass / carrying capacity'),
             ('catch_t', 'Median annual realised catch (tonnes)')]
     ceilings = {key: max(r[key] for s in scenarios for rows in s['series'].values() for r in rows)
                 for key, _ in axes}
@@ -205,7 +206,7 @@ def mse_scenario_plots(result):
 
 def mse_metric_note():
     return ('<p class="muted">Final biomass is the median across trials. The threshold column '
-            'counts trials that fell below 0.2 of unfished spawning biomass at any time; '
+            'counts trials that fell below 0.2 of carrying capacity at any time; '
             '0.2 is an illustrative comparison level. Catch change is annual absolute change '
             'relative to mean catch, including the first change from recent catch. Cases and '
             'scenarios have equal weight, not estimated probabilities.</p>')
@@ -213,12 +214,12 @@ def mse_metric_note():
 
 def mse_methods(result):
     assumptions = result['assumptions']
-    scenarios = ('<p>Recruitment stays at its baseline mean, or falls to half that mean '
-                 'for six years before recovering. Year-to-year recruitment still varies '
-                 'in both scenarios.</p>' if any('recruitment_multipliers' in s
+    scenarios = ('<p>Intrinsic growth stays at its baseline mean, or uses 0.7 of that mean '
+                 'for six years before recovering. Year-to-year growth still varies '
+                 'in both scenarios.</p>' if any('growth_multipliers' in s
                  for s in assumptions['scenarios']) else '')
     return (f'<p>Four fitted assessment cases supply the simulated stocks. Each rule is tested '
-            f'for {assumptions["years"]} years under two recruitment scenarios, with '
+            f'for {assumptions["years"]} years under two growth scenarios, with '
             f'{assumptions["replicates"]} repeated trials per case and scenario. The same '
             'random errors are used when comparing rules.</p>'
             '<p>Each year, an index is observed with error, a catch rule is applied, and the '
@@ -240,15 +241,15 @@ def mse_report(result):
     """Write a short account of the comparison, separate from the summary page."""
     metrics = result['metrics']
     catches = [row['mean_catch_t'] for row in metrics]
-    stock = [row['final_SB_over_SB0'] for row in metrics]
+    stock = [row['final_B_over_K'] for row in metrics]
     findings = (f'Across the three rules, mean annual catch ranged from '
                 f'<strong>{min(catches):,.0f} to {max(catches):,.0f} tonnes</strong>. '
-                f'Median final spawning biomass ranged from <strong>{min(stock):.2f} to '
-                f'{max(stock):.2f}</strong> of its unfished level.')
+                f'Median final biomass ranged from <strong>{min(stock):.2f} to '
+                f'{max(stock):.2f}</strong> of its carrying capacity.')
     changes = ' '.join(f'{esc(row["name"])} had average annual catch changes of '
                        f'{row["catch_change_percent"]:.1f}%.' for row in metrics)
     shortfalls = sum(row['shortfall_trials'] for row in metrics)
-    catch_note = (' Some requested catches could not be taken within the simulated fishing '
+    catch_note = (' Some requested catches could not be taken within the simulated harvest '
                   'limit; the comparison uses realised catches.' if shortfalls else '')
     return ('<p>This report compares three simple catch rules under the same simulated '
             'stock conditions and observation errors.</p><h2>Methods</h2>' + mse_methods(result)
@@ -306,18 +307,22 @@ def output_page(job, result, record, lineage):
         body += table([result['series'][0], result['series'][-1]], [('year','Year'),('index','Relative CPUE')])
         body += '<details><summary>All annual values</summary>' + table(result['series'], [('year','Year'),('index','Relative CPUE')]) + '</details>'
     elif key.startswith('assessment_') and key[-2:] in ('a1','a2','b1','b2'):
-        body += f'<p>Annual age-structured model · ages 0–10+ · natural mortality {result["M"]:.2f} per year. Biology is fixed and recruitment is constant.</p>'
-        body += '<h2>Biomass trajectory</h2>' + plot({job['title']:result['series']}, 'SB_over_SB0', 'Spawning biomass / unfished level')
-        body += table([result['series'][0],result['series'][-1]], [('year','Year'),('SB_over_SB0','SB / SB₀'),('F','Fishing mortality')])
+        body += f'<p>Schaefer surplus-production model · intrinsic growth {result["r"]:.2f} per year · R/RTMB fit. Initial biomass equals carrying capacity.</p>'
+        body += '<h2>Biomass trajectory</h2>' + plot({job['title']:result['series']}, 'B_over_K', 'Biomass / carrying capacity')
+        body += table([result['series'][0],result['series'][-1]], [('year','Year'),('B_over_K','B / K'),('harvest_rate','Harvest rate')])
         fit_series = {'Observed CPUE':[{'year':r['year'], 'index':r['observed_index']} for r in result['series']],
                       'Fitted CPUE':[{'year':r['year'], 'index':r['fitted_index']} for r in result['series']]}
         if result['boundary_fit']:
             body += '<p class="note">The fit reached a search boundary. Inspect the fit before interpreting it.</p>'
         body += '<details><summary>Fit and diagnostic checks</summary><h2>Fit to the CPUE index</h2>' + plot(fit_series, 'index', 'Relative CPUE', points=('Observed CPUE',))
         body += '<h2>Fit residuals</h2>' + plot({'Log residual': result['series']}, 'log_residual', 'Log(observed / fitted); persistent patterns merit review', points=('Log residual',))
-        body += '<p>Annual catches were reproduced within the numerical tolerance. The fit ' + ('reached' if result['boundary_fit'] else 'stayed within') + ' the biomass search bounds. These checks do not establish model adequacy.</p>'
+        body += '<h2>Recorded checks</h2>' + table([result], [
+            ('feasibility_check', 'Positive biomass'), ('balance_check', 'Biomass recurrence'),
+            ('balance_residual_t', 'Balance residual (t)'), ('gradient_check', 'Projected gradient'),
+            ('projected_gradient_logK', 'Projected gradient at fit'), ('active_bound', 'Active capacity bound')])
+        body += '<p>The checks describe the declared recurrence and optimizer, and do not establish model adequacy.</p>'
         body += '</details><details><summary>All annual estimates</summary>'
-        body += table(result['series'], [('year','Year'),('SB_over_SB0','SB / SB₀'),('F','Fishing mortality')]) + '</details>'
+        body += table(result['series'], [('year','Year'),('B_over_K','B / K'),('harvest_rate','Harvest rate')]) + '</details>'
     elif key == 'cpue_report':
         body = '<article class="narrative-report" data-report="cpue_report">' + cpue_report(result) + '</article>'
     elif key == 'assessment_report':
@@ -325,24 +330,23 @@ def output_page(job, result, record, lineage):
     elif key == 'mse_prepare':
         body += '<p class="note">Four assessment cases → three catch rules → one comparison.</p>'
         body += ('<h2>From stock assessment to MSE</h2><p>Each fitted assessment supplies a '
-                 'starting stock and its estimated parameters. Preparation reconstructs numbers '
-                 'at age after the last observed year, so simulation begins in the following year. '
+                 'starting biomass and its fitted carrying capacity, growth and catchability. '
+                 'Simulation begins in the year after the last observed catch. '
                  'The four cases are deliberately included in this example.</p>')
         body += table([
-            {'source': 'Fitted model and catch history', 'use': 'Reconstruct the starting numbers at age.'},
-            {'source': 'Natural mortality and recruitment', 'use': 'Set survival and the baseline number of new fish.'},
+            {'source': 'Fitted model and catch history', 'use': 'Carry forward the fitted final biomass.'},
+            {'source': 'Intrinsic growth and carrying capacity', 'use': 'Define annual surplus production.'},
             {'source': 'Catchability and recent CPUE indices', 'use': 'Simulate future indices and define the reference index.'},
             {'source': 'Recent annual catches', 'use': 'Set the reference catch for the management rules.'},
         ], [('source', 'Assessment result used'), ('use', 'Role in MSE')])
-        from .mse import spawning
-        model_rows = [{**model, 'starting_depletion': spawning(model['numbers']) / model['SB0']}
+        model_rows = [{**model, 'starting_depletion': model['B'] / model['K']}
                       for model in result['operating_models']]
         body += '<h2>Starting stocks</h2>' + table(model_rows, [
             ('name', 'Assessment case'), ('first_year', 'First future year'),
-            ('starting_depletion', 'Starting SB / SB₀'), ('reference_catch_t', 'Reference catch (t/year)')])
+            ('starting_depletion', 'Starting B / K'), ('reference_catch_t', 'Reference catch (t/year)')])
         body += ('<p>Open <strong>Inputs &amp; versions</strong> to follow each case to the exact '
                  'assessment run used. Full starting states and parameters are in the Data tab.</p>')
-        body += ('<h2>Added for the future trials</h2><p>The example specifies two recruitment '
+        body += ('<h2>Added for the future trials</h2><p>The example specifies two growth '
                  'scenarios, observation error and three management rules. These are additional '
                  'assumptions; they are not estimated by the assessments. Every rule faces the '
                  'same scenarios and random trials.</p>')
@@ -350,7 +354,7 @@ def output_page(job, result, record, lineage):
         body += ('<p>The MSE catch buffer belongs to the Buffered rule job. Changing it reuses '
                  'these prepared stocks and common trial conditions; the MP output and MSE '
                  'comparison record the fraction actually tested.</p>')
-        body += ('<h2>What is compared?</h2><p>Catch, spawning biomass and annual catch changes. '
+        body += ('<h2>What is compared?</h2><p>Catch, biomass and annual catch changes. '
                  'These are illustrative objectives for demonstrating the connected workflow.</p>')
         body += '<details><summary>Simulation assumptions</summary>' + mse_methods(result) + mse_limits(result)
         body += '<pre>' + esc(json.dumps(result['assumptions'], indent=2)) + '</pre></details>'
@@ -366,15 +370,15 @@ def output_page(job, result, record, lineage):
         body += mse_trial_plots(example)
         body += ('<p class="muted">The index-based MPs use the three-year observed index; '
                  'constant catch keeps the reference catch. Stock change includes fishing, '
-                 'natural mortality and recruitment. SB / SB₀ is spawning biomass relative '
-                 'to its unfished level.</p>')
+                 'surplus production and catch removals. B / K is biomass relative '
+                 'to its carrying capacity.</p>')
         body += '<details><summary>All years in this trial</summary>' + mse_trial(example['rows']) + '</details>'
         body += '<details><summary>Median results across all trials</summary>' + mse_scenario_plots(result) + '</details>'
         body += '<h2>Across all trials</h2>'
         body += mse_metrics([{'name': result['name'], **result['metrics']}]) + mse_metric_note()
         body += '<details><summary>Results by stock case and scenario</summary>' + table(
-            result['cases'], [('case', 'Stock case'), ('scenario', 'Recruitment'),
-                              ('mean_catch_t', 'Mean catch (t/year)'), ('final_SB_over_SB0', 'Final SB / SB₀'),
+            result['cases'], [('case', 'Stock case'), ('scenario', 'Growth'),
+                              ('mean_catch_t', 'Mean catch (t/year)'), ('final_B_over_K', 'Final B / K'),
                               ('below_threshold_percent', 'Trials below 0.2 (%)')]) + '</details>'
         body += '<details><summary>Scope and assumptions</summary>' + mse_methods(result) + mse_limits(result) + '</details>'
     elif key == 'mse_summary':
@@ -383,22 +387,22 @@ def output_page(job, result, record, lineage):
         body += mse_metrics(result['metrics']) + mse_metric_note()
         body += mse_scenario_plots(result)
         body += '<details><summary>Results by stock case and scenario</summary>' + table(
-            result['cases'], [('rule', 'Rule'), ('case', 'Stock case'), ('scenario', 'Recruitment'),
+            result['cases'], [('rule', 'Rule'), ('case', 'Stock case'), ('scenario', 'Growth'),
                               ('mean_catch_t', 'Mean catch (t/year)'),
-                              ('final_SB_over_SB0', 'Final SB / SB₀')]) + '</details>'
+                              ('final_B_over_K', 'Final B / K')]) + '</details>'
     elif key == 'mse_report':
         body = '<article class="narrative-report" data-report="mse_report">' + mse_report(result) + '</article>'
     else:
-        cpue = key.startswith('cpue_'); value = 'index' if cpue else 'SB_over_SB0'
-        label = 'CPUE relative to the first year' if cpue else 'Spawning biomass / unfished level'
+        cpue = key.startswith('cpue_'); value = 'index' if cpue else 'B_over_K'
+        label = 'CPUE relative to the first year' if cpue else 'Biomass / carrying capacity'
         body += '<h2>Results</h2>' + plot(result['series'], value, label)
         rows = [{'case': name, 'year': values[-1]['year'], 'value': values[-1][value]} for name, values in result['series'].items()]
-        body += table(rows, [('case','Analysis'),('year','Final year'),('value','Relative CPUE' if cpue else 'SB / SB₀')])
+        body += table(rows, [('case','Analysis'),('year','Final year'),('value','Relative CPUE' if cpue else 'B / K')])
         if not cpue:
-            body += '<details><summary>Fishing mortality and case checks</summary><h2>Fishing mortality</h2>' + plot(result['series'], 'F', 'Annual fishing mortality')
+            body += '<details><summary>Harvest rate and case checks</summary><h2>Harvest rate</h2>' + plot(result['series'], 'harvest_rate', 'Catch / starting biomass')
             diagnostics = [{**r, 'boundary': 'Review' if r['boundary_fit'] else 'Within bounds'} for r in result['diagnostics']]
-            body += '<h2>Case checks</h2>' + table(diagnostics, [('case','Case'),('M','Natural mortality'),('catch_check','Catch matching'),('boundary','Biomass search')]) + '</details>'
-        body += '<h2>Interpretation</h2><p>' + ('The two analyses use different treatment of vessel effects. Any selected record filter applies to analysis A. This comparison shows how those methods and inputs change the index.' if cpue else 'The four cases combine two CPUE indices with two mortality settings. Their differences illustrate how analytical inputs and assumptions carry through to assessment outputs. These calculations provide no management advice.') + '</p>'
+            body += '<h2>Case checks</h2>' + table(diagnostics, [('case','Case'),('r','Intrinsic growth'),('balance_check','Biomass balance'),('feasibility_check','Feasibility'),('gradient_check','Projected gradient'),('boundary','Biomass search')]) + '</details>'
+        body += '<h2>Interpretation</h2><p>' + ('The two analyses use different treatment of vessel effects. Any selected record filter applies to analysis A. This comparison shows how those methods and inputs change the index.' if cpue else 'The four cases combine two CPUE indices with two growth settings. Their differences illustrate how analytical inputs and assumptions carry through to assessment outputs. These calculations provide no management advice.') + '</p>'
     body += '<h2>Analysis record</h2><p>Produced in <strong>' + esc(record['run_id']) + '</strong>. Each retained input keeps its original run.</p>'
     if lineage:
         preview = [{**row, 'checksum': row['checksum'][:12]} for row in lineage]
@@ -408,5 +412,11 @@ def output_page(job, result, record, lineage):
         repo = esc(execution['repository'])
         commit = esc(execution['commit'])
         body += '<p>Executed on GitHub Actions · <a href="https://github.com/' + repo + '/commit/' + commit + '">' + commit[:8] + '</a></p>'
+    container = record.get('software', {}).get('container')
+    if container:
+        body += '<p>Calculation container: <code>' + esc(container) + '</code></p>'
+        url = record.get('software', {}).get('container_url')
+        if url:
+            body += '<p><a href="' + esc(url) + '">Container package</a></p>'
     body += '<details><summary>Data, code, settings and software</summary><pre>' + esc(json.dumps(record, indent=2)) + '</pre></details>'
     return '<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(job['title']) + '</title><style>' + STYLE + '</style><body><p class="muted">Fisheries workflow · illustrative analysis</p><h1>' + esc(job['title']) + '</h1>' + body + '<footer>Synthetic data and simplified models. The downloadable run bundle preserves the inputs, code, settings and results.</footer></body></html>'

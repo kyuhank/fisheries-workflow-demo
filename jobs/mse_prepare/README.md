@@ -1,35 +1,35 @@
 # Prepare MSE (`mse_prepare`)
 
-Reconstruct the first future-year stock states from all four fitted assessments and retain the common simulation assumptions, rules and limitations for the illustrative MSE.
+Reconstruct next-year Schaefer stocks after the terminal assessment catch, then prepare common seeded growth and observation errors once for all three management rules.
 
-Owner: MSE analyst.
+Owner: MSE analyst. The readable entrypoint is [run.R](run.R), using shared [mse.R](../../workflow/r/mse.R).
 
 ## Inputs and settings
 
 Declared upstream jobs: [Assessment A1 (`assessment_a1`)](../assessment_a1/README.md), [Assessment A2 (`assessment_a2`)](../assessment_a2/README.md), [Assessment B1 (`assessment_b1`)](../assessment_b1/README.md), [Assessment B2 (`assessment_b2`)](../assessment_b2/README.md)
 
-Incoming artifacts: `runs/assessment_a1/output.json`, `runs/assessment_a2/output.json`, `runs/assessment_b1/output.json` and `runs/assessment_b2/output.json`: fitted parameters, annual catches and observed indices.
+Incoming artifacts: All four assessment outputs: r, K, q, annual catches, observed indices and the declared next-year biomass.
 
-Saved settings: No job-specific settings are saved (`record.json.settings` is `{}`). Every job also preserves snapshot lineage separately; `mse` controls which jobs are in the active graph.
+Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
 
-## Run
+## Run in the container
 
-From the repository root:
+Inside the declared container, from the repository root:
 
 ```sh
 python3 run.py --from mse_prepare --scope job
 ```
 
-This selects the job and refreshes required upstream inputs when needed. `--output DIR` replaces the default `runs` directory; `--settings FILE` overrides current settings with values from a JSON file.
+The coordinator and R run inside the declared R/RTMB/Quarto container; the coordinator refreshes required inputs before calling the job. The run record identifies the actual image and versions. `--output DIR` changes the default `runs` directory; `--settings FILE` supplies JSON setting overrides.
 
-MSE must be enabled (`"mse": true`, the fresh-run default) for this job to be selected.
+MSE must be enabled (`"mse": true`). The declared trials use 15 years, 20 paired replicates per fitted case and growth scenario, with catches capped at 40% of current biomass.
 
 ## Outputs and downstream jobs
 
-- `runs/mse_prepare/output.json`: operating models, assumptions, rules and limitations.
-- `runs/mse_prepare/report.html`: the page produced by the shared [report renderer](../../workflow/reports.py).
-- `runs/mse_prepare/record.json`: run identity, settings, input lineage and artifact checksums.
+- `runs/mse_prepare/output.json`: the R calculation result.
+- `runs/mse_prepare/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/mse_prepare/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These paths are generated run artifacts. Declared downstream jobs: [Constant catch (`mse_constant`)](../mse_constant/README.md), [Index rule (`mse_index`)](../mse_index/README.md), [Buffered rule (`mse_buffered`)](../mse_buffered/README.md)
+These are generated run artifacts. Declared downstream jobs: [Constant catch (`mse_constant`)](../mse_constant/README.md), [Index rule (`mse_index`)](../mse_index/README.md), [Buffered rule (`mse_buffered`)](../mse_buffered/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_prepare/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_prepare/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_prepare/record.json).

@@ -26,14 +26,14 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from workflow.spec import HANDOVERS, SPEC, STAGES
+from workflow.r_bridge import RBridge
 
 CONFIG = json.loads((ROOT / 'cloud/config.json').read_text())
 BASE = CONFIG['url'].rstrip('/')
 REPOSITORY = 'kyuhank/fisheries-workflow-demo'
-IMAGE = ('ghcr.io/pacificcommunity/fisheries-workflow@sha256:'
-         '53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc')
+IMAGE = os.environ.get('PAPER_RUNTIME_IMAGE')
 EXPECTED_COMMIT = os.environ.get('PAPER_EXPECTED_COMMIT')
-SETTINGS = {'last_year': 2023, 'min_hooks_a': 0, 'mortality_2': .3,
+SETTINGS = {'last_year': 2023, 'min_hooks_a': 0, 'growth_rate_2': .3,
             'mse': True, 'mse_buffer': .8}
 CHECKS = []
 VERIFIED_RUNS = {}
@@ -133,6 +133,9 @@ def check_identity(run, value, previous):
         assert execution['provider'] == 'GitHub Actions', 'Wrong execution provider.'
         assert execution['repository'] == REPOSITORY, 'Record has the old repository.'
         assert execution['container'] == IMAGE, 'Record has the wrong container digest.'
+        assert record['software']['container'] == IMAGE, 'Software image differs from execution.'
+        assert record['software']['runtime'] == 'Rscript (container)', 'Calculation backend differs.'
+        assert record['software'].get('RTMB'), 'Missing actual RTMB package version.'
         assert execution['commit'] == commit, 'Record has a different source commit.'
         assert str(execution['github_run']) == run_id, 'Record has a different execution identity.'
         assert record['run_id'] == value['run_id'], 'Job has a different analysis run identity.'
@@ -334,6 +337,7 @@ def isolation(owner, other):
 
 
 def main():
+    assert RBridge.require_container() == IMAGE, 'Checker requires the actual declared calculation container.'
     assert CONFIG['repository'] == REPOSITORY, 'Local configuration has the wrong repository.'
     assert urllib.parse.urlsplit(BASE).scheme == 'https', 'Hosted endpoint must use HTTPS.'
     if EXPECTED_COMMIT:
@@ -362,8 +366,8 @@ def main():
     assert selected['retained'] == [], 'Fresh selected job retained unexpected results.'
     REPORT['selected_job_bundle'] = reproduce(other, selected, job='cpue_a')
     REPORT['session_isolation'] = isolation(session, other)
-    REPORT['runtime'] = {'python': platform.python_version(), 'platform': sys.platform,
-                         'sqlite': sqlite3.sqlite_version}
+    REPORT['runtime'] = {**RBridge().software(), 'python': platform.python_version(),
+                         'platform': sys.platform, 'sqlite': sqlite3.sqlite_version}
     REPORT['status'] = 'passed'
     print('PASS: real hosted execution, selected-job inputs, retained identities, bundle reproduction and reader isolation.', flush=True)
 

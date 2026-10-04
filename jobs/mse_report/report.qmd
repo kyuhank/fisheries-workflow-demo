@@ -1,0 +1,110 @@
+---
+title: "Management strategy comparison report"
+lang: en-NZ
+format:
+  html:
+    embed-resources: true
+    toc: true
+    theme: cosmo
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+Synthetic fisheries workflow. This report is rendered by Quarto from preserved R outputs.
+
+```{r}
+# Read preserved results. Report rendering performs no model fitting.
+payload <- jsonlite::fromJSON("report-data.json", simplifyVector = FALSE)
+result <- payload$result
+record <- payload$record
+rows_frame <- function(rows) {
+  do.call(rbind, lapply(rows, function(row) as.data.frame(row, stringsAsFactors = FALSE)))
+}
+plot_series <- function(series, field, label) {
+  years <- unlist(lapply(series, function(rows) vapply(rows, function(x) x$year, numeric(1))))
+  values <- unlist(lapply(series, function(rows) vapply(rows, function(x) x[[field]], numeric(1))))
+  colours <- c("#1378a3", "#b56435", "#7357a8", "#328363")
+  plot(range(years), range(c(0, values)), type = "n", xlab = "Year", ylab = label)
+  for (i in seq_along(series)) {
+    lines(vapply(series[[i]], function(x) x$year, numeric(1)),
+          vapply(series[[i]], function(x) x[[field]], numeric(1)),
+          col = colours[(i - 1) %% length(colours) + 1], lwd = 2)
+  }
+  legend("topright", names(series), col = colours[seq_along(series)], lty = 1, bty = "n")
+}
+```
+## Methods
+
+Four fitted Schaefer cases supply starting biomass, carrying capacity, growth and catchability. Three catch rules face the same saved R growth and observation error streams: constant catch, an index rule and a buffered rule. Each trial observes an index with error, sets catch and updates biomass using surplus production and removals. The index rules see a three-year observed mean rather than true biomass. Realised catch is capped at 0.4 times starting biomass, and realised intrinsic growth is capped at 1 per year. Surplus production uses starting biomass; catch is then removed in the same annual recurrence.
+
+Each rule runs for **`r result$assumptions$years` years**, with **`r result$assumptions$replicates` trials** per case and scenario. One scenario keeps the growth multiplier at one; the other uses 0.7 for six years, then returns to one. The underlying mean-one lognormal growth and observation perturbations have coefficients of variation `r result$assumptions$growth_cv` and `r result$assumptions$observation_cv`, before the growth cap is applied. The preparation result preserves seeds, RNG settings and the actual paired error vectors.
+
+## Results
+
+```{r}
+metrics <- lapply(result$metrics, function(row) {
+  list(rule = row$name, mean_catch_t = row$mean_catch_t,
+       final_B_over_K = row$final_B_over_K,
+       below_threshold_percent = row$below_threshold_percent,
+       catch_change_percent = row$catch_change_percent)
+})
+knitr::kable(rows_frame(metrics), digits = 3)
+for (scenario in result$scenarios) {
+  plot_series(scenario$series, "B_over_K", paste(scenario$name, "— median end-year biomass / K"))
+  plot_series(scenario$series, "catch_t", paste(scenario$name, "— median realised catch (tonnes)"))
+}
+```
+
+Final biomass is a median over trials. The threshold statistic counts trials that crossed 0.2 of carrying capacity, an illustrative comparison level. Catch change includes the first change from the reference catch. Cases and scenarios receive equal comparison weight; they are not estimated probabilities.
+
+## Interpretation
+
+Compare catch, biomass and catch stability together. These trials show how each decision affects the stock and future observations. They do not select a preferred rule for a real fishery. The comparison inherits the fitted starting states and fixed assumptions and does not include assessment parameter uncertainty.
+
+```{r}
+#| results: asis
+for (limitation in result$limitations) cat("- ", limitation, "\n", sep = "")
+if (length(result$boundary_cases)) {
+  cat("\nBoundary fits used as operating models: ",
+      paste(unlist(result$boundary_cases), collapse = ", "), ".\n", sep = "")
+}
+```
+
+## Analysis record
+
+Produced in **`r record$run_id`**. Each input below keeps its original run and output checksum.
+
+```{r}
+inputs <- lapply(names(record$inputs), function(key) {
+  list(job = key, run = record$inputs[[key]]$run_id,
+       output_sha256 = record$inputs[[key]]$checksum)
+})
+if (length(inputs)) knitr::kable(rows_frame(inputs))
+```
+
+New calculations and this Quarto report run inside the declared container. The downloadable bundle includes the actual R job, shared R sources, this QMD, the preserved result JSON, settings and checksums.
+
+```{r}
+software <- lapply(names(record$software), function(key) {
+  list(component = key, value = as.character(record$software[[key]]))
+})
+knitr::kable(rows_frame(software))
+```
+
+```{r}
+#| results: asis
+image <- record$software$container
+cat("Calculation image and digest: `", image, "`\n\n", sep = "")
+if (!is.null(record$software$container_url)) {
+  cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
+}
+if (!is.null(record$source$repository) && !is.null(record$source$commit)) {
+  cat("[Recorded source commit](", record$source$repository, "/commit/",
+      record$source$commit, ")\n\n", sep = "")
+}
+cat("<details><summary>Full preserved input record</summary>\n\n```json\n",
+    jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),
+    "\n```\n\n</details>\n", sep = "")
+```

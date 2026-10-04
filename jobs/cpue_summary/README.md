@@ -1,33 +1,33 @@
 # Compare CPUE results (`cpue_summary`)
 
-Collect both fitted CPUE series under their declared job titles for comparison in plots and tables.
+Collect the two fitted CPUE series for comparison without fitting another model.
 
-Owner: CPUE analyst.
+Owner: CPUE analyst. The readable entrypoint is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
 
 ## Inputs and settings
 
 Declared upstream jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md)
 
-Incoming artifacts: `runs/cpue_a/output.json` and `runs/cpue_b/output.json`: each result's `series`.
+Incoming artifacts: The `series` in `runs/cpue_a/output.json` and `runs/cpue_b/output.json`.
 
-Saved settings: No job-specific settings are saved (`record.json.settings` is `{}`). Every job also preserves snapshot lineage separately; `mse` controls which jobs are in the active graph.
+Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
 
-## Run
+## Run in the container
 
-From the repository root:
+Inside the declared container, from the repository root:
 
 ```sh
 python3 run.py --from cpue_summary --scope job
 ```
 
-This selects the job and refreshes required upstream inputs when needed. `--output DIR` replaces the default `runs` directory; `--settings FILE` overrides current settings with values from a JSON file.
+The coordinator and R run inside the declared R/RTMB/Quarto container; the coordinator refreshes required inputs before calling the job. The run record identifies the actual image and versions. `--output DIR` changes the default `runs` directory; `--settings FILE` supplies JSON setting overrides.
 
 ## Outputs and downstream jobs
 
-- `runs/cpue_summary/output.json`: the two named CPUE series.
-- `runs/cpue_summary/report.html`: the page produced by the shared [report renderer](../../workflow/reports.py).
-- `runs/cpue_summary/record.json`: run identity, settings, input lineage and artifact checksums.
+- `runs/cpue_summary/output.json`: the R calculation result.
+- `runs/cpue_summary/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/cpue_summary/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These paths are generated run artifacts. Declared downstream jobs: [CPUE report (`cpue_report`)](../cpue_report/README.md)
+These are generated run artifacts. Declared downstream jobs: [CPUE report (`cpue_report`)](../cpue_report/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/record.json).

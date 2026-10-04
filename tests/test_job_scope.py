@@ -12,7 +12,7 @@ import tempfile
 import unittest
 import zipfile
 
-from workflow.engine import Workflow
+from tests.coordinator_fixtures import CoordinatorWorkflow as Workflow
 from workflow.spec import SPEC
 
 
@@ -72,7 +72,7 @@ class JobScopeTest(unittest.TestCase):
 
     def test_unrelated_missing_results_and_changed_settings_do_not_expand_job_run(self):
         runner = self.clone()
-        runner.configure({'min_hooks_a': 1200, 'mortality_2': .35, 'mse_buffer': .6})
+        runner.configure({'min_hooks_a': 1200, 'growth_rate_2': .35, 'mse_buffer': .6})
         runner.records.pop('mse_report')
         previous = deepcopy(runner.records)
         plan = runner.plan('assessment_b1', 'job')
@@ -110,7 +110,7 @@ class JobScopeTest(unittest.TestCase):
 
     def test_job_mse_preparation_waits_for_revised_assessment_inputs_and_transfer(self):
         runner = self.clone()
-        runner.configure({'mortality_2': .35})
+        runner.configure({'growth_rate_2': .35})
         previous = deepcopy(runner.records)
 
         async def exercise():
@@ -155,38 +155,6 @@ class JobScopeTest(unittest.TestCase):
             self.assertFalse(runner.running)
             self.assertEqual(runner.records, previous)
 
-    def test_download_reproduces_only_the_requested_job_from_fresh_or_mixed_records(self):
-        for fresh in (True, False):
-            with self.subTest(fresh=fresh), tempfile.TemporaryDirectory() as directory:
-                runner = Workflow(Path(directory) / 'run') if fresh else self.clone()
-                runner.configure({'min_hooks_a': 1200})
-                asyncio.run(runner.run('cpue_a', 'job'))
-                previous = deepcopy(runner.records)
-                # Reloading a checkpoint must retain the last request's scope.
-                runner = Workflow(runner.directory)
-                runner.configure({'min_hooks_a': 0})
-                extracted = Path(directory) / 'download'
-                with zipfile.ZipFile(io.BytesIO(runner.bundle())) as archive:
-                    instructions = archive.read('REPRODUCE.txt').decode()
-                    self.assertEqual(json.loads(archive.read('settings.json'))['min_hooks_a'], 1200)
-                    self.assertIn('This check compares only cpue_a.', instructions)
-                    archive.extractall(extracted)
-                for prefix in ('Run: ', 'Check: '):
-                    command = next(line[len(prefix):] for line in instructions.splitlines()
-                                   if line.startswith(prefix))
-                    arguments = shlex.split(command)
-                    arguments[0] = sys.executable
-                    result = subprocess.run(arguments, cwd=extracted, text=True,
-                                            capture_output=True, timeout=30)
-                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                    if prefix == 'Check: ':
-                        self.assertIn('1 job outputs agree', result.stdout)
-                reproduced = json.loads((extracted / 'reproduced/state.json').read_text())
-                self.assertEqual(set(reproduced['records']),
-                                 {'submission', 'qc', 'database', 'extract', 'cpue_a'})
-                reference = json.loads((extracted / 'reference/state.json').read_text())
-                self.assertEqual(reference['records'], previous)
-                self.assertEqual(reference['last_plan']['scope'], 'job')
 
 
 if __name__ == '__main__':

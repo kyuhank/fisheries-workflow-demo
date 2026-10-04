@@ -1,64 +1,102 @@
-"""Job boundaries must survive dispatch, code changes and portable downloads."""
+"""Actual R source custody, dispatch boundaries and declared bundle runtime."""
 import asyncio
 import hashlib
-import importlib
 import io
-from pathlib import Path
+import json
 import tempfile
 import unittest
 from unittest.mock import AsyncMock, patch
 import zipfile
+from pathlib import Path
 
-from workflow.engine import ROOT, Workflow, job_files
+from workflow.engine import ROOT, Workflow, calculation_files, job_files
 from workflow.spec import SPEC
+from tests.coordinator_fixtures import CoordinatorBridge
 
 
 class JobSourceTests(unittest.TestCase):
-    def test_each_registered_job_has_an_importable_entrypoint_and_guide(self):
+    def runner(self, directory):
+        return Workflow(directory, r_bridge=CoordinatorBridge())
+
+    def test_all_registered_jobs_have_readable_R_entrypoint_and_guide(self):
         folders = {p.name for p in (ROOT / 'jobs').iterdir() if p.is_dir()
                    and p.name != '__pycache__'}
         self.assertEqual(folders, set(SPEC))
         for key in SPEC:
             self.assertTrue((ROOT / 'jobs' / key / 'README.md').is_file())
-            self.assertTrue(asyncio.iscoroutinefunction(
-                importlib.import_module(f'jobs.{key}.run').calculate))
+            source = (ROOT / 'jobs' / key / 'run.R').read_text()
+            self.assertIn('calculate <- function(context)', source)
+            self.assertNotIn('system(', source)
+            self.assertNotIn('reticulate', source)
+        for key in ('cpue_report', 'assessment_report', 'mse_report'):
+            self.assertTrue((ROOT / 'jobs' / key / 'report.qmd').is_file())
 
-    def test_coordinator_calls_selected_job_and_rejects_unregistered_names(self):
+    def test_selected_job_receives_its_declared_JSON_inputs(self):
         with tempfile.TemporaryDirectory() as directory:
-            runner = Workflow(directory)
-            calculation = AsyncMock(return_value={'selected': 'cpue_a'})
-            with patch('jobs.cpue_a.run.calculate', calculation):
-                self.assertEqual(asyncio.run(runner.calculate('cpue_a', 'test')),
-                                 {'selected': 'cpue_a'})
-                calculation.assert_awaited_once_with(runner, 'test')
+            runner = self.runner(directory)
+            folder = Path(directory) / 'extract'
+            folder.mkdir()
+            inputs = {'sets': [{'set_id': 'one'}], 'catch': []}
+            (folder / 'output.json').write_text(json.dumps(inputs))
+            selected = AsyncMock(return_value={'result': {'selected': 'cpue_a'}, 'effects': {}})
+            runner.calculator.calculate = selected
+            self.assertEqual(asyncio.run(runner.calculate('cpue_a', 'test')), {'selected': 'cpue_a'})
+            context = selected.await_args.args[0]
+            self.assertEqual(context['parents'], {'extract': inputs})
+            self.assertEqual(context['job_settings'], {'min_hooks': 0})
+            self.assertEqual(context['key'], 'cpue_a')
+            self.assertEqual(context['run_id'], 'test')
             with self.assertRaisesRegex(ValueError, 'No calculation registered'):
                 asyncio.run(runner.calculate('../../other', 'test'))
+            selected.assert_awaited_once()
 
-    def test_job_source_revision_changes_only_its_own_code_record(self):
+    def test_only_QC_can_request_declared_resubmission_effect(self):
         with tempfile.TemporaryDirectory() as directory:
-            runner = Workflow(directory)
-            before_a, before_b = runner.code_record('cpue_a'), runner.code_record('cpue_b')
+            runner = self.runner(directory)
+            path = Path(directory) / 'extract'
+            path.mkdir()
+            (path / 'output.json').write_text('{}')
+            runner.calculator.calculate = AsyncMock(return_value={
+                'result': {}, 'effects': {'resubmit_submission': {}}})
+            with self.assertRaisesRegex(ValueError, 'undeclared workflow side effects'):
+                asyncio.run(runner.calculate('cpue_a', 'test'))
+            self.assertEqual(runner.events, [])
+
+    def test_job_revision_is_local_and_shared_R_revision_reaches_all_sourced_jobs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            runner = self.runner(directory)
+            before = {key: runner.code_record(key) for key in ('cpue_a', 'cpue_b')}
             original = Path.read_bytes
-            target = ROOT / 'jobs/cpue_a/run.py'
-            def changed(path):
-                return original(path) + b'\n# a different job revision\n' if path == target else original(path)
-            with patch.object(Path, 'read_bytes', changed):
-                self.assertNotEqual(runner.code_record('cpue_a'), before_a)
-                self.assertEqual(runner.code_record('cpue_b'), before_b)
-            self.assertNotIn('jobs/cpue_a/README.md', before_a)
+            for name, affected in [('jobs/cpue_a/run.R', {'cpue_a'}),
+                                   ('workflow/r/models.R', {'cpue_a', 'cpue_b'})]:
+                target = ROOT / name
+                def changed(path):
+                    return original(path) + b'\n# changed source\n' if path == target else original(path)
+                with patch.object(Path, 'read_bytes', changed):
+                    for key in before:
+                        self.assertEqual(runner.code_record(key) != before[key], key in affected)
+            self.assertNotIn('jobs/cpue_a/README.md', before['cpue_a'])
+            self.assertFalse(any(name.endswith('.py') and name.startswith('jobs/')
+                                 for name in before['cpue_a']))
 
-    def test_download_contains_all_job_sources_and_guides_with_checksums(self):
+    def test_bundle_preserves_actual_R_QMD_sources_and_container_recipe(self):
         with tempfile.TemporaryDirectory() as directory:
-            runner = Workflow(directory)
-            with zipfile.ZipFile(io.BytesIO(runner.bundle())) as archive:
-                import json
+            runner = self.runner(directory)
+            image = 'ghcr.io/example/fisheries@sha256:' + 'a' * 64
+            with patch.object(runner, 'software', return_value={'container': image}), \
+                 zipfile.ZipFile(io.BytesIO(runner.bundle())) as archive:
                 checksums = json.loads(archive.read('SHA256SUMS.json'))
-                for path in job_files():
+                for path in [*job_files(), *calculation_files()]:
                     name = path.relative_to(ROOT).as_posix()
                     self.assertEqual(archive.read(name), path.read_bytes())
                     self.assertEqual(checksums[name], hashlib.sha256(path.read_bytes()).hexdigest())
-                self.assertIn('ADAPT.md', archive.namelist())
-                self.assertIn('cloud/README.md', archive.namelist())
+                recipe = archive.read('REPRODUCE.txt').decode()
+                self.assertIn('docker run --rm --network none', recipe)
+                self.assertIn('PAPER_RUNTIME_IMAGE=' + image, recipe)
+                self.assertIn('python3 run.py', recipe)
+                self.assertIn('scripts/generate-data.R', archive.namelist())
+                self.assertFalse(any(name.startswith('jobs/') and name.endswith('run.py')
+                                     for name in archive.namelist()))
 
 
 if __name__ == '__main__':

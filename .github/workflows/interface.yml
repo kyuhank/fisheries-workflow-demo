@@ -10,15 +10,18 @@ permissions:
 jobs:
   diagram:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build the current pages in the preserved runtime
         env:
-          IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc
+          IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
         run: |
           docker pull "$IMAGE"
           docker run --rm --network none \
+            --env PAPER_RUNTIME_IMAGE="$IMAGE" \
+            --env PAPER_RUNTIME_IMAGE_URL=https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow \
+            --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID --env GITHUB_RUN_ATTEMPT \
             --user "$(id -u):$(id -g)" \
             --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
             "$IMAGE" sh -c 'python scripts/build.py && python scripts/release.py'

@@ -31,14 +31,14 @@ function recordedSettings(chain, fallback) {
   const values = { ...fallback };
   if (chain.submission) values.last_year = chain.submission.settings.last_year;
   if (chain.cpue_a) values.min_hooks_a = chain.cpue_a.settings.min_hooks;
-  const mortality = [chain.assessment_a2, chain.assessment_b2]
-    .filter(Boolean).map((record) => record.settings.M);
-  if (new Set(mortality).size > 1) {
+  const growth = [chain.assessment_a2, chain.assessment_b2]
+    .filter(Boolean).map((record) => record.settings.r);
+  if (new Set(growth).size > 1) {
     throw Error(
-      "These inputs used different mortality settings. Use the individual downloaded runs.",
+      "These inputs used different growth rate settings. Use the individual downloaded runs.",
     );
   }
-  if (mortality.length) values.mortality_2 = mortality[0];
+  if (growth.length) values.growth_rate_2 = growth[0];
   if (chain.mse_buffered) values.mse_buffer = chain.mse_buffered.settings.buffer ?? 0.8;
   return values;
 }

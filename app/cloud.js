@@ -70,7 +70,7 @@ class CloudRun {
         throw Error("The live service is unavailable.");
       }
       if (!this.repository || info.repository !== this.repository) {
-        throw Error("The live service is being updated. Use Offline run for this version.");
+        throw Error("The live service is being updated. Use View example for this version.");
       }
       this.session = await this.request(
         "/session",
@@ -117,7 +117,7 @@ class CloudRun {
         return record.settings.min_hooks !== settings.min_hooks_a;
       }
       if (["assessment_a2", "assessment_b2"].includes(job.key)) {
-        return record.settings.M !== settings.mortality_2;
+        return record.settings.r !== settings.growth_rate_2;
       }
       if (job.key === "mse_buffered") {
         return (record.settings.buffer ?? 0.8) !== (settings.mse_buffer ?? 0.8);
@@ -202,9 +202,9 @@ class CloudRun {
         continue;
       }
       if (!update.run || update.run.id !== request.id) {
-        throw Error(
-          "This temporary run has expired. Start a new session to continue.",
-        );
+        throw Object.assign(Error("The acknowledged live run could not be located."), {
+          executionUnknown: true,
+        });
       }
       this.run = update.run;
       if (this.run.github_run) this.onPhase(null, null, this.run.github_run);
