@@ -236,6 +236,50 @@ dialog nav .active {
   color: var(--muted);
   font-size: 12px;
 }
+.view-guide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding: 15px 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #edf3f6;
+}
+.view-guide h2 {
+  margin: 0 0 5px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.view-guide p {
+  margin: 0;
+  max-width: 100ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.view-guide > a {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+@media (max-width:850px) {
+  .view-guide {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+@media (max-width:650px) {
+  .tabs { flex-wrap: wrap; }
+  .tabs > span {
+    flex-basis: 100%;
+    margin: 4px 0 0;
+  }
+  .view-guide { padding: 13px 14px; }
+}
 .modules {
   overflow-x: auto;
   overscroll-behavior-inline: contain;

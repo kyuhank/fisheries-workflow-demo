@@ -69,6 +69,11 @@ with hosted_docs() as url, sync_playwright() as playwright:
             }
             if (document.documentElement.scrollWidth > innerWidth + 1)
                 problems.push('page overflows horizontally');
+            const guideText = document.querySelector('#view-guide-description').getBoundingClientRect();
+            const guideLink = document.querySelector('#view-guide-link').getBoundingClientRect();
+            if (guideText.left < guideLink.right && guideText.right > guideLink.left &&
+                guideText.top < guideLink.bottom && guideText.bottom > guideLink.top)
+                problems.push('view guide text overlaps its switch link');
             return problems;
         }""")
         assert not problems, (width, zoom, problems)

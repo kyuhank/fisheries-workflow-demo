@@ -19,6 +19,21 @@ def run_selection(page):
     return page.evaluate('({selected, settingsIntent, completedRun, plan, settings: settings()})')
 
 
+def switch_with_guide(page, target):
+    """Changing the explanatory view must preserve the selected execution."""
+    before = run_selection(page)
+    assert page.locator('#view-guide-link').get_attribute('href') == '#' + target
+    page.locator('#view-guide-link').click()
+    page.wait_for_url('**#' + target)
+    active, inactive = ('jobs', 'workflow') if target == 'orchestration' else ('workflow', 'jobs')
+    assert page.locator(f'#{active}-view').is_visible()
+    assert page.locator(f'#{inactive}-view').is_hidden()
+    assert page.locator(f'[data-tab="{active}"]').get_attribute('aria-selected') == 'true'
+    assert page.locator('#run-controls').count() == 1
+    assert page.locator('#jobs-view #run-controls').count() == int(target == 'orchestration')
+    assert run_selection(page) == before, 'View guide changed the run selection or plan'
+
+
 def expect_run(page, previous, expected, scope):
     page.wait_for_function("""previous => !busy && orchestrationRuns.length === previous + 1 &&
       document.querySelector('#status-title').textContent === 'Results are ready'
@@ -89,7 +104,11 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.locator('#jobs-view #run').count() == 1
     page.wait_for_function("document.querySelector('#mode').value === 'live'")
     page.locator('#mode').select_option('saved')
-    page.locator('[data-tab="jobs"]').click()
+    assert 'saved' in page.locator('#view-guide-description').inner_text()
+    assert 'Output and Record' in page.locator('#view-guide-description').inner_text()
+    switch_with_guide(page, 'workflow')
+    assert 'saved jobs' in page.locator('#view-guide-description').inner_text()
+    switch_with_guide(page, 'orchestration')
     assert page.locator('#show-tasks').inner_text().startswith('Tasks')
     assert page.locator('#workspace-title').inner_text() == 'Tasks'
     assert page.locator('.task-responsibility').count() == page.evaluate('taskGroups.length')
@@ -134,6 +153,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
 
     page.locator('#mode').select_option('live')
     page.locator('#run:enabled').wait_for(timeout=90000)
+    assert 'Run the workflow' in page.locator('#view-guide-description').inner_text()
     assert page.locator('[data-group="current"] .open-output').is_disabled()
     assert page.locator('[data-group="current"] .open-job-record').is_disabled()
     assert page.locator('[data-group="current"] .state').inner_text() == 'Waiting'
@@ -148,6 +168,11 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#handover').select_option('manual')
     assert page.locator('[data-tab="jobs"]').inner_text() == 'Job outputs'
     assert 'without shared orchestration' in page.locator('#workspace-description').inner_text()
+    assert 'without shared orchestration' in page.locator('#view-guide-description').inner_text()
+    switch_with_guide(page, 'workflow')
+    assert 'confirm each file transfer' in page.locator('#view-guide-description').inner_text()
+    assert 'job outputs' in page.locator('#view-guide-link').inner_text()
+    switch_with_guide(page, 'orchestration')
     assert page.locator('.handover-marker').count() == 5
     page.locator('#run').click()
     page.locator('#handover-panel:visible').wait_for(timeout=30000)
@@ -192,6 +217,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.evaluate('orchestrationRuns.at(-1).input.scope') == 'workflow'
 
     page.locator('#handover').select_option('connected')
+    assert 'without shared orchestration' not in page.locator('#view-guide-description').inner_text()
     page.locator('#all-tasks').click()
     page.locator('#job-status-filter').select_option('')
     page.locator('#task-filter').select_option('cpue')
@@ -251,7 +277,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('.workflow-node[data-job="cpue_summary"]').click()
     page.wait_for_function("plan?.scope === 'workflow' && plan.run.length === 2")
     page.locator('#run:enabled').wait_for()
-    page.locator('[data-tab="jobs"]').click()
+    switch_with_guide(page, 'orchestration')
     previous = page.evaluate('orchestrationRuns.length')
     page.locator('#run').click()
     expect_run(page, previous, ['cpue_summary', 'cpue_report'], 'workflow')

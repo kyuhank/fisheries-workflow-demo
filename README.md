@@ -17,13 +17,18 @@ for a real fishery.
 | **Offline run** | The same Python analysis runs in your browser. The downloaded HTML includes Python and the data. |
 | **View example** | Open saved outputs and records without running code. |
 
+The **Workflow diagram** shows the analytical connections: each job receives
+inputs from the jobs connected to it. **Orchestration tool** organises these same
+jobs by task, with example analyst roles, progress and execution records. Switch
+between the views to follow the same execution.
+
 Run the workflow once, then change **CPUE A records**, **Mortality setting 2** or
 **MSE catch buffer**. Use **Update workflow** to update affected jobs; unchanged
 results keep their original records. **Orchestration tool** groups numbered jobs
 under **Tasks**. Click a job to open its output. Its **Run** action runs that job,
 first preparing any missing or outdated upstream inputs. Other results stay in
 place; use **Update workflow** to update jobs that depend on the revised output.
-Both views follow the same execution. **Dependencies** shows connected jobs;
+**Dependencies** shows connected jobs;
 **Record** shows saved inputs and versions, with **Reproduce & compare** to check a result.
 
 MSE compares three catch rules using the four fitted assessment cases. A scenario

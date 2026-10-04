@@ -32,7 +32,11 @@
       <section class="status" id="status"
         aria-live="polite"><span class="status-icon spinner" id="status-icon"></span><div><strong id="status-title">Loading the demonstration</strong><p id="status-message">The live connection starts when the page is ready.</p></div><span id="run-id"></span><button id="retry-connection" class="quiet" hidden>Retry connection</button><button id="offline-fallback" class="quiet" hidden>Use Offline run</button><a id="github-run" hidden target="_blank" rel="noopener">Execution ↗</a></section>
       <nav class="tabs"
-        aria-label="View"><button class="active" data-tab="workflow" aria-selected="true">Workflow</button><button data-tab="jobs" aria-selected="false">Orchestration tool</button><span id="completion"></span></nav>
+        aria-label="View"><button class="active" data-tab="workflow" aria-selected="true">Workflow diagram</button><button data-tab="jobs" aria-selected="false">Orchestration tool</button><span id="completion"></span></nav>
+      <section class="view-guide" aria-labelledby="view-guide-title">
+        <div><h2 id="view-guide-title">Follow the analytical connections</h2><p id="view-guide-description">The diagram shows which analyses provide inputs to others. Use the Orchestration tool to run the same connected jobs and inspect their responsibilities, progress and records.</p></div>
+        <a id="view-guide-link" href="#orchestration">Open Orchestration tool <span aria-hidden="true">→</span></a>
+      </section>
       <section id="handover-note" class="handover-note"
         hidden><div><strong>Separate workspaces · manual file transfer</strong><span>This mode represents work without shared orchestration. Receiving analyses wait until you confirm a file transfer.</span></div><button id="revise-cpue" class="quiet" hidden>Revise CPUE A</button></section>
       <section id="handover-panel" class="handover-panel" hidden
@@ -58,7 +62,7 @@
           </aside>
           <div class="workspace-content">
             <div
-              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Tasks</h2><p id="workspace-description">This view illustrates shared job coordination, using example roles and linked job records.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
+              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Tasks</h2><p id="workspace-description">Select a task to inspect its jobs, example analyst roles and execution records.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
             <div id="tasks" class="task-list"></div>
             <section id="dependencies-view" aria-label="Direct job dependencies" hidden>
               <div class="dependency-toolbar"><label for="dependency-job">Inspect a job<select id="dependency-job" aria-describedby="dependency-help"></select></label><p id="dependency-help">Browse the jobs that provide inputs and use the result. Your run selection stays the same.</p></div>

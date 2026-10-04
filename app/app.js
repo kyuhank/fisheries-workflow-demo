@@ -832,7 +832,7 @@ function renderTasks() {
     : workspaceView === "dependencies" ? "Follow a job’s connections"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "This view illustrates shared job coordination, using example roles and linked job records."
+    ? "Select a task to inspect its jobs, example analyst roles and execution records."
     : workspaceView === "dependencies" ? "Required inputs connect each job to the analyses that use its output."
     : "Follow required inputs; open the output or its recorded inputs and versions.";
   $("task-filter").value = selectedTask || "";
@@ -1113,6 +1113,7 @@ function render() {
   if (manual) $("workspace-description").textContent = workspaceView === "dependencies"
     ? "These connections show which files each analyst needs across separate workspaces. Transfers require confirmation."
     : "This view represents separate workspaces without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
+  renderViewGuide();
   for (const id of ["snapshot", "filter", "mortality", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
   }
@@ -1434,6 +1435,29 @@ $("reset").onclick = async () => {
     status("failed", "Reset unavailable", error.message);
   }
 };
+function renderViewGuide() {
+  const orchestration = $("workflow-view").hidden;
+  const manual = $("handover").value === "manual" && mode !== "saved";
+  $("view-guide-title").textContent = orchestration
+    ? manual ? "Follow work across separate workspaces"
+    : mode === "saved" ? "Inspect the saved jobs"
+    : "Coordinate jobs and trace a revision"
+    : "Follow the analytical connections";
+  $("view-guide-description").textContent = orchestration
+    ? manual
+      ? "These are separate analyst workspaces without shared orchestration. Inspect responsibilities and job records, and confirm file transfers when an analysis is waiting."
+      : mode === "saved"
+      ? "These tasks contain the same jobs shown in the diagram, with saved outputs. Select a task, then use a job’s Output and Record to inspect its result and inputs."
+      : "These tasks contain the jobs shown in the diagram. Run the workflow, then change a setting to follow a revision. Open a job’s Record to trace the inputs it used."
+    : manual
+      ? "The diagram shows the analyses and their input connections. In Manual handover, jobs run across separate workspaces and wait for you to confirm each file transfer."
+      : mode === "saved"
+      ? "The diagram shows which analyses provide inputs to others. The Orchestration tool organises the same saved jobs so you can inspect their outputs and recorded inputs."
+      : "The diagram shows which analyses provide inputs to others. Use the Orchestration tool to run the same connected jobs and inspect their responsibilities, progress and records.";
+  $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
+  $("view-guide-link").textContent = orchestration ? "See workflow diagram →"
+    : manual ? "Inspect job outputs →" : "Open Orchestration tool →";
+}
 function showTab(tab) {
   const orchestration = tab === "jobs";
   for (const button of document.querySelectorAll("[data-tab]")) {
@@ -1446,6 +1470,7 @@ function showTab(tab) {
   // One set of controls operates the same workflow from either view.
   if (orchestration) $("workspace-run-controls").append($("run-controls"));
   else $("workflow-view").before($("run-controls"));
+  renderViewGuide();
 }
 function showLinkedTab() {
   showTab(location.hash === "#orchestration" ? "jobs" : "workflow");
