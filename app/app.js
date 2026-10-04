@@ -357,6 +357,11 @@ function jobNode(node, colour, path) {
     submission: ["Data", "submission"],
     cpue_a: ["CPUE analysis", "A"],
     cpue_b: ["CPUE analysis", "B"],
+    cpue_summary: ["Results", "summary"],
+    assessment_a1: ["Assessment", "A1"],
+    assessment_a2: ["Assessment", "A2"],
+    assessment_b1: ["Assessment", "B1"],
+    assessment_b2: ["Assessment", "B2"],
     assessment_summary: ["Results", "summary"],
     assessment_report: ["Assessment", "report"],
   };
