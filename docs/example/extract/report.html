@@ -9,20 +9,23 @@ ORDER BY year, set_id;
 SELECT year, catch_t
 FROM removals
 ORDER BY year;
-</pre></details><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Checksum prefix</th></tr></thead><tbody><tr><td>Prepare and load</td><td>Run 001</td><td>20e349ca9329</td></tr></tbody></table><p>Executed on GitHub Actions · <a href="https://github.com/kyuhank/fisheries-workflow-demo/commit/86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7">86aa73ec</a></p><p>Calculation container: <code>ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d</code></p><p><a href="https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow">Container package</a></p><details><summary>Data, code, settings and software</summary><pre>{
+</pre></details><h2>Analysis record</h2><p>Produced in <strong>Run 001</strong>. Each retained input keeps its original run.</p><table><thead><tr><th>Input job</th><th>Original run</th><th>Checksum prefix</th></tr></thead><tbody><tr><td>Prepare and load</td><td>Run 001</td><td>20e349ca9329</td></tr></tbody></table><p>Executed on GitHub Actions · <a href="https://github.com/kyuhank/fisheries-workflow-demo/commit/5ed42619f7e8ce6a53a855b47522dcff6cc873de">5ed42619</a></p><p>Calculation container: <code>ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d</code></p><p><a href="https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow">Container package</a></p><details><summary>Data, code, settings and software</summary><pre>{
   &quot;job&quot;: &quot;extract&quot;,
   &quot;owner&quot;: &quot;Data analyst&quot;,
   &quot;run_id&quot;: &quot;Run 001&quot;,
-  &quot;signature&quot;: &quot;dcd11c29a14890ff3c90a9afc2ec91248fcea96120287942ccb328b798798c1e&quot;,
+  &quot;signature&quot;: &quot;d92fc600e8a3f1b404cee680bc19b4593de916301916395399c46eea92fbb87a&quot;,
   &quot;settings&quot;: {},
   &quot;snapshot&quot;: 2023,
   &quot;code&quot;: {
-    &quot;workflow/engine.py&quot;: &quot;070bf48de0d3e7e8d76e54ea7f769e0c288459356fa3357abc2b44e10c3d177b&quot;,
-    &quot;workflow/spec.py&quot;: &quot;6e9a21eac0857aeaaaafec91e8fef3c5cedb00facf98a20e7775fe626169a739&quot;,
+    &quot;Makefile&quot;: &quot;e41825f04fc35a282462e2b26eb9c0f12b3ab7d0a158c803d0ef6c910343b82e&quot;,
+    &quot;workflow/Makefile&quot;: &quot;9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157&quot;,
+    &quot;workflow/jobs.json&quot;: &quot;b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a&quot;,
+    &quot;workflow/engine.py&quot;: &quot;27ec286dc1b58c8b4265cc66a3cea1ef890b5da8bd3e30efac834430affba877&quot;,
+    &quot;workflow/spec.py&quot;: &quot;ae5455de889c2d544aab55f0e579d02614713a081768bf1a0d9937fda1de0e92&quot;,
     &quot;workflow/reports.py&quot;: &quot;b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c&quot;,
-    &quot;workflow/r_bridge.py&quot;: &quot;34d932d4df4779b7e01aa1d6519631e6ef1dd0db8dcf732001e0caa03b79f60d&quot;,
+    &quot;workflow/r_bridge.py&quot;: &quot;96b5705302400c14857c36f3d35ca99f541369ee2f3e602d513769189047abfc&quot;,
     &quot;workflow/r_driver.R&quot;: &quot;b3e4328bddb45d5be44503ba4a336aca71f857d6f408bd0d252a1c174d97851e&quot;,
-    &quot;workflow/quarto_reports.py&quot;: &quot;d2eb42d2fa714c3bd817b17d7bb0117e518072313334def879842cc1f2583556&quot;,
+    &quot;workflow/quarto_reports.py&quot;: &quot;bd61f3637efe1463874171284696024a039087af51fadc5af5b3ca2f3cbeac9f&quot;,
     &quot;jobs/extract/run.R&quot;: &quot;6b768a98204b33eab339a69086bfe823439a9775adc3a3936f3ace0bf22400e7&quot;,
     &quot;workflow/r/common.R&quot;: &quot;9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191&quot;,
     &quot;workflow/r/mse.R&quot;: &quot;da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956&quot;,
@@ -64,14 +67,14 @@ ORDER BY year;
     &quot;provider&quot;: &quot;GitHub Actions&quot;,
     &quot;purpose&quot;: &quot;saved-example-build&quot;,
     &quot;repository&quot;: &quot;kyuhank/fisheries-workflow-demo&quot;,
-    &quot;commit&quot;: &quot;86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7&quot;,
-    &quot;github_run&quot;: &quot;37223958280&quot;,
+    &quot;commit&quot;: &quot;5ed42619f7e8ce6a53a855b47522dcff6cc873de&quot;,
+    &quot;github_run&quot;: &quot;37239588308&quot;,
     &quot;container&quot;: &quot;ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d&quot;,
     &quot;container_url&quot;: &quot;https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow&quot;
   },
   &quot;source&quot;: {
     &quot;repository&quot;: &quot;https://github.com/kyuhank/fisheries-workflow-demo&quot;,
-    &quot;commit&quot;: &quot;86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7&quot;
+    &quot;commit&quot;: &quot;5ed42619f7e8ce6a53a855b47522dcff6cc873de&quot;
   },
   &quot;data_files&quot;: {
     &quot;fishery.sqlite&quot;: &quot;4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0&quot;,

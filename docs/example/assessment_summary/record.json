@@ -2,16 +2,19 @@
   "job": "assessment_summary",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "1ac43fa6b98d866349878a30fd2d51ca2df9a68c4db663efae9975ad73a5f87b",
+  "signature": "393b7b1011b08d42e02a70aa38da34c3f3a57dbace0d5d3d3931e6efa84f71f0",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "070bf48de0d3e7e8d76e54ea7f769e0c288459356fa3357abc2b44e10c3d177b",
-    "workflow/spec.py": "6e9a21eac0857aeaaaafec91e8fef3c5cedb00facf98a20e7775fe626169a739",
+    "Makefile": "e41825f04fc35a282462e2b26eb9c0f12b3ab7d0a158c803d0ef6c910343b82e",
+    "workflow/Makefile": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+    "workflow/jobs.json": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
+    "workflow/engine.py": "27ec286dc1b58c8b4265cc66a3cea1ef890b5da8bd3e30efac834430affba877",
+    "workflow/spec.py": "ae5455de889c2d544aab55f0e579d02614713a081768bf1a0d9937fda1de0e92",
     "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
-    "workflow/r_bridge.py": "34d932d4df4779b7e01aa1d6519631e6ef1dd0db8dcf732001e0caa03b79f60d",
+    "workflow/r_bridge.py": "96b5705302400c14857c36f3d35ca99f541369ee2f3e602d513769189047abfc",
     "workflow/r_driver.R": "b3e4328bddb45d5be44503ba4a336aca71f857d6f408bd0d252a1c174d97851e",
-    "workflow/quarto_reports.py": "d2eb42d2fa714c3bd817b17d7bb0117e518072313334def879842cc1f2583556",
+    "workflow/quarto_reports.py": "bd61f3637efe1463874171284696024a039087af51fadc5af5b3ca2f3cbeac9f",
     "jobs/assessment_summary/run.R": "53197ec03051c810073b4fd23ec11bb2f5093efa1020250615ef8e0cb73d97ae",
     "workflow/r/common.R": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
     "workflow/r/mse.R": "da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956",
@@ -35,8 +38,8 @@
     "sqlite": "3.45.1"
   },
   "outputs": {
-    "output.json": "c2495bc3f8904171cb661b45c1a778ae60d7159e441eba01bf20372c791f8f1a",
-    "report.html": "c1c455aac9279e4df10877ecbe99df5bdd5ccd10085171b6aadfd596b1f7256c"
+    "output.json": "e7f4c74c8249b791599de4ca064aac9e1f15c50669ca66ea312c5f97072ffb38",
+    "report.html": "33e37046ca8f9091dc83dc670e9a039ea7226627baeecdb0d584d1dafdcffd45"
   },
   "log": [
     "Compare the four fitted cases in plots and tables.",
@@ -45,33 +48,33 @@
   "inputs": {
     "assessment_a1": {
       "run_id": "Run 001",
-      "checksum": "5d32d9efe0d1e82465dcbb7d540f72d8a37ea833301d0b623c87bad28f100348"
+      "checksum": "6daa92814a32f3b45b17383f2a941f7de9ff6e9669f018599d02fd97c6325524"
     },
     "assessment_a2": {
       "run_id": "Run 001",
-      "checksum": "bf39b4b12590aaedcfa57ee52f855332501c2b566864323446ad29bc20855965"
+      "checksum": "ce6f47f39b4101eae414ccb8dd716e03d443188dbc2c6e931ed37444b58a2776"
     },
     "assessment_b1": {
       "run_id": "Run 001",
-      "checksum": "739ac7fe2841f4321e35329de299c13d4e13ab89298811a7c0076b9e09e14711"
+      "checksum": "d24961df68ed61382b205cd6d519a0621b0cb56df3572f9aac087273c4c9945b"
     },
     "assessment_b2": {
       "run_id": "Run 001",
-      "checksum": "b0f91f4bb90d7cb6cbe6fc290a2d4103408edb00cd568b02b8704b660bec8fcd"
+      "checksum": "36d396efef101f15aa24550bb8671950a1257c6232768dcf8ef30c7a488ca90b"
     }
   },
   "execution": {
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
-    "github_run": "37223958280",
+    "commit": "5ed42619f7e8ce6a53a855b47522dcff6cc873de",
+    "github_run": "37239588308",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
+    "commit": "5ed42619f7e8ce6a53a855b47522dcff6cc873de"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

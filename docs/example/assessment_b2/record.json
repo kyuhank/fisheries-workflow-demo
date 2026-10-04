@@ -2,18 +2,21 @@
   "job": "assessment_b2",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "d6e3ce11c38ba822fdc075cc232088561efcf11b947282f7e8fd719ad139b890",
+  "signature": "4c7e5d7874ceb1cb1486d09ec19b8d71bb2576ce500f4a21ea1aa6a321ef6acc",
   "settings": {
     "r": 0.3
   },
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "070bf48de0d3e7e8d76e54ea7f769e0c288459356fa3357abc2b44e10c3d177b",
-    "workflow/spec.py": "6e9a21eac0857aeaaaafec91e8fef3c5cedb00facf98a20e7775fe626169a739",
+    "Makefile": "e41825f04fc35a282462e2b26eb9c0f12b3ab7d0a158c803d0ef6c910343b82e",
+    "workflow/Makefile": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+    "workflow/jobs.json": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
+    "workflow/engine.py": "27ec286dc1b58c8b4265cc66a3cea1ef890b5da8bd3e30efac834430affba877",
+    "workflow/spec.py": "ae5455de889c2d544aab55f0e579d02614713a081768bf1a0d9937fda1de0e92",
     "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
-    "workflow/r_bridge.py": "34d932d4df4779b7e01aa1d6519631e6ef1dd0db8dcf732001e0caa03b79f60d",
+    "workflow/r_bridge.py": "96b5705302400c14857c36f3d35ca99f541369ee2f3e602d513769189047abfc",
     "workflow/r_driver.R": "b3e4328bddb45d5be44503ba4a336aca71f857d6f408bd0d252a1c174d97851e",
-    "workflow/quarto_reports.py": "d2eb42d2fa714c3bd817b17d7bb0117e518072313334def879842cc1f2583556",
+    "workflow/quarto_reports.py": "bd61f3637efe1463874171284696024a039087af51fadc5af5b3ca2f3cbeac9f",
     "jobs/assessment_b2/run.R": "bdc313361eeee533d77eea41f7dd297205c51151c7c857ba6f2f711eedcd1f24",
     "workflow/r/common.R": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
     "workflow/r/mse.R": "da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956",
@@ -37,8 +40,8 @@
     "sqlite": "3.45.1"
   },
   "outputs": {
-    "output.json": "b0f91f4bb90d7cb6cbe6fc290a2d4103408edb00cd568b02b8704b660bec8fcd",
-    "report.html": "f2e91a03e5cea22a9dea9a2310715e341c19ea00808128a881e3308335869028"
+    "output.json": "36d396efef101f15aa24550bb8671950a1257c6232768dcf8ef30c7a488ca90b",
+    "report.html": "b804d454de9b8e26023dc534c93f6cf1f1de2801c3c5423992b0bffc7afaee47"
   },
   "log": [
     "Fit the illustrative model to index B with growth-rate setting 2.",
@@ -47,21 +50,21 @@
   "inputs": {
     "prepare_b": {
       "run_id": "Run 001",
-      "checksum": "0f0c1e9c29b53d56a77a3d2b83b1ba5767c1fb05efb55e991c66ee06aa89d559"
+      "checksum": "2fc45d4a82df20c68664a235c216dc6a98ddaf3219ce2c6d115fc67474649073"
     }
   },
   "execution": {
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
-    "github_run": "37223958280",
+    "commit": "5ed42619f7e8ce6a53a855b47522dcff6cc873de",
+    "github_run": "37239588308",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
+    "commit": "5ed42619f7e8ce6a53a855b47522dcff6cc873de"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",
