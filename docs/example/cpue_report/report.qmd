@@ -1,0 +1,94 @@
+---
+title: "CPUE analysis report"
+lang: en-NZ
+format:
+  html:
+    embed-resources: true
+    toc: true
+    theme: cosmo
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+Synthetic fisheries workflow. This report is rendered by Quarto from preserved R outputs.
+
+```{r}
+# Read preserved results. Report rendering performs no model fitting.
+payload <- jsonlite::fromJSON("report-data.json", simplifyVector = FALSE)
+result <- payload$result
+record <- payload$record
+rows_frame <- function(rows) {
+  do.call(rbind, lapply(rows, function(row) as.data.frame(row, stringsAsFactors = FALSE)))
+}
+plot_series <- function(series, field, label) {
+  years <- unlist(lapply(series, function(rows) vapply(rows, function(x) x$year, numeric(1))))
+  values <- unlist(lapply(series, function(rows) vapply(rows, function(x) x[[field]], numeric(1))))
+  colours <- c("#1378a3", "#b56435", "#7357a8", "#328363")
+  plot(range(years), range(c(0, values)), type = "n", xlab = "Year", ylab = label)
+  for (i in seq_along(series)) {
+    lines(vapply(series[[i]], function(x) x$year, numeric(1)),
+          vapply(series[[i]], function(x) x[[field]], numeric(1)),
+          col = colours[(i - 1) %% length(colours) + 1], lwd = 2)
+  }
+  legend("topright", names(series), col = colours[seq_along(series)], lty = 1, bty = "n")
+}
+```
+## Methods
+
+Analysis A fits a Poisson GLM in R with year and vessel effects; analysis B uses year effects only. Both include the log of hooks divided by 1000 as an offset. Predictions at fixed effort and reference vessel are scaled to one in the first year. The record filter belongs to analysis A. This report reads the two saved indices.
+
+## Results
+
+```{r}
+endpoints <- lapply(names(result$series), function(name) {
+  rows <- result$series[[name]]
+  list(analysis = name, first_year = rows[[1]]$year,
+       final_year = tail(rows, 1)[[1]]$year,
+       final_relative_CPUE = tail(rows, 1)[[1]]$index)
+})
+knitr::kable(rows_frame(endpoints), digits = 3)
+plot_series(result$series, "index", "CPUE relative to first year")
+```
+
+## Interpretation
+
+Differences between the indices reflect vessel adjustment and the selected records. These synthetic observations illustrate the workflow. The comparison does not validate either index for a real fishery.
+
+## Analysis record
+
+Produced in **`r record$run_id`**. Each input below keeps its original run and output checksum.
+
+```{r}
+inputs <- lapply(names(record$inputs), function(key) {
+  list(job = key, run = record$inputs[[key]]$run_id,
+       output_sha256 = record$inputs[[key]]$checksum)
+})
+if (length(inputs)) knitr::kable(rows_frame(inputs))
+```
+
+New calculations and this Quarto report run inside the declared container. The downloadable bundle includes the actual R job, shared R sources, this QMD, the preserved result JSON, settings and checksums.
+
+```{r}
+software <- lapply(names(record$software), function(key) {
+  list(component = key, value = as.character(record$software[[key]]))
+})
+knitr::kable(rows_frame(software))
+```
+
+```{r}
+#| results: asis
+image <- record$software$container
+cat("Calculation image and digest: `", image, "`\n\n", sep = "")
+if (!is.null(record$software$container_url)) {
+  cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
+}
+if (!is.null(record$source$repository) && !is.null(record$source$commit)) {
+  commit_url <- paste0(record$source$repository, "/commit/", record$source$commit)
+  cat("[", commit_url, "](", commit_url, ")\n\n", sep = "")
+}
+cat("<details><summary>Full preserved input record</summary>\n\n```json\n",
+    jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),
+    "\n```\n\n</details>\n", sep = "")
+```

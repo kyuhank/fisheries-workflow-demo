@@ -1,0 +1,115 @@
+{
+  "version": "1.8.0",
+  "source_commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
+  "source_url": "https://github.com/kyuhank/fisheries-workflow-demo/tree/d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
+  "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+  "runtime": {
+    "r": "4.6.0",
+    "r_platform": "x86_64-pc-linux-gnu",
+    "quarto": "1.9.37",
+    "jsonlite": "2.0.0",
+    "RTMB": "2.0",
+    "TMB": "1.9.25",
+    "knitr": "1.52",
+    "rmarkdown": "2.32",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow",
+    "python": "3.12.3",
+    "platform": "linux",
+    "sqlite": "3.45.1"
+  },
+  "numerical_comparison": {
+    "ordinary_relative": 1e-06,
+    "ordinary_absolute": 1e-09,
+    "assessment_log_residual_absolute": 1e-08,
+    "residual_formula_absolute": 1e-12,
+    "near_zero_assessment_gradient_magnitude_and_difference": 1e-07,
+    "criteria": "Successful matching fit metadata; copied summary/report values equal their direct sources before exceptions apply."
+  },
+  "native": {
+    "status": "passed",
+    "source_commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
+    "run": 37209218315,
+    "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/37209218315",
+    "python_tests": 108,
+    "passed": 96,
+    "database_fixture_skips_in_main_suite": 12,
+    "separate_database_tests_passed": 12,
+    "actual_R_Quarto_integration_cases": 7
+  },
+  "interface": {
+    "status": "passed",
+    "source_commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
+    "run": 37209310361,
+    "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/37209310361",
+    "artifact_id": 11305418557,
+    "artifact_sha256": "041a5c6241bd63ed128ee4096243ae9cbb071b8cecc7f55ac89402870b4a5c9f"
+  },
+  "hosted": {
+    "status": "passed",
+    "source_commit": "0f4e95956d589a15e2b329a3348688a046887454",
+    "checker_run": 37208276171,
+    "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/37208276171",
+    "live_runs": [
+      37208313015,
+      37208502810,
+      37208597099,
+      37208723449,
+      37208860604,
+      37208988267
+    ],
+    "workflow_bundle": {
+      "bundle_sha256": "9d7f2c0f48614210f6e2ba85fe0102cc33181e7240cc6044883ae1b429260b25",
+      "checksummed_files": 174,
+      "source_files_match_checkout": true,
+      "frozen_input_matches_original_submission": true,
+      "native_outputs_compared": 22,
+      "selected_job": null,
+      "result": "passed"
+    },
+    "selected_job_bundle": {
+      "bundle_sha256": "505664ead8ed4190ee934f6c9f7686127d7310ba0c11e5fde9e63e9316944e4c",
+      "checksummed_files": 117,
+      "source_files_match_checkout": true,
+      "frozen_input_matches_original_submission": true,
+      "native_outputs_compared": 1,
+      "selected_job": "cpue_a",
+      "result": "passed"
+    },
+    "session_isolation": {
+      "own_state_output_bundle": "passed",
+      "second_reader_own_state": "passed",
+      "cross_reader_denials": {
+        "/state": 403,
+        "/output": 403,
+        "/bundle": 403
+      },
+      "result": "passed"
+    },
+    "source_alignment": "Final source differs only in native CI metadata forwarding and its regression fixture; all other250 tracked paths are byte-identical. No unchanged hosted execution was repeated."
+  },
+  "preserved_case": {
+    "status": "passed",
+    "source_commit": "0f4e95956d589a15e2b329a3348688a046887454",
+    "run": 37208273944,
+    "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/37208273944",
+    "comparator_sha256": "2eb4276fb9fbd17f1d961ddabea61e3568b63d0409a26f0deaf748a39c21619d",
+    "original_bundle_sha256": "920d44e1ee551cb6d34912c91cb9505a9898871e59f4200d02c9f48fdb6de902",
+    "ordinary_tolerance_discrepancies_retained": 9
+  },
+  "files": {
+    "fisheries-workflow-1.8.0.zip": {
+      "sha256": "a7d6e6440de6b6a3f19cb556d5e709f0289886513f34b8329aac4b1260e3b6b5",
+      "bytes": 10115919
+    },
+    "fisheries-workflow.html": {
+      "sha256": "926286fd16eb3939f1795a5c7ad227dd1dac7bc987004a2e8e6e7d975d1a9508",
+      "bytes": 11296307
+    },
+    "SHA256SUMS.txt": {
+      "sha256": "7b6436d684bb51adf073d460dbf69db7c74b9c86a893bde6f85efd7013cfab08",
+      "bytes": 185
+    }
+  },
+  "scope": "Synthetic execution consistency, source/input custody and interface checks. Biological validity and analyst-time gains require separate evaluation."
+}

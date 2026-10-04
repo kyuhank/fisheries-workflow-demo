@@ -2,28 +2,41 @@
   "job": "mse_prepare",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "ab4a485b49ec8e31c6d7c858440bc6cb50fb8034199a46cafcd3340f5aa750e3",
+  "signature": "f0621c5b518e1d9cf4bb56230e05fb41359a3ffee25487b5e7411775b1a97094",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "workflow/engine.py": "6631ecf3e14968ff7ec46484c75a9c1f12cdf3a24dfb77c733a3aa7bbf17526c",
-    "workflow/spec.py": "cde967aeceb3144771b2c4c1c71b8b137f8af0fba8901ff22fa4d9328678d47c",
-    "workflow/reports.py": "9a823965d59b3fde3fb696c854f94782584979846555bf14d430b59c5e7e7284",
-    "jobs/__init__.py": "18959393726ef6f5e3453241a1e05cc5edad619c394c8334b6269150d8b8f8f5",
-    "jobs/mse_prepare/__init__.py": "e53a2601eed471097b9571a3321328dab3fd8d04827679e156250e031f157ca2",
-    "jobs/mse_prepare/run.py": "98ab8a63c88bca193b603ee70915997b5e4cae1f4572e63eea0b102f468b997c",
-    "workflow/mse.py": "173f6f3145d62c52ad42930a9635fe4eafc619dd84a8504b2bd70a290eb12940",
-    "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
+    "workflow/engine.py": "070bf48de0d3e7e8d76e54ea7f769e0c288459356fa3357abc2b44e10c3d177b",
+    "workflow/spec.py": "6e9a21eac0857aeaaaafec91e8fef3c5cedb00facf98a20e7775fe626169a739",
+    "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
+    "workflow/r_bridge.py": "34d932d4df4779b7e01aa1d6519631e6ef1dd0db8dcf732001e0caa03b79f60d",
+    "workflow/r_driver.R": "b3e4328bddb45d5be44503ba4a336aca71f857d6f408bd0d252a1c174d97851e",
+    "workflow/quarto_reports.py": "d2eb42d2fa714c3bd817b17d7bb0117e518072313334def879842cc1f2583556",
+    "jobs/mse_prepare/run.R": "dae23c4c405f5ac70aa64947d5a8c503e2c3e765d176d4c7fe7fe68d64a18cae",
+    "workflow/r/common.R": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
+    "workflow/r/mse.R": "da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956",
+    "workflow/r/models.R": "597d1e92c36be68950d888ff1ad0183b352eb2fde6dda7218017b59c52db53d8"
   },
   "software": {
-    "python": "3.12.14",
+    "r": "4.6.0",
+    "r_platform": "x86_64-pc-linux-gnu",
+    "quarto": "1.9.37",
+    "jsonlite": "2.0.0",
+    "RTMB": "2.0",
+    "TMB": "1.9.25",
+    "knitr": "1.52",
+    "rmarkdown": "2.32",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow",
+    "python": "3.12.3",
     "platform": "linux",
-    "runtime": "CPython",
-    "sqlite": "3.53.4"
+    "runtime": "Rscript (container)",
+    "adapter_runtime": "CPython",
+    "sqlite": "3.45.1"
   },
   "outputs": {
-    "output.json": "f77a03c717d3132aaf44155b157c68bc9199a8c5e5ce8c974a287347f67b818d",
-    "report.html": "491d804e2ad95cf8ce43aaaf06fc5b1d613d662a179e398ab48094a744bb2d3c"
+    "output.json": "0dcacbc43d78e593b7996a7f92b75db1365a50f8c22a38575bdcd1a63122f29f",
+    "report.html": "fe94976ff399f96ba9c4af7c6742653184f1b74a1ae208fe8d1641c704914a1b"
   },
   "log": [
     "Use the four assessment cases to prepare stocks for simulated management trials.",
@@ -32,28 +45,45 @@
   "inputs": {
     "assessment_a1": {
       "run_id": "Run 001",
-      "checksum": "9e0de3eb413d12034d2623326f0815263d628883dc319075deeaec2188718747"
+      "checksum": "5d32d9efe0d1e82465dcbb7d540f72d8a37ea833301d0b623c87bad28f100348"
     },
     "assessment_a2": {
       "run_id": "Run 001",
-      "checksum": "b1d45e0de67157197b2d92366e16403c4ce1a9c9e397b4cacf5a6b41f37b2cf8"
+      "checksum": "bf39b4b12590aaedcfa57ee52f855332501c2b566864323446ad29bc20855965"
     },
     "assessment_b1": {
       "run_id": "Run 001",
-      "checksum": "0cd4d216ca86285a7eb6238ba891a851236ca6324af5c30986996aab763de1e5"
+      "checksum": "739ac7fe2841f4321e35329de299c13d4e13ab89298811a7c0076b9e09e14711"
     },
     "assessment_b2": {
       "run_id": "Run 001",
-      "checksum": "9dabd62b2374fa2ca257314f9c2494266fef11789c0741614c3c999e377e32c4"
+      "checksum": "b0f91f4bb90d7cb6cbe6fc290a2d4103408edb00cd568b02b8704b660bec8fcd"
     }
+  },
+  "execution": {
+    "provider": "GitHub Actions",
+    "purpose": "saved-example-build",
+    "repository": "kyuhank/fisheries-workflow-demo",
+    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
+    "github_run": "37209310361",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": null,
-    "version": "1.7.12"
+    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
   },
   "data_files": {
-    "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
-    "submission.json": "a610844d7e80a607f372b112ed5af87dcd97d66a0dcd35c361beea859bc56590"
+    "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",
+    "submission.json": "75916a75249767061bf4f7d7722db170d424e79d501fa5a8bfe4a9c18e5499a1",
+    "scenario.json": "3761550df25c39881e299bb9d6020f52597209a12b2c05e4842568e8114ce5c2",
+    "source-data.json": "6be298067960bd00151dab1e15f9e3d2fac735b292a3accdc15539a13a389d29",
+    "generation.json": "68a6219e81695e34a355d40b75338a86d5e868dc93ba02864ad28faea8d4e9b5"
+  },
+  "report_rendering": {
+    "engine": "HTML presentation",
+    "calculation": "R",
+    "quarto_executed": false,
+    "source": "workflow/reports.py"
   }
 }
