@@ -1,4 +1,4 @@
-import { checkSession, SessionExpired, startInSession } from "./session.ts";
+import { checkSession, SessionDenied, SessionExpired, startInSession } from "./session.ts";
 
 const now = Date.parse("2026-09-15T00:20:00Z");
 const row = (age: number) => ({
@@ -28,7 +28,7 @@ Deno.test("a current session still requires its matching credential", () => {
   try {
     checkSession([row(0)], "different", now);
   } catch (error) {
-    if (!(error instanceof SessionExpired)) return;
+    if (error instanceof SessionDenied) return;
   }
   throw Error("An invalid credential was accepted or classified as expiry.");
 });

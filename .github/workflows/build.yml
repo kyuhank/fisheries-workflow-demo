@@ -1,0 +1,33 @@
+name: Build demo release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Record the source being built
+        run: |
+          python3 -c 'import json, os; from pathlib import Path; info = json.loads(Path("build-info.json").read_text()); print(json.dumps({"source_sha": os.environ["GITHUB_SHA"], "repository": info["repository"], "version": info["version"]}, sort_keys=True))'
+      - name: Build the pages and offline release in the preserved runtime
+        run: |
+          docker pull "$IMAGE"
+          docker run --rm --network none \
+            --user "$(id -u):$(id -g)" \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --workdir /workspace "$IMAGE" \
+            sh -c 'python scripts/build.py && python scripts/release.py'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: demo-release-${{ github.sha }}
+          path: |
+            docs/
+            dist/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7

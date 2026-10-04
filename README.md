@@ -63,7 +63,8 @@ With `--scope job`, only the selected job and any missing or outdated upstream
 inputs run.
 
 Open `runs/assessment_report/report.html` or `runs/mse_report/report.html`.
-`make container` runs in Docker, `make check` checks the workflow, and `make html`
+`make container` runs the preserved Linux AMD64 image in Docker (ARM computers
+require AMD64 emulation), `make check` checks the workflow, and `make html`
 builds the website and offline download.
 
 See [ADAPT.md](ADAPT.md) for the code structure, [cloud/README.md](cloud/README.md)

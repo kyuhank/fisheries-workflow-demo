@@ -1,9 +1,15 @@
-import { createGitHub, REPOSITORY as REPO, WORKFLOW } from "./github.ts";
+import {
+  createGitHub,
+  OWNER_ID,
+  REPOSITORY as REPO,
+  REPOSITORY_ID,
+  WORKFLOW,
+} from "./github.ts";
 import { setup } from "./setup.ts";
 import { createDatabase, DatabaseError } from "./database.ts";
 import { validateRunnerWrite } from "./runner-write.ts";
 import { runScope, runSettings } from "./request.ts";
-import { checkSession, SessionExpired, startInSession } from "./session.ts";
+import { checkSession, SessionDenied, SessionExpired, startInSession } from "./session.ts";
 const jobs = [
   "submission",
   "qc",
@@ -102,8 +108,8 @@ async function runner(request: Request, id: string, finishing = false) {
   if (
     claims.iss !== "https://token.actions.githubusercontent.com" ||
     claims.aud !== "fisheries-paper-demo" || claims.repository !== REPO ||
-    claims.repository_id !== "1367765865" ||
-    claims.repository_owner_id !== "51262923" ||
+    claims.repository_id !== String(REPOSITORY_ID) ||
+    claims.repository_owner_id !== String(OWNER_ID) ||
     claims.ref !== "refs/heads/main" ||
     claims.event_name !== "workflow_dispatch" ||
     claims.workflow_ref !== REPO + "/" + WORKFLOW + "@refs/heads/main" ||
@@ -381,6 +387,9 @@ export async function handle(request: Request) {
     }
     return reply({ error: "Unknown operation." }, 404);
   } catch (e) {
+    if (e instanceof SessionDenied) {
+      return reply({ error: e.message, code: "session_denied" }, 403);
+    }
     if (e instanceof SessionExpired) {
       return reply({ error: e.message, code: "session_expired" }, 410);
     }

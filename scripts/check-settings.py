@@ -317,7 +317,7 @@ class MockCloud:
     def route(self, route):
         path = urlsplit(route.request.url).path.rsplit('/', 1)[-1]
         if path == 'info':
-            value = {'configured': True}
+            value = {'configured': True, 'repository': json.loads((ROOT/'cloud/config.json').read_text())['repository']}
         elif path == 'session':
             value = {'id': 'settings-test-session', 'token': 'settings-test-token'}
         elif path == 'run':

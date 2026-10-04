@@ -1,0 +1,35 @@
+name: Check hosted demonstration
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: fisheries-workflow-online-check
+  cancel-in-progress: false
+jobs:
+  online:
+    if: github.repository == 'kyuhank/fisheries-workflow-demo' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc
+    steps:
+      - name: Retrieve the checked demonstration source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check real hosted execution and downloaded reproduction
+        run: |
+          docker pull "$IMAGE"
+          docker run --rm --user "$(id -u):$(id -g)" \
+            --env PAPER_EXPECTED_COMMIT="$GITHUB_SHA" \
+            --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
+            --entrypoint python "$IMAGE" scripts/check-online.py
+      - name: Preserve the non-secret acceptance report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: hosted-demonstration-checks
+          path: .test-output/online-checks.json
+          if-no-files-found: warn
+          retention-days: 14

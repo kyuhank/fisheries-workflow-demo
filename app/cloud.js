@@ -2,6 +2,7 @@
 class CloudRun {
   constructor(config, jobs, onEvent, onPhase) {
     this.url = config.url;
+    this.repository = config.repository;
     this.jobs = jobs;
     this.onEvent = onEvent;
     this.onPhase = onPhase;
@@ -65,6 +66,9 @@ class CloudRun {
       );
       if (!info.configured) {
         throw Error("The live service is unavailable.");
+      }
+      if (!this.repository || info.repository !== this.repository) {
+        throw Error("The live service is being updated. Use Offline run for this version.");
       }
       this.session = await this.request(
         "/session",

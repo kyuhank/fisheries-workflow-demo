@@ -31,3 +31,31 @@ jobs:
         run: |
           deno check supabase/functions/paper-api/index.ts
           deno test supabase/functions/paper-api/*_test.ts
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PAPER_TEST_POSTGRES_CONTAINER: paper-test-postgres-${{ github.run_id }}-${{ github.run_attempt }}
+      POSTGRES_IMAGE: postgres:17-alpine@sha256:aa90e97ee862e558111d34cfb8b2c4bec768c2b039fb791341686928560263b3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start an isolated disposable PostgreSQL fixture
+        run: |
+          docker run --detach --name "$PAPER_TEST_POSTGRES_CONTAINER" \
+            --network none --env POSTGRES_PASSWORD=test-only "$POSTGRES_IMAGE"
+          for attempt in $(seq 1 30); do
+            if docker exec "$PAPER_TEST_POSTGRES_CONTAINER" pg_isready -h 127.0.0.1 -U postgres; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs "$PAPER_TEST_POSTGRES_CONTAINER"
+          exit 1
+      - name: Check runner database transactions
+        run: python3 -m unittest discover -s tests -p test_runner_database.py -v
+      - name: Remove the disposable fixture
+        if: always()
+        run: |
+          if docker container inspect "$PAPER_TEST_POSTGRES_CONTAINER" >/dev/null 2>&1; then
+            docker rm --force "$PAPER_TEST_POSTGRES_CONTAINER"
+          fi

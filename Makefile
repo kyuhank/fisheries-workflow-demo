@@ -6,6 +6,6 @@ check:
 html:
 	python3 scripts/build.py
 container:
-	docker build -t fisheries-workflow .
+	docker build --platform linux/amd64 -t fisheries-workflow .
 	mkdir -p runs
-	docker run --rm --network none --user "$$(id -u):$$(id -g)" -v "$(CURDIR)/runs:/outputs" fisheries-workflow
+	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" -v "$(CURDIR)/runs:/outputs" fisheries-workflow

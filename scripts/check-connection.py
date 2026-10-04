@@ -10,6 +10,7 @@ from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY = json.loads((ROOT / "cloud/config.json").read_text())["repository"]
 
 
 def preview():
@@ -52,7 +53,7 @@ try:
                 reject(new DOMException('Aborted', 'AbortError')));
             });
           };
-          window.cloud = new CloudRun({url: 'https://example.test'}, [], () => {}, () => {});
+          window.cloud = new CloudRun({url: 'https://example.test', repository: 'test/repo'}, [], () => {}, () => {});
           const first = cloud.initialise(), second = cloud.initialise();
           window.sameAttempt = first === second;
           window.attempt = first.catch(error => { window.failure = error.message; });
@@ -65,12 +66,26 @@ try:
           window.fetch = async (url, options) => {
             calls.push({url, headers: options.headers});
             return new Response(JSON.stringify(url.endsWith('/info')
-              ? {configured: true} : {id: 'test-session', token: 'test-token'}));
+              ? {configured: true, repository: 'test/repo'} : {id: 'test-session', token: 'test-token'}));
           };
           await cloud.initialise();
         }""")
         assert unit.evaluate("calls.length === 2 && !calls[0].headers['Content-Type']")
         assert unit.evaluate("cloud.session.id === 'test-session'")
+
+        # A gateway for another edition must not create a reader session.
+        unit.evaluate("""async () => {
+          calls.length = 0;
+          cloud.session = null;
+          window.fetch = async (url, options) => {
+            calls.push({url, headers: options.headers});
+            return Response.json({configured: true, repository: 'other/repo'});
+          };
+          window.mismatch = await cloud.initialise()
+            .then(() => false, error => error.message.includes('being updated'));
+        }""")
+        assert unit.evaluate("mismatch && calls.length === 1 && cloud.session === null")
+        unit.evaluate("cloud.session = {id: 'test-session', token: 'test-token'}")
 
         # Once a run is acknowledged, even an explicit expiry must not replay it.
         unit.evaluate("""async () => {
@@ -107,7 +122,7 @@ try:
             if (url.includes('/run?session=old')) return Response.json({
               error: 'This demonstration session is unavailable. Select Start afresh.'
             }, {status: 400});
-            if (url.endsWith('/info')) return Response.json({configured: true});
+            if (url.endsWith('/info')) return Response.json({configured: true, repository: 'test/repo'});
             if (url.endsWith('/session')) return Response.json({id: 'replacement', token: 'new'});
             throw new TypeError('Lost replacement response');
           };
@@ -128,7 +143,7 @@ try:
                 route.fulfill(status=503, content_type='application/json',
                               body=json.dumps({'error': 'The live service is unavailable.'}))
             else:
-                value = ({'configured': True} if urlsplit(route.request.url).path.endswith('/info')
+                value = ({'configured': True, 'repository': REPOSITORY} if urlsplit(route.request.url).path.endswith('/info')
                          else {'id': 'test-session', 'token': 'test-token'})
                 route.fulfill(content_type='application/json', body=json.dumps(value))
 
@@ -172,7 +187,7 @@ try:
             code = 200
             if path == 'info':
                 code = 503 if expiry['renewal_failure'] else 200
-                value = {'error': 'Unavailable'} if code == 503 else {'configured': True}
+                value = {'error': 'Unavailable'} if code == 503 else {'configured': True, 'repository': REPOSITORY}
             elif path == 'session':
                 expiry['snapshots'].append(page.evaluate("""() => ({
                   records: Object.keys(records).length,
@@ -354,7 +369,7 @@ try:
         race_page.locator('#mode').select_option('cloud')
         race_page.wait_for_timeout(50)
         race_page.locator('#mode').select_option('live')
-        pending_info.pop().fulfill(content_type='application/json', body='{"configured":true}')
+        pending_info.pop().fulfill(content_type='application/json', body=json.dumps({'configured': True, 'repository': REPOSITORY}))
         race_page.locator('#run:enabled').wait_for(timeout=90000)
         assert race_page.locator('#mode').input_value() == 'live'
         assert race_page.locator('#mode-notice').is_hidden()

@@ -15,7 +15,7 @@ async function post(path,body){const r=await fetch(API+path,{method:'POST',heade
   const link=document.createElement('a');link.className='action';link.href=result.install_url;link.textContent='Install the paper app';actions.append(link);
  }else if(query.has('installed')){
   const r=await fetch(API+'/info'),info=await r.json();
-  message.textContent=info.configured?'Connected. Readers can run the example without signing in.':'The app is not connected to fisheries-workflow-demo yet. Check the selected repository in the app installation.';
+  message.textContent=(r.ok&&info.configured&&info.repository==='kyuhank/fisheries-workflow-demo')?'Connected. Readers can run the example without signing in.':'The app is not connected to fisheries-workflow-demo yet. Check the selected repository in the app installation.';
  }else if(state){
   const result=await post('/setup/manifest',{state});
   message.textContent='Register a private GitHub App for this demonstration. It can read the selected repository and run its Actions. It cannot edit source files or account settings.';

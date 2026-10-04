@@ -18,5 +18,9 @@ Runtime files were obtained from the [versioned Pyodide distribution](https://cd
 The package checksum is recorded in `pyodide-lock.json`. The runtime is embedded
 in the downloadable HTML, so it does not need a content delivery network to run.
 
-The optional container uses the public CPUE workshop image pinned by digest
-in `Dockerfile`. A container engine must have the image before it can run offline.
+The container uses the public fisheries-workflow runtime from
+[SPC’s Docker image repository](https://github.com/PacificCommunity/ofp-sam-docker-images/tree/main/fisheries-workflow),
+pinned by digest in `Dockerfile`. It provides CPython 3.12.14 and SQLite 3.53.4
+for Linux AMD64. ARM computers require AMD64 emulation. A container engine must
+have the image before it can run offline. Analysis code and data are preserved
+separately in this repository and its releases.

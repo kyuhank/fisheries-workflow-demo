@@ -139,7 +139,7 @@ class HostedWorkflow(Workflow):
         self.pool = None
         self.execution = {'provider': 'GitHub Actions', 'repository': 'kyuhank/fisheries-workflow-demo',
                           'commit': context['commit_sha'], 'github_run': context['github_run'],
-                          'container': 'ghcr.io/pacificcommunity/cpue-workshop@sha256:17b03d6e06da229b17524997d8a3fc8eb5f8f25233894b5ab99f89109b3890c5',
+                          'container': 'ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc',
                           'data_source': 'Supabase PostgreSQL: fixed synthetic records',
                           'data_checksum': digest(encoded(self.hosted_data))}
         self.configure({'mse': False, **context['settings']})

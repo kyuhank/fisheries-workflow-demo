@@ -1,4 +1,4 @@
-FROM ghcr.io/pacificcommunity/cpue-workshop@sha256:17b03d6e06da229b17524997d8a3fc8eb5f8f25233894b5ab99f89109b3890c5
+FROM ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc
 WORKDIR /workspace
 COPY workflow/ workflow/
 COPY cloud/ cloud/

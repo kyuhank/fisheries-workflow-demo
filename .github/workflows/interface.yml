@@ -13,6 +13,15 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build the current pages in the preserved runtime
+        env:
+          IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:53549c0f7b159968fcb5c8861fff7f8d88572d0cf8764237e983f69bbd4581cc
+        run: |
+          docker pull "$IMAGE"
+          docker run --rm --network none \
+            --user "$(id -u):$(id -g)" \
+            --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
+            "$IMAGE" python scripts/build.py
       - name: Install browser checks
         run: |
           python3 -m venv .browser-check

@@ -1,3 +1,9 @@
+export class SessionDenied extends Error {
+  constructor() {
+    super("This demonstration session is unavailable. Select Start afresh.");
+  }
+}
+
 export class SessionExpired extends Error {
   constructor() {
     super(
@@ -10,9 +16,7 @@ export class SessionExpired extends Error {
 export function checkSession(rows: any[], tokenHash: string, now = Date.now()) {
   if (rows.length !== 1) throw new SessionExpired();
   if (tokenHash !== rows[0].token_hash) {
-    throw Error(
-      "This demonstration session is unavailable. Select Start afresh.",
-    );
+    throw new SessionDenied();
   }
   if (Date.parse(rows[0].touched_at) < now - 10 * 60 * 1000) {
     throw new SessionExpired();
