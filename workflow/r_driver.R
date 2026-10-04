@@ -35,12 +35,20 @@ workflow_runtime_info <- function() {
 workflow_json_value <- function(value, object_field = FALSE) {
   if (is.list(value)) {
     object <- !is.null(names(value))
-    result <- lapply(value, workflow_json_value, object_field = object)
+    # A scalar is a scalar whether it is an object field or an array element.
+    result <- lapply(value, workflow_json_value, object_field = TRUE)
     if (object) names(result) <- names(value)
     return(result)
   }
+  array <- !is.null(dim(value))
+  if (array) {
+    if (length(dim(value)) != 1L) stop("JSON job arrays must be one-dimensional")
+    # jsonlite encodes dimensioned R arrays as nested JSON arrays. These job
+    # vectors are explicitly one-dimensional, including arrays of one value.
+    value <- as.vector(value)
+  }
   if (is.numeric(value) && any(!is.finite(value))) stop("Non-finite R output")
-  if (object_field && length(value) == 1L && is.null(dim(value))) return(jsonlite::unbox(value))
+  if (object_field && length(value) == 1L && !array) return(jsonlite::unbox(value))
   value
 }
 

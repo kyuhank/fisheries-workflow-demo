@@ -12,5 +12,55 @@
     "origin": "https://github.com/kyuhank/cpue-demo-extract",
     "commit": "a0716f589325a5576f5b9d97990e3977c17bad36",
     "original_path": "extract-catch.sql"
+  },
+  {
+    "file": "data/fishery.sqlite",
+    "sha256": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",
+    "origin": "Generated in the declared R container",
+    "generator": "scripts/generate-data.R",
+    "generation": "data/generation.json",
+    "source_commit": "a158aa51fdc93a7535728c1e882b13bedf4dd181",
+    "github_run": "37200423798",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+  },
+  {
+    "file": "data/submission.json",
+    "sha256": "75916a75249767061bf4f7d7722db170d424e79d501fa5a8bfe4a9c18e5499a1",
+    "origin": "Generated in the declared R container",
+    "generator": "scripts/generate-data.R",
+    "generation": "data/generation.json",
+    "source_commit": "a158aa51fdc93a7535728c1e882b13bedf4dd181",
+    "github_run": "37200423798",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+  },
+  {
+    "file": "data/scenario.json",
+    "sha256": "3761550df25c39881e299bb9d6020f52597209a12b2c05e4842568e8114ce5c2",
+    "origin": "Generated in the declared R container",
+    "generator": "scripts/generate-data.R",
+    "generation": "data/generation.json",
+    "source_commit": "a158aa51fdc93a7535728c1e882b13bedf4dd181",
+    "github_run": "37200423798",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+  },
+  {
+    "file": "data/source-data.json",
+    "sha256": "6be298067960bd00151dab1e15f9e3d2fac735b292a3accdc15539a13a389d29",
+    "origin": "Generated in the declared R container",
+    "generator": "scripts/generate-data.R",
+    "generation": "data/generation.json",
+    "source_commit": "a158aa51fdc93a7535728c1e882b13bedf4dd181",
+    "github_run": "37200423798",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+  },
+  {
+    "file": "data/generation.json",
+    "sha256": "68a6219e81695e34a355d40b75338a86d5e868dc93ba02864ad28faea8d4e9b5",
+    "origin": "Generated in the declared R container",
+    "generator": "scripts/generate-data.R",
+    "generation": "data/generation.json",
+    "source_commit": "a158aa51fdc93a7535728c1e882b13bedf4dd181",
+    "github_run": "37200423798",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
   }
 ]

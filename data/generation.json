@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "type": "R-fixture-import",
+  "generator": {
+    "path": "scripts/generate-data.R",
+    "sha256": "779a38fa34c30a18159bc503b70dccd047694949429e208eb7a1337d8bd4fd69"
+  },
+  "adapter": {
+    "path": "scripts/import-r-data.py",
+    "sha256": "719aedf8b48664f72b029f8f662dd0d8b24c0a21bec119a0adb3a080ab720450"
+  },
+  "input": {
+    "path": "data/source-data.json",
+    "sha256": "6be298067960bd00151dab1e15f9e3d2fac735b292a3accdc15539a13a389d29"
+  },
+  "truth": {
+    "path": "data/scenario.json",
+    "sha256": "3761550df25c39881e299bb9d6020f52597209a12b2c05e4842568e8114ce5c2",
+    "type": "synthetic-schaefer-poisson",
+    "R": "R version 4.6.0 (2026-04-24)",
+    "seed": 20261004,
+    "rng": [
+      "Mersenne-Twister",
+      "Inversion",
+      "Rejection"
+    ]
+  },
+  "outputs": {
+    "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",
+    "submission.json": "75916a75249767061bf4f7d7722db170d424e79d501fa5a8bfe4a9c18e5499a1",
+    "scenario.json": "3761550df25c39881e299bb9d6020f52597209a12b2c05e4842568e8114ce5c2",
+    "source-data.json": "6be298067960bd00151dab1e15f9e3d2fac735b292a3accdc15539a13a389d29"
+  },
+  "source": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "commit": "a158aa51fdc93a7535728c1e882b13bedf4dd181"
+  },
+  "execution": {
+    "provider": "GitHub Actions",
+    "purpose": "source-data-preparation",
+    "github_run": "37200423798",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
+  }
+}

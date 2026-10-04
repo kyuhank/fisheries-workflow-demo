@@ -1,0 +1,5922 @@
+{
+  "sets": [
+    {
+      "set_id": "2000-A-01",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2000-A-02",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2000-A-03",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2000-A-04",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2000-A-05",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2000-A-06",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2000-A-07",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2000-A-08",
+      "year": 2000,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2000-B-01",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2000-B-02",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2000-B-03",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2000-B-04",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2000-B-05",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 14
+    },
+    {
+      "set_id": "2000-B-06",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2000-B-07",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2000-B-08",
+      "year": 2000,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2000-C-01",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2000-C-02",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2000-C-03",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2000-C-04",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2000-C-05",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2000-C-06",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2000-C-07",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2000-C-08",
+      "year": 2000,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2000-D-01",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2000-D-02",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2000-D-03",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2000-D-04",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2000-D-05",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2000-D-06",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2000-D-07",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2000-D-08",
+      "year": 2000,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2001-A-01",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2001-A-02",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2001-A-03",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2001-A-04",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2001-A-05",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2001-A-06",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2001-A-07",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2001-A-08",
+      "year": 2001,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2001-B-01",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2001-B-02",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2001-B-03",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2001-B-04",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2001-B-05",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2001-B-06",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2001-B-07",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2001-B-08",
+      "year": 2001,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2001-C-01",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2001-C-02",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2001-C-03",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2001-C-04",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2001-C-05",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2001-C-06",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2001-C-07",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2001-C-08",
+      "year": 2001,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2001-D-01",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2001-D-02",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2001-D-03",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2001-D-04",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2001-D-05",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2001-D-06",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2001-D-07",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2001-D-08",
+      "year": 2001,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 14
+    },
+    {
+      "set_id": "2002-A-01",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2002-A-02",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2002-A-03",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2002-A-04",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2002-A-05",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2002-A-06",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2002-A-07",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2002-A-08",
+      "year": 2002,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2002-B-01",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2002-B-02",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2002-B-03",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2002-B-04",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2002-B-05",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2002-B-06",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2002-B-07",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2002-B-08",
+      "year": 2002,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2002-C-01",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2002-C-02",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2002-C-03",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2002-C-04",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2002-C-05",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2002-C-06",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2002-C-07",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2002-C-08",
+      "year": 2002,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2002-D-01",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2002-D-02",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2002-D-03",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2002-D-04",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2002-D-05",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2002-D-06",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2002-D-07",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2002-D-08",
+      "year": 2002,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2003-A-01",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2003-A-02",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2003-A-03",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2003-A-04",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2003-A-05",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2003-A-06",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2003-A-07",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2003-A-08",
+      "year": 2003,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2003-B-01",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2003-B-02",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2003-B-03",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2003-B-04",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2003-B-05",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2003-B-06",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2003-B-07",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2003-B-08",
+      "year": 2003,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2003-C-01",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2003-C-02",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2003-C-03",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2003-C-04",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2003-C-05",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2003-C-06",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2003-C-07",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2003-C-08",
+      "year": 2003,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2003-D-01",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2003-D-02",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2003-D-03",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2003-D-04",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2003-D-05",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2003-D-06",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2003-D-07",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2003-D-08",
+      "year": 2003,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2004-A-01",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2004-A-02",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-A-03",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-A-04",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2004-A-05",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2004-A-06",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2004-A-07",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2004-A-08",
+      "year": 2004,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2004-B-01",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2004-B-02",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2004-B-03",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2004-B-04",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-B-05",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-B-06",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2004-B-07",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2004-B-08",
+      "year": 2004,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-C-01",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2004-C-02",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2004-C-03",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2004-C-04",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2004-C-05",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-C-06",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2004-C-07",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2004-C-08",
+      "year": 2004,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2004-D-01",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2004-D-02",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 12
+    },
+    {
+      "set_id": "2004-D-03",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2004-D-04",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2004-D-05",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-D-06",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2004-D-07",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 15
+    },
+    {
+      "set_id": "2004-D-08",
+      "year": 2004,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2005-A-01",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2005-A-02",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2005-A-03",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2005-A-04",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2005-A-05",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2005-A-06",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2005-A-07",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2005-A-08",
+      "year": 2005,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2005-B-01",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2005-B-02",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2005-B-03",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2005-B-04",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2005-B-05",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2005-B-06",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2005-B-07",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2005-B-08",
+      "year": 2005,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2005-C-01",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2005-C-02",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2005-C-03",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2005-C-04",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2005-C-05",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2005-C-06",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2005-C-07",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2005-C-08",
+      "year": 2005,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2005-D-01",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2005-D-02",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2005-D-03",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2005-D-04",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2005-D-05",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2005-D-06",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2005-D-07",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2005-D-08",
+      "year": 2005,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2006-A-01",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2006-A-02",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2006-A-03",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2006-A-04",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2006-A-05",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2006-A-06",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2006-A-07",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2006-A-08",
+      "year": 2006,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2006-B-01",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2006-B-02",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2006-B-03",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2006-B-04",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2006-B-05",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2006-B-06",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2006-B-07",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2006-B-08",
+      "year": 2006,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2006-C-01",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2006-C-02",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2006-C-03",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2006-C-04",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2006-C-05",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2006-C-06",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2006-C-07",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2006-C-08",
+      "year": 2006,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2006-D-01",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2006-D-02",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2006-D-03",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2006-D-04",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2006-D-05",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2006-D-06",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2006-D-07",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2006-D-08",
+      "year": 2006,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2007-A-01",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2007-A-02",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-A-03",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-A-04",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-A-05",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2007-A-06",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-A-07",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2007-A-08",
+      "year": 2007,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2007-B-01",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-B-02",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2007-B-03",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2007-B-04",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-B-05",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2007-B-06",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2007-B-07",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2007-B-08",
+      "year": 2007,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-C-01",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2007-C-02",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2007-C-03",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2007-C-04",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2007-C-05",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2007-C-06",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2007-C-07",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2007-C-08",
+      "year": 2007,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2007-D-01",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2007-D-02",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2007-D-03",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2007-D-04",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2007-D-05",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2007-D-06",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 15
+    },
+    {
+      "set_id": "2007-D-07",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2007-D-08",
+      "year": 2007,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2008-A-01",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2008-A-02",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-A-03",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2008-A-04",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2008-A-05",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2008-A-06",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2008-A-07",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-A-08",
+      "year": 2008,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2008-B-01",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2008-B-02",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-B-03",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2008-B-04",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2008-B-05",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2008-B-06",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2008-B-07",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2008-B-08",
+      "year": 2008,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-C-01",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-C-02",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2008-C-03",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2008-C-04",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2008-C-05",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2008-C-06",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-C-07",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-C-08",
+      "year": 2008,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2008-D-01",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2008-D-02",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2008-D-03",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2008-D-04",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2008-D-05",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2008-D-06",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2008-D-07",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2008-D-08",
+      "year": 2008,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2009-A-01",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2009-A-02",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2009-A-03",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2009-A-04",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2009-A-05",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2009-A-06",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2009-A-07",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2009-A-08",
+      "year": 2009,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2009-B-01",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2009-B-02",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2009-B-03",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2009-B-04",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2009-B-05",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2009-B-06",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2009-B-07",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2009-B-08",
+      "year": 2009,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2009-C-01",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2009-C-02",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2009-C-03",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2009-C-04",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2009-C-05",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2009-C-06",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2009-C-07",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2009-C-08",
+      "year": 2009,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2009-D-01",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2009-D-02",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2009-D-03",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2009-D-04",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2009-D-05",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2009-D-06",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2009-D-07",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 14
+    },
+    {
+      "set_id": "2009-D-08",
+      "year": 2009,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 17
+    },
+    {
+      "set_id": "2010-A-01",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2010-A-02",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-A-03",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2010-A-04",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-A-05",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-A-06",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2010-A-07",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2010-A-08",
+      "year": 2010,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-B-01",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-B-02",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2010-B-03",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2010-B-04",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2010-B-05",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2010-B-06",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2010-B-07",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2010-B-08",
+      "year": 2010,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2010-C-01",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2010-C-02",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2010-C-03",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2010-C-04",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2010-C-05",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-C-06",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2010-C-07",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2010-C-08",
+      "year": 2010,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2010-D-01",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-D-02",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-D-03",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2010-D-04",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2010-D-05",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2010-D-06",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2010-D-07",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2010-D-08",
+      "year": 2010,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-A-01",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2011-A-02",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2011-A-03",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2011-A-04",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-A-05",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2011-A-06",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-A-07",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-A-08",
+      "year": 2011,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2011-B-01",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2011-B-02",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2011-B-03",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2011-B-04",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2011-B-05",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2011-B-06",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2011-B-07",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2011-B-08",
+      "year": 2011,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-C-01",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-C-02",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2011-C-03",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2011-C-04",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2011-C-05",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2011-C-06",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2011-C-07",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-C-08",
+      "year": 2011,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2011-D-01",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2011-D-02",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2011-D-03",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2011-D-04",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2011-D-05",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2011-D-06",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2011-D-07",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2011-D-08",
+      "year": 2011,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2012-A-01",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2012-A-02",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2012-A-03",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2012-A-04",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2012-A-05",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2012-A-06",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2012-A-07",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2012-A-08",
+      "year": 2012,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2012-B-01",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2012-B-02",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2012-B-03",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2012-B-04",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2012-B-05",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2012-B-06",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2012-B-07",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2012-B-08",
+      "year": 2012,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2012-C-01",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2012-C-02",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2012-C-03",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2012-C-04",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2012-C-05",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2012-C-06",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2012-C-07",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2012-C-08",
+      "year": 2012,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2012-D-01",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2012-D-02",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 13
+    },
+    {
+      "set_id": "2012-D-03",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2012-D-04",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 12
+    },
+    {
+      "set_id": "2012-D-05",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2012-D-06",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2012-D-07",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2012-D-08",
+      "year": 2012,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2013-A-01",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-A-02",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-A-03",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-A-04",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-A-05",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-A-06",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2013-A-07",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-A-08",
+      "year": 2013,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2013-B-01",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2013-B-02",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2013-B-03",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2013-B-04",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-B-05",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-B-06",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-B-07",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2013-B-08",
+      "year": 2013,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2013-C-01",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2013-C-02",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2013-C-03",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-C-04",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-C-05",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-C-06",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2013-C-07",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2013-C-08",
+      "year": 2013,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-D-01",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2013-D-02",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2013-D-03",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2013-D-04",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-D-05",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2013-D-06",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2013-D-07",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2013-D-08",
+      "year": 2013,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2014-A-01",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2014-A-02",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2014-A-03",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2014-A-04",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2014-A-05",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2014-A-06",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2014-A-07",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2014-A-08",
+      "year": 2014,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2014-B-01",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2014-B-02",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2014-B-03",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2014-B-04",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2014-B-05",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2014-B-06",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2014-B-07",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2014-B-08",
+      "year": 2014,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2014-C-01",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2014-C-02",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2014-C-03",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2014-C-04",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2014-C-05",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2014-C-06",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2014-C-07",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2014-C-08",
+      "year": 2014,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2014-D-01",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2014-D-02",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2014-D-03",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2014-D-04",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2014-D-05",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2014-D-06",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2014-D-07",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2014-D-08",
+      "year": 2014,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2015-A-01",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2015-A-02",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2015-A-03",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2015-A-04",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2015-A-05",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2015-A-06",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2015-A-07",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2015-A-08",
+      "year": 2015,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2015-B-01",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2015-B-02",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2015-B-03",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2015-B-04",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2015-B-05",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2015-B-06",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2015-B-07",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2015-B-08",
+      "year": 2015,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2015-C-01",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2015-C-02",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2015-C-03",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2015-C-04",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2015-C-05",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2015-C-06",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2015-C-07",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2015-C-08",
+      "year": 2015,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2015-D-01",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2015-D-02",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2015-D-03",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2015-D-04",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2015-D-05",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2015-D-06",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2015-D-07",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2015-D-08",
+      "year": 2015,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-A-01",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2016-A-02",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2016-A-03",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2016-A-04",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2016-A-05",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2016-A-06",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2016-A-07",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2016-A-08",
+      "year": 2016,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-B-01",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-B-02",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2016-B-03",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2016-B-04",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2016-B-05",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2016-B-06",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2016-B-07",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2016-B-08",
+      "year": 2016,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2016-C-01",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2016-C-02",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2016-C-03",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2016-C-04",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-C-05",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2016-C-06",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-C-07",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2016-C-08",
+      "year": 2016,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2016-D-01",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2016-D-02",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-D-03",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-D-04",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2016-D-05",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2016-D-06",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 14
+    },
+    {
+      "set_id": "2016-D-07",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2016-D-08",
+      "year": 2016,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2017-A-01",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2017-A-02",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2017-A-03",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2017-A-04",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2017-A-05",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2017-A-06",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2017-A-07",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2017-A-08",
+      "year": 2017,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2017-B-01",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2017-B-02",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2017-B-03",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2017-B-04",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2017-B-05",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2017-B-06",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2017-B-07",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2017-B-08",
+      "year": 2017,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2017-C-01",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2017-C-02",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2017-C-03",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2017-C-04",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2017-C-05",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2017-C-06",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2017-C-07",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2017-C-08",
+      "year": 2017,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2017-D-01",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2017-D-02",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2017-D-03",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2017-D-04",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2017-D-05",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2017-D-06",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2017-D-07",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2017-D-08",
+      "year": 2017,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2018-A-01",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2018-A-02",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2018-A-03",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2018-A-04",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2018-A-05",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2018-A-06",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2018-A-07",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2018-A-08",
+      "year": 2018,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2018-B-01",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2018-B-02",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2018-B-03",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2018-B-04",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2018-B-05",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2018-B-06",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2018-B-07",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2018-B-08",
+      "year": 2018,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2018-C-01",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2018-C-02",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2018-C-03",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2018-C-04",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2018-C-05",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2018-C-06",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2018-C-07",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2018-C-08",
+      "year": 2018,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2018-D-01",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2018-D-02",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2018-D-03",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2018-D-04",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2018-D-05",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2018-D-06",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 12
+    },
+    {
+      "set_id": "2018-D-07",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2018-D-08",
+      "year": 2018,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2019-A-01",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2019-A-02",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2019-A-03",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2019-A-04",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2019-A-05",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2019-A-06",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2019-A-07",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2019-A-08",
+      "year": 2019,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2019-B-01",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2019-B-02",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2019-B-03",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2019-B-04",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2019-B-05",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2019-B-06",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2019-B-07",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2019-B-08",
+      "year": 2019,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2019-C-01",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2019-C-02",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2019-C-03",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2019-C-04",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2019-C-05",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2019-C-06",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2019-C-07",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2019-C-08",
+      "year": 2019,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2019-D-01",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2019-D-02",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2019-D-03",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2019-D-04",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2019-D-05",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2019-D-06",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2019-D-07",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2019-D-08",
+      "year": 2019,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2020-A-01",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2020-A-02",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2020-A-03",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2020-A-04",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-A-05",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2020-A-06",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-A-07",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2020-A-08",
+      "year": 2020,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-B-01",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2020-B-02",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-B-03",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2020-B-04",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-B-05",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2020-B-06",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-B-07",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-B-08",
+      "year": 2020,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2020-C-01",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2020-C-02",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2020-C-03",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2020-C-04",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2020-C-05",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2020-C-06",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2020-C-07",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-C-08",
+      "year": 2020,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2020-D-01",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2020-D-02",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2020-D-03",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2020-D-04",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2020-D-05",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2020-D-06",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2020-D-07",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2020-D-08",
+      "year": 2020,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2021-A-01",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-A-02",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-A-03",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2021-A-04",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-A-05",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-A-06",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-A-07",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-A-08",
+      "year": 2021,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2021-B-01",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2021-B-02",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2021-B-03",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2021-B-04",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2021-B-05",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-B-06",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2021-B-07",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2021-B-08",
+      "year": 2021,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2021-C-01",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2021-C-02",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2021-C-03",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2021-C-04",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2021-C-05",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2021-C-06",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2021-C-07",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2021-C-08",
+      "year": 2021,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2021-D-01",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2021-D-02",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2021-D-03",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2021-D-04",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2021-D-05",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2021-D-06",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2021-D-07",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2021-D-08",
+      "year": 2021,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2022-A-01",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2022-A-02",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2022-A-03",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2022-A-04",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2022-A-05",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2022-A-06",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2022-A-07",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2022-A-08",
+      "year": 2022,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2022-B-01",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2022-B-02",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2022-B-03",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2022-B-04",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2022-B-05",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2022-B-06",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2022-B-07",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2022-B-08",
+      "year": 2022,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2022-C-01",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 9
+    },
+    {
+      "set_id": "2022-C-02",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2022-C-03",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2022-C-04",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2022-C-05",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2022-C-06",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2022-C-07",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2022-C-08",
+      "year": 2022,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2022-D-01",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2022-D-02",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2022-D-03",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2022-D-04",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2022-D-05",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2022-D-06",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2022-D-07",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2022-D-08",
+      "year": 2022,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2023-A-01",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2023-A-02",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2023-A-03",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2023-A-04",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2023-A-05",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2023-A-06",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-A-07",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2023-A-08",
+      "year": 2023,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2023-B-01",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-B-02",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-B-03",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-B-04",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2023-B-05",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2023-B-06",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2023-B-07",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-B-08",
+      "year": 2023,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-C-01",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-C-02",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2023-C-03",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2023-C-04",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2023-C-05",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2023-C-06",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-C-07",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2023-C-08",
+      "year": 2023,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-D-01",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2023-D-02",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2023-D-03",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 6
+    },
+    {
+      "set_id": "2023-D-04",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2023-D-05",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2023-D-06",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2023-D-07",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 11
+    },
+    {
+      "set_id": "2023-D-08",
+      "year": 2023,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-A-01",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2024-A-02",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2024-A-03",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2024-A-04",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2024-A-05",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-A-06",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2024-A-07",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-A-08",
+      "year": 2024,
+      "vessel": "A",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2024-B-01",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2024-B-02",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-B-03",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2024-B-04",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 1000,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-B-05",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 1600,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2024-B-06",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 1
+    },
+    {
+      "set_id": "2024-B-07",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2024-B-08",
+      "year": 2024,
+      "vessel": "B",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2024-C-01",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2024-C-02",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 0
+    },
+    {
+      "set_id": "2024-C-03",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 1400,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2024-C-04",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2024-C-05",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-C-06",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2024-C-07",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 7
+    },
+    {
+      "set_id": "2024-C-08",
+      "year": 2024,
+      "vessel": "C",
+      "hooks": 1600,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2024-D-01",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-D-02",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 5
+    },
+    {
+      "set_id": "2024-D-03",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 800,
+      "catch_n": 2
+    },
+    {
+      "set_id": "2024-D-04",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 1600,
+      "catch_n": 8
+    },
+    {
+      "set_id": "2024-D-05",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 4
+    },
+    {
+      "set_id": "2024-D-06",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 1000,
+      "catch_n": 3
+    },
+    {
+      "set_id": "2024-D-07",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 10
+    },
+    {
+      "set_id": "2024-D-08",
+      "year": 2024,
+      "vessel": "D",
+      "hooks": 1400,
+      "catch_n": 3
+    }
+  ],
+  "catch": [
+    {
+      "year": 2000,
+      "catch_t": 400
+    },
+    {
+      "year": 2001,
+      "catch_t": 420
+    },
+    {
+      "year": 2002,
+      "catch_t": 440
+    },
+    {
+      "year": 2003,
+      "catch_t": 460
+    },
+    {
+      "year": 2004,
+      "catch_t": 480
+    },
+    {
+      "year": 2005,
+      "catch_t": 500
+    },
+    {
+      "year": 2006,
+      "catch_t": 520
+    },
+    {
+      "year": 2007,
+      "catch_t": 540
+    },
+    {
+      "year": 2008,
+      "catch_t": 560
+    },
+    {
+      "year": 2009,
+      "catch_t": 580
+    },
+    {
+      "year": 2010,
+      "catch_t": 600
+    },
+    {
+      "year": 2011,
+      "catch_t": 620
+    },
+    {
+      "year": 2012,
+      "catch_t": 640
+    },
+    {
+      "year": 2013,
+      "catch_t": 660
+    },
+    {
+      "year": 2014,
+      "catch_t": 680
+    },
+    {
+      "year": 2015,
+      "catch_t": 700
+    },
+    {
+      "year": 2016,
+      "catch_t": 720
+    },
+    {
+      "year": 2017,
+      "catch_t": 740
+    },
+    {
+      "year": 2018,
+      "catch_t": 760
+    },
+    {
+      "year": 2019,
+      "catch_t": 780
+    },
+    {
+      "year": 2020,
+      "catch_t": 800
+    },
+    {
+      "year": 2021,
+      "catch_t": 820
+    },
+    {
+      "year": 2022,
+      "catch_t": 840
+    },
+    {
+      "year": 2023,
+      "catch_t": 860
+    },
+    {
+      "year": 2024,
+      "catch_t": 880
+    }
+  ],
+  "scenario": {
+    "schema_version": 1,
+    "type": "synthetic-schaefer-poisson",
+    "seed": 20261004,
+    "generator": "R Schaefer biomass trajectory and Poisson sampled catch counts",
+    "rng": [
+      "Mersenne-Twister",
+      "Inversion",
+      "Rejection"
+    ],
+    "R": "R version 4.6.0 (2026-04-24)",
+    "parameters": {
+      "K": 10000,
+      "r": 0.29999999999999999,
+      "initial_B_over_K": 1,
+      "q": 0.00040000000000000002,
+      "vessel_effects": {
+        "A": 0.80000000000000004,
+        "B": 1,
+        "C": 1.2,
+        "D": 1.5
+      }
+    },
+    "units": {
+      "biomass": "tonnes",
+      "annual_catch": "tonnes",
+      "observed_catch": "fish",
+      "effort": "hooks",
+      "CPUE": "fish per 1000 hooks"
+    },
+    "snapshot_end": 2023,
+    "submission_year": 2024,
+    "truth": [
+      {
+        "year": 2000,
+        "biomass_t": 10000,
+        "B_over_K": 1,
+        "catch_t": 400,
+        "next_biomass_t": 9600
+      },
+      {
+        "year": 2001,
+        "biomass_t": 9600,
+        "B_over_K": 0.95999999999999996,
+        "catch_t": 420,
+        "next_biomass_t": 9295.2000000000007
+      },
+      {
+        "year": 2002,
+        "biomass_t": 9295.2000000000007,
+        "B_over_K": 0.92952000000000012,
+        "catch_t": 440,
+        "next_biomass_t": 9051.7377088000012
+      },
+      {
+        "year": 2003,
+        "biomass_t": 9051.7377088000012,
+        "B_over_K": 0.90517377088000017,
+        "catch_t": 460,
+        "next_biomass_t": 8849.2403549726441
+      },
+      {
+        "year": 2004,
+        "biomass_t": 8849.2403549726441,
+        "B_over_K": 0.88492403549726439,
+        "catch_t": 480,
+        "next_biomass_t": 8674.7408156621459
+      },
+      {
+        "year": 2005,
+        "biomass_t": 8674.7408156621459,
+        "B_over_K": 0.86747408156621464,
+        "catch_t": 500,
+        "next_biomass_t": 8519.6292137933469
+      },
+      {
+        "year": 2006,
+        "biomass_t": 8519.6292137933469,
+        "B_over_K": 0.85196292137933471,
+        "catch_t": 520,
+        "next_biomass_t": 8377.9955197157196
+      },
+      {
+        "year": 2007,
+        "biomass_t": 8377.9955197157196,
+        "B_over_K": 0.83779955197157197,
+        "catch_t": 540,
+        "next_biomass_t": 8245.6699077791345
+      },
+      {
+        "year": 2008,
+        "biomass_t": 8245.6699077791345,
+        "B_over_K": 0.8245669907779134,
+        "catch_t": 560,
+        "next_biomass_t": 8119.6387132712443
+      },
+      {
+        "year": 2009,
+        "biomass_t": 8119.6387132712443,
+        "B_over_K": 0.81196387132712444,
+        "catch_t": 580,
+        "next_biomass_t": 7997.6743422310246
+      },
+      {
+        "year": 2010,
+        "biomass_t": 7997.6743422310246,
+        "B_over_K": 0.79976743422310248,
+        "catch_t": 600,
+        "next_biomass_t": 7878.092798368918
+      },
+      {
+        "year": 2011,
+        "biomass_t": 7878.092798368918,
+        "B_over_K": 0.78780927983689175,
+        "catch_t": 620,
+        "next_biomass_t": 7759.5902536882277
+      },
+      {
+        "year": 2012,
+        "biomass_t": 7759.5902536882277,
+        "B_over_K": 0.77595902536882277,
+        "catch_t": 640,
+        "next_biomass_t": 7641.1301026406964
+      },
+      {
+        "year": 2013,
+        "biomass_t": 7641.1301026406964,
+        "B_over_K": 0.76411301026406964,
+        "catch_t": 660,
+        "next_biomass_t": 7521.8630560684505
+      },
+      {
+        "year": 2014,
+        "biomass_t": 7521.8630560684505,
+        "B_over_K": 0.75218630560684507,
+        "catch_t": 680,
+        "next_biomass_t": 7401.0692578615635
+      },
+      {
+        "year": 2015,
+        "biomass_t": 7401.0692578615635,
+        "B_over_K": 0.74010692578615633,
+        "catch_t": 700,
+        "next_biomass_t": 7278.1152504301272
+      },
+      {
+        "year": 2016,
+        "biomass_t": 7278.1152504301272,
+        "B_over_K": 0.72781152504301272,
+        "catch_t": 720,
+        "next_biomass_t": 7152.4209776028574
+      },
+      {
+        "year": 2017,
+        "biomass_t": 7152.4209776028574,
+        "B_over_K": 0.71524209776028569,
+        "catch_t": 740,
+        "next_biomass_t": 7023.4334956581124
+      },
+      {
+        "year": 2018,
+        "biomass_t": 7023.4334956581124,
+        "B_over_K": 0.70234334956581124,
+        "catch_t": 760,
+        "next_biomass_t": 6890.6050023175758
+      },
+      {
+        "year": 2019,
+        "biomass_t": 6890.6050023175758,
+        "B_over_K": 0.68906050023175758,
+        "catch_t": 780,
+        "next_biomass_t": 6753.3733840739287
+      },
+      {
+        "year": 2020,
+        "biomass_t": 6753.3733840739287,
+        "B_over_K": 0.67533733840739285,
+        "catch_t": 800,
+        "next_biomass_t": 6611.1438373545625
+      },
+      {
+        "year": 2021,
+        "biomass_t": 6611.1438373545625,
+        "B_over_K": 0.66111438373545628,
+        "catch_t": 820,
+        "next_biomass_t": 6463.2703034151946
+      },
+      {
+        "year": 2022,
+        "biomass_t": 6463.2703034151946,
+        "B_over_K": 0.6463270303415195,
+        "catch_t": 840,
+        "next_biomass_t": 6309.0355039894903
+      },
+      {
+        "year": 2023,
+        "biomass_t": 6309.0355039894903,
+        "B_over_K": 0.63090355039894908,
+        "catch_t": 860,
+        "next_biomass_t": 6147.6282854683395
+      },
+      {
+        "year": 2024,
+        "biomass_t": 6147.6282854683395,
+        "B_over_K": 0.61476282854683395,
+        "catch_t": 880,
+        "next_biomass_t": 5978.1167650201296
+      }
+    ],
+    "scope": "Synthetic teaching example; not observations from a real fishery.",
+    "notes": [
+      "Sampled set counts supply an abundance index, not a census of annual removals.",
+      "Known annual removals and sampled CPUE share the declared biomass trajectory.",
+      "Growth sensitivities and MSE perturbations illustrate assumptions; they are not validated uncertainty."
+    ]
+  }
+}

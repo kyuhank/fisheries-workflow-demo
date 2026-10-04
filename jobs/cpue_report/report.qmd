@@ -85,8 +85,8 @@ if (!is.null(record$software$container_url)) {
   cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
 }
 if (!is.null(record$source$repository) && !is.null(record$source$commit)) {
-  cat("[Recorded source commit](", record$source$repository, "/commit/",
-      record$source$commit, ")\n\n", sep = "")
+  commit_url <- paste0(record$source$repository, "/commit/", record$source$commit)
+  cat("[", commit_url, "](", commit_url, ")\n\n", sep = "")
 }
 cat("<details><summary>Full preserved input record</summary>\n\n```json\n",
     jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),

@@ -79,7 +79,7 @@ class NativeIntegrationTest(unittest.TestCase):
                                               self.runner.settings, 'Adapter check')
             compare(value, self.runner.output(key), key)
 
-    def test_2_CPUE_filter_partial_update_matches_rebuilt_branch(self):
+    def test_2_CPUE_filter_partial_update_matches_independent_full_workflow(self):
         runner = self.clone()
         before = copy.deepcopy(runner.records)
         runner.configure({'min_hooks_a': 1200})
@@ -88,14 +88,15 @@ class NativeIntegrationTest(unittest.TestCase):
         self.assertGreater(runner.output('cpue_a')['sets_excluded'], 0)
         for key in result['retained']:
             self.assertEqual(runner.records[key], before[key])
-        # Refit the same branch from preserved exact data; no additional full workflow render.
-        fresh = self.clone()
-        fresh.configure({'min_hooks_a': 1200})
-        for key in result['run']:
-            fresh.records.pop(key, None)
-        asyncio.run(fresh.run('cpue_a'))
-        for key in SPEC:
-            compare(runner.output(key), fresh.output(key), key)
+        # Independent fresh full workflow: no restored checkpoint or baseline outputs.
+        with tempfile.TemporaryDirectory() as directory:
+            fresh = Workflow(directory)
+            fresh.configure({'mse': True, 'min_hooks_a': 1200})
+            full = asyncio.run(fresh.run())
+            self.assertEqual(full['run'], list(SPEC))
+            self.assertEqual(full['retained'], [])
+            for key in SPEC:
+                compare(runner.output(key), fresh.output(key), key)
 
     def test_3_growth_sensitivity_changes_only_declared_fit_descendants(self):
         runner = self.clone()

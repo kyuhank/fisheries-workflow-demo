@@ -1,6 +1,7 @@
 # Meaningful scientific sanity checks. Execute only in the authorised R container.
-source("workflow/r_driver.R")
-workflow_require_container()
+driver <- new.env(parent = globalenv())
+source("workflow/r_driver.R", local = driver)
+driver$workflow_require_container()
 source("workflow/r/common.R")
 source("workflow/r/models.R")
 source("workflow/r/mse.R")
@@ -127,11 +128,23 @@ changed <- index_rule
 changed$error_streams[[1]]$errors[[1]]$growth <- changed$error_streams[[1]]$errors[[1]]$growth + 0.1
 rejects(mse_summarise(list(constant, changed, buffered)))
 
-# The bridge must preserve empty/one-row arrays; jsonlite alone needs this distinction.
+# Exercise the real driver: scalar array elements must not gain singleton arrays.
+# Regression for the CI defect where vessel strings became unhashable lists.
 stopifnot(is.null(names(json_array(character()))),
           is.null(names(json_array("one"))), !is.null(names(empty_object())))
-one <- workflow_encode(list(rows = list(list(year = 2024)), returned = list(), settings = empty_object()))
-decoded <- jsonlite::fromJSON(one, simplifyVector = FALSE)
-stopifnot(length(decoded$rows) == 1, is.list(decoded$rows[[1]]), length(decoded$returned) == 0,
-          is.null(names(decoded$returned)), grepl('"settings":{}', one, fixed = TRUE))
+encoded <- driver$workflow_encode(list(
+  vessels = array(c("A", "B")), returned = list("id"), one = array(1),
+  empty = list(), empty_vector = array(numeric()),
+  rows = list(list(year = 2024, vessel = "A")), settings = empty_object()))
+decoded <- jsonlite::fromJSON(encoded, simplifyVector = FALSE)
+stopifnot(identical(decoded$vessels, list("A", "B")),
+          identical(decoded$returned, list("id")),
+          length(decoded$one) == 1, is.numeric(decoded$one[[1]]), decoded$one[[1]] == 1,
+          grepl('"one":[1]', encoded, fixed = TRUE),
+          identical(decoded$empty, list()), identical(decoded$empty_vector, list()),
+          length(decoded$rows) == 1, is.list(decoded$rows[[1]]),
+          is.numeric(decoded$rows[[1]]$year), decoded$rows[[1]]$year == 2024,
+          identical(decoded$rows[[1]]$vessel, "A"),
+          grepl('"settings":{}', encoded, fixed = TRUE))
+rejects(driver$workflow_encode(list(matrix = matrix(1:4, nrow = 2))))
 cat("R GLM, RTMB, timing, paired-trial and serialization sanity checks passed.\n")
