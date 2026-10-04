@@ -2,7 +2,7 @@
   "job": "assessment_report",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "6115dbf8c69982ede80f7a07d7ba295703af7b4b53acafb5d38b8121f4f37779",
+  "signature": "0a65c6a18843c1e306054ed98147c5db94d15fe6063df54f48d7298fdc874c42",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "321bc00223e9ee0a0ec734930767b55cc6e53243dbedced5f9656934b9693c69",
-    "report.html": "6d924f7c447febda20889ecc09ebd9baaaf92a5f0630f15904154676aec23329"
+    "output.json": "9b57fc52b7ee49756faf78169c8b75f17701cddd26e76d3305c87720be6b8074",
+    "report.html": "91e0bad2b067a89e0e84f6ec06dd2f8ccbb08c0dfa89b6862e198c41c1cad424"
   },
   "log": [
     "Write a short report and preserve its analytical record.",
@@ -29,13 +29,13 @@
   "inputs": {
     "assessment_summary": {
       "run_id": "Run 001",
-      "checksum": "321bc00223e9ee0a0ec734930767b55cc6e53243dbedced5f9656934b9693c69"
+      "checksum": "9b57fc52b7ee49756faf78169c8b75f17701cddd26e76d3305c87720be6b8074"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

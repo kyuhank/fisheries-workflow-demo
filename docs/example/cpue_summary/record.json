@@ -2,7 +2,7 @@
   "job": "cpue_summary",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "6fef26d88e54a56ead79f611392609060b64f0293001733b225479075b81ec94",
+  "signature": "53283de1da3357a520cc8835cb8e7b92a647e065fbe9963df44a4cb6e08a9484",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "e068df466048a70e4e26d2386232274d563338284d5bd573e7fb759a59632e6b",
-    "report.html": "2335c7ed5a8d7c5fb178910669c59e99c9a36ff18be450a2ef8a90d6ea723591"
+    "output.json": "8be31791b6c24b59cacfeb27100f9d4b1feeb730ac3a7d34d622ca479bcf5ec5",
+    "report.html": "3fd893ccb3d6a7c1dfb6ea18e03bdbd7f170bc83593f2c916aa5ae0ee8323337"
   },
   "log": [
     "Compare both indices in a plot and table.",
@@ -29,17 +29,17 @@
   "inputs": {
     "cpue_a": {
       "run_id": "Run 001",
-      "checksum": "638f6b680fb833b38edb186a064eede2e3e623b243f5ad262e3e77953f1b1845"
+      "checksum": "000d9a1264be8ad9cd440bdb0d05e579bf5f2eb7c18a30cc4726d462f70ea5b7"
     },
     "cpue_b": {
       "run_id": "Run 001",
-      "checksum": "6fbc54151c80608b173575b75ba3498ab9389257c662141be4af270358508e43"
+      "checksum": "d3aa75b010730021988c2ddb495aa64ea98c5e40e07902d90e557e9565196e67"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

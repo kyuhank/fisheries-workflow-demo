@@ -2,7 +2,7 @@
   "job": "assessment_summary",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "1f03f1bebae9927d05839b8769bc6252dbfe0ed51eb8e9820ab1f9501f0a5d41",
+  "signature": "ae078f0eae3d3530a1ef1c2f68db5673bbbc947ee3a18ae1793a8507ac915025",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "321bc00223e9ee0a0ec734930767b55cc6e53243dbedced5f9656934b9693c69",
-    "report.html": "ed7503f493959b77d9c0cd72944c4840bbd806b87ea4351e16f58be9bb935f4b"
+    "output.json": "9b57fc52b7ee49756faf78169c8b75f17701cddd26e76d3305c87720be6b8074",
+    "report.html": "111d21958d7f02cd5c29ab5ac58ec9cbdd62b0541d6f43b7442366188895b641"
   },
   "log": [
     "Compare the four fitted cases in plots and tables.",
@@ -29,25 +29,25 @@
   "inputs": {
     "assessment_a1": {
       "run_id": "Run 001",
-      "checksum": "25484a93c5c60fc3e28ea0184d95d7a23b3b1ed11c1e1b81c3df82b449581cc0"
+      "checksum": "9e0de3eb413d12034d2623326f0815263d628883dc319075deeaec2188718747"
     },
     "assessment_a2": {
       "run_id": "Run 001",
-      "checksum": "cd211b75c64300ecbaa1192320616f10d82209c82c20c15b3e09014fd9b2fbd8"
+      "checksum": "b1d45e0de67157197b2d92366e16403c4ce1a9c9e397b4cacf5a6b41f37b2cf8"
     },
     "assessment_b1": {
       "run_id": "Run 001",
-      "checksum": "ce9f1c9d0f03718aefc52f0cd7dd3cd0a20ef6a5251543f8b3803c42d683d9b1"
+      "checksum": "0cd4d216ca86285a7eb6238ba891a851236ca6324af5c30986996aab763de1e5"
     },
     "assessment_b2": {
       "run_id": "Run 001",
-      "checksum": "f7157cb0c7bcb915d14f8d7165cb6249469859153676be4a729297c1b4a43506"
+      "checksum": "9dabd62b2374fa2ca257314f9c2494266fef11789c0741614c3c999e377e32c4"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

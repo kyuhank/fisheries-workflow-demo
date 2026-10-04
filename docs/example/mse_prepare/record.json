@@ -2,7 +2,7 @@
   "job": "mse_prepare",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "2cbc88c8a254d858a73dc4c1c313d97084bd78ed842bf1a2b4282ef1080c227c",
+  "signature": "9e8c6036101284cc587c1675e3b15bf7313464a4b063a701f00748fb0890e47b",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "e71f3c18113f3270c6311f2534ff6f64cee60396f77b576a40ae17b4982bb06a",
-    "report.html": "9620ae6fad60ec4bf99158ac609a04b9c932a1072f2bed3e87dc700e27474e0f"
+    "output.json": "f77a03c717d3132aaf44155b157c68bc9199a8c5e5ce8c974a287347f67b818d",
+    "report.html": "0d2248368f2cd6a76bfa475f9b5318961f222b4f8bf5a30ec2a21beab8643fc1"
   },
   "log": [
     "Use the four assessment cases to prepare stocks for simulated management trials.",
@@ -29,25 +29,25 @@
   "inputs": {
     "assessment_a1": {
       "run_id": "Run 001",
-      "checksum": "25484a93c5c60fc3e28ea0184d95d7a23b3b1ed11c1e1b81c3df82b449581cc0"
+      "checksum": "9e0de3eb413d12034d2623326f0815263d628883dc319075deeaec2188718747"
     },
     "assessment_a2": {
       "run_id": "Run 001",
-      "checksum": "cd211b75c64300ecbaa1192320616f10d82209c82c20c15b3e09014fd9b2fbd8"
+      "checksum": "b1d45e0de67157197b2d92366e16403c4ce1a9c9e397b4cacf5a6b41f37b2cf8"
     },
     "assessment_b1": {
       "run_id": "Run 001",
-      "checksum": "ce9f1c9d0f03718aefc52f0cd7dd3cd0a20ef6a5251543f8b3803c42d683d9b1"
+      "checksum": "0cd4d216ca86285a7eb6238ba891a851236ca6324af5c30986996aab763de1e5"
     },
     "assessment_b2": {
       "run_id": "Run 001",
-      "checksum": "f7157cb0c7bcb915d14f8d7165cb6249469859153676be4a729297c1b4a43506"
+      "checksum": "9dabd62b2374fa2ca257314f9c2494266fef11789c0741614c3c999e377e32c4"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

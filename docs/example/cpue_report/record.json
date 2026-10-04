@@ -2,7 +2,7 @@
   "job": "cpue_report",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "2f68741bff9e909c569a37c718959d7ae9dc3e9bb5c485ffb47dc8fe777ec25c",
+  "signature": "5049604966a01efc83e64efaaf8d594726cb87a983dbd4ae8b5bb04e93e5df03",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "e068df466048a70e4e26d2386232274d563338284d5bd573e7fb759a59632e6b",
-    "report.html": "4b2aaf3811ad14e49cbaf6e8bfe6d8c1fc4e28d5771ba624dfce614eb6f028bf"
+    "output.json": "8be31791b6c24b59cacfeb27100f9d4b1feeb730ac3a7d34d622ca479bcf5ec5",
+    "report.html": "04dfcfb14a17ecc90534d6bd0052b025af2f214d77005437567c1f551cf7295a"
   },
   "log": [
     "Write a short account of the CPUE methods and results.",
@@ -29,13 +29,13 @@
   "inputs": {
     "cpue_summary": {
       "run_id": "Run 001",
-      "checksum": "e068df466048a70e4e26d2386232274d563338284d5bd573e7fb759a59632e6b"
+      "checksum": "8be31791b6c24b59cacfeb27100f9d4b1feeb730ac3a7d34d622ca479bcf5ec5"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

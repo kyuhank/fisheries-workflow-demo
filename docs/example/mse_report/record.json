@@ -2,7 +2,7 @@
   "job": "mse_report",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "4e1aa99fe3f564ceb6a9b42378dd763222d606878027accbe7dc4d89b1901f7e",
+  "signature": "f9f120f6959212c88cc7bc25536355c66d25275175680ac3625a3e66996d5ec8",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581",
-    "report.html": "f93b3e7986e00db8b5048b5d005c27352d4669570e0112038661914600586c12"
+    "output.json": "7a5fcdb630ef617f0f7718000a287605c5b3be0cdc55843caf954464a2f361bf",
+    "report.html": "b5f3bd8f99c1026ba149917d981b1453b3a1baefceab6dabb09374b0b5afc7c5"
   },
   "log": [
     "Report the tested procedures, their trade-offs and the limits of the example.",
@@ -29,13 +29,13 @@
   "inputs": {
     "mse_summary": {
       "run_id": "Run 001",
-      "checksum": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581"
+      "checksum": "7a5fcdb630ef617f0f7718000a287605c5b3be0cdc55843caf954464a2f361bf"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

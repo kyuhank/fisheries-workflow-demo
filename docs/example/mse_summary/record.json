@@ -2,7 +2,7 @@
   "job": "mse_summary",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "480dda9c091a161031610cce75cb0c6499336518f0d23702043c962bc091fbb9",
+  "signature": "bce22653754711d389f477fd0a4fb5461cefa32ad47744f2c740471f394d878f",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "b1f565a4db2567b5000e7d3fbf9a4f667f0d894b9d2ad31a74d5a77ecbb7d581",
-    "report.html": "c48803d4199e5988d2d9112f024d6177d837b1aad7f725b2579ae9a60894b49e"
+    "output.json": "7a5fcdb630ef617f0f7718000a287605c5b3be0cdc55843caf954464a2f361bf",
+    "report.html": "9597933391b1741be754a2a93515be5eb8631f7bf479e6e3a21411886557e3f0"
   },
   "log": [
     "Compare catch, stock levels and catch stability across the management trials.",
@@ -29,21 +29,21 @@
   "inputs": {
     "mse_constant": {
       "run_id": "Run 001",
-      "checksum": "d6aa46c0e065a38a175e5f01f3ccd29e87b3b40ba0f031ea26a829dcd0f7eda4"
+      "checksum": "ffb0e404009443bf6e60cd19fc872e6c5044e9c2c6b0f5186f98578c704e9c9e"
     },
     "mse_index": {
       "run_id": "Run 001",
-      "checksum": "17b3ab39d1dac879b18c8fcda672c919098d314ff795cdc16cc3ff7e87c6b678"
+      "checksum": "15dc728ee498da3304a34972cc55dbd5ae82155ee18bd2cdf54f5cc3d1b63eb8"
     },
     "mse_buffered": {
       "run_id": "Run 001",
-      "checksum": "776495432804e91aab6ebef4f46a8fbd893cca51b7d2eac78be1061637199ed3"
+      "checksum": "5475a091a4c94f3622e16870259d86ee05c0f673d423303200fd811051405e0d"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",

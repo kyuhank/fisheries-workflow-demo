@@ -2,7 +2,7 @@
   "job": "mse_constant",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "7f7d00c3f933b568c15e55c21a79a2c9a9c51d4c183516ce37591235621f3549",
+  "signature": "a9377f380aaad9311003f037b7f1094dbb40213c14b496a06f5baa82a6983642",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -13,14 +13,14 @@
     "workflow/age_model.py": "16f63407aefd35d2c0f839f793e13911e500b20d35abe289a6bff27313a2db33"
   },
   "software": {
-    "python": "3.10.12",
+    "python": "3.12.14",
     "platform": "linux",
     "runtime": "CPython",
-    "sqlite": "3.37.2"
+    "sqlite": "3.53.4"
   },
   "outputs": {
-    "output.json": "d6aa46c0e065a38a175e5f01f3ccd29e87b3b40ba0f031ea26a829dcd0f7eda4",
-    "report.html": "12e9c1940a31a211275d1a70639f667173a63956a1881e4db7c2258f979b020c"
+    "output.json": "ffb0e404009443bf6e60cd19fc872e6c5044e9c2c6b0f5186f98578c704e9c9e",
+    "report.html": "bd0e7f929e1bb4a0c27c85893825bb565f2537eb8267f5375e37eb2910c62952"
   },
   "log": [
     "Test a fixed annual catch under the same simulated future conditions.",
@@ -29,13 +29,13 @@
   "inputs": {
     "mse_prepare": {
       "run_id": "Run 001",
-      "checksum": "e71f3c18113f3270c6311f2534ff6f64cee60396f77b576a40ae17b4982bb06a"
+      "checksum": "f77a03c717d3132aaf44155b157c68bc9199a8c5e5ce8c974a287347f67b818d"
     }
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "650b4f9ed0f3eba34f1ed9d650d32cf5ff6aef58",
-    "version": "1.7.8"
+    "commit": null,
+    "version": "1.7.9"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
