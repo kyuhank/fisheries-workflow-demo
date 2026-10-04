@@ -2,7 +2,7 @@
   "job": "mse_buffered",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "db319fb99d6c6f879804147e8e9f981681f18084a7e5860d3a9cd7e08a24a653",
+  "signature": "c04b6bafe5e180c4d590e19e46af92c31ba045bde93dab4a2581fbe557735536",
   "settings": {
     "buffer": 0.8
   },
@@ -22,7 +22,7 @@
   },
   "outputs": {
     "output.json": "5475a091a4c94f3622e16870259d86ee05c0f673d423303200fd811051405e0d",
-    "report.html": "cd1c5993d4f4a20e34284eacc2c29ffc6b07fc8fc93eb29cdc2244bbd6964744"
+    "report.html": "5a62c2226712c0e5a3a65f2fa2b143349cf8393b38bb07e62b523922df387e6a"
   },
   "log": [
     "Set catch from index thresholds and the selected buffer; limit annual advice changes to 15%.",
@@ -37,7 +37,7 @@
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
     "commit": null,
-    "version": "1.7.10"
+    "version": "1.7.11"
   },
   "data_files": {
     "fishery.sqlite": "48c3fb1bbf47ee5a4bc29ac8f69323fdef1347a56b24b02d1f089bffc3dcd11b",
