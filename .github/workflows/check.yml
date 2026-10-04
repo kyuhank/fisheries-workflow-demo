@@ -23,6 +23,7 @@ jobs:
             --user "$(id -u):$(id -g)" \
             --env PAPER_RUNTIME_IMAGE="$IMAGE" --env PAPER_RUNTIME_IMAGE_URL \
             --env PAPER_NATIVE_INTEGRATION=1 \
+            --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID \
             --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
             "$IMAGE" sh -c 'Rscript --vanilla tests/test-r-models.R && python3 -m unittest discover -s tests -v'
   server:

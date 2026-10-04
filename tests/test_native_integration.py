@@ -173,6 +173,13 @@ class NativeIntegrationTest(unittest.TestCase):
                 self.assertTrue(preserved['report_rendering']['quarto_executed'])
 
     def test_7_hosted_bundle_freezes_different_actual_inputs_for_fresh_R_reproduction(self):
+        identity = {name: os.environ.get(name) for name in
+                    ('GITHUB_SHA', 'GITHUB_REPOSITORY', 'GITHUB_RUN_ID')}
+        if not all(identity.values()):
+            self.skipTest('This hosted-coordinator fixture requires actual GitHub native CI identity.')
+        self.assertRegex(identity['GITHUB_SHA'], r'^[a-f0-9]{40}$')
+        self.assertRegex(identity['GITHUB_REPOSITORY'], r'^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$')
+        self.assertRegex(identity['GITHUB_RUN_ID'], r'^[0-9]+$')
         os.environ.setdefault('PAPER_REQUEST_ID', '00000000-0000-4000-8000-000000000001')
         from cloud.run import HostedWorkflow
         source = self.runner.source_context()
@@ -180,12 +187,16 @@ class NativeIntegrationTest(unittest.TestCase):
         supplied['sets'][0]['catch_n'] += 7
         frozen = encoded(supplied)
         with tempfile.TemporaryDirectory() as directory:
-            # Use the actual hosted coordinator/adapter with an explicitly local
-            # input fixture; no API, credential or claimed GitHub identity.
+            # Use the actual hosted coordinator/adapter without an API or
+            # credential; record the real enclosing native CI execution.
             runner = HostedWorkflow.__new__(HostedWorkflow)
             Workflow.__init__(runner, Path(directory) / 'hosted')
             runner.hosted_data, runner.pool = supplied, None
-            runner.execution = {'provider': 'Native container input fixture',
+            runner.execution = {'provider': 'GitHub Actions',
+                                'purpose': 'native-hosted-input-fixture',
+                                'repository': identity['GITHUB_REPOSITORY'],
+                                'commit': identity['GITHUB_SHA'],
+                                'github_run': identity['GITHUB_RUN_ID'],
                                 'container': RBridge.require_container(),
                                 'data_checksum': digest(frozen)}
             runner.configure({'mse': True})
