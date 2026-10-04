@@ -2,7 +2,7 @@
   "job": "qc",
   "owner": "Data curator",
   "run_id": "Run 001",
-  "signature": "cc54ff6e4b154a86aa7401b1501a1b171c4b4ad24ab8cc41facb465bfc3d345d",
+  "signature": "28e613b671795be54a7746fd72f44e3cc729154e5dbddc41615b839ffc2f622c",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -36,7 +36,7 @@
   },
   "outputs": {
     "output.json": "0f53c7bbd1e4d82063de95170926b550eff32d00bf1ef9151ef428c1aa3dfb8c",
-    "report.html": "40eea06fc4d95667fce48cb2b8cc5e89af6544d4def301121ba9dbf1076c9512"
+    "report.html": "d5deed52d5d1142939eece9e7620616e2c085b1bd5cb65e07624e6a856869d1f"
   },
   "log": [
     "Check records and return invalid effort for correction.",
@@ -54,14 +54,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

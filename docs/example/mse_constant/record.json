@@ -2,7 +2,7 @@
   "job": "mse_constant",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "6ebc808f562358f540966c214c58fb4847b8aef3f95aa189bd226396174d763b",
+  "signature": "f797dd22bd4b73f1ab761cec97f2d6d8f8e9fc4f70f0d276eab75dfa5b009add",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -36,7 +36,7 @@
   },
   "outputs": {
     "output.json": "c40da13b86bc49c9c78ffbc7cfd124d0fff6a2bc3581a10cbe041af733056ab7",
-    "report.html": "7f7dc97d5b5c97318667513de0b1286da62c8220ba4b10db433bf4fc25b59402"
+    "report.html": "09363e50d235b81ef9854945d77a7c223a0436ed4d347f6414ae68635826899c"
   },
   "log": [
     "Test a fixed annual catch under the same simulated future conditions.",
@@ -52,14 +52,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

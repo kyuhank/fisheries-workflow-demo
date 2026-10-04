@@ -2,7 +2,7 @@
   "job": "database",
   "owner": "Data curator",
   "run_id": "Run 001",
-  "signature": "c7a3884bc0d1527365b7c7b8cb179bb2db3f9b97054ab811457e212aa216dd4f",
+  "signature": "921c003b9b40816170c2e63f4bec1a0edd6c82702f4c432654b0e773ba74a319",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -37,7 +37,7 @@
   "outputs": {
     "output.json": "20e349ca9329931036ebfba1969c9e4ad8fe600d87a0919e19dfda4746942151",
     "snapshot.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",
-    "report.html": "fca035b37c7d352a2e069ee3360e12a33cc2f2da98c395dec96af308487ac062"
+    "report.html": "31dd6576fb87aee9d18ba2799d6d635295560726a7505588312859b6a08dc8fd"
   },
   "log": [
     "Store the accepted records in a fixed database snapshot.",
@@ -53,14 +53,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

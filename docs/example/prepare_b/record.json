@@ -2,7 +2,7 @@
   "job": "prepare_b",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "27b3877c86d562448f559b3facabbb2bf9c08f6c7711a46439590cc5cb909c64",
+  "signature": "0d527ace7109bc9403c0bd64f469872075bed4c87036431235e223373268cc75",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -36,7 +36,7 @@
   },
   "outputs": {
     "output.json": "0f0c1e9c29b53d56a77a3d2b83b1ba5767c1fb05efb55e991c66ee06aa89d559",
-    "report.html": "07beb1fc5057ae3e67570d0e9e27210f0c521f0168fba30bb42dd3b3f7c61644"
+    "report.html": "f48cefb45c72e90fe4d5cc35da48857a5a66237097ad3e40f24b3bf602de6093"
   },
   "log": [
     "Join index B to annual catches and check the model inputs.",
@@ -56,14 +56,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

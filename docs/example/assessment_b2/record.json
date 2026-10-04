@@ -2,7 +2,7 @@
   "job": "assessment_b2",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "6c0e8f26b7c90e71e802a5a4c7632e1ff74bd099b263aaf0b893ab6424b3a473",
+  "signature": "d6e3ce11c38ba822fdc075cc232088561efcf11b947282f7e8fd719ad139b890",
   "settings": {
     "r": 0.3
   },
@@ -38,7 +38,7 @@
   },
   "outputs": {
     "output.json": "b0f91f4bb90d7cb6cbe6fc290a2d4103408edb00cd568b02b8704b660bec8fcd",
-    "report.html": "7aab870051dfabb09f568f57b025583e2c573e2ad3b07c1dbeffb06e9dc4b0cc"
+    "report.html": "f2e91a03e5cea22a9dea9a2310715e341c19ea00808128a881e3308335869028"
   },
   "log": [
     "Fit the illustrative model to index B with growth-rate setting 2.",
@@ -54,14 +54,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

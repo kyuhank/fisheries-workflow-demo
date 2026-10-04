@@ -2,7 +2,7 @@
   "job": "mse_index",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "16c120b347a8d1c1fbafa68a3f4a989380c1007bc6286cf025e64f346980ecdc",
+  "signature": "ff1dd218abc786236669f03c349bd02e673876c0e5f45745572dc9fc7d8aae48",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -36,7 +36,7 @@
   },
   "outputs": {
     "output.json": "376204afe7a7a89c86b933015b3700b4364898368b8f2807303191236c971346",
-    "report.html": "a18842fe9dd8ca49ce80213fc0a30e710dae42e5f41972be7d22f983d99ea210"
+    "report.html": "710cf153351b1f8816947fecb429d83909043b8d113f476c9b61e287cab3f96a"
   },
   "log": [
     "Update annual catch using a simulated abundance index.",
@@ -52,14 +52,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

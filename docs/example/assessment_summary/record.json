@@ -2,7 +2,7 @@
   "job": "assessment_summary",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "8f05cd5bb1ac9bfaf30e891be8c0f36a30c85c7375b921986ad01c95c12c25f0",
+  "signature": "1ac43fa6b98d866349878a30fd2d51ca2df9a68c4db663efae9975ad73a5f87b",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -36,7 +36,7 @@
   },
   "outputs": {
     "output.json": "c2495bc3f8904171cb661b45c1a778ae60d7159e441eba01bf20372c791f8f1a",
-    "report.html": "e629abf218d4e99791927dd73dc36a75dc0187be4cec974fe0990dbd9a9d3997"
+    "report.html": "c1c455aac9279e4df10877ecbe99df5bdd5ccd10085171b6aadfd596b1f7256c"
   },
   "log": [
     "Compare the four fitted cases in plots and tables.",
@@ -64,14 +64,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

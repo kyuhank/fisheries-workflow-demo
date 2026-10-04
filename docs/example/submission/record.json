@@ -38,7 +38,7 @@
   },
   "outputs": {
     "output.json": "a4fe352d0c61929f638cfc5ded6e143ba5fd852bcd5c8720845914667c70a2aa",
-    "report.html": "227fb6a2e39661ebaf94952e6fc9f555e79d0110a7d813b487c450d6203c8e9c"
+    "report.html": "e2dfe673f87fd3bf965e19c16f9f8890660b6a783e8a3d7749295ab4296bc7b8"
   },
   "log": [
     "Submit catch and effort records for checking.",
@@ -52,14 +52,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

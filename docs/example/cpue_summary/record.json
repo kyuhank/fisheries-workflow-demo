@@ -2,7 +2,7 @@
   "job": "cpue_summary",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "7c00beeccf5ab30361d7fef5b18cefcc38f452f3bec3b0fb5892485cedaad958",
+  "signature": "ec75ac71f672159f8c17280dfaa0dc063ba01579411a44f62cddbe8a3675b8ab",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -36,7 +36,7 @@
   },
   "outputs": {
     "output.json": "658c282ad70317eede9b4c25f417d21a37860f4903f8a70e975757eaf0575ca6",
-    "report.html": "497783c067b8ddd526cead66d1b28d6840d90c830fd813fced2033a34cd890b0"
+    "report.html": "79daf9e742d66ef0a16cf83be5b22ab3e04fbe46c9a7123ea1bd4c85e64645b1"
   },
   "log": [
     "Compare both indices in a plot and table.",
@@ -56,14 +56,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

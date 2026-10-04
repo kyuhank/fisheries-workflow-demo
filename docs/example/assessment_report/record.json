@@ -2,7 +2,7 @@
   "job": "assessment_report",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "b24ba71c56cec160631fa89ebfa414add65eb73155f754dbdebd30b6857ce3ce",
+  "signature": "3ffeed5e929f302e2f813750cec035e0e39acbfa30729d678beeae951e7223d2",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -37,9 +37,9 @@
   },
   "outputs": {
     "output.json": "c2495bc3f8904171cb661b45c1a778ae60d7159e441eba01bf20372c791f8f1a",
-    "report.html": "8f38a114e0c656c91bf24f0140d37ad9e07a600709ac05b8f61027d71b0b320c",
+    "report.html": "601fba84c36316904ba662003610eea28bd17440896de8e4f382b3e2d78aaf98",
     "report.qmd": "56710f99b1694cb3ba67472e062eadf4c4f4507c0167b92ab5214400a16c9a2e",
-    "report-data.json": "596b04d94e5e63a693ab902e74a3ef4cf13d63288614590e9914ce7b146e12ec"
+    "report-data.json": "acffb41f27816290e64bdaf398580dea99992dbdc51c9043d8875d5abd2e8331"
   },
   "log": [
     "Write a short report and preserve its analytical record.",
@@ -55,14 +55,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

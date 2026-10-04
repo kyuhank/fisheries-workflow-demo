@@ -2,7 +2,7 @@
   "job": "mse_summary",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "af8f3439675102483755dcbd7f28e83c16f30adbc9ad6d7df35f0d39ab692b70",
+  "signature": "992796f6557696695b58ae6550534f0f9ae73e54ce5fa11270baa9ef570ba5bf",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -36,7 +36,7 @@
   },
   "outputs": {
     "output.json": "c21bcfe5052600a4fa44bce40c9dc62bdfb99571f855af2ba2f0ab7388c9c0ea",
-    "report.html": "9cd088afc3d19dd357f221e9b05429d6aedc44ccb56bf6910ff2e96478a46363"
+    "report.html": "3874d82d43a1ccb8d87769afeddc04c5b0a15912a8677acdefc5c921b838c447"
   },
   "log": [
     "Compare catch, stock levels and catch stability across the management trials.",
@@ -60,14 +60,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

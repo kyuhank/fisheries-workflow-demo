@@ -2,7 +2,7 @@
   "job": "cpue_report",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "e52ca7353f98fd9ba4cb559a74297530f44959a4d87ea3e8a4c2460e75b1e88c",
+  "signature": "b16f600f95d67a1448ad104dbc96c27210b097a483c98f25d12de6fed6e3f9c8",
   "settings": {},
   "snapshot": 2023,
   "code": {
@@ -37,9 +37,9 @@
   },
   "outputs": {
     "output.json": "658c282ad70317eede9b4c25f417d21a37860f4903f8a70e975757eaf0575ca6",
-    "report.html": "b201f81e8618aceadf790903e8627d974fb890089307abb047d2b71bfccb9472",
+    "report.html": "750346da6a853d97df9c6e77f7f826aacdb9d84bc9b304b11ad8bb173801acdf",
     "report.qmd": "a7a6ed8c56ad05457d0bf7ec5861e480301201352561bea13641c2c4c8eabb90",
-    "report-data.json": "f34fcaf2a3793274c5e2a040059fd637f67ce62bcd9c081d278414e10550672a"
+    "report-data.json": "bb9daff962c775cea60f665016d0b57e12af154e347072ce6156aa1d886ddd7c"
   },
   "log": [
     "Write a short account of the CPUE methods and results.",
@@ -55,14 +55,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

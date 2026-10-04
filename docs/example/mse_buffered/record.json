@@ -2,7 +2,7 @@
   "job": "mse_buffered",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "c48336c36a33d1181bb559a2db947460bcebf071dc899f29769e5a735136d263",
+  "signature": "cfdb5e8baf12094282da916b5e3d086f6f3ec77a1ee1919f5217b998433971df",
   "settings": {
     "buffer": 0.8
   },
@@ -38,7 +38,7 @@
   },
   "outputs": {
     "output.json": "e7223b3f3d1d4eac786a6c956bd865c9f2ceb84ee09794eba4e45929df37ebfb",
-    "report.html": "65e8e83dc24ba85c9f21996e48523827e67b486b3d3232e4f952f9c40668fdb9"
+    "report.html": "433693e0c8a4082607e4815facc7e721a3db93bb0d647dd9be1956c45a1aa37f"
   },
   "log": [
     "Set catch from index thresholds and the selected buffer; limit annual advice changes to 15%.",
@@ -54,14 +54,14 @@
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21",
-    "github_run": "37209310361",
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7",
+    "github_run": "37223958280",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "d2d0a3007bc9bdb282223eaa06a6d3facbf89d21"
+    "commit": "86aa73ec0f7e1fc5b7e140575267cd24b8e5aad7"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",
