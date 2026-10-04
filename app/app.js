@@ -1380,13 +1380,13 @@ function renderViewGuide() {
     ? manual
       ? "These are separate analyst workspaces without shared orchestration. Inspect responsibilities and job records, and confirm file transfers when an analysis is waiting."
       : mode === "saved"
-      ? "These tasks contain the same jobs shown in the diagram, with saved outputs. Select a task, then use a job’s Output and Record to inspect its result and inputs."
-      : "These tasks contain the jobs shown in the diagram. Run the workflow, then change a setting to follow a revision. Open a job’s Record to trace the inputs it used."
+      ? "These tasks organise the diagram’s saved jobs; no analyses run in View example. Select a task and open a job’s Output and Record to inspect its result, inputs and container. Choose Live run on the website to change settings and run a revised workflow."
+      : "Run the workflow, change CPUE A records, then choose Update workflow. The Orchestration tool follows the input connections shown in the diagram and starts affected jobs when their inputs are ready, inside the recorded container. Unaffected results and records remain available. Open Output and Record to trace a revision."
     : manual
       ? "The diagram shows the analyses and their input connections. In Manual handover, jobs run across separate workspaces and wait for you to confirm each file transfer."
       : mode === "saved"
-      ? "The diagram shows which analyses provide inputs to others. The Orchestration tool organises the same saved jobs so you can inspect their outputs and recorded inputs."
-      : "The diagram shows which analyses provide inputs to others. Use the Orchestration tool to run the same connected jobs and inspect their responsibilities, progress and records.";
+      ? "The diagram shows the input connections between the saved jobs. No analyses run in View example. Open the Orchestration tool, select a task and use Output and Record to inspect results and recorded inputs. Choose Live run on the website to change settings and run a revised workflow."
+      : "The diagram shows which jobs supply inputs to others. Run the workflow, change CPUE A records, then choose Update workflow. The Orchestration tool starts affected jobs when their inputs are ready, inside the recorded container, and keeps unaffected results and records. Open Output and Record to trace a revision.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
   $("view-guide-link").textContent = orchestration ? "See workflow diagram →"
     : manual ? "Inspect job outputs →" : "Open Orchestration tool →";

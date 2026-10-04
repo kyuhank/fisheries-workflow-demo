@@ -19,7 +19,9 @@ for a real fishery.
 The **Workflow diagram** shows the analytical connections: each job receives
 inputs from the jobs connected to it. **Orchestration tool** organises these same
 jobs by task, with example analyst roles, progress and execution records. Switch
-between the views to follow the same execution.
+between the views to follow the same execution. The tool follows the defined input
+connections and starts affected jobs when their inputs are ready, inside the
+recorded container. Results outside the revision keep their original records.
 
 Run the workflow once, then change **CPUE A records**, **Growth-rate setting 2** or
 **MSE catch buffer**. Use **Update workflow** to update affected jobs; unchanged
