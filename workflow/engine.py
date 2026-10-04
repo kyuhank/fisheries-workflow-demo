@@ -397,10 +397,11 @@ class Workflow:
             image = software['container']
             url_env = (' --env ' + shlex.quote('PAPER_RUNTIME_IMAGE_URL=' + software['container_url'])
                        if software.get('container_url') else '')
-            run = ('docker run --rm --network none --env PAPER_RUNTIME_IMAGE=' + image
+            pull = 'docker pull --platform linux/amd64 ' + image
+            run = ('docker run --rm --network none --platform linux/amd64 --env PAPER_RUNTIME_IMAGE=' + image
                    + url_env + ' --volume "$PWD:/workspace" --workdir /workspace ' + image
                    + ' python3 run.py --settings settings.json --output reproduced')
-            check = ('docker run --rm --network none --env PAPER_RUNTIME_IMAGE=' + image
+            check = ('docker run --rm --network none --platform linux/amd64 --env PAPER_RUNTIME_IMAGE=' + image
                      + url_env + ' --volume "$PWD:/workspace" --workdir /workspace ' + image
                      + ' python3 verify.py reference reproduced')
             note = ''
@@ -409,7 +410,7 @@ class Workflow:
                 check += f' --job {job_target}'
                 note = (f'This check compares only {job_target}. Other saved results retain their earlier '
                         'records and may use earlier inputs; they are not reproduced by this command.\n')
-            archive.writestr('REPRODUCE.txt', f'Run: {run}\nCheck: {check}\n{note}'
+            archive.writestr('REPRODUCE.txt', f'Pull: {pull}\nRun: {run}\nCheck: {check}\n{note}'
                             'New calculations run only in Docker: Rscript executes the R job scripts, Python '
                             'coordinates jobs and SQLite, and Quarto renders the three report jobs. The offline '
                             'page displays saved outputs. Software details, actual container digest and original '

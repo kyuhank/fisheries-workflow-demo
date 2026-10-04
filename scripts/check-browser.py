@@ -112,7 +112,15 @@ def main():
         page.goto((ROOT / 'docs/offline.html').as_uri())
         page.wait_for_function("mode === 'saved'")
         assert page.locator('#mode option').count() == 2
-        assert page.locator('#mode option[value="cloud"]').is_disabled()
+        # Playwright's disabled state follows the enclosing label's control;
+        # this option is inside a label, so inspect its native state directly.
+        assert page.locator('#mode option[value="cloud"]').evaluate(
+            "option => option.disabled && option.hasAttribute('disabled')")
+        # Even a direct invocation cannot start Live from the portable file.
+        assert page.evaluate("""async () => {
+          await activateMode('cloud');
+          return mode === 'saved' && !ready && cloud.session === null;
+        }""")
         assert page.locator('#run').is_hidden()
         assert page.locator('#reset').is_disabled()
         assert page.locator('.workflow-node.complete').count() == 22

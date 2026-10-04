@@ -34,14 +34,11 @@ jobs:
         run: |
           .browser-check/bin/python scripts/check-diagram.py --engine chromium
           .browser-check/bin/python scripts/check-diagram.py --engine webkit
-          .browser-check/bin/python scripts/check-records.py
-          .browser-check/bin/python scripts/check-connection.py
-          .browser-check/bin/python scripts/check-browser.py
-          .browser-check/bin/python scripts/check-settings.py
-          .browser-check/bin/python scripts/check-plans.py
-          .browser-check/bin/python scripts/check-reports.py
-          .browser-check/bin/python scripts/check-orchestration.py
-          .browser-check/bin/python scripts/check-mse.py
+          check_status=0
+          for check_file in records connection browser settings plans reports orchestration mse; do
+            .browser-check/bin/python "scripts/check-${check_file}.py" || check_status=1
+          done
+          exit "$check_status"
       - name: Preserve the checked pages and download files
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

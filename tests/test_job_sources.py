@@ -3,6 +3,7 @@ import asyncio
 import hashlib
 import io
 import json
+import shlex
 import tempfile
 import unittest
 from unittest.mock import AsyncMock, patch
@@ -92,6 +93,17 @@ class JobSourceTests(unittest.TestCase):
                     self.assertEqual(checksums[name], hashlib.sha256(path.read_bytes()).hexdigest())
                 recipe = archive.read('REPRODUCE.txt').decode()
                 self.assertIn('docker run --rm --network none', recipe)
+                commands = {name: shlex.split(command) for name, command in
+                            (line.split(': ', 1) for line in recipe.splitlines()
+                             if line.startswith(('Pull: ', 'Run: ', 'Check: ')))}
+                self.assertEqual(commands['Pull'],
+                                 ['docker', 'pull', '--platform', 'linux/amd64', image])
+                for name in ('Run', 'Check'):
+                    command = commands[name]
+                    self.assertEqual(command[:7], ['docker', 'run', '--rm', '--network',
+                                                  'none', '--platform', 'linux/amd64'])
+                    self.assertIn('PAPER_RUNTIME_IMAGE=' + image, command)
+                    self.assertEqual(command[command.index('python3') - 1], image)
                 self.assertIn('PAPER_RUNTIME_IMAGE=' + image, recipe)
                 self.assertIn('python3 run.py', recipe)
                 self.assertIn('scripts/generate-data.R', archive.namelist())
