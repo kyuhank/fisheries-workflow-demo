@@ -1,7 +1,7 @@
-"""Check saved MSE reports/lineage and mocked Live strategy rerun scope.
+"""Check saved MSE reports, input records and Live rerun scope.
 
-The R simulations, paired errors and barrier order are checked in the actual
-container. Browser fixtures only test navigation, provenance and requests.
+Browser fixtures test navigation and requests. Container checks test simulations,
+paired errors and barrier order.
 """
 import json
 from pathlib import Path

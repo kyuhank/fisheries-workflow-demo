@@ -27,8 +27,7 @@ def switch_with_guide(page, target):
     page.locator('#view-guide-link').click()
     page.wait_for_url('**#' + target)
     active, inactive = ('jobs', 'workflow') if target == 'orchestration' else ('workflow', 'jobs')
-    # The URL changes before the hashchange handler updates the shared view.
-    # Wait for that observable UI transition, then retain the invariant checks.
+    # Wait for the view update after the URL changes.
     page.locator(f'#{active}-view').wait_for(state='visible')
     page.locator(f'#{inactive}-view').wait_for(state='hidden')
     assert page.locator(f'#{active}-view').is_visible()
@@ -40,8 +39,7 @@ def switch_with_guide(page, target):
 
 
 def expect_run(page, previous, expected, scope):
-    # A completed single job may leave an unrelated setting pending, which
-    # refreshPlan correctly reports instead of the generic completion message.
+    # A completed single job may leave an unrelated setting pending.
     page.wait_for_function("""({previous, expected}) => !busy &&
       orchestrationRuns.length === previous + 1 && completedRun &&
       JSON.stringify(completedRun.run) === JSON.stringify(expected)
@@ -163,8 +161,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#output-close').click()
     assert run_selection(page) == before, 'Inspecting dependency output/record changed the run selection'
 
-    # The saved file executes nothing. Live UI contracts use the actual HTTP
-    # client with synthetic completion states, independently of model tests.
+    # Saved executes nothing; Live controls use the HTTP client with fixture states.
     ui = runpy.run_path(str(ROOT / 'scripts/check-browser.py'))
     mock = ui['MockCloud']()
     ui['open_live'](page, mock)
@@ -188,8 +185,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#run').click()
     expect_run(page, 0, page.evaluate('jobs.map(job => job.key)'), 'workflow')
 
-    # Manual handover views expose all three boundaries and preserve busy state.
-    # These are UI events, explicitly not evidence of an executed transfer.
+    # Check all three handover views and the busy state; no transfer is executed.
     page.locator('#handover').select_option('manual')
     for boundary, key, title, size in [
         ('data', 'cpue_a', 'Data manager → CPUE analyst', 2),
@@ -216,8 +212,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.locator('#handover').select_option('connected')
     page.evaluate("states = {}; render()")
 
-    # A job request has different scope from the full workflow and preserves
-    # all unrelated identities. Dependency browsing must never change that scope.
+    # Dependency browsing preserves job scope and unrelated record identities.
     page.locator('#all-tasks').click()
     before = page.evaluate('records')
     previous = page.evaluate('orchestrationRuns.length')

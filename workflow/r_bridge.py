@@ -101,6 +101,6 @@ class RBridge:
             raise ValueError('The R job must return the declared result/effects envelope.')
         if not isinstance(value['result'], dict) or not isinstance(value['effects'], dict):
             raise ValueError('R job output and effects must be JSON objects.')
-        # Reject null/non-finite contamination during normal Python encoding too.
+        # Reject non-finite JSON numbers before saving the result.
         json.dumps(value, allow_nan=False)
         return value

@@ -14,7 +14,7 @@ REPOSITORY = json.loads((ROOT / "cloud/config.json").read_text())["repository"]
 
 
 def preview():
-    """Use current UI sources with the last generated container-result payload."""
+    """Use current UI sources with the saved container results."""
     saved = (ROOT/'docs/index.html').read_text()
     payload = re.search(r'<script id="demo-payload" type="application/json">(.*?)</script>', saved, re.S).group(1)
     html = (ROOT/'app/index.html').read_text()
@@ -129,8 +129,7 @@ try:
         }""")
         assert unit.evaluate("forbidden && calls.length === 1 && cloud.session.id === 'replacement'")
 
-        # A lost or malformed dispatch response has an unknown outcome. Do not
-        # silently create a replacement session or send another dispatch.
+        # An uncertain dispatch stays unresolved; do not replace the session or replay it.
         for failure in ["throw new TypeError('Lost response')", "return new Response('{')"]:
             unit.evaluate("""async failure => {
               calls.length = 0;
@@ -140,8 +139,7 @@ try:
                 .then(() => false, error => error.executionUnknown);
             }""", failure)
             assert unit.evaluate("unknown && calls.length === 1 && cloud.session.id === 'current'")
-        # Support the already deployed expiry response, but never repeat a lost
-        # dispatch response from the replacement session.
+        # Handle session expiry without replaying an uncertain dispatch.
         unit.evaluate("""async () => {
           calls.length = 0;
           cloud.session = {id: 'old', token: 'old'};
@@ -158,8 +156,7 @@ try:
             .then(() => false, error => error.executionUnknown);
         }""")
         assert unit.evaluate("unknown && calls.length === 4 && cloud.session.id === 'replacement'")
-        # An acknowledged run with a missing/mismatched state is unresolved,
-        # rather than an invitation to send another calculation request.
+        # A missing or mismatched state must not trigger another calculation request.
         unit.evaluate("""async () => {
           calls.length = 0;
           cloud.session = {id: 'known-session', token: 'known-token'};
@@ -204,8 +201,7 @@ try:
         assert page.locator('#offline-download').get_attribute('href') == 'offline.html'
         assert page.locator('#mode-notice').is_hidden()
 
-        # A ten-minute cleanup is simulated by rejecting the old credential.
-        # No real runner is dispatched and no wall-clock retention wait is needed.
+        # Simulate cleanup by rejecting the old credential; no runner is dispatched.
         expiry = {'expired': True, 'renewal_failure': False, 'sessions': 0,
                   'accepted': 0, 'bodies': [], 'snapshots': []}
         fixture = page.evaluate("""() => {
@@ -280,8 +276,7 @@ try:
         assert page.evaluate("Object.values(records).every(record => record.run_id === 'fresh-run')")
         assert page.locator('#run').is_enabled()
 
-        # Failure to renew clears the busy state, and an explicit retry keeps the
-        # same chosen analysis while starting just one accepted run.
+        # After failed renewal, explicit retry keeps the selection and starts one run.
         expiry['expired'] = True
         expiry['renewal_failure'] = True
         page.locator('#run').click()
@@ -302,8 +297,7 @@ try:
           latestRun = ''; $('mse-buffer').value = '0.8'; render();
         }""")
 
-        # Unavailable Live falls back to the saved container results. The chosen
-        # Live settings, handover and starting job survive a later reconnect.
+        # Saved fallback preserves the Live settings, handover and starting job.
         state['available'] = False
         page.locator('#snapshot').select_option('2024')
         page.locator('#filter').select_option('1200')
@@ -329,8 +323,7 @@ try:
         assert page.locator('#handover').input_value() == 'manual'
         assert page.evaluate("selected === 'cpue_a'")
 
-        # Status loss must keep the original capability, acknowledged run and
-        # execution link. Switching to Saved and back never unlocks another run.
+        # Status loss and view changes preserve the capability, run and execution link.
         page.evaluate("""() => {
           window.originalRequest = cloud.request.bind(cloud);
           window.dispatchCount = 0;
@@ -364,8 +357,7 @@ try:
         assert not errors, errors
         context.close()
 
-        # Late connection results never overwrite an explicitly selected Saved
-        # view. No run is sent in either the success or failure race.
+        # Late connection results preserve the selected Saved view and dispatch no run.
         for success in (False, True):
             race = browser.new_context(viewport={'width': 390, 'height': 844})
             race_page = race.new_page()

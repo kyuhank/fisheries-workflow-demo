@@ -1,8 +1,6 @@
-"""Check the portable saved-results UI and mocked Live control contracts.
+"""Check the portable Saved view and Live controls with HTTP fixtures.
 
-Browser computation was retired when all new jobs moved to R in the recorded
-container. Native container and hosted checks validate calculations; this suite
-checks browsing and the genuine HTTP client without claiming mock computation.
+These cases test browsing and requests. Container checks test calculations.
 """
 from copy import deepcopy
 import hashlib
@@ -24,7 +22,7 @@ def payload():
 
 
 class MockCloud:
-    """Synthetic HTTP state only; no scientific calculation is performed."""
+    """Return fixture HTTP state without running calculations."""
     def __init__(self):
         self.fixture = payload()
         self.records = {}
@@ -112,8 +110,7 @@ def main():
         page.goto((ROOT / 'docs/offline.html').as_uri())
         page.wait_for_function("mode === 'saved'")
         assert page.locator('#mode option').count() == 2
-        # Playwright's disabled state follows the enclosing label's control;
-        # this option is inside a label, so inspect its native state directly.
+        # Inspect the option directly; Playwright follows the enclosing label.
         assert page.locator('#mode option[value="cloud"]').evaluate(
             "option => option.disabled && option.hasAttribute('disabled')")
         # Even a direct invocation cannot start Live from the portable file.

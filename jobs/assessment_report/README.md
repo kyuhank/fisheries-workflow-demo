@@ -1,8 +1,8 @@
 # Assessment report (`assessment_report`)
 
-Pass the saved assessment comparison to the concise Quarto report. The report describes the fixed assumptions, convergence and bounds without refitting or claiming confidence intervals.
+Render the saved assessment comparison as a Quarto report. The report describes the fixed assumptions, convergence and bounds without refitting or claiming confidence intervals.
 
-Owner: Assessment analyst. The readable entrypoint is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+Analyst role: Assessment analyst. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
 
 ## Inputs and settings
 
@@ -22,14 +22,17 @@ Inside the declared container, from the repository root:
 make inside-job JOB=assessment_report
 ```
 
-The coordinator refreshes required inputs and calls the job through `workflow/Makefile`. The run record identifies the actual image and versions. `OUTPUT=DIR` changes the default `runs` directory; `SETTINGS=FILE` supplies JSON settings.
+The coordinator refreshes required inputs and calls this job through
+`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
+`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
+software versions used.
 
 ## Outputs and downstream jobs
 
 - `runs/assessment_report/output.json`: the R calculation result.
-- `runs/assessment_report/report.html`: the native Quarto output from [report.qmd](report.qmd).
+- `runs/assessment_report/report.html`: the Quarto report from [report.qmd](report.qmd).
 - `runs/assessment_report/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These are generated run artifacts. Declared downstream jobs: None.
+Downstream jobs: None.
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/record.json).

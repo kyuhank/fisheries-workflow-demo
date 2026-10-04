@@ -2,7 +2,7 @@
 
 Fit the toy Schaefer model to index B with fixed intrinsic growth r = 0.25 and initial biomass equal to K. RTMB estimates one log(K) parameter; catchability q is profiled.
 
-Owner: Assessment analyst. The readable entrypoint is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+Analyst role: Assessment analyst. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
 
 ## Inputs and settings
 
@@ -23,14 +23,17 @@ Inside the declared container, from the repository root:
 make inside-job JOB=assessment_b1
 ```
 
-The coordinator refreshes required inputs and calls the job through `workflow/Makefile`. The run record identifies the actual image and versions. `OUTPUT=DIR` changes the default `runs` directory; `SETTINGS=FILE` supplies JSON settings.
+The coordinator refreshes required inputs and calls this job through
+`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
+`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
+software versions used.
 
 ## Outputs and downstream jobs
 
 - `runs/assessment_b1/output.json`: the R calculation result.
-- `runs/assessment_b1/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/assessment_b1/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
 - `runs/assessment_b1/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These are generated run artifacts. Declared downstream jobs: [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md)
+Downstream jobs: [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/record.json).

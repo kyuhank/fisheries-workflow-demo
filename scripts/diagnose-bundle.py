@@ -1,4 +1,4 @@
-"""Inspect genuine preserved synthetic inputs in the declared calculation image."""
+"""Inspect saved synthetic inputs inside the declared container."""
 import hashlib
 import json
 import math

@@ -54,7 +54,7 @@ def preview():
 
 
 def observe_runs(page):
-    # Observe the actual UI request and result, preserving both execution paths.
+    # Check the request and result for both execution paths.
     page.evaluate("""() => {
       window.checkedRuns = [];
       window.checkedViews = [];
@@ -233,8 +233,7 @@ def main():
         baseline = mock.fixture['saved']['records']
         cloud_checks(page, mock, baseline)
 
-        # Reverting settings restores explicit selection; Saved uses its actual
-        # baseline and Live restores its own pending intent and settings.
+        # Reverting restores the selection; Saved and Live keep their own settings.
         mock.records = deepcopy(baseline)
         page.evaluate("""async baseline => {
           records = structuredClone(baseline); cloud.records = structuredClone(baseline);
@@ -263,8 +262,7 @@ def main():
         expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
         page.locator('#mse-buffer').select_option('0.6')
         expect_plan(page, 'mse_buffered', BUFFER)
-        # Hold actual HTTP reset responses to check the UI while they are in
-        # flight. A failed reset keeps the previous records and never replays.
+        # Delay reset responses; a failed reset keeps records and does not replay.
         pending_resets = []
         def held_reset(route):
             if route.request.url.split('?')[0].endswith('/reset'):

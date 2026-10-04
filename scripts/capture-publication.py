@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture the genuine Saved reader for print; no analysis or mocked results."""
+"""Capture the Saved view at print resolution."""
 import hashlib
 import json
 from pathlib import Path

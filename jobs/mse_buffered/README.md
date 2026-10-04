@@ -2,7 +2,7 @@
 
 Test index-based catch steps with the selected buffer and a 15% annual advice-change limit in the common seeded Schaefer management trials.
 
-Owner: MSE analyst. The readable entrypoint is [run.R](run.R), using shared [mse.R](../../workflow/r/mse.R).
+Analyst role: MSE analyst. The entry point is [run.R](run.R), using shared [mse.R](../../workflow/r/mse.R).
 
 ## Inputs and settings
 
@@ -20,16 +20,19 @@ Inside the declared container, from the repository root:
 make inside-job JOB=mse_buffered
 ```
 
-The coordinator refreshes required inputs and calls the job through `workflow/Makefile`. The run record identifies the actual image and versions. `OUTPUT=DIR` changes the default `runs` directory; `SETTINGS=FILE` supplies JSON settings.
+The coordinator refreshes required inputs and calls this job through
+`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
+`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
+software versions used.
 
 MSE must be enabled (`"mse": true`). The declared trials use 15 years, 20 paired replicates per fitted case and growth scenario, with catches capped at 40% of current biomass.
 
 ## Outputs and downstream jobs
 
 - `runs/mse_buffered/output.json`: the R calculation result.
-- `runs/mse_buffered/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/mse_buffered/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
 - `runs/mse_buffered/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These are generated run artifacts. Declared downstream jobs: [MSE results summary (`mse_summary`)](../mse_summary/README.md)
+Downstream jobs: [MSE results summary (`mse_summary`)](../mse_summary/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/record.json).

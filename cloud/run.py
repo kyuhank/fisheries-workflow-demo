@@ -1,4 +1,4 @@
-"""Run the container R calculations on GitHub, with hosted inputs and event records."""
+"""Run hosted jobs on GitHub and report execution events."""
 import asyncio
 import base64
 from concurrent.futures import ProcessPoolExecutor
@@ -36,7 +36,7 @@ def calculate_independent_job(directory, key, settings, run_id):
 
 
 class TemporaryAPIError(RuntimeError):
-    """A transient service failure; calculation status can wait for reconnection."""
+    """A temporary API failure that allows later reconnection."""
 
 
 def api(path, body=None):
@@ -84,7 +84,7 @@ def api(path, body=None):
 
 
 class EventDelivery:
-    """Keep immutable event snapshots in order across temporary service failures."""
+    """Keep event snapshots in order during service interruptions."""
     def __init__(self):
         self.pending = []
         self.retry_at = 0

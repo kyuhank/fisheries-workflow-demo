@@ -1,4 +1,4 @@
-"""Render report jobs from real QMD source inside the same calculation container."""
+"""Render report jobs inside the calculation container."""
 import json
 from pathlib import Path
 import shutil
@@ -19,12 +19,11 @@ def render_report(root, key, result, record, folder, result_html):
     executable = shutil.which('quarto')
     if executable is None:
         raise RuntimeError('Quarto is required for native report jobs.')
-    # Native Quarto reads preserved JSON results; it never refits a model.
+    # Render recorded results without refitting the models.
     source = root / 'jobs' / key / 'report.qmd'
     (folder / 'report.qmd').write_bytes(source.read_bytes())
     (folder / 'report-data.json').write_text(json.dumps({'result': result, 'record': record}, allow_nan=False))
-    # Quarto's pinned appdirs implementation writes XDG cache/config/data paths.
-    # A non-root Docker UID may not write the image's inherited user directory.
+    # Give Quarto writable XDG directories when Docker uses a non-root UID.
     with tempfile.TemporaryDirectory(prefix='fisheries-quarto-') as temporary:
         environment = process_environment()
         environment['PAPER_REPORT_DIR'] = str(folder.resolve())

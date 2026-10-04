@@ -2,7 +2,7 @@
 
 Assemble the supplied synthetic catch and effort records in R through the selected final year. Set the first effort value to zero to demonstrate the correction cycle.
 
-Owner: Data provider. The readable entrypoint is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
+Analyst role: Data provider. The entry point is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
 
 ## Inputs and settings
 
@@ -20,14 +20,17 @@ Inside the declared container, from the repository root:
 make inside-job JOB=submission
 ```
 
-The coordinator refreshes required inputs and calls the job through `workflow/Makefile`. The run record identifies the actual image and versions. `OUTPUT=DIR` changes the default `runs` directory; `SETTINGS=FILE` supplies JSON settings.
+The coordinator refreshes required inputs and calls this job through
+`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
+`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
+software versions used.
 
 ## Outputs and downstream jobs
 
 - `runs/submission/output.json`: the R calculation result.
-- `runs/submission/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/submission/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
 - `runs/submission/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These are generated run artifacts. Declared downstream jobs: [Quality check (`qc`)](../qc/README.md)
+Downstream jobs: [Quality check (`qc`)](../qc/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/record.json).

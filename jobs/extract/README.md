@@ -2,7 +2,7 @@
 
 Check and return observations and annual removals obtained through the real SQLite snapshot queries. Zero catches and vessel identity are retained.
 
-Owner: Data analyst. The readable entrypoint is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
+Analyst role: Data analyst. The entry point is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
 
 ## Inputs and settings
 
@@ -20,14 +20,17 @@ Inside the declared container, from the repository root:
 make inside-job JOB=extract
 ```
 
-The coordinator refreshes required inputs and calls the job through `workflow/Makefile`. The run record identifies the actual image and versions. `OUTPUT=DIR` changes the default `runs` directory; `SETTINGS=FILE` supplies JSON settings.
+The coordinator refreshes required inputs and calls this job through
+`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
+`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
+software versions used.
 
 ## Outputs and downstream jobs
 
 - `runs/extract/output.json`: the R calculation result.
-- `runs/extract/report.html`: a readable result page from the shared [renderer](../../workflow/reports.py).
+- `runs/extract/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
 - `runs/extract/record.json`: inputs, settings, R source hashes, actual container identity and software used.
 
-These are generated run artifacts. Declared downstream jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md)
+Downstream jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md)
 
 Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/record.json).

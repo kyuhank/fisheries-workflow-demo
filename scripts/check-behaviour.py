@@ -1,4 +1,4 @@
-"""Write a compact record of the behavioural checks, without timing claims."""
+"""Record the behavioural checks; omit execution-time comparisons."""
 import hashlib
 import json
 from pathlib import Path

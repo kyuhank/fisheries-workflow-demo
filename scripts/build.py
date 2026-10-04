@@ -1,4 +1,4 @@
-"""Build a self-contained browser demo and a readable saved example."""
+"""Build the browser demo and its saved example."""
 import asyncio
 import base64
 import hashlib
@@ -76,8 +76,7 @@ def build():
             html = html.replace('/*__'+name+'__*/', content)
         return html.replace('/*__PAYLOAD__*/', json.dumps(data, separators=(',', ':')).replace('</', '<\\/'))
 
-    # Both pages view saved results without a browser calculation runtime.
-    # New jobs are dispatched to the declared container by the hosted adapter.
+    # Both pages browse saved results; Live submits new jobs to the container.
     offline_page = page(payload)
     (ROOT/'docs/offline.html').write_text(offline_page)
     for previous in (ROOT/'docs').glob('runtime-*.json'):

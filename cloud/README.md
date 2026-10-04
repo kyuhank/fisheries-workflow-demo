@@ -6,8 +6,9 @@ is restricted to this repository, with Actions write and Contents read permissio
 no GitHub credential is returned to the visitor.
 
 The standard GitHub runner downloads the image pinned in `live.yml`. The container
-retrieves synthetic observations from PostgreSQL, executes each `jobs/*/run.R` entry point and renders the three QMD reports, and saves
-reports and a portable run bundle. The runner authenticates with GitHub OIDC;
+retrieves synthetic observations from PostgreSQL, runs the `jobs/*/run.R` entry
+points and renders the three QMD reports. It saves the outputs, reports and a
+portable run bundle. The runner authenticates with GitHub OIDC;
 the API verifies the repository, owner, workflow, branch, event, commit and run.
 A reader's random session capability permits access only to that temporary session.
 The API accepts supplied settings, not arbitrary commands, repositories or queries.
@@ -27,11 +28,11 @@ The API accepts supplied settings, not arbitrary commands, repositories or queri
 - The service allows three active executions, 20 temporary sessions and 300 runs
   a day. The hosting uses Supabase Free and public standard GitHub runners.
   No paid runner or service upgrade is enabled. Free-service limits or inactivity
-  can make online execution unavailable; the downloaded saved-result reader remains usable.
+  can interrupt online execution. Downloaded results remain readable.
 
 ## Hosting another copy
 
-This service is specific to the paper repository. For a separate installation:
+The service is configured for this demonstration repository. To host another copy:
 
 1. Create a Free Supabase project and apply `schema.sql` to its database.
 2. Load the fixed records from `data/`; grant public users no table access.

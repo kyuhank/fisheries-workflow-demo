@@ -125,9 +125,7 @@ with hosted_docs() as url, sync_playwright() as playwright:
     nodes = page.evaluate('Object.fromEntries(payload.diagram.nodes.map(node => [node.key, node]))')
     assert {edge['from'] for edge in edges} == {
         'assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'}
-    # Arrow routes may use distinct ports and a short clearance before the box.
-    # Check meaningful source/target proximity and routing, rather than forcing
-    # the old overlapping centreline layout.
+    # Allow separate ports and box clearance; check proximity and route direction.
     for edge in edges:
         source, target = nodes[edge['from']], nodes[edge['to']]
         first, last = edge['points'][0], edge['points'][-1]

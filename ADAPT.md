@@ -23,16 +23,16 @@
 4. Add the node and connections to `app/diagram.json`; the build verifies these against the calculation graph. Write a concise job guide.
 5. Check the change inside the declared container. Edit page sources in `app/`; `docs/` is generated from accepted source and saved calculations.
 
-The coordinator reads these declarations, checks the saved inputs and selects
-the ready jobs. `workflow/Makefile` calls their R entrypoints; the coordinator
-records the outputs before releasing dependent jobs. Independent jobs can run
-together, while declared peer groups finish before later stages advance. The
-orchestration view and dependency diagram show the same job connections.
+The coordinator reads the declarations and checks saved inputs to select ready
+jobs. `workflow/Makefile` calls their R entry points. The coordinator then records
+the outputs and releases dependent jobs. Independent jobs can run together;
+declared peer groups finish before later stages advance. Both demo views show
+these job connections.
 
 A Live request uses the existing [hosted service](cloud/README.md): it starts
 `.github/workflows/live.yml`, pulls the recorded image and calls `make inside-live`
-there. This starts `cloud/run.py`, which retrieves the request and uses the same
-coordinator. Editing job declarations does not deploy or create the hosted service.
+there. `cloud/run.py` retrieves the request and runs the same coordinator. The job
+configuration defines the calculations; the service requires a separate deployment.
 
 ## Separate analyst repositories
 
@@ -41,8 +41,8 @@ An assessment programme could maintain each analyst's task in its own repository
 The coordinator would retrieve the selected source version for each job and pass
 identified outputs between repositories. Analysts would agree on input products,
 units, years and checks. Records would retain the contributing source versions,
-container digests and upstream runs. Repository separation alone does not supply
-these connections or the programme's access controls.
+container digests and upstream runs. A shared service must implement
+these connections and the programme's access controls.
 
 ## Change the example
 
@@ -58,17 +58,17 @@ then use `scripts/import-r-data.py` to store its JSON as SQLite and a submission
 Preserve the JSON, generating source, seed and scenario. A hosted PostgreSQL copy
 must use those same generated observations and annual catches.
 
-The container includes all required R packages and Quarto. If requirements change,
-build and check a new image version before updating the immutable digest in the
-workflow. No new analysis runs in the browser; the downloaded HTML is a saved
-result reader. Code, inputs and results remain separate from the software image.
+If software requirements change, build and check a new image version before
+updating the immutable digest in the workflow. The browser and downloaded HTML
+display saved results; calculations run in the container. Code, inputs and results
+are preserved separately from the software image.
 
 ## Numerical comparisons
 
 `verify.py` compares output values at relative tolerance 1e-6 or absolute tolerance
 1e-9. Assessment log-index residuals retain relative tolerance 1e-6 with absolute
-tolerance 1e-8 after checking them against the observed and fitted indices. Two near-zero assessment gradient
-diagnostics have magnitude and difference caps of 1e-7, conditional on matching
-successful fit diagnostics. These are comparison policies, not model-accuracy
+tolerance 1e-8 after checking them against the observed and fitted indices. Two
+near-zero assessment gradient diagnostics have magnitude and difference caps of
+1e-7, conditional on matching successful fit diagnostics. These are comparison policies, not model-accuracy
 guarantees. Summary and report copies must match their own source assessments
 before the exceptions apply. Other values retain the general tolerances.

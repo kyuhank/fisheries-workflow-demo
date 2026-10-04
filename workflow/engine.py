@@ -35,7 +35,7 @@ def read_json(path):
 
 
 def job_files():
-    """Executable jobs and their reader guides, without cached bytecode or outputs."""
+    """List job source files and reader guides."""
     return sorted(path for path in (ROOT / 'jobs').rglob('*')
                   if path.is_file() and path.suffix in ('.md', '.R', '.qmd'))
 
@@ -208,7 +208,7 @@ class Workflow:
                     'catch': [dict(r) for r in db.execute(catch_sql)], 'sql': sql + '\n' + catch_sql}
 
     def store_snapshot(self, data):
-        """The storage adapter loads accepted R-checked rows into real SQLite."""
+        """Load rows accepted by R into the SQLite snapshot."""
         folder = self.directory / 'database'
         folder.mkdir(exist_ok=True)
         dbfile = folder / 'snapshot.sqlite'
@@ -315,8 +315,7 @@ class Workflow:
                            if parent in stage_for and stage_for[parent] != index}
                 await asyncio.gather(*(tasks[parent] for parent in parents))
                 for handover in handover_groups(keys, plan['run']):
-                    # Only transfers share this gate; independent reporting keeps
-                    # running while a recipient waits for its input files.
+                    # Gate transfers only; reporting continues while inputs await receipt.
                     async with transfer_lock:
                         if self.manual_transfer is None:
                             break
@@ -384,8 +383,7 @@ class Workflow:
                     continue
                 archive.writestr(name, data); checksums[name] = digest(data)
             if hasattr(self, 'hosted_data'):
-                # Freeze the actual input supplied to the hosted R jobs, even
-                # when the checkout's illustrative database is different.
+                # Freeze hosted inputs; the checkout may contain a different example.
                 data = encoded(self.hosted_data)
                 archive.writestr(FROZEN_SOURCE, data)
                 checksums[FROZEN_SOURCE] = digest(data)
@@ -400,8 +398,7 @@ class Workflow:
                 # Form changes made after execution do not change the saved job.
                 bundle_settings = read_json(self.directory / 'state.json')['settings']
             if 'mse_buffered' in self.records:
-                # A planned but unexecuted control change is not the setting of
-                # the downloaded result. Historical records used the default.
+                # Use executed settings, not pending form changes; older records used defaults.
                 bundle_settings['mse_buffer'] = self.records['mse_buffered']['settings'].get(
                     'buffer', DEFAULTS['mse_buffer'])
             settings = encoded(bundle_settings)

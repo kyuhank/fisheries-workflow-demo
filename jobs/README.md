@@ -1,9 +1,9 @@
-# Jobs: R calculations and recorded container runs
+# Jobs and their connections
 
-The example has 22 jobs. Each folder contains a short [run.R](cpue_a/run.R)
-entrypoint and a guide to its inputs, settings and outputs. The scientific work
-is R: Poisson GLM CPUE, a one-parameter RTMB Schaefer assessment with fixed growth
-sensitivities, and small seeded closed-loop management trials.
+The 22 jobs use Poisson GLMs for CPUE, a one-parameter RTMB Schaefer assessment
+with fixed growth sensitivities, and seeded closed-loop management trials. Each
+folder contains an R entry point, such as [run.R](cpue_a/run.R), and a guide to its
+inputs, settings and outputs.
 
 ```text
 jobs/cpue_a/run.R       readable CPUE A entrypoint
@@ -19,10 +19,9 @@ workflow/Makefile      R and report recipes inside the container
 workflow/engine.py     coordination, SQLite gates and saved records
 ```
 
-The coordinator plans dependencies, moves artifacts and records execution. It
-runs inside the declared immutable R/RTMB/Quarto container and calls each R entrypoint there.
-No Python scientific fallback or offline browser calculation is used. Saved
-results remain readable without executing the workflow.
+The coordinator follows the input connections, passes outputs between jobs and
+records each execution. It calls the R entry points inside the declared immutable
+R/RTMB/Quarto container. The browser displays saved results.
 
 ## Declare the connections
 
@@ -98,20 +97,19 @@ From the repository root:
 make job JOB=cpue_a
 ```
 
-Make uses the declared image, pulling it if needed, and starts the coordinator there. It prepares
-missing or outdated inputs and uses `workflow/Makefile` to call
-`jobs/cpue_a/run.R` in that container. `OUTPUT=DIR` selects an output directory;
-`SETTINGS=FILE` supplies settings. When already inside the container, use
-`make inside-job JOB=cpue_a` to avoid starting another Docker container. Container identity and actual
-R/package versions belong to the run record, so a moving image tag alone is not
-its execution identity.
+Make uses the declared image, pulling it if needed, and starts the coordinator
+inside it. The coordinator prepares missing or outdated inputs and uses
+`workflow/Makefile` to call `jobs/cpue_a/run.R`. `OUTPUT=DIR` selects an output
+directory; `SETTINGS=FILE` supplies settings. When already inside the container,
+use `make inside-job JOB=cpue_a`. The run record identifies the container digest
+and R/package versions used.
 
 The R bridge passes a named `context` containing settings, decoded parent
-results and raw source or genuine SQLite query rows. `calculate(context)` returns
+results and raw source or SQLite query rows. `calculate(context)` returns
 the result. QC can also return corrected submission rows for the coordinator to
-save. Database storage and SQL extraction use the real SQLite gate; the R jobs
-check and calculate their own results. Report jobs render their saved results
-and records through their concise `report.qmd` templates without refitting.
+save. Database storage and SQL extraction use SQLite; R jobs check their inputs and
+calculate results. Report jobs render saved results and records through
+`report.qmd` templates without refitting.
 
 ```text
 runs/cpue_a/output.json  R result
@@ -132,7 +130,7 @@ The generating truth and units are declared by
 
 [Browse saved results](https://kyuhank.github.io/fisheries-workflow-demo/example/)
 or use **Record** in the [demo](https://kyuhank.github.io/fisheries-workflow-demo/)
-to inspect an actual result's inputs, R source and container. Downloaded runs
+to inspect a result's inputs, R source and container. Downloaded runs
 include the shared R code, job folders, data and records; one copied job folder
 uses these surrounding dependencies.
 
@@ -153,11 +151,10 @@ input artifact references and source revisions; an upstream revision could then
 invalidate only the affected results. A moving branch name alone would not identify
 the code or inputs used by a previous result.
 
-The current demo coordinates folders in one repository. It does not fetch or
-execute other repositories. Connecting independent repositories would require
-repository checkout, artifact transport, access controls and approved execution
-routes in that service. The folder structure makes the job boundaries visible
-without assuming those deployment facilities already exist.
+The demo currently executes folders in one repository. Connecting independent
+repositories would require the service to check out code, transfer artifacts,
+control access and use approved execution routes. The folder structure shows
+where those job boundaries would lie.
 
 See [ADAPT.md](../ADAPT.md) for adding a job, and
 [cloud/README.md](../cloud/README.md) for the current hosted execution.
