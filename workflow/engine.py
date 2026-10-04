@@ -2,6 +2,7 @@
 import asyncio
 import hashlib
 import io
+from importlib import import_module
 import json
 from pathlib import Path
 import platform
@@ -10,7 +11,7 @@ import sqlite3
 import sys
 import zipfile
 
-from . import models, reports
+from . import reports
 from .spec import DEFAULTS, SPEC, STAGES, active_spec, downstream, handover_groups
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +27,12 @@ def encoded(value):
 
 def read_json(path):
     return json.loads(path.read_text())
+
+
+def job_files():
+    """Executable jobs and their reader guides, without cached bytecode or outputs."""
+    return sorted(path for path in (ROOT / 'jobs').rglob('*')
+                  if path.is_file() and path.suffix in ('.py', '.md'))
 
 
 class Workflow:
@@ -90,7 +97,8 @@ class Workflow:
         return {}
 
     def code_record(self, key):
-        names = ['workflow/engine.py', 'workflow/spec.py', 'workflow/reports.py']
+        names = ['workflow/engine.py', 'workflow/spec.py', 'workflow/reports.py',
+                 'jobs/__init__.py', f'jobs/{key}/__init__.py', f'jobs/{key}/run.py']
         if key.startswith(('cpue_', 'assessment_')) or key == 'database':
             names += ['workflow/models.py', 'workflow/age_model.py']
         if key == 'extract':
@@ -219,81 +227,10 @@ class Workflow:
                 'jobs': list(self.spec.values()), 'events': self.events}
 
     async def calculate(self, key, run_id):
-        if key == 'submission':
-            result = self.source_rows()
-            result['sets'][0]['hooks'] = 0
-            return result
-        if key == 'qc':
-            submission = self.output('submission')
-            invalid = [r['set_id'] for r in submission['sets'] if r['hooks'] <= 0 or r['catch_n'] < 0]
-            if invalid:
-                await self.emit('qc', 'failed', 'Zero effort found. Return the record to the data provider.')
-                await self.emit('submission', 'returned', 'The provider corrects the effort field.')
-                await self.emit('submission', 'running', 'The provider resubmits the corrected records.',
-                                activity='resubmit')
-                submission = self.source_rows()
-                self.save('submission', submission, run_id)
-                await self.emit('submission', 'complete', 'Corrected submission received.')
-                await self.emit('qc', 'running', 'Check the corrected submission.')
-            if any(r['hooks'] <= 0 or r['catch_n'] < 0 for r in submission['sets']):
-                raise ValueError('The corrected submission still contains invalid records.')
-            if len({r['set_id'] for r in submission['sets']}) != len(submission['sets']):
-                raise ValueError('Duplicate observation identifiers.')
-            return {'returned': invalid, 'rows': len(submission['sets']), 'checks': [
-                {'check':'Positive effort', 'result':'Pass'}, {'check':'Non-negative catch', 'result':'Pass'},
-                {'check':'Unique observation IDs', 'result':'Pass'}]}
-        if key == 'database':
-            result = self.output('submission')
-            folder = self.directory / key; folder.mkdir(exist_ok=True)
-            dbfile = folder / 'snapshot.sqlite'; dbfile.unlink(missing_ok=True)
-            with sqlite3.connect(dbfile) as db:
-                db.execute('CREATE TABLE sets(set_id TEXT PRIMARY KEY,year INTEGER,vessel TEXT,hooks INTEGER CHECK(hooks>0),catch_n INTEGER CHECK(catch_n>=0))')
-                db.execute('CREATE TABLE removals(year INTEGER PRIMARY KEY,catch_t REAL CHECK(catch_t>=0))')
-                db.executemany('INSERT INTO sets VALUES(?,?,?,?,?)', [[r[k] for k in ['set_id','year','vessel','hooks','catch_n']] for r in result['sets']])
-                db.executemany('INSERT INTO removals VALUES(?,?)', [[r['year'],r['catch_t']] for r in result['catch']])
-            years = [r['year'] for r in result['sets']]
-            return {'rows': len(years), 'first_year': min(years), 'last_year': max(years),
-                    **models.describe_data(result['sets'], result['catch'])}
-        if key == 'extract':
-            sql = (ROOT / 'workflow/extract.sql').read_text()
-            catch_sql = (ROOT / 'workflow/extract-catch.sql').read_text()
-            with sqlite3.connect(self.directory / 'database/snapshot.sqlite') as db:
-                db.row_factory = sqlite3.Row
-                return {'sets': [dict(r) for r in db.execute(sql)],
-                        'catch': [dict(r) for r in db.execute(catch_sql)], 'sql': sql + '\n' + catch_sql}
-        if key in ('cpue_a', 'cpue_b'):
-            return models.cpue(self.output('extract')['sets'], key == 'cpue_a',
-                               self.settings['min_hooks_a'] if key == 'cpue_a' else 0)
-        if key.startswith('prepare_'):
-            index = self.output('cpue_' + key[-1])['series']
-            catch = {r['year']: r['catch_t'] for r in self.output('extract')['catch']}
-            if any(r['year'] not in catch for r in index):
-                raise ValueError('A CPUE year has no matching catch.')
-            return {'rows': [{**r, 'catch_t': catch[r['year']]} for r in index]}
-        if key in ('assessment_a1','assessment_a2','assessment_b1','assessment_b2'):
-            return models.assessment(self.output('prepare_' + key[-2])['rows'], self.job_settings(key)['M'])
-        if key in ('cpue_summary', 'assessment_summary'):
-            result = {'series': {SPEC[p]['title']: self.output(p)['series'] for p in SPEC[key]['parents']}}
-            if key == 'assessment_summary':
-                result['diagnostics'] = [{'case': SPEC[p]['title'], 'M': self.output(p)['M'],
-                                          'boundary_fit': self.output(p)['boundary_fit'],
-                                          'catch_check': self.output(p)['catch_check']}
-                                         for p in SPEC[key]['parents']]
-            return result
-        if key in ('cpue_report', 'assessment_report'):
-            return self.output(SPEC[key]['parents'][0])
-        if key.startswith('mse_'):
-            from . import mse
-            if key == 'mse_prepare':
-                return mse.prepare({parent: self.output(parent) for parent in SPEC[key]['parents']})
-            if key in ('mse_constant', 'mse_index', 'mse_buffered'):
-                return mse.simulate(self.output('mse_prepare'), key.removeprefix('mse_'),
-                                    buffer=self.settings['mse_buffer'] if key == 'mse_buffered' else None)
-            if key == 'mse_summary':
-                return mse.summarise({parent: self.output(parent) for parent in SPEC[key]['parents']})
-            if key == 'mse_report':
-                return self.output('mse_summary')
-        raise ValueError('No calculation registered for this job.')
+        if key not in SPEC:
+            raise ValueError('No calculation registered for this job.')
+        job = import_module(f'jobs.{key}.run')
+        return await job.calculate(self, run_id)
 
     async def run(self, start='submission', scope='workflow'):
         if self.running:
@@ -374,6 +311,8 @@ class Workflow:
             files += list(ROOT.glob('tests/*.py'))
             files += list(ROOT.glob('cloud/*.py'))
             files += list(ROOT.glob('scripts/generate-data.py'))
+            files += job_files()
+            files += [ROOT / 'ADAPT.md', ROOT / 'cloud/README.md']
             files += [ROOT / name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json'] if (ROOT / name).exists()]
             files += list(ROOT.glob('vendor/analysis/*'))
             checksums = {}

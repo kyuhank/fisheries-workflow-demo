@@ -1,9 +1,9 @@
 name: Check calculations
 on:
   push:
-    paths: ['workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   pull_request:
-    paths: ['workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   workflow_dispatch:
 permissions:
   contents: read

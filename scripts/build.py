@@ -10,7 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from workflow.engine import Workflow
+from workflow.engine import Workflow, job_files
 from workflow.spec import SPEC
 
 
@@ -43,6 +43,7 @@ def build():
              *ROOT.glob('tests/*.py'), *ROOT.glob('cloud/*.py'), *ROOT.glob('vendor/analysis/*')]
     files += [ROOT/name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json']]
     files += [ROOT/'scripts/generate-data.py']
+    files += job_files() + [ROOT/'ADAPT.md', ROOT/'cloud/README.md']
     runtime_names = ['pyodide.js','pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json',
                      'sqlite3-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl']
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE','vendor/pyodide/LICENSE','vendor/pyodide/PYTHON-LICENSE'])

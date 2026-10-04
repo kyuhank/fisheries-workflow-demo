@@ -53,6 +53,21 @@ Releases and downloaded files remain available independently of the live service
 Follow the archive's `REPRODUCE.txt` to repeat and compare a run. For a single-job
 run, it checks the selected output; other saved results keep their original records.
 
+## Explore the jobs
+
+Open [jobs/](jobs/README.md) to follow the 22 jobs in execution order. Each folder
+contains its actual calculation entry point and a short guide to its inputs,
+settings, outputs and connected jobs. For example,
+[CPUE A](jobs/cpue_a/README.md) reads the extracted observations, produces an
+index and supplies [assessment preparation A](jobs/prepare_a/README.md).
+The demo's **Record** view also links to the corresponding job folder.
+
+This example keeps the jobs in one repository so its code and synthetic data can
+be downloaded together. In an operational workflow, different teams could maintain
+these jobs in separate repositories. The
+[repository guide](jobs/README.md#separate-repositories) explains how a shared
+orchestration service would connect their versioned inputs and outputs.
+
 ## Run locally
 
 Use Python 3.12 or later; no extra Python packages are required.

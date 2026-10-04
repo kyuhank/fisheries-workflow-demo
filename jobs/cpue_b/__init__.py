@@ -1,0 +1,1 @@
+"""CPUE analysis B job."""

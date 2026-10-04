@@ -1,9 +1,9 @@
 name: Check diagram
 on:
   push:
-    paths: ['app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
+    paths: ['jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
   pull_request:
-    paths: ['app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
+    paths: ['jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
           docker run --rm --network none \
             --user "$(id -u):$(id -g)" \
             --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
-            "$IMAGE" python scripts/build.py
+            "$IMAGE" sh -c 'python scripts/build.py && python scripts/release.py'
       - name: Install browser checks
         run: |
           python3 -m venv .browser-check
@@ -39,3 +39,13 @@ jobs:
           .browser-check/bin/python scripts/check-reports.py
           .browser-check/bin/python scripts/check-orchestration.py
           .browser-check/bin/python scripts/check-mse.py
+      - name: Preserve the checked pages and download files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: demo-release-${{ github.sha }}
+          path: |
+            docs/
+            dist/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 7

@@ -1,0 +1,1 @@
+"""CPUE report job."""

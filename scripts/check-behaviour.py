@@ -24,7 +24,8 @@ def main():
     result = unittest.TextTestRunner(resultclass=RecordResult, verbosity=1).run(suite)
     if not result.wasSuccessful():
         raise SystemExit(1)
-    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('tests/*.py'), *ROOT.glob('cloud/*.py')]
+    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('tests/*.py'), *ROOT.glob('cloud/*.py'),
+             *(path for path in (ROOT/'jobs').rglob('*.py') if '__pycache__' not in path.parts)]
     record = {
         'scope': 'Synthetic workflow implementation; no assessment-performance or scientific-validity claim.',
         'checks_passed': result.passed,

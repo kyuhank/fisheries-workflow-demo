@@ -3,6 +3,8 @@
 | File | Responsibility |
 | --- | --- |
 | `workflow/spec.py` | Jobs, owners, dependencies and parallel groups. |
+| `jobs/<job_id>/run.py` | The selected job's calculation and input selection. |
+| `jobs/<job_id>/README.md` | Its incoming artifacts, settings, outputs and connected jobs. |
 | `workflow/models.py` | The example analyses. |
 | `scripts/generate-data.py` | Synthetic catch history and fishing observations. |
 | `workflow/mse.py` | Assessment-conditioned stocks, management trials and their comparison. |
@@ -13,8 +15,10 @@
 1. Add a job in `workflow/spec.py`: give it a name, one owner role and its input jobs.
    List parents before children in `JOBS`. Include the job in `STAGES`, in a group
    after its parents; independent jobs can share a group.
-2. Put the calculation in `workflow/models.py` or a separate module. Call it from
-   `Workflow.calculate()` in `workflow/engine.py`.
+2. Create `jobs/<job_id>/run.py` with an async `calculate(workflow, run_id)`
+   function. `Workflow.calculate()` imports that entry point for the selected job.
+   Keep reusable model functions in `workflow/models.py` or a separate shared
+   module, and call them from the job's entry point. Add a concise folder guide.
 3. Record every setting and code file that can change the result in
    `job_settings()` and `code_record()`.
 4. Check input names, units and coverage before calculating. Return an error if

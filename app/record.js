@@ -90,6 +90,17 @@ function renderRecord() {
     cards.append(card);
   }
   panel.append(cards);
+  const repository = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(source.repository || "")
+    ? source.repository : "https://github.com/kyuhank/fisheries-workflow-demo";
+  const recordedRevision = /^[a-f0-9]{40}$/.test(source.commit || "") &&
+      Object.hasOwn(record.code || {}, `jobs/${key}/run.py`) ? source.commit : null;
+  const jobSource = uiElement("a", "record-source",
+    recordedRevision ? "Job code & guide ↗" : "Current job code & guide ↗");
+  const jobRepository = recordedRevision ? repository : "https://github.com/kyuhank/fisheries-workflow-demo";
+  jobSource.href = `${jobRepository}/tree/${recordedRevision || "main"}/jobs/${encodeURIComponent(key)}`;
+  jobSource.target = "_blank";
+  jobSource.rel = "noopener noreferrer";
+  panel.append(jobSource);
   if (
     /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(source.repository || "") &&
     /^[a-f0-9]{40}$/.test(source.commit || "")

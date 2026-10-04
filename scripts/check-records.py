@@ -33,6 +33,14 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     page.locator('[data-output="record"]').click()
     assert 'Job 12 · Assessment A2 · Run 001' in page.locator('.record-heading').inner_text()
     assert 'Prepare inputs A' in page.locator('.record-input').inner_text()
+    job_link = page.locator('a.record-source').filter(has_text='Job code & guide')
+    if args.online:
+        assert job_link.get_attribute('href').endswith(
+            '/' + page.evaluate('currentOutput.record.source.commit') + '/jobs/assessment_a2')
+    else:
+        job_link = page.locator('a.record-source').filter(has_text='Current job code & guide')
+        assert job_link.get_attribute('href').endswith('/main/jobs/assessment_a2')
+    assert page.evaluate('Object.hasOwn(currentOutput.record.code, "jobs/assessment_a2/run.py")')
     if args.online:
         assert 'Docker image' in page.locator('.record-cards').inner_text()
         assert '@sha256:' in page.locator('.record-details pre').text_content()
