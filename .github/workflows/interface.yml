@@ -39,6 +39,8 @@ jobs:
             .browser-check/bin/python "scripts/check-${check_file}.py" || check_status=1
           done
           exit "$check_status"
+      - name: Preserve genuine Saved views for the paper
+        run: .browser-check/bin/python scripts/capture-publication.py
       - name: Preserve the checked pages and download files
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -46,6 +48,7 @@ jobs:
           path: |
             docs/
             dist/
+            .test-output/publication/
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 7

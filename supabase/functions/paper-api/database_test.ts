@@ -1,5 +1,24 @@
 import { createDatabase, DatabaseError } from "./database.ts";
 
+/** Inspect requested deadlines without sleeping or making a network request. */
+async function inspectTransport(
+  check: (deadlines: number[], diagnostics: unknown[][]) => Promise<void>,
+) {
+  const timeout = AbortSignal.timeout, log = console.error;
+  const deadlines: number[] = [], diagnostics: unknown[][] = [];
+  AbortSignal.timeout = (milliseconds: number) => {
+    deadlines.push(milliseconds);
+    return new AbortController().signal;
+  };
+  console.error = (...values: unknown[]) => { diagnostics.push(values); };
+  try {
+    await check(deadlines, diagnostics);
+  } finally {
+    AbortSignal.timeout = timeout;
+    console.error = log;
+  }
+}
+
 Deno.test("a timed-out state update retries the same update", async () => {
   const requests: RequestInit[] = [];
   const db = createDatabase(
@@ -122,4 +141,124 @@ Deno.test("an exhausted database 504 remains distinguishable from invalid input"
       ) throw Error("Incorrect failure classification.");
     }
   }
+});
+
+Deno.test("an aborted read retries within the ordinary deadline without exposing its error", async () => {
+  await inspectTransport(async (deadlines, diagnostics) => {
+    let attempts = 0;
+    const db = createDatabase(
+      "https://private.invalid",
+      "private-key",
+      async () => {
+        attempts++;
+        if (attempts === 1) {
+          throw new DOMException("private URL and token", "AbortError");
+        }
+        return Response.json([{ status: "running" }]);
+      },
+    );
+    const rows = await db("paper_runs?id=eq.private-run");
+    if (
+      attempts !== 2 || rows[0].status !== "running" ||
+      JSON.stringify(deadlines) !== "[8000,8000]"
+    ) throw Error("The aborted read did not recover within its original bounds.");
+    const observed = diagnostics[0]?.[1] as Record<string, unknown>;
+    if (
+      diagnostics.length !== 1 || observed.class !== "AbortError" ||
+      observed.phase !== "run_read" || observed.status !== null ||
+      typeof observed.elapsed_ms !== "number" || observed.elapsed_ms < 0 ||
+      Object.keys(observed).sort().join(",") !== "class,elapsed_ms,phase,status" ||
+      JSON.stringify(diagnostics).includes("private")
+    ) throw Error("Read diagnostics exposed data or lost their phase.");
+  });
+});
+
+Deno.test("a large finish keeps its original bytes and receipt after a lost response", async () => {
+  await inspectTransport(async (deadlines, diagnostics) => {
+    const operation = "00000000-0000-4000-8000-000000000002";
+    const body = {
+      p_request: "00000000-0000-4000-8000-000000000001",
+      p_operation: operation,
+      p_action: "finish",
+      p_body: {
+        checkpoint: "C".repeat(2_800_000),
+        bundle: "B".repeat(2_800_000),
+        state: { records: {} },
+        result: { run_id: "Run 002" },
+        error: null,
+        pending_events: [],
+      },
+    };
+    const original = JSON.stringify(body), requests: string[] = [];
+    const db = createDatabase(
+      "https://private.invalid",
+      "private-key",
+      async (_url, options) => {
+        requests.push(String(options!.body));
+        if (requests.length === 1) {
+          // A changed caller object must not mutate an already submitted receipt.
+          body.p_body.checkpoint = "private changed checkpoint";
+          return new Response("private database response", { status: 503 });
+        }
+        return Response.json(null);
+      },
+    );
+    const result = await db("rpc/paper_runner_write", "POST", body);
+    if (
+      result !== null || requests.length !== 2 ||
+      requests.some((value) => value !== original) ||
+      requests.some((value) => JSON.parse(value).p_operation !== operation) ||
+      JSON.stringify(deadlines) !== "[25000,25000]"
+    ) throw Error("Large result custody changed during its receipt retry.");
+    const observed = diagnostics[0]?.[1] as Record<string, unknown>;
+    if (
+      diagnostics.length !== 1 || observed.class !== "HTTPError" ||
+      observed.phase !== "runner_finish" || observed.status !== 503 ||
+      JSON.stringify(diagnostics).includes("private") ||
+      JSON.stringify(diagnostics).includes(operation)
+    ) throw Error("Finish diagnostics exposed data or lost their phase.");
+    await db("rpc/paper_runner_write", "POST", {
+      p_operation: operation,
+      p_action: "event",
+      p_body: { event: { state: "running" } },
+    });
+    if (deadlines[2] !== 8000) {
+      throw Error("The longer deadline leaked into ordinary event delivery.");
+    }
+  });
+});
+
+Deno.test("an interrupted finish remains bounded and cannot claim success", async () => {
+  await inspectTransport(async (deadlines, diagnostics) => {
+    let attempts = 0;
+    const failure = new Error("private URL, token and request data");
+    failure.name = "private error name";
+    const db = createDatabase(
+      "https://private.invalid",
+      "private-key",
+      async () => { attempts++; throw failure; },
+    );
+    try {
+      await db("rpc/paper_runner_write", "POST", {
+        p_action: "finish",
+        p_operation: "private-operation",
+      });
+      throw Error("An unacknowledged finish claimed success.");
+    } catch (error) {
+      if (
+        !(error instanceof DatabaseError) || !error.retryable ||
+        attempts !== 3 || JSON.stringify(deadlines) !== "[25000,25000,25000]" ||
+        error.message !== "The database connection was interrupted."
+      ) throw Error("Finish failure bounds or public error changed.");
+    }
+    if (
+      diagnostics.length !== 3 ||
+      diagnostics.some((entry) => {
+        const value = entry[1] as Record<string, unknown>;
+        return value.class !== "OtherError" || value.phase !== "runner_finish" ||
+          value.status !== null ||
+          Object.keys(value).sort().join(",") !== "class,elapsed_ms,phase,status";
+      }) || JSON.stringify(diagnostics).includes("private")
+    ) throw Error("An exhausted finish exposed private diagnostic content.");
+  });
 });

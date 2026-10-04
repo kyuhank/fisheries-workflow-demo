@@ -440,7 +440,7 @@ function renderDiagram() {
   const defs = svgElement("defs");
   for (
     const [name, colour] of Object.entries({
-      muted: "#bac9d0",
+      muted: "#8699a2",
       selected: "#1779a0",
       running: "#bb821f",
       saved: "#548c81",

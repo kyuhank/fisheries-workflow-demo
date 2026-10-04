@@ -301,11 +301,11 @@ dialog nav .active {
 }
 .connection {
   fill: none;
-  stroke: #bac9d0;
+  stroke: #8699a2;
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: .65;
+  opacity: .8;
 }
 .connection.catch {
   stroke-dasharray: 5 5;

@@ -119,7 +119,10 @@ async function runner(request: Request, id: string, finishing = false) {
     claims.iat > now + 30 || !Number.isFinite(claims.nbf) ||
     claims.nbf > now + 30 || !/^\d{1,20}$/.test(claims.run_id || "")
   ) throw Error("Untrusted runner.");
-  const rows = await db("paper_runs?id=eq." + id);
+  const rows = await db(
+    "paper_runs?id=eq." + id +
+      "&select=id,session_id,status,start_job,settings,handover,transfer_count,connected,github_run,commit_sha,scope",
+  );
   if (rows.length !== 1) throw Error("Run expired.");
   const run = rows[0];
   if (run.commit_sha !== claims.sha) throw Error("Different code version.");
@@ -232,7 +235,7 @@ export async function handle(request: Request) {
       if (existing.length >= 20) {
         return reply({
           error:
-            "The shared demo is busy. Use browser calculation or try later.",
+            "The shared demo is busy. View the saved example or try later.",
         }, 429);
       }
       const id = crypto.randomUUID(),
@@ -244,7 +247,9 @@ export async function handle(request: Request) {
       const id = u.searchParams.get("request") || "";
       const run = await runner(request, id, path === "/runner/finish");
       if (path === "/runner/context") {
-        const [s] = await db("paper_sessions?id=eq." + run.session_id);
+        const [s] = await db(
+          "paper_sessions?id=eq." + run.session_id + "&select=checkpoint",
+        );
         return reply({ ...run, checkpoint: s.checkpoint });
       }
       if (path === "/runner/data") {
