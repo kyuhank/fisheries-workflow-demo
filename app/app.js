@@ -364,12 +364,12 @@ function jobNode(node, colour, path) {
   const titleY = database ? 44 : 26;
   const title = svgElement("text", { x: 14, y: titleY, class: "node-title" });
   for (const [index, line] of lines.entries()) {
-    const part = svgElement("tspan", { x: 14, y: titleY + index * 20 });
+    const part = svgElement("tspan", { x: 14, y: titleY + index * 24 });
     part.textContent = line;
     title.append(part);
   }
   card.append(title);
-  const statusY = titleY + (lines.length - 1) * 20 + 24;
+  const statusY = titleY + (lines.length - 1) * 24 + 26;
   const status = svgElement("g", {
     class: "node-status",
     transform: `translate(14 ${statusY - 12})`,
@@ -432,21 +432,23 @@ function jobNode(node, colour, path) {
     : node.subtitle || "";
   card.append(origin);
 
+  const compactView = key === "qc" || key === "extract";
+  const viewWidth = compactView ? 20 : 44;
   const view = svgElement("g", {
     class: "view node-view",
-    transform: `translate(${w - 51} ${h - 26})`,
+    transform: `translate(${w - viewWidth - 7} ${h - 26})`,
     role: "button",
     tabindex: records[key] ? 0 : -1,
     "aria-disabled": String(!records[key]),
     "aria-label": "View " + job.title + " output",
   });
-  view.append(svgElement("rect", { width: 44, height: 22, rx: 4 }));
+  view.append(svgElement("rect", { width: viewWidth, height: 22, rx: 4 }));
   const viewText = svgElement("text", {
-    x: 22,
+    x: viewWidth / 2,
     y: 15,
     "text-anchor": "middle",
   });
-  viewText.textContent = "View ›";
+  viewText.textContent = compactView ? "›" : "View ›";
   view.append(viewText);
   const open = (event) => {
     event.stopPropagation();

@@ -64,6 +64,16 @@ with hosted_docs() as url, sync_playwright() as playwright:
                                    b.top < bounds.top - 1 || b.bottom > bounds.bottom + 1))
                         problems.push(node.key + ': text outside box: ' + text.textContent);
                 }
+                const stateText = group.querySelector('.node-status text').getBoundingClientRect();
+                const viewControl = group.querySelector('.node-view rect').getBoundingClientRect();
+                if (stateText.left < viewControl.right && stateText.right > viewControl.left &&
+                    stateText.top < viewControl.bottom && stateText.bottom > viewControl.top)
+                    problems.push(node.key + ': state text overlaps output control');
+                const title = group.querySelector('.node-title');
+                const renderedTitleSize = parseFloat(getComputedStyle(title).fontSize) *
+                    Math.hypot(matrix.a, matrix.b);
+                if (renderedTitleSize < 12)
+                    problems.push(node.key + ': title too small at rendered size: ' + renderedTitleSize);
                 if (!group.querySelector('.node-status').textContent.includes('Complete'))
                     problems.push(node.key + ': missing state text');
             }

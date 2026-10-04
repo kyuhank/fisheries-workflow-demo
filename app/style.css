@@ -291,11 +291,11 @@ dialog nav .active {
 .workflow-diagram {
   display: block;
   width: 100%;
-  min-width: 1060px;
+  min-width: 1200px;
   height: auto;
 }
 .module-title {
-  font-size: 21px;
+  font-size: 23px;
   font-weight: 650;
   letter-spacing: -.3px;
 }
@@ -979,7 +979,7 @@ dialog iframe {
   flex-wrap: wrap;
 }
 .workflow-diagram {
-  min-width: 1060px;
+  min-width: 1200px;
 }
 .selection .eyebrow {
   font-size: 10px;
@@ -1219,16 +1219,16 @@ dialog iframe {
   stroke-width: 2;
 }
 .node-title {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 650;
   fill: var(--accent);
   letter-spacing: -.2px;
 }
 .workflow-node[data-job^="assessment_"] .node-title {
-  font-size: 16px;
+  font-size: 19px;
 }
 .node-status {
-  font-size: 15px;
+  font-size: 17px;
   color: var(--muted);
 }
 .node-status text {
@@ -1243,7 +1243,7 @@ dialog iframe {
 }
 .workflow-node[data-job="qc"] .node-status,
 .workflow-node[data-job="extract"] .node-status {
-  font-size: 13px;
+  font-size: 15px;
 }
 .workflow-node.complete .node-status {
   color: #347e60;
