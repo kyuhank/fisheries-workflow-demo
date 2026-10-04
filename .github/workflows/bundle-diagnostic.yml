@@ -1,0 +1,30 @@
+name: Check preserved hosted bundle
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Inspect the preserved original inputs in their recorded container
+        run: |
+          docker pull "$IMAGE"
+          docker run --rm --network none --user "$(id -u):$(id -g)" \
+            --env PAPER_RUNTIME_IMAGE="$IMAGE" \
+            --env PAPER_RUNTIME_IMAGE_URL=https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow \
+            --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
+            "$IMAGE" python3 scripts/diagnose-bundle.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: preserved-bundle-diagnostics
+          path: .test-output/bundle-diagnostic.json
+          include-hidden-files: true
+          if-no-files-found: error
