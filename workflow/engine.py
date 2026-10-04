@@ -17,6 +17,9 @@ from .quarto_reports import render_report
 from .spec import DEFAULTS, SPEC, STAGES, active_spec, downstream, handover_groups
 
 ROOT = Path(__file__).resolve().parents[1]
+FROZEN_SOURCE = 'data/frozen-source.json'
+DATA_FILES = ('fishery.sqlite', 'submission.json', 'scenario.json', 'source-data.json',
+              'generation.json', 'frozen-source.json')
 
 
 def digest(data):
@@ -126,7 +129,7 @@ class Workflow:
                     'parents': parents, 'software': self.software()}
         if key == 'submission':
             material['data'] = {name: digest((ROOT / 'data' / name).read_bytes())
-                                for name in ['fishery.sqlite', 'submission.json', 'scenario.json', 'source-data.json', 'generation.json'] if (ROOT / 'data' / name).is_file()}
+                                for name in DATA_FILES if (ROOT / 'data' / name).is_file()}
         return digest(encoded(material))
 
     def software(self):
@@ -186,6 +189,9 @@ class Workflow:
         """Read source bytes; year selection and the QC example are R jobs."""
         if hasattr(self, 'hosted_data'):
             return {**json.loads(json.dumps(self.hosted_data)), 'submission': None}
+        frozen = ROOT / FROZEN_SOURCE
+        if frozen.is_file():
+            return {**read_json(frozen), 'submission': None}
         with sqlite3.connect(f'file:{ROOT / "data/fishery.sqlite"}?mode=ro', uri=True) as db:
             db.row_factory = sqlite3.Row
             rows = [dict(r) for r in db.execute('SELECT * FROM sets ORDER BY year,set_id')]
@@ -238,7 +244,7 @@ class Workflow:
             record['source'] = {'repository': 'https://github.com/' + self.execution['repository'],
                                 'commit': self.execution['commit']}
         record['data_files'] = {name: digest((ROOT / 'data' / name).read_bytes())
-                                for name in ['fishery.sqlite', 'submission.json', 'scenario.json', 'source-data.json', 'generation.json'] if (ROOT / 'data' / name).is_file()}
+                                for name in DATA_FILES if (ROOT / 'data' / name).is_file()}
         self.records[key] = record
         lineage = [{'job': SPEC[parent]['title'], **details} for parent, details in record['inputs'].items()]
         page = reports.output_page(SPEC[key], result, record, lineage)
@@ -373,7 +379,15 @@ class Workflow:
             checksums = {}
             for path in files:
                 name = str(path.relative_to(ROOT)); data = path.read_bytes()
+                if name == FROZEN_SOURCE and hasattr(self, 'hosted_data'):
+                    continue
                 archive.writestr(name, data); checksums[name] = digest(data)
+            if hasattr(self, 'hosted_data'):
+                # Freeze the actual input supplied to the hosted R jobs, even
+                # when the checkout's illustrative database is different.
+                data = encoded(self.hosted_data)
+                archive.writestr(FROZEN_SOURCE, data)
+                checksums[FROZEN_SOURCE] = digest(data)
             for path in self.directory.rglob('*'):
                 if path.is_file():
                     name = 'reference/' + str(path.relative_to(self.directory))

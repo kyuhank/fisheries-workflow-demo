@@ -53,3 +53,13 @@ The container includes all required R packages and Quarto. If requirements chang
 build and check a new image version before updating the immutable digest in the
 workflow. No new analysis runs in the browser; the downloaded HTML is a saved
 result reader. Code, inputs and results remain separate from the software image.
+
+## Numerical comparisons
+
+`verify.py` compares output values at relative tolerance 1e-6 or absolute tolerance
+1e-9. Assessment log-index residuals use absolute tolerance 1e-8 after checking
+them against the observed and fitted indices. Two near-zero assessment gradient
+diagnostics have magnitude and difference caps of 1e-7, conditional on matching
+successful fit diagnostics. These are comparison policies, not model-accuracy
+guarantees. Summary and report copies must match their own source assessments
+before the exceptions apply. Other values retain the general tolerances.

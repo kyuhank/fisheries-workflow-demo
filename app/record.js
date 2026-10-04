@@ -223,9 +223,35 @@ function renderRecord() {
   panel.append(details);
 }
 
+async function comparisonAssessmentOutputs(expectedRecords) {
+  return Object.fromEntries(await Promise.all(comparisonAssessmentJobs.map(async (job) => {
+    const output = await call("view", { job }), expected = expectedRecords[job];
+    if (!expected || output.record?.run_id !== expected.run_id ||
+        output.record.outputs?.["output.json"] !== expected.outputs["output.json"]) {
+      throw Error("The recorded assessment input is no longer available: " + job);
+    }
+    return [job, output.output];
+  })));
+}
+
 async function reproduceOutput(reference, context) {
   if (busy || !ready) return;
   const key = reference.record.job;
+  const copiedAssessment = ["assessment_summary", "assessment_report"].includes(key);
+  let referenceAssessments;
+  if (copiedAssessment) {
+    busy = true;
+    render();
+    try {
+      referenceAssessments = await comparisonAssessmentOutputs(context.jobs);
+    } catch (error) {
+      status("failed", "The original assessment inputs could not be read", error.message);
+      return;
+    } finally {
+      busy = false;
+      render();
+    }
+  }
   $("output-dialog").close();
   $("snapshot").value = context.settings.last_year;
   $("filter").value = context.settings.min_hooks_a;
@@ -235,12 +261,23 @@ async function reproduceOutput(reference, context) {
   selected = "submission";
   executionScope = "workflow";
   settingsIntent = false;
-  await refreshPlan();
+  if (!await refreshPlan()) return;
   const result = await $("run").onclick();
   if (!result) return;
+  busy = true;
+  render();
   try {
     const output = await call("view", { job: key });
-    const mismatch = compareOutput(reference.output, output.output);
+    let assessmentContext = null, mismatch = null;
+    if (copiedAssessment) {
+      const actualAssessments = await comparisonAssessmentOutputs(records);
+      assessmentContext = Object.fromEntries(comparisonAssessmentJobs.map((job) =>
+        [job, [referenceAssessments[job], actualAssessments[job]]]));
+      for (const job of comparisonAssessmentJobs) {
+        mismatch ||= compareOutput(...assessmentContext[job], job);
+      }
+    }
+    mismatch ||= compareOutput(reference.output, output.output, key, assessmentContext);
     const changed = compareMaterials(context.jobs, records);
     const agrees = !mismatch;
     output.comparison = {
@@ -253,6 +290,9 @@ async function reproduceOutput(reference, context) {
       reference_output: reference.output,
       relative_tolerance: 1e-6,
       absolute_tolerance: 1e-9,
+      assessment_gradient_magnitude_and_difference_limit: 1e-7,
+      assessment_log_residual_absolute_tolerance: 1e-8,
+      assessment_log_residual_invariant_tolerance: 1e-12,
       title: agrees
         ? (changed.length
           ? "Output agrees · execution materials changed"
@@ -261,7 +301,7 @@ async function reproduceOutput(reference, context) {
       message: `${reference.record.run_id} → ${output.record.run_id}. ` +
         (mismatch
           ? `First difference: ${mismatch}. `
-          : "Numerical comparison passed (relative 1e−6; absolute 1e−9). ") +
+          : "Numerical comparison passed using the recorded comparison criteria. ") +
         (changed.length
           ? "Changed: " + changed.join(", ") + "."
           : "Recorded code, data files, settings and software matched."),
@@ -272,9 +312,13 @@ async function reproduceOutput(reference, context) {
       }
     }
     reproductionChecks.set(checkKey(output.record), output.comparison);
+    busy = false;
     displayOutput(byKey[key].title, output, "Reproduction check");
     document.querySelector('[data-output="record"]').click();
   } catch (error) {
     status("failed", "The comparison could not be completed", error.message);
+  } finally {
+    busy = false;
+    render();
   }
 }

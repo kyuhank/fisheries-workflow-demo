@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from workflow.spec import HANDOVERS, SPEC, STAGES
 from workflow.r_bridge import RBridge
+from workflow.engine import FROZEN_SOURCE
 
 CONFIG = json.loads((ROOT / 'cloud/config.json').read_text())
 BASE = CONFIG['url'].rstrip('/')
@@ -292,12 +293,15 @@ def reproduce(session, value, job=None):
             assert set(manifest) == set(names) - {'SHA256SUMS.json', 'REPRODUCE.txt'}, 'Checksum manifest is incomplete.'
             for name, checksum in manifest.items():
                 assert hashlib.sha256(archive.read(name)).hexdigest() == checksum, 'Bundle checksum mismatch.'
-                if not name.startswith('reference/') and name != 'settings.json':
+                if not name.startswith('reference/') and name not in ('settings.json', FROZEN_SOURCE):
                     source = ROOT / name
                     assert source.is_file() and hashlib.sha256(source.read_bytes()).hexdigest() == checksum, 'Bundle source differs from the checked checkout.'
             state = json.loads(archive.read('reference/state.json'))
             assert state['records'] == value['records'], 'Bundle records differ from completed execution.'
             assert state['settings'] == value['settings'], 'Bundle settings differ from completed execution.'
+            supplied = state['records']['submission']['execution']['data_checksum']
+            assert isinstance(supplied, str) and re.fullmatch(r'[a-f0-9]{64}', supplied), 'Invalid original hosted input checksum.'
+            assert manifest.get(FROZEN_SOURCE) == supplied, 'Frozen input differs from the original hosted submission.'
             for key, record in state['records'].items():
                 for name, checksum in record['outputs'].items():
                     assert manifest['reference/' + key + '/' + name] == checksum, 'Recorded output checksum differs.'
@@ -307,11 +311,27 @@ def reproduce(session, value, job=None):
         if job:
             command += ['--from', job, '--scope', 'job']
             comparison += ['--job', job]
-        for argv in (command, comparison):
-            completed = subprocess.run(argv, cwd=destination, capture_output=True, text=True, timeout=360)
-            assert completed.returncode == 0, 'Fresh native bundle reproduction failed.'
+        diagnostics = REPORT.setdefault('reproduction_diagnostics', [])
+        for stage, argv in (('calculate', command), ('compare', comparison)):
+            detail = {'selected_job': job, 'stage': stage, 'bundle_sha256': hashlib.sha256(data).hexdigest()}
+            try:
+                completed = subprocess.run(argv, cwd=destination, capture_output=True, text=True, timeout=360)
+            except subprocess.TimeoutExpired as error:
+                # These local children read the public synthetic bundle only;
+                # reader capabilities and HTTP credentials are never arguments.
+                def tail(value):
+                    return (value.decode(errors='replace') if isinstance(value, bytes) else value or '')[-4096:]
+                detail.update(returncode=None, timed_out=True,
+                              stdout=tail(error.stdout), stderr=tail(error.stderr))
+                diagnostics.append(detail)
+                raise RuntimeError(f'Fresh native bundle {stage} timed out.') from None
+            detail.update(returncode=completed.returncode, timed_out=False,
+                          stdout=completed.stdout[-4096:], stderr=completed.stderr[-4096:])
+            diagnostics.append(detail)
+            assert completed.returncode == 0, f'Fresh native bundle {stage} failed (exit {completed.returncode}); see reproduction diagnostics.'
         return {'bundle_sha256': hashlib.sha256(data).hexdigest(),
                 'checksummed_files': len(manifest), 'source_files_match_checkout': True,
+                'frozen_input_matches_original_submission': True,
                 'native_outputs_compared': 1 if job else len(state['records']),
                 'selected_job': job, 'result': 'passed'}
 

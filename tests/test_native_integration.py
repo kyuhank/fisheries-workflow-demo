@@ -1,4 +1,4 @@
-"""Six actual container R/RTMB/Quarto integration cases, explicitly enabled in CI.
+"""Seven actual container R/RTMB/Quarto integration cases, explicitly enabled in CI.
 
 This is execution consistency and workflow custody evidence. The separate R
 science script owns mathematical and declared synthetic-data checks.
@@ -17,7 +17,7 @@ import tempfile
 import unittest
 import zipfile
 
-from workflow.engine import Workflow
+from workflow.engine import FROZEN_SOURCE, Workflow, digest, encoded
 from workflow.r_bridge import RBridge
 from workflow.spec import SPEC
 from verify import compare, verify
@@ -171,3 +171,41 @@ class NativeIntegrationTest(unittest.TestCase):
             for key in REPORTS:
                 preserved = json.loads((extracted / 'reproduced' / key / 'record.json').read_text())
                 self.assertTrue(preserved['report_rendering']['quarto_executed'])
+
+    def test_7_hosted_bundle_freezes_different_actual_inputs_for_fresh_R_reproduction(self):
+        os.environ.setdefault('PAPER_REQUEST_ID', '00000000-0000-4000-8000-000000000001')
+        from cloud.run import HostedWorkflow
+        source = self.runner.source_context()
+        supplied = copy.deepcopy({'sets': source['sets'], 'catch': source['catch']})
+        supplied['sets'][0]['catch_n'] += 7
+        frozen = encoded(supplied)
+        with tempfile.TemporaryDirectory() as directory:
+            # Use the actual hosted coordinator/adapter with an explicitly local
+            # input fixture; no API, credential or claimed GitHub identity.
+            runner = HostedWorkflow.__new__(HostedWorkflow)
+            Workflow.__init__(runner, Path(directory) / 'hosted')
+            runner.hosted_data, runner.pool = supplied, None
+            runner.execution = {'provider': 'Native container input fixture',
+                                'container': RBridge.require_container(),
+                                'data_checksum': digest(frozen)}
+            runner.configure({'mse': True})
+            result = asyncio.run(runner.run())
+            self.assertEqual(result['run'], list(SPEC))
+            self.assertNotEqual(runner.output('cpue_a'), self.runner.output('cpue_a'))
+            extracted = Path(directory) / 'extracted'
+            with zipfile.ZipFile(io.BytesIO(runner.bundle())) as archive:
+                self.assertEqual(archive.namelist().count(FROZEN_SOURCE), 1)
+                self.assertEqual(archive.read(FROZEN_SOURCE), frozen)
+                manifest = json.loads(archive.read('SHA256SUMS.json'))
+                self.assertEqual(manifest[FROZEN_SOURCE],
+                                 runner.records['submission']['execution']['data_checksum'])
+                archive.extractall(extracted)
+            process = subprocess.run([sys.executable, 'run.py', '--settings', 'settings.json',
+                                      '--output', 'reproduced'], cwd=extracted,
+                                     capture_output=True, text=True, timeout=360)
+            self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+            self.assertEqual(verify(extracted / 'reference', extracted / 'reproduced'), 22)
+            reproduced = json.loads((extracted / 'reproduced/submission/output.json').read_text())
+            self.assertEqual(reproduced, runner.output('submission'))
+            record = json.loads((extracted / 'reproduced/submission/record.json').read_text())
+            self.assertEqual(record['data_files']['frozen-source.json'], digest(frozen))

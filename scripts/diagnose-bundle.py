@@ -17,7 +17,7 @@ RBridge.require_container()
 bundle = ROOT / 'diagnostics' / 'hosted-update-22.zip'
 assert hashlib.sha256(bundle.read_bytes()).hexdigest() == '920d44e1ee551cb6d34912c91cb9505a9898871e59f4200d02c9f48fdb6de902'
 report = {'status': 'running', 'bundle_sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(),
-          'container': os.environ['PAPER_RUNTIME_IMAGE'], 'steps': []}
+          'container': os.environ['PAPER_RUNTIME_IMAGE'], 'comparator_sha256': hashlib.sha256((ROOT / 'verify.py').read_bytes()).hexdigest(), 'steps': []}
 destination = ROOT / '.test-output' / 'bundle-diagnostic.json'
 destination.parent.mkdir(exist_ok=True)
 
@@ -45,7 +45,7 @@ try:
             assert all(hashlib.sha256(archive.read(n)).hexdigest() == h for n, h in manifest.items())
             archive.extractall(folder)
         for stage, argv in [('run', [sys.executable, 'run.py', '--settings', 'settings.json', '--output', 'reproduced']),
-                            ('compare', [sys.executable, 'verify.py', 'reference', 'reproduced'])]:
+                            ('compare', [sys.executable, str(ROOT / 'verify.py'), 'reference', 'reproduced'])]:
             result = subprocess.run(argv, cwd=folder, capture_output=True, text=True, timeout=360)
             record = {'stage': stage, 'returncode': result.returncode,
                       'stdout': result.stdout[-12000:], 'stderr': result.stderr[-12000:]}

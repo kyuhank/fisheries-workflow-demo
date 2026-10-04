@@ -43,7 +43,8 @@ required.
 
 If the live service cannot connect, a notice offers **View example**. For use without internet access, download `fisheries-workflow.html` from a release. This portable reader displays saved results and records; new calculations require the container.
 
-**Download this run** saves its code, data, settings and outputs. Live results
+**Download this run** saves its code, data, settings and outputs, including the
+actual synthetic records supplied to a Live execution. Live results
 expire after ten minutes of inactivity; the next run can rebuild missing inputs.
 Releases and downloaded files remain available independently of the live service.
 Follow the archive's `REPRODUCE.txt` to repeat and compare a run. For a single-job
