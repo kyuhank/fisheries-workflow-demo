@@ -6,11 +6,11 @@ Analyst role: Data provider. The entry point is [run.R](run.R), using shared [co
 
 ## Inputs and settings
 
-Declared upstream jobs: None.
+Previous jobs: None.
 
-Incoming artifacts: [`data/fishery.sqlite`](../../data/fishery.sqlite): base `sets` and `removals`; [`data/submission.json`](../../data/submission.json): the additional 2024 batch. R selects and assembles the requested snapshot.
+Input files: [`data/fishery.sqlite`](../../data/fishery.sqlite): base `sets` and `removals`; [`data/submission.json`](../../data/submission.json): the additional 2024 batch. R selects and assembles the requested snapshot.
 
-Saved settings: `last_year` (fresh default: 2023). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: `last_year` (default: 2023).
 
 ## Run in the container
 

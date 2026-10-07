@@ -6,11 +6,11 @@ Analyst role: Data curator. The entry point is [run.R](run.R), using shared [mod
 
 ## Inputs and settings
 
-Declared upstream jobs: [Quality check (`qc`)](../qc/README.md)
+Previous jobs: [Quality check (`qc`)](../qc/README.md)
 
-Incoming artifacts: QC is the declared scheduling gate. The calculation reads accepted `runs/submission/output.json` rows; the QC result is recorded as the declared parent.
+Input files: QC is the declared scheduling gate. The calculation reads accepted `runs/submission/output.json` rows; the QC result is recorded as the declared parent.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

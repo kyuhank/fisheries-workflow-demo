@@ -6,22 +6,23 @@ folder contains an R entry point, such as [run.R](cpue_a/run.R), and a guide to 
 inputs, settings and outputs.
 
 ```text
-jobs/cpue_a/run.R       readable CPUE A entrypoint
+jobs/cpue_a/run.R       CPUE A R script
 jobs/assessment_a1/run.R  fixed-growth RTMB fit
 jobs/mse_index/run.R    index-based management trials
 jobs/*/README.md        job inputs, settings, outputs and connected jobs
-jobs/*_report/report.qmd  concise reports rendered by native Quarto
+jobs/*_report/report.qmd  reports rendered by Quarto
 workflow/r/common.R    row checks, snapshot assembly and input joins
 workflow/r/models.R    GLMs, Schaefer objective and RTMB fitting
-workflow/r/mse.R       paired seeded management trials and comparisons
+workflow/r/mse.R       management trials with shared random errors
 workflow/jobs.json     job declarations and input links
 workflow/Makefile      R and report recipes inside the container
-workflow/engine.py     coordination, SQLite gates and saved records
+workflow/engine.py     coordination, file handovers and saved records
 ```
 
 The coordinator follows the input connections, passes outputs between jobs and
-records each execution. It calls the R entry points inside the declared immutable
-R/RTMB/Quarto container. The browser displays saved results.
+records each execution. Each R job runs inside the recorded container. The browser displays results and
+execution records. These records let readers follow inputs back to the database
+snapshot. The `mse` setting enables the management-trial jobs.
 
 ## Declare the connections
 
@@ -41,7 +42,7 @@ inputs, starts ready jobs through `workflow/Makefile`, and saves their outputs a
 records before dependent jobs continue. The configuration also declares parallel
 groups and manual handovers. The demo reads JSON with Python's standard library.
 
-The R entry points use the named inputs supplied by the coordinator:
+The R scripts use the named inputs supplied by the coordinator:
 
 ```r
 # jobs/cpue_a/run.R
@@ -150,8 +151,8 @@ calculate results. Report jobs render saved results and records through
 
 ```text
 runs/cpue_a/output.json  R result
-runs/cpue_a/report.html  readable result
-runs/cpue_a/record.json  inputs, settings, source hashes and actual container/software
+runs/cpue_a/report.html  result page
+runs/cpue_a/record.json  inputs, settings, source hashes and container and software
 runs/database/snapshot.sqlite  accepted fixed database snapshot
 runs/state.json         workflow execution state
 ```

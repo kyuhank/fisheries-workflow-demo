@@ -6,11 +6,11 @@ Analyst role: MSE analyst. The entry point is [run.R](run.R), using shared [mse.
 
 ## Inputs and settings
 
-Declared upstream jobs: [Constant catch (`mse_constant`)](../mse_constant/README.md), [Index rule (`mse_index`)](../mse_index/README.md), [Buffered rule (`mse_buffered`)](../mse_buffered/README.md)
+Previous jobs: [Constant catch (`mse_constant`)](../mse_constant/README.md), [Index rule (`mse_index`)](../mse_index/README.md), [Buffered rule (`mse_buffered`)](../mse_buffered/README.md)
 
-Incoming artifacts: Completed constant, index and buffered rule outputs, including their actual common error vectors.
+Input files: Completed constant, index and buffered rule outputs, including their actual common error vectors.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

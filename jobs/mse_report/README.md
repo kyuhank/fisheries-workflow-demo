@@ -2,15 +2,15 @@
 
 Render the saved management-trial comparison as a Quarto report. Trial fractions describe this conditional illustration; they are not validated risk estimates.
 
-Analyst role: MSE analyst. The entry point is [run.R](run.R), using shared [mse.R](../../workflow/r/mse.R).
+Analyst role: MSE analyst. [run.R](run.R) supplies the saved results; [report.qmd](report.qmd) renders the report.
 
 ## Inputs and settings
 
-Declared upstream jobs: [MSE results summary (`mse_summary`)](../mse_summary/README.md)
+Previous jobs: [MSE results summary (`mse_summary`)](../mse_summary/README.md)
 
-Incoming artifacts: `runs/mse_summary/output.json` and the report job's saved run record.
+Input files: `runs/mse_summary/output.json` and the report job's saved run record.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

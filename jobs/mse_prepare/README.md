@@ -6,11 +6,11 @@ Analyst role: MSE analyst. The entry point is [run.R](run.R), using shared [mse.
 
 ## Inputs and settings
 
-Declared upstream jobs: [Assessment A1 (`assessment_a1`)](../assessment_a1/README.md), [Assessment A2 (`assessment_a2`)](../assessment_a2/README.md), [Assessment B1 (`assessment_b1`)](../assessment_b1/README.md), [Assessment B2 (`assessment_b2`)](../assessment_b2/README.md)
+Previous jobs: [Assessment A1 (`assessment_a1`)](../assessment_a1/README.md), [Assessment A2 (`assessment_a2`)](../assessment_a2/README.md), [Assessment B1 (`assessment_b1`)](../assessment_b1/README.md), [Assessment B2 (`assessment_b2`)](../assessment_b2/README.md)
 
-Incoming artifacts: All four assessment outputs: r, K, q, annual catches, observed indices and the declared next-year biomass.
+Input files: All four assessment outputs: r, K, q, annual catches, observed indices and the declared next-year biomass.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

@@ -6,11 +6,11 @@ Analyst role: Assessment analyst. The entry point is [run.R](run.R), using share
 
 ## Inputs and settings
 
-Declared upstream jobs: [Prepare inputs B (`prepare_b`)](../prepare_b/README.md)
+Previous jobs: [Prepare inputs B (`prepare_b`)](../prepare_b/README.md)
 
-Incoming artifacts: Joined index and catch `rows` in `runs/prepare_b/output.json`.
+Input files: Joined index and catch `rows` in `runs/prepare_b/output.json`.
 
-Saved settings: `growth_rate_2` saved as `r` (fresh default: 0.30; choices: 0.25, 0.30, 0.35). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: `growth_rate_2` saved as `r` (default: 0.30; choices: 0.25, 0.30, 0.35).
 
 Biomass is reported as B/K and catches in tonnes. Growth and initial depletion are fixed sensitivity assumptions; convergence does not establish real-stock validity or uncertainty.
 The result records feasibility, biomass recurrence balance, objective gradient and the projected gradient at a parameter bound. Balance uses the supplied catches; it is not an independent catch fit.
