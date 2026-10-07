@@ -61,7 +61,8 @@ def build():
              *ROOT.glob('tests/*.py'), *ROOT.glob('tests/*.R'), *ROOT.glob('cloud/*.py'), *ROOT.glob('vendor/analysis/*')]
     files += [ROOT/name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json']]
     files += [ROOT/'scripts/generate-data.R', ROOT/'scripts/import-r-data.py']
-    files += job_files() + [ROOT/'ADAPT.md', ROOT/'cloud/README.md']
+    files += job_files() + [ROOT/'ADAPT.md', ROOT/'cloud/README.md',
+                           ROOT/'examples/analyst-repositories.yaml']
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE'])
     payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'notices': notices,
                'files': {str(p.relative_to(ROOT)):base64_file(p) for p in files},

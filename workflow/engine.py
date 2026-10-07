@@ -373,7 +373,8 @@ class Workflow:
             files += list(ROOT.glob('cloud/*.py'))
             files += [ROOT / 'scripts/generate-data.R', ROOT / 'scripts/import-r-data.py']
             files += job_files()
-            files += [ROOT / 'ADAPT.md', ROOT / 'cloud/README.md']
+            files += [ROOT / 'ADAPT.md', ROOT / 'cloud/README.md',
+                      ROOT / 'examples/analyst-repositories.yaml']
             files += [ROOT / name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json'] if (ROOT / name).exists()]
             files += list(ROOT.glob('vendor/analysis/*'))
             checksums = {}

@@ -66,6 +66,20 @@ These are three separate files. The driver loads their shared functions from
 
 ## Follow the jobs
 
+The four tasks exchange the following files. The job guides below identify the
+individual jobs and their input records.
+
+| Task | Receives | Produces |
+| --- | --- | --- |
+| Data preparation | Supplied fishing records and annual catches | `extract/output.json`: fishing `sets` for CPUE and annual `catch` for assessment preparation |
+| CPUE analysis | Extracted fishing `sets` | `cpue_a/output.json` and `cpue_b/output.json`: index `series` for assessment preparation |
+| Stock assessment | CPUE indices and annual catches | `output.json` from `assessment_a1`, `assessment_a2`, `assessment_b1` and `assessment_b2`: four fitted cases for MSE preparation |
+| Management strategy evaluation | Four fitted assessment cases | `mse_summary/output.json`: management-trial comparisons for the MSE report |
+
+These paths are relative to `runs/`. Each receiving job records the producer's
+run and file checksum. The live example keeps the tasks in one repository;
+the [separate-repository example](#separate-repositories) describes their handover.
+
 ### Data preparation
 
 | Job | Receives from |

@@ -34,6 +34,11 @@ A Live request uses the existing [hosted service](cloud/README.md): it starts
 there. `cloud/run.py` retrieves the request and runs the same coordinator. The job
 configuration defines the calculations; the service requires a separate deployment.
 
+See [GitHub Actions](https://docs.github.com/en/actions/get-started/understand-github-actions)
+for workflows and runners, and the
+[Docker overview](https://docs.docker.com/get-started/docker-overview/)
+for images and containers.
+
 ## Separate analyst repositories
 
 The [job guide](jobs/README.md#separate-repositories) follows a concrete CPUE →

@@ -3,6 +3,7 @@ import asyncio
 import hashlib
 import io
 import json
+import re
 import shlex
 import tempfile
 import unittest
@@ -111,6 +112,27 @@ class JobSourceTests(unittest.TestCase):
                 self.assertIn('scripts/generate-data.R', archive.namelist())
                 self.assertFalse(any(name.startswith('jobs/') and name.endswith('run.py')
                                      for name in archive.namelist()))
+
+    def test_bundle_preserves_linked_repository_example(self):
+        name = 'examples/analyst-repositories.yaml'
+        guide = (ROOT / 'ADAPT.md').read_text()
+        self.assertIn(name, re.findall(r'\]\(([^)]+)\)', guide))
+        expected = (ROOT / name).read_bytes()
+        with tempfile.TemporaryDirectory() as directory:
+            runner = self.runner(directory)
+            image = 'ghcr.io/example/fisheries@sha256:' + 'a' * 64
+            with patch.object(runner, 'software', return_value={'container': image}), \
+                 zipfile.ZipFile(io.BytesIO(runner.bundle())) as archive:
+                self.assertEqual(archive.namelist().count(name), 1)
+                self.assertEqual(archive.read(name), expected)
+                checksums = json.loads(archive.read('SHA256SUMS.json'))
+                self.assertEqual(checksums[name], hashlib.sha256(expected).hexdigest())
+                for document in ('ADAPT.md', 'jobs/README.md'):
+                    data = (ROOT / document).read_bytes()
+                    self.assertEqual(archive.namelist().count(document), 1)
+                    self.assertEqual(archive.read(document), data)
+                    self.assertEqual(checksums[document], hashlib.sha256(data).hexdigest())
+                self.assertIn(b'status: illustration_only', archive.read(name))
 
 
 if __name__ == '__main__':
