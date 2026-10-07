@@ -1046,13 +1046,13 @@ function render() {
     : "Confirm file transfer →";
   const manual = $("handover").value === "manual" && mode !== "saved";
   document.querySelector('[data-tab="jobs"]').textContent = manual ? "Job outputs" : "Orchestration tool";
-  document.querySelector('.workspace-brand .eyebrow').textContent = manual ? "Separate workspaces" : "Orchestration";
+  document.querySelector('.workspace-brand .eyebrow').textContent = manual ? "Manual handover" : "Orchestration";
   document.querySelector('.workspace-brand strong').textContent = manual ? "Job outputs" : "Analysis workspace";
   document.querySelector('.workspace-nav').setAttribute('aria-label', manual
     ? "Job outputs navigation" : "Orchestration navigation");
   if (manual) $("workspace-description").textContent = workspaceView === "dependencies"
-    ? "These connections show which files each analyst needs across separate workspaces. Transfers require confirmation."
-    : "This view represents separate workspaces without shared orchestration. Inspect each analyst’s jobs, inputs and results.";
+    ? "These connections show the files passed between analysts. Manual handovers require confirmation."
+    : "This mode simulates manual handovers between analysts. Inspect their jobs and records, then confirm a handover to continue receiving jobs.";
   renderViewGuide();
   for (const id of ["snapshot", "filter", "growth-rate", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
@@ -1186,7 +1186,7 @@ function handleEvent(event) {
         ? "Data manager → CPUE analyst"
         : event.boundary === "assessment" ? "Assessment analyst → MSE analyst"
         : "CPUE analyst → Assessment analyst";
-      $("handover-message").textContent = "This simulates a file transfer between separate workspaces with no shared orchestration. No upload is needed.";
+      $("handover-message").textContent = "This simulates a file handover between analysts. Confirm it to continue receiving jobs; no upload is needed.";
     } else if (event.state === "received") {
       waitingTransfer = null;
       confirmingTransfer = false;
@@ -1372,21 +1372,21 @@ function renderViewGuide() {
   const orchestration = $("workflow-view").hidden;
   const manual = $("handover").value === "manual" && mode !== "saved";
   $("view-guide-title").textContent = orchestration
-    ? manual ? "Follow work across separate workspaces"
+    ? manual ? "Follow a manual handover"
     : mode === "saved" ? "Inspect the saved jobs"
-    : "Coordinate jobs and trace a revision"
+    : "Coordinate jobs and follow an update"
     : "Follow the analytical connections";
   $("view-guide-description").textContent = orchestration
     ? manual
-      ? "These are separate analyst workspaces without shared orchestration. Inspect responsibilities and job records, and confirm file transfers when an analysis is waiting."
+      ? "This mode simulates manual handovers between analysts. Inspect responsibilities and job records, and confirm a handover when a receiving analysis is waiting."
       : mode === "saved"
-      ? "These tasks organise the diagram’s saved jobs; no analyses run in View example. Select a task and open a job’s Output and Record to inspect its result, inputs and container. Choose Live run on the website to change settings and run a revised workflow."
-      : "Run the workflow, change CPUE A records, then choose Update workflow. The Orchestration tool follows the input connections shown in the diagram and starts affected jobs when their inputs are ready, inside the recorded container. Unaffected results and records remain available. Open Output and Record to trace a revision."
+      ? "Tasks group the saved jobs by analysis. Select a task and open Output or Record to inspect results and their sources. View example runs no analyses; choose Live run on the website to execute jobs and follow their progress."
+      : "Run the workflow, then change a setting and choose Update workflow. The tool starts ready jobs, shows their progress and any failures, and keeps the records of both new and reused results. Open Output or Record to inspect a job."
     : manual
-      ? "The diagram shows the analyses and their input connections. In Manual handover, jobs run across separate workspaces and wait for you to confirm each file transfer."
+      ? "The diagram shows the connections between analyses. Manual handover simulates transfers between analysts: receiving jobs wait for confirmation while other ready jobs can continue."
       : mode === "saved"
-      ? "The diagram shows the input connections between the saved jobs. No analyses run in View example. Open the Orchestration tool, select a task and use Output and Record to inspect results and recorded inputs. Choose Live run on the website to change settings and run a revised workflow."
-      : "The diagram shows which jobs supply inputs to others. Run the workflow, change CPUE A records, then choose Update workflow. The Orchestration tool starts affected jobs when their inputs are ready, inside the recorded container, and keeps unaffected results and records. Open Output and Record to trace a revision.";
+      ? "The diagram shows which jobs supply inputs to others. View example displays saved results. Open the Orchestration tool to inspect each job and its records; choose Live run on the website to execute the workflow."
+      : "The diagram shows which jobs supply inputs to others. The Orchestration tool uses these connections to start ready jobs and follow their progress. Change CPUE A records, then choose Update workflow to see which analyses rerun.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
   $("view-guide-link").textContent = orchestration ? "See workflow diagram →"
     : manual ? "Inspect job outputs →" : "Open Orchestration tool →";
