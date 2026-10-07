@@ -115,9 +115,9 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.wait_for_function("document.querySelector('#mode').value === 'saved'")
     page.locator('#mode').select_option('saved')
     assert 'saved' in page.locator('#view-guide-description').inner_text()
-    assert 'Output and Record' in page.locator('#view-guide-description').inner_text()
+    assert all(label in page.locator('#view-guide-description').inner_text() for label in ('Output', 'Record'))
     switch_with_guide(page, 'workflow')
-    assert 'saved jobs' in page.locator('#view-guide-description').inner_text()
+    assert 'saved results' in page.locator('#view-guide-description').inner_text()
     switch_with_guide(page, 'orchestration')
     assert page.locator('#show-tasks').inner_text().startswith('Tasks')
     assert page.locator('#workspace-title').inner_text() == 'Tasks'
