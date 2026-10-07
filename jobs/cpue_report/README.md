@@ -2,15 +2,15 @@
 
 Render the saved CPUE comparison as a Quarto report. The report reads the result and run record without refitting the GLMs.
 
-Analyst role: CPUE analyst. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+Analyst role: CPUE analyst. [run.R](run.R) supplies the saved results; [report.qmd](report.qmd) renders the report.
 
 ## Inputs and settings
 
-Declared upstream jobs: [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md)
+Previous jobs: [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md)
 
-Incoming artifacts: `runs/cpue_summary/output.json` and the report job's saved run record.
+Input files: `runs/cpue_summary/output.json` and the report job's saved run record.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

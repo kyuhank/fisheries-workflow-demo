@@ -6,11 +6,11 @@ Analyst role: CPUE analyst. The entry point is [run.R](run.R), using shared [com
 
 ## Inputs and settings
 
-Declared upstream jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md)
+Previous jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md)
 
-Incoming artifacts: The `series` in `runs/cpue_a/output.json` and `runs/cpue_b/output.json`.
+Input files: The `series` in `runs/cpue_a/output.json` and `runs/cpue_b/output.json`.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

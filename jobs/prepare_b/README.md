@@ -6,11 +6,11 @@ Analyst role: Assessment analyst. The entry point is [run.R](run.R), using share
 
 ## Inputs and settings
 
-Declared upstream jobs: [Extract data (`extract`)](../extract/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md)
+Previous jobs: [Extract data (`extract`)](../extract/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md)
 
-Incoming artifacts: The index `series` in `runs/cpue_b/output.json` and annual `catch` in `runs/extract/output.json`.
+Input files: The index `series` in `runs/cpue_b/output.json` and annual `catch` in `runs/extract/output.json`.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

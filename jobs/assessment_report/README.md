@@ -2,15 +2,15 @@
 
 Render the saved assessment comparison as a Quarto report. The report describes the fixed assumptions, convergence and bounds without refitting or claiming confidence intervals.
 
-Analyst role: Assessment analyst. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+Analyst role: Assessment analyst. [run.R](run.R) supplies the saved results; [report.qmd](report.qmd) renders the report.
 
 ## Inputs and settings
 
-Declared upstream jobs: [Compare assessments (`assessment_summary`)](../assessment_summary/README.md)
+Previous jobs: [Compare assessments (`assessment_summary`)](../assessment_summary/README.md)
 
-Incoming artifacts: `runs/assessment_summary/output.json` and the report job's saved run record.
+Input files: `runs/assessment_summary/output.json` and the report job's saved run record.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 Biomass is reported as B/K and catches in tonnes. Growth and initial depletion are fixed sensitivity assumptions; convergence does not establish real-stock validity or uncertainty.
 

@@ -6,11 +6,11 @@ Analyst role: MSE analyst. The entry point is [run.R](run.R), using shared [mse.
 
 ## Inputs and settings
 
-Declared upstream jobs: [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md)
+Previous jobs: [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md)
 
-Incoming artifacts: Stocks, scenarios and saved `error_streams` in `runs/mse_prepare/output.json`.
+Input files: Stocks, scenarios and saved `error_streams` in `runs/mse_prepare/output.json`.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

@@ -6,11 +6,11 @@ Analyst role: Data analyst. The entry point is [run.R](run.R), using shared [com
 
 ## Inputs and settings
 
-Declared upstream jobs: [Prepare and load (`database`)](../database/README.md)
+Previous jobs: [Prepare and load (`database`)](../database/README.md)
 
-Incoming artifacts: `runs/database/snapshot.sqlite` queried using [`extract.sql`](../../workflow/extract.sql) and [`extract-catch.sql`](../../workflow/extract-catch.sql). The adapter supplies the actual query rows and SQL to R.
+Input files: `runs/database/snapshot.sqlite` queried using [`extract.sql`](../../workflow/extract.sql) and [`extract-catch.sql`](../../workflow/extract-catch.sql). The adapter supplies the actual query rows and SQL to R.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 

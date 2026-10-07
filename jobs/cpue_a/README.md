@@ -6,11 +6,11 @@ Analyst role: CPUE analyst. The entry point is [run.R](run.R), using shared [mod
 
 ## Inputs and settings
 
-Declared upstream jobs: [Extract data (`extract`)](../extract/README.md)
+Previous jobs: [Extract data (`extract`)](../extract/README.md)
 
-Incoming artifacts: The `sets` rows in `runs/extract/output.json`.
+Input files: The `sets` rows in `runs/extract/output.json`.
 
-Saved settings: `min_hooks_a` saved as `min_hooks` (fresh default: 0). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: `min_hooks_a` saved as `min_hooks` (default: 0).
 
 ## Run in the container
 

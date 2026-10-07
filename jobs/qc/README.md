@@ -6,11 +6,11 @@ Analyst role: Data curator. The entry point is [run.R](run.R), using shared [com
 
 ## Inputs and settings
 
-Declared upstream jobs: [Data submission (`submission`)](../submission/README.md)
+Previous jobs: [Data submission (`submission`)](../submission/README.md)
 
-Incoming artifacts: `runs/submission/output.json` and the raw supplied source rows. Correction can replace the submission `output.json`, `report.html` and `record.json`.
+Input files: `runs/submission/output.json` and the raw supplied source rows. Correction can replace the submission `output.json`, `report.html` and `record.json`.
 
-Saved settings: No job-specific settings (`{}`). Snapshot lineage is preserved separately; `mse` controls the active graph.
+Saved settings: No job-specific settings (`{}`).
 
 ## Run in the container
 
