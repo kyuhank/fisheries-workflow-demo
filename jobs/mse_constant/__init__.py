@@ -1,1 +1,0 @@
-"""Constant catch job."""

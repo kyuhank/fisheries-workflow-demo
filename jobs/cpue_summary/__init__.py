@@ -1,1 +1,0 @@
-"""Compare CPUE results job."""

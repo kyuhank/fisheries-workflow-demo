@@ -1,1 +1,0 @@
-"""Compare assessments job."""

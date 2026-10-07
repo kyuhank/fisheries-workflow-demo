@@ -1,9 +1,11 @@
 # Jobs and their connections
 
-The 22 jobs use Poisson GLMs for CPUE, a one-parameter RTMB Schaefer assessment
-with fixed growth sensitivities, and seeded closed-loop management trials. Each
-folder contains an R entry point, such as [run.R](cpue_a/run.R), and a guide to its
-inputs, settings and outputs.
+Each of the 22 job folders contains an R script and a guide to its inputs,
+settings and outputs. Start with the [CPUE A script](cpue_a/run.R), then follow
+its shared functions in [models.R](../workflow/r/models.R).
+
+The example uses Poisson GLMs for CPUE, a one-parameter RTMB Schaefer assessment
+with fixed growth sensitivities, and management trials with fixed random seeds.
 
 ```text
 jobs/cpue_a/run.R       CPUE A R script

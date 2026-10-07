@@ -14,6 +14,12 @@ make the connections easy to explore; the results provide no advice for a real f
 | **Live run** | GitHub Actions retrieves the recorded Docker image on a remote computer and runs the R jobs and reports inside its container. No login is needed. |
 | **View example** | Explore saved outputs and execution records without running the analyses. |
 
+[GitHub Actions](https://docs.github.com/en/actions/get-started/understand-github-actions)
+provides the remote execution service. The
+[container image](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/)
+packages the software needed by the R scripts and reports, so runs use the same
+recorded software environment.
+
 The **Workflow diagram** shows the inputs passed between analyses. The
 **Orchestration tool** uses these connections to start jobs when their inputs are
 ready. Its task view groups related jobs and shows progress and execution records.
