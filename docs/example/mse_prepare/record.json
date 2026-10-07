@@ -2,14 +2,14 @@
   "job": "mse_prepare",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "4c831897cd6e661ac1530899d9dd99fe4629fbccdbda91a9ea583e0f7c7d70b8",
+  "signature": "5443688ac668374469b8ebb282ad2a13434aef569cae05cca148abad3667bfdb",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "Makefile": "e41825f04fc35a282462e2b26eb9c0f12b3ab7d0a158c803d0ef6c910343b82e",
     "workflow/Makefile": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
     "workflow/jobs.json": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
-    "workflow/engine.py": "9bbe49190530d4f7cf88741136503bd0fa4717a371243b62b22c4828e68a5b67",
+    "workflow/engine.py": "0f6157fb206f794382bd1713d2818aa3729f8ad1ffda028742238dc5ddb2a8fb",
     "workflow/spec.py": "ae5455de889c2d544aab55f0e579d02614713a081768bf1a0d9937fda1de0e92",
     "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
     "workflow/r_bridge.py": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
@@ -38,8 +38,8 @@
     "sqlite": "3.45.1"
   },
   "outputs": {
-    "output.json": "1b95488b1ff91a90f5827303e4395dfbf60d7110f0b42416c536c634a0ce9588",
-    "report.html": "9d74299b7ba75b226146f3c10d135bb96ddd7c0b74793cbcd3ca1d4a6ee99cf6"
+    "output.json": "0dcacbc43d78e593b7996a7f92b75db1365a50f8c22a38575bdcd1a63122f29f",
+    "report.html": "7a36700e5c280c0e1779bba68ab70b15250fdd46dda124afc5e53e01b13d02e7"
   },
   "log": [
     "Use the four assessment cases to prepare stocks for simulated management trials.",
@@ -48,33 +48,33 @@
   "inputs": {
     "assessment_a1": {
       "run_id": "Run 001",
-      "checksum": "6daa92814a32f3b45b17383f2a941f7de9ff6e9669f018599d02fd97c6325524"
+      "checksum": "5d32d9efe0d1e82465dcbb7d540f72d8a37ea833301d0b623c87bad28f100348"
     },
     "assessment_a2": {
       "run_id": "Run 001",
-      "checksum": "ce6f47f39b4101eae414ccb8dd716e03d443188dbc2c6e931ed37444b58a2776"
+      "checksum": "bf39b4b12590aaedcfa57ee52f855332501c2b566864323446ad29bc20855965"
     },
     "assessment_b1": {
       "run_id": "Run 001",
-      "checksum": "d24961df68ed61382b205cd6d519a0621b0cb56df3572f9aac087273c4c9945b"
+      "checksum": "739ac7fe2841f4321e35329de299c13d4e13ab89298811a7c0076b9e09e14711"
     },
     "assessment_b2": {
       "run_id": "Run 001",
-      "checksum": "36d396efef101f15aa24550bb8671950a1257c6232768dcf8ef30c7a488ca90b"
+      "checksum": "b0f91f4bb90d7cb6cbe6fc290a2d4103408edb00cd568b02b8704b660bec8fcd"
     }
   },
   "execution": {
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "1ebf6dfa1797f7da875afc332fec742f5f46ec88",
-    "github_run": "37242765838",
+    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4",
+    "github_run": "37568937127",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "1ebf6dfa1797f7da875afc332fec742f5f46ec88"
+    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

@@ -2,14 +2,14 @@
   "job": "cpue_report",
   "owner": "CPUE analyst",
   "run_id": "Run 001",
-  "signature": "90426f1b04460f9ccf7529cc5fe004aa8ee048763133fa1e92618f285600d321",
+  "signature": "b1ac74c50995d6b4241e4ad9b6ad51a07b807db06f2d1b815e153b9b0c234a8b",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "Makefile": "e41825f04fc35a282462e2b26eb9c0f12b3ab7d0a158c803d0ef6c910343b82e",
     "workflow/Makefile": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
     "workflow/jobs.json": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
-    "workflow/engine.py": "9bbe49190530d4f7cf88741136503bd0fa4717a371243b62b22c4828e68a5b67",
+    "workflow/engine.py": "0f6157fb206f794382bd1713d2818aa3729f8ad1ffda028742238dc5ddb2a8fb",
     "workflow/spec.py": "ae5455de889c2d544aab55f0e579d02614713a081768bf1a0d9937fda1de0e92",
     "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
     "workflow/r_bridge.py": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
@@ -39,10 +39,10 @@
     "sqlite": "3.45.1"
   },
   "outputs": {
-    "output.json": "204430e588ab07469565cdcb6af63382b676820c251ba04d8b70a7ae392b6bf2",
-    "report.html": "b3d6a081db8d843ca6ccef78250502faf58a6e447c27e37e27f0e360be5389b9",
+    "output.json": "658c282ad70317eede9b4c25f417d21a37860f4903f8a70e975757eaf0575ca6",
+    "report.html": "4b1b5d87b7f8b91aee74a1017c0a9b0cd3db6b6e3c953873a613066c78fbdd9b",
     "report.qmd": "a7a6ed8c56ad05457d0bf7ec5861e480301201352561bea13641c2c4c8eabb90",
-    "report-data.json": "f2a5b9af5efb6ea1d3a85ce12e4f0af08d9f367313377d04c16d29157f2eab40"
+    "report-data.json": "418fa6e465a0284a5b7eae40f08fba6ee35484bbcf472f13558a710a1c8f3730"
   },
   "log": [
     "Write a short account of the CPUE methods and results.",
@@ -51,21 +51,21 @@
   "inputs": {
     "cpue_summary": {
       "run_id": "Run 001",
-      "checksum": "204430e588ab07469565cdcb6af63382b676820c251ba04d8b70a7ae392b6bf2"
+      "checksum": "658c282ad70317eede9b4c25f417d21a37860f4903f8a70e975757eaf0575ca6"
     }
   },
   "execution": {
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "1ebf6dfa1797f7da875afc332fec742f5f46ec88",
-    "github_run": "37242765838",
+    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4",
+    "github_run": "37568937127",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "1ebf6dfa1797f7da875afc332fec742f5f46ec88"
+    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

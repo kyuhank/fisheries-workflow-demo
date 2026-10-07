@@ -2,14 +2,14 @@
   "job": "mse_constant",
   "owner": "MSE analyst",
   "run_id": "Run 001",
-  "signature": "a16b6da45d6e8919e070cd3e874021f1d4277a37f09cc26bb838c426a123cd25",
+  "signature": "06dc758feabf80ffa0dee18112bf730602fffa21b93f3e2f1a2388b09b8b7c1f",
   "settings": {},
   "snapshot": 2023,
   "code": {
     "Makefile": "e41825f04fc35a282462e2b26eb9c0f12b3ab7d0a158c803d0ef6c910343b82e",
     "workflow/Makefile": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
     "workflow/jobs.json": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
-    "workflow/engine.py": "9bbe49190530d4f7cf88741136503bd0fa4717a371243b62b22c4828e68a5b67",
+    "workflow/engine.py": "0f6157fb206f794382bd1713d2818aa3729f8ad1ffda028742238dc5ddb2a8fb",
     "workflow/spec.py": "ae5455de889c2d544aab55f0e579d02614713a081768bf1a0d9937fda1de0e92",
     "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
     "workflow/r_bridge.py": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
@@ -38,8 +38,8 @@
     "sqlite": "3.45.1"
   },
   "outputs": {
-    "output.json": "18e3fb389643580fce80f74bd9c0340036d3d55531df12d14cfbfe7826476056",
-    "report.html": "a332b654ced331c6abb4792304c097fa0dbe71fa676a98f2455766bb1aa32fd2"
+    "output.json": "c40da13b86bc49c9c78ffbc7cfd124d0fff6a2bc3581a10cbe041af733056ab7",
+    "report.html": "6c8c2d6683dac7c91573bf0bc0a404ad7bf27b807de9782b7e8ad452135842ff"
   },
   "log": [
     "Test a fixed annual catch under the same simulated future conditions.",
@@ -48,21 +48,21 @@
   "inputs": {
     "mse_prepare": {
       "run_id": "Run 001",
-      "checksum": "1b95488b1ff91a90f5827303e4395dfbf60d7110f0b42416c536c634a0ce9588"
+      "checksum": "0dcacbc43d78e593b7996a7f92b75db1365a50f8c22a38575bdcd1a63122f29f"
     }
   },
   "execution": {
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "1ebf6dfa1797f7da875afc332fec742f5f46ec88",
-    "github_run": "37242765838",
+    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4",
+    "github_run": "37568937127",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "1ebf6dfa1797f7da875afc332fec742f5f46ec88"
+    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",
