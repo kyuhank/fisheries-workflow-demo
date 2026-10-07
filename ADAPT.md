@@ -36,13 +36,18 @@ configuration defines the calculations; the service requires a separate deployme
 
 ## Separate analyst repositories
 
-The demo keeps all jobs in one repository to make inspection and downloads easy.
-An assessment programme could maintain each analyst's task in its own repository.
-The coordinator would retrieve the selected source version for each job and pass
-identified outputs between repositories. Analysts would agree on input products,
-units, years and checks. Records would retain the contributing source versions,
-container digests and upstream runs. A shared service must implement
-these connections and the programme's access controls.
+The [job guide](jobs/README.md#separate-repositories) follows a concrete CPUE →
+preparation → assessment handover. The
+[illustrative catalogue](examples/analyst-repositories.yaml) gives each analyst's
+repository a source commit and identifies the shared code, container and artifacts.
+Its values are placeholders; the current coordinator does not read this YAML.
+[`workflow/jobs.json`](workflow/jobs.json) remains the executable configuration.
+
+A service would need to retrieve the pinned source and shared dependencies,
+transfer artifacts and verify their checksums, check fields, units and years,
+and assemble each job's `context`. It would then run the job through an approved
+execution route and preserve outputs and records. Repository access, artifact
+storage and these adapters require implementation and validation.
 
 ## Change the example
 
