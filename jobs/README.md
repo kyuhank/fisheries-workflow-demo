@@ -41,7 +41,44 @@ inputs, starts ready jobs through `workflow/Makefile`, and saves their outputs a
 records before dependent jobs continue. The configuration also declares parallel
 groups and manual handovers. The demo reads JSON with Python's standard library.
 
+The R entry points use the named inputs supplied by the coordinator:
+
+```r
+# jobs/cpue_a/run.R
+calculate <- function(context) {
+  cpue(context$parents$extract$sets, vessel_effect = TRUE,
+       min_hooks = context$settings$min_hooks_a)
+}
+
+# jobs/prepare_a/run.R
+calculate <- function(context) {
+  prepare_inputs(context$parents$cpue_a$series, context$parents$extract$catch)
+}
+
+# jobs/assessment_a1/run.R
+calculate <- function(context) {
+  assessment(context$parents$prepare_a$rows, r = 0.25)
+}
+```
+
+These are three separate files. The driver loads their shared functions from
+`workflow/r/` and supplies `context`; a copied `run.R` is not standalone.
+
 ## Follow the jobs
+
+The four tasks exchange the following files. The job guides below identify the
+individual jobs and their input records.
+
+| Task | Receives | Produces |
+| --- | --- | --- |
+| Data preparation | Supplied fishing records and annual catches | `extract/output.json`: fishing `sets` for CPUE and annual `catch` for assessment preparation |
+| CPUE analysis | Extracted fishing `sets` | `cpue_a/output.json` and `cpue_b/output.json`: index `series` for assessment preparation |
+| Stock assessment | CPUE indices and annual catches | `output.json` from `assessment_a1`, `assessment_a2`, `assessment_b1` and `assessment_b2`: four fitted cases for MSE preparation |
+| Management strategy evaluation | Four fitted assessment cases | `mse_summary/output.json`: management-trial comparisons for the MSE report |
+
+These paths are relative to `runs/`. Each receiving job records the producer's
+run and file checksum. The live example keeps the tasks in one repository;
+the [separate-repository example](#separate-repositories) describes their handover.
 
 ### Data preparation
 
@@ -136,25 +173,23 @@ uses these surrounding dependencies.
 
 ## Separate repositories
 
-This downloadable example keeps the jobs together. An operational workflow could
-place data preparation, CPUE analysis, assessment and MSE in repositories maintained
-by their respective teams, or give an individual job its own repository. The
-analytical dependencies would still determine which output each job needs. Shared
-calculation libraries would also need a recorded version or a preserved copy.
+The demo keeps one repository for convenient inspection and download. In an
+assessment programme, analysts could maintain CPUE, input preparation and
+assessment in their own repositories. The same handover would apply:
 
-A shared orchestration service would use a job catalogue to resolve each job to
-its repository and exact revision, execution command and software environment.
-When an upstream job finishes, it would make its output available at a versioned
-artifact location, record its checksum and check the expected names, units and
-coverage before releasing the dependent job. Each result would retain the exact
-input artifact references and source revisions; an upstream revision could then
-invalidate only the affected results. A moving branch name alone would not identify
-the code or inputs used by a previous result.
+| Analyst's task | Reads | Produces |
+| --- | --- | --- |
+| CPUE: `cpue_a` | Fishing `sets` from `extract` | Index `series`: `year`, `index` |
+| Preparation: `prepare_a` | CPUE `series` and annual `catch` from `extract` | Joined `rows`: `year`, `index`, `catch_t` |
+| Assessment: `assessment_a1` | Prepared `rows` | Fit, biomass series and diagnostics |
 
-The demo currently executes folders in one repository. Connecting independent
-repositories would require the service to check out code, transfer artifacts,
-control access and use approved execution routes. The folder structure shows
-where those job boundaries would lie.
+The index is relative; `catch_t` is in tonnes. The receiving job needs the expected
+fields and annual coverage. Each run would retain its full source commit, container
+image digest, settings, and each input artifact's producer run, preserved location
+and SHA-256 checksum. Shared R libraries and supporting code must also have pinned,
+preserved source alongside the software image.
 
-See [ADAPT.md](../ADAPT.md) for adding a job, and
-[cloud/README.md](../cloud/README.md) for the current hosted execution.
+[ADAPT.md](../ADAPT.md#separate-analyst-repositories) describes the service needed
+for this arrangement and links an illustrative catalogue. Independent repository
+execution is not implemented or tested in this demo. See
+[cloud/README.md](../cloud/README.md) for its current hosted execution.

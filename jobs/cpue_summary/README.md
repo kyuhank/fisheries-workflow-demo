@@ -2,7 +2,7 @@
 
 Collect the two fitted CPUE series for comparison without fitting another model.
 
-Analyst role: CPUE analyst. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+Analyst role: CPUE analyst. The entry point is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
 
 ## Inputs and settings
 

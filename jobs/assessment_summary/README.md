@@ -2,7 +2,7 @@
 
 Compare the four fixed-growth Schaefer sensitivity cases, their biomass trajectories and fit diagnostics.
 
-Analyst role: Assessment analyst. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+Analyst role: Assessment analyst. The entry point is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
 
 ## Inputs and settings
 
