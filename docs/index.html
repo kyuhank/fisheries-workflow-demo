@@ -106,6 +106,8 @@ h1 {
   font-size: 15px;
   color: var(--muted);
   margin: 0;
+  max-width: 75ch;
+  line-height: 1.5;
 }
 .header-links {
   display: flex;
@@ -2062,19 +2064,19 @@ dialog iframe {
         <div>
           <h1>Fisheries workflow demonstration</h1>
           <p
-            class="intro">Run connected analyses with synthetic data and simplified models. Trace results from data to assessment and management strategy evaluation.</p>
+            class="intro">Repeat earlier analyses to build on prior work or examine advice. Follow catch per unit effort (CPUE) indices into assessment and assessment results into management strategy evaluation (MSE), using synthetic data and simplified models.</p>
         </div>
         <div
           class="header-links"><button id="example" class="quiet">Example report</button><a id="offline-download" href="offline.html" download="fisheries-workflow-example.html">Download saved example</a><a href="https://github.com/kyuhank/fisheries-workflow-demo" target="_blank" rel="noopener">Code &amp; download ↗</a></div>
       </header>
       <section class="controls"
         aria-label="Analysis settings">
-        <label>Run mode<select id="mode" aria-describedby="mode-help"><option value="cloud" selected>Live run</option><option value="saved">View example</option></select><small id="mode-help">New results in the recorded container on GitHub.</small></label>
-        <label>Connection<select id="handover" aria-describedby="handover-help"><option value="connected">Connected workflow</option><option value="manual">Manual handover</option></select><small id="handover-help">Pass recorded inputs automatically.</small></label>
+        <label>Run mode<select id="mode" aria-describedby="mode-help"><option value="cloud" selected>Live run</option><option value="saved">View example</option></select><small id="mode-help">Run analyses on GitHub with recorded software.</small></label>
+        <label>Input transfer<select id="handover" aria-describedby="handover-help"><option value="connected">Automatic file transfer</option><option value="manual">Manual handover</option></select><small id="handover-help">Pass recorded inputs automatically.</small></label>
         <label>Data snapshot<select id="snapshot" aria-describedby="snapshot-help"><option>2021</option><option>2022</option><option selected>2023</option><option>2024</option></select><small id="snapshot-help">Records through this year.</small></label>
         <label>CPUE A records<select id="filter" aria-describedby="filter-help"><option value="0">All valid effort</option><option value="1200">At least 1,200 hooks</option></select><small id="filter-help">Filter the records used by A.</small></label>
-        <label>Growth rate setting 2<select id="growth-rate" aria-describedby="growth-rate-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="growth-rate-help">Applies to assessments A2 and B2.</small></label>
-        <label>MSE catch buffer<select id="mse-buffer" aria-describedby="mse-buffer-help"><option value="0.6">60% of stepped target</option><option value="0.8" selected>80% of stepped target</option><option value="1">100% of stepped target</option></select><small id="mse-buffer-help">Index thresholds set the target; annual advice limit ±15%.</small></label>
+        <label>Growth rate setting 2<select id="growth-rate" aria-describedby="growth-rate-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="growth-rate-help">Fixed growth assumption in assessments A2 and B2.</small></label>
+        <label>MSE catch buffer<select id="mse-buffer" aria-describedby="mse-buffer-help"><option value="0.6">60% of stepped target</option><option value="0.8" selected>80% of stepped target</option><option value="1">100% of stepped target</option></select><small id="mse-buffer-help">Buffer the stepped catch target, then limit annual catch-request changes to ±15%.</small></label>
         <button id="reset" class="quiet" disabled>Start afresh</button></section>
       <aside id="mode-notice" class="mode-notice" role="status" hidden><div><strong>Showing the saved example</strong><p id="mode-notice-message"></p></div><button id="dismiss-mode-notice" class="quiet" aria-label="Dismiss mode notice">Dismiss ×</button></aside>
       <section class="status" id="status"
@@ -2082,7 +2084,7 @@ dialog iframe {
       <nav class="tabs"
         aria-label="View"><button class="active" data-tab="workflow" aria-selected="true">Workflow diagram</button><button data-tab="jobs" aria-selected="false">Orchestration tool</button><span id="completion"></span></nav>
       <section class="view-guide" aria-labelledby="view-guide-title">
-        <div><h2 id="view-guide-title">Follow the analytical connections</h2><p id="view-guide-description">The diagram shows which analyses provide inputs to others. Use the Orchestration tool to run the same connected jobs and inspect their responsibilities, progress and records.</p></div>
+        <div><h2 id="view-guide-title">Follow results into later analyses</h2><p id="view-guide-description">Arrows show which results become inputs. Open a result, then use Inputs &amp; versions to trace the earlier analyses it used.</p></div>
         <a id="view-guide-link" href="#orchestration">Open Orchestration tool <span aria-hidden="true">→</span></a>
       </section>
       <section id="handover-note" class="handover-note"
@@ -2090,7 +2092,7 @@ dialog iframe {
       <section id="handover-panel" class="handover-panel" hidden
         aria-live="polite"><div><strong id="handover-title">Waiting for a file transfer</strong><p id="handover-message">Click Confirm file transfer to continue.</p></div><button id="transfer-files">Confirm file transfer →</button><button id="connect-workflow" class="quiet">Connect automatically</button></section>
       <section
-        class="selection" id="run-controls"><div><span class="eyebrow" id="selection-label">Start from</span><h2 id="selection-title">Data submission</h2><p id="selection-description">Submit records, check them and run the connected analyses.</p><p id="reuse-message" class="reuse"></p></div><div class="run-actions"><button id="run" class="primary" disabled>Run full workflow <span aria-hidden="true">→</span></button><button id="run-workflow" class="quiet" hidden>Run workflow</button></div></section>
+        class="selection" id="run-controls"><div><span class="eyebrow" id="selection-label">Start from</span><h2 id="selection-title">Data submission</h2><p id="selection-description">Submit catch and effort records, then run CPUE analysis, assessment and MSE.</p><p id="reuse-message" class="reuse"></p></div><div class="run-actions"><button id="run" class="primary" disabled>Run full workflow <span aria-hidden="true">→</span></button><button id="run-workflow" class="quiet" hidden>Run workflow</button></div></section>
       <section id="workflow-view" class="modules"
         aria-label="Connected workflow"></section>
       <section id="jobs-view" hidden>
@@ -2110,7 +2112,7 @@ dialog iframe {
           </aside>
           <div class="workspace-content">
             <div
-              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Tasks</h2><p id="workspace-description">Select a task to inspect its jobs, example analyst roles and execution records.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
+              class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Tasks</h2><p id="workspace-description">Select a task to see its analyses and results.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
             <div id="tasks" class="task-list"></div>
             <section id="dependencies-view" aria-label="Direct job dependencies" hidden>
               <div class="dependency-toolbar"><label for="dependency-job">Inspect a job<select id="dependency-job" aria-describedby="dependency-help"></select></label><p id="dependency-help">Browse the jobs that provide inputs and use the result. Your run selection stays the same.</p></div>
@@ -3443,9 +3445,9 @@ function renderTasks() {
     : workspaceView === "dependencies" ? "Follow a job’s connections"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "Select a task to inspect its jobs, example analyst roles and execution records."
-    : workspaceView === "dependencies" ? "Required inputs connect each job to the analyses that use its output."
-    : "Follow required inputs; open the output or its recorded inputs and versions.";
+    ? "Select a task to see its analyses and results."
+    : workspaceView === "dependencies" ? "See the earlier results a job needs and the later analyses that use it."
+    : "Open Output for a result or Record for the inputs and versions it used.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
   $("show-tasks").classList.toggle("active", workspaceView === "tasks");
@@ -3716,14 +3718,14 @@ function render() {
     ? "Confirming transfer…"
     : "Confirm file transfer →";
   const manual = $("handover").value === "manual" && mode !== "saved";
-  document.querySelector('[data-tab="jobs"]').textContent = manual ? "Job outputs" : "Orchestration tool";
+  document.querySelector('[data-tab="jobs"]').textContent = "Orchestration tool";
   document.querySelector('.workspace-brand .eyebrow').textContent = manual ? "Manual handover" : "Orchestration";
   document.querySelector('.workspace-brand strong').textContent = manual ? "Job outputs" : "Analysis workspace";
   document.querySelector('.workspace-nav').setAttribute('aria-label', manual
     ? "Job outputs navigation" : "Orchestration navigation");
   if (manual) $("workspace-description").textContent = workspaceView === "dependencies"
     ? "These connections show the files passed between analysts. Manual handovers require confirmation."
-    : "This mode simulates manual handovers between analysts. Inspect their jobs and records, then confirm a handover to continue receiving jobs.";
+    : "Inspect results and records; confirm a file transfer when an analysis is waiting.";
   renderViewGuide();
   for (const id of ["snapshot", "filter", "growth-rate", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
@@ -4044,20 +4046,20 @@ function renderViewGuide() {
   const manual = $("handover").value === "manual" && mode !== "saved";
   $("view-guide-title").textContent = orchestration
     ? manual ? "Follow a manual handover"
-    : mode === "saved" ? "Inspect the saved jobs"
-    : "Coordinate jobs and follow an update"
-    : "Follow the analytical connections";
+    : mode === "saved" ? "Inspect results and their inputs"
+    : "Run analyses and follow an update"
+    : "Follow results into later analyses";
   $("view-guide-description").textContent = orchestration
     ? manual
-      ? "This mode simulates manual handovers between analysts. Inspect responsibilities and job records, and confirm a handover when a receiving analysis is waiting."
+      ? "Receiving analyses wait for Confirm file transfer; other ready jobs can continue. Open Output or Record to inspect a result."
       : mode === "saved"
-      ? "Tasks group the saved jobs by analysis. Select a task and open Output or Record to inspect results and their sources. View example runs no analyses; choose Live run on the website to execute jobs and follow their progress."
-      : "Run the workflow, then change a setting and choose Update workflow. The tool starts ready jobs, shows their progress and any failures, and keeps the records of both new and reused results. Open Output or Record to inspect a job."
+      ? "Explore saved results by task. Open Output to read a result or Record to follow its inputs, code and software."
+      : "Run the workflow, change a setting, then choose Update workflow. Affected jobs rerun; unchanged results keep their original records."
     : manual
-      ? "The diagram shows the connections between analyses. Manual handover simulates transfers between analysts: receiving jobs wait for confirmation while other ready jobs can continue."
+      ? "Arrows show the results passed between analysts. Confirm each file transfer to continue the receiving analyses."
       : mode === "saved"
-      ? "The diagram shows which jobs supply inputs to others. View example displays saved results. Open the Orchestration tool to inspect each job and its records; choose Live run on the website to execute the workflow."
-      : "The diagram shows which jobs supply inputs to others. The Orchestration tool uses these connections to start ready jobs and follow their progress. Change CPUE A records, then choose Update workflow to see which analyses rerun.";
+      ? "Explore saved results: CPUE indices feed assessments, whose results inform MSE. Open a result, then use Inputs & versions to trace the earlier results it used."
+      : "Arrows show which results become inputs to later analyses. Change CPUE A records and choose Update workflow to follow the effect through assessment and MSE.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
   $("view-guide-link").textContent = orchestration ? "See workflow diagram →"
     : manual ? "Inspect job outputs →" : "Open Orchestration tool →";
@@ -4255,8 +4257,8 @@ $("save-output").onclick = () =>
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"
-    ? "New results in the recorded container on GitHub."
-    : "Saved container results; does not run code.";
+    ? "Run analyses on GitHub with recorded software."
+    : "Browse saved results; does not run code.";
 }
 
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
@@ -4309,8 +4311,8 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     messages.length = 0;
     payload.saved.events.forEach(log);
     status("", "Saved results", location.protocol === "file:"
-      ? "Browse the saved reports and records without internet. Open the website for a new container run."
-      : "Open a job’s report and record, or choose Live run for a new container execution.");
+      ? `${Object.keys(records).length} completed jobs. Browse their reports and records offline.`
+      : `${Object.keys(records).length} completed jobs. Choose Live run to repeat or update the analyses.`);
   } else if (unresolvedLive) {
     showError(Object.assign(Error("The previous live run has an unresolved outcome."), {
       executionUnknown: true,
@@ -4576,8 +4578,8 @@ function renderRecord() {
       "record-note",
       unavailable ||
         (mode === "saved"
-          ? "This is a saved example. Select a calculation mode to run new results."
-          : "Reruns the full workflow with the recorded settings and compares this output with the original."),
+          ? "To repeat this analysis, download this run and follow REPRODUCE.txt, or choose Live run on the website."
+          : "Repeats the workflow with recorded settings and compares this result with the original."),
     ),
   );
   const details = uiElement("details", "record-details");

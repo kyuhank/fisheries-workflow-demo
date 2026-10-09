@@ -207,8 +207,8 @@ function renderRecord() {
       "record-note",
       unavailable ||
         (mode === "saved"
-          ? "This is a saved example. Select a calculation mode to run new results."
-          : "Reruns the full workflow with the recorded settings and compares this output with the original."),
+          ? "To repeat this analysis, download this run and follow REPRODUCE.txt, or choose Live run on the website."
+          : "Repeats the workflow with recorded settings and compares this result with the original."),
     ),
   );
   const details = uiElement("details", "record-details");

@@ -772,9 +772,9 @@ function renderTasks() {
     : workspaceView === "dependencies" ? "Follow a job’s connections"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "Select a task to inspect its jobs, example analyst roles and execution records."
-    : workspaceView === "dependencies" ? "Required inputs connect each job to the analyses that use its output."
-    : "Follow required inputs; open the output or its recorded inputs and versions.";
+    ? "Select a task to see its analyses and results."
+    : workspaceView === "dependencies" ? "See the earlier results a job needs and the later analyses that use it."
+    : "Open Output for a result or Record for the inputs and versions it used.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
   $("show-tasks").classList.toggle("active", workspaceView === "tasks");
@@ -1045,14 +1045,14 @@ function render() {
     ? "Confirming transfer…"
     : "Confirm file transfer →";
   const manual = $("handover").value === "manual" && mode !== "saved";
-  document.querySelector('[data-tab="jobs"]').textContent = manual ? "Job outputs" : "Orchestration tool";
+  document.querySelector('[data-tab="jobs"]').textContent = "Orchestration tool";
   document.querySelector('.workspace-brand .eyebrow').textContent = manual ? "Manual handover" : "Orchestration";
   document.querySelector('.workspace-brand strong').textContent = manual ? "Job outputs" : "Analysis workspace";
   document.querySelector('.workspace-nav').setAttribute('aria-label', manual
     ? "Job outputs navigation" : "Orchestration navigation");
   if (manual) $("workspace-description").textContent = workspaceView === "dependencies"
     ? "These connections show the files passed between analysts. Manual handovers require confirmation."
-    : "This mode simulates manual handovers between analysts. Inspect their jobs and records, then confirm a handover to continue receiving jobs.";
+    : "Inspect results and records; confirm a file transfer when an analysis is waiting.";
   renderViewGuide();
   for (const id of ["snapshot", "filter", "growth-rate", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
@@ -1373,20 +1373,20 @@ function renderViewGuide() {
   const manual = $("handover").value === "manual" && mode !== "saved";
   $("view-guide-title").textContent = orchestration
     ? manual ? "Follow a manual handover"
-    : mode === "saved" ? "Inspect the saved jobs"
-    : "Coordinate jobs and follow an update"
-    : "Follow the analytical connections";
+    : mode === "saved" ? "Inspect results and their inputs"
+    : "Run analyses and follow an update"
+    : "Follow results into later analyses";
   $("view-guide-description").textContent = orchestration
     ? manual
-      ? "This mode simulates manual handovers between analysts. Inspect responsibilities and job records, and confirm a handover when a receiving analysis is waiting."
+      ? "Receiving analyses wait for Confirm file transfer; other ready jobs can continue. Open Output or Record to inspect a result."
       : mode === "saved"
-      ? "Tasks group the saved jobs by analysis. Select a task and open Output or Record to inspect results and their sources. View example runs no analyses; choose Live run on the website to execute jobs and follow their progress."
-      : "Run the workflow, then change a setting and choose Update workflow. The tool starts ready jobs, shows their progress and any failures, and keeps the records of both new and reused results. Open Output or Record to inspect a job."
+      ? "Explore saved results by task. Open Output to read a result or Record to follow its inputs, code and software."
+      : "Run the workflow, change a setting, then choose Update workflow. Affected jobs rerun; unchanged results keep their original records."
     : manual
-      ? "The diagram shows the connections between analyses. Manual handover simulates transfers between analysts: receiving jobs wait for confirmation while other ready jobs can continue."
+      ? "Arrows show the results passed between analysts. Confirm each file transfer to continue the receiving analyses."
       : mode === "saved"
-      ? "The diagram shows which jobs supply inputs to others. View example displays saved results. Open the Orchestration tool to inspect each job and its records; choose Live run on the website to execute the workflow."
-      : "The diagram shows which jobs supply inputs to others. The Orchestration tool uses these connections to start ready jobs and follow their progress. Change CPUE A records, then choose Update workflow to see which analyses rerun.";
+      ? "Explore saved results: CPUE indices feed assessments, whose results inform MSE. Open a result, then use Inputs & versions to trace the earlier results it used."
+      : "Arrows show which results become inputs to later analyses. Change CPUE A records and choose Update workflow to follow the effect through assessment and MSE.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
   $("view-guide-link").textContent = orchestration ? "See workflow diagram →"
     : manual ? "Inspect job outputs →" : "Open Orchestration tool →";
@@ -1584,8 +1584,8 @@ $("save-output").onclick = () =>
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"
-    ? "New results in the recorded container on GitHub."
-    : "Saved container results; does not run code.";
+    ? "Run analyses on GitHub with recorded software."
+    : "Browse saved results; does not run code.";
 }
 
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
@@ -1638,8 +1638,8 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     messages.length = 0;
     payload.saved.events.forEach(log);
     status("", "Saved results", location.protocol === "file:"
-      ? "Browse the saved reports and records without internet. Open the website for a new container run."
-      : "Open a job’s report and record, or choose Live run for a new container execution.");
+      ? `${Object.keys(records).length} completed jobs. Browse their reports and records offline.`
+      : `${Object.keys(records).length} completed jobs. Choose Live run to repeat or update the analyses.`);
   } else if (unresolvedLive) {
     showError(Object.assign(Error("The previous live run has an unresolved outcome."), {
       executionUnknown: true,

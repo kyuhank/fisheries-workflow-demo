@@ -2,10 +2,11 @@
 
 [Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Orchestration tool](https://kyuhank.github.io/fisheries-workflow-demo/#orchestration) · [Download](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
-Follow a change in fishing records through CPUE analysis, stock assessment and
-management strategy evaluation (MSE). Inspect the inputs, code and software behind
-each result, then rerun the affected analyses. Synthetic data and simple models
-make the connections easy to explore; the results provide no advice for a real fishery.
+Reproduce earlier analyses before building on them or reviewing the basis of
+advice. Follow catch per unit effort (CPUE) indices through stock assessment into
+management strategy evaluation (MSE), tracing the inputs, code and software
+behind each result. The synthetic data and simplified models illustrate the
+process; they provide no advice for a real fishery.
 
 ## Run the demo
 
@@ -24,13 +25,18 @@ The **Workflow diagram** shows the inputs passed between analyses. The
 **Orchestration tool** uses these connections to start jobs when their inputs are
 ready. Its task view groups related jobs and shows progress and execution records.
 
-1. Choose **Live run** and complete **Run full workflow**.
-2. Change **CPUE A records**, **Growth-rate setting 2** or **MSE catch buffer**.
-3. Select **Update workflow**. Affected jobs rerun; unchanged results keep their records.
-4. Under **Tasks**, select a job and open **Record** to follow its inputs and versions.
+1. Choose **View example** to explore the 22 completed jobs.
+2. Under **Tasks**, select an analysis. Open **Output** to read its result or
+   **Record** to follow the exact earlier results it used.
+3. Choose **Live run**, then **Run full workflow** to repeat the analyses.
+4. Change **CPUE A records**, **Growth rate setting 2** or **MSE catch buffer**,
+   then choose **Update workflow**. Affected jobs rerun; unchanged results keep
+   their records.
 
 **Run** executes one selected job after preparing its required inputs.
-**Dependencies** shows connected jobs; **Reproduce & compare** checks a result.
+**Dependencies** shows inputs and later analyses. **Reproduce & compare** repeats
+the workflow with recorded settings and compares the selected result with its
+saved reference.
 **Manual handover** pauses a transfer until **Confirm file transfer** is selected,
 while independent jobs continue. No file upload is required in this example.
 
@@ -38,7 +44,7 @@ while independent jobs continue. No file upload is required in this example.
 
 Start with [jobs/](jobs/README.md), which lists all 22 jobs in execution order.
 Each folder contains an R entry point and a short guide to its inputs, settings
-and outputs. [CPUE A](jobs/cpue_a/README.md), for example, reads fishing records,
+and outputs. [CPUE A](jobs/cpue_a/README.md), for example, reads catch and effort records,
 produces an index and supplies [assessment preparation A](jobs/prepare_a/README.md).
 The demo's **Record** view links to the corresponding job folder.
 
