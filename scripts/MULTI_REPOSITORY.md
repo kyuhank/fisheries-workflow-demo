@@ -70,7 +70,7 @@ Successful conformance does not approve model adequacy,
 management advice, operational adoption or a performance improvement.
 
 
-For the authorised continuation, supply the corrected MR-04 snapshot and a fresh
+For an explicit checkpoint continuation, supply the corrected MR-04 snapshot and a fresh
 output directory. Append these explicit checkpoint options to the command above:
 
 ```sh
@@ -93,11 +93,13 @@ bytes and existing-output comparisons, and records explicit import provenance.
 The failed first MR-04 remains linked through its immutable prior receipt;
 continuation is selected by the parent and never happens automatically.
 
-Publish an offline companion with the exact first six output/source directories,
-original FAILED `evidence.json`, its original coordinator origin, the mono
-reference/manifest, the corrected MR-04 and deliberate MR-08 component snapshots,
-and the separately pinned new coordinator closure. Keep each invocation's raw
-receipts unchanged. The preserved SPC image has no Git executable; the eight
+The public companion supplies the mono reference/manifest, both component
+variants and a pinned coordinator closure for a fresh18-attempt repetition.
+It excludes checkpoint outputs and administrative execution records. Optional
+continuation additionally requires the separately preserved first six output
+directories, original FAILED receipt and original coordinator origin. Those raw
+checkpoint files belong to a separate recovery archive. Keep each invocation's
+raw receipts unchanged. The preserved SPC image has no Git executable; the eight
 Git-checkout software fixtures are explicitly skipped there, while two Git-free
 inventory/identity checks remain active. Their Git-backed host checks are separate
 from the actual snapshot/R evidence and from scientific review.
