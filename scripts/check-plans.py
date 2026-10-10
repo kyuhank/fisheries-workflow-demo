@@ -1,4 +1,8 @@
-"""Compare live run previews with the Python scheduler for each job and scope."""
+"""Compare live previews and scheduler scopes using explicit software fixtures.
+
+The minimal CoordinatorWorkflow doubles select monorepo compatibility here;
+this planning check performs no numerical or scientific input-contract validation.
+"""
 import asyncio
 import json
 from pathlib import Path
@@ -13,7 +17,8 @@ from tests.coordinator_fixtures import CoordinatorWorkflow as Workflow
 
 
 async def scenarios(directory):
-    runner = Workflow(directory)
+    runner = Workflow(directory, source_lock=False)
+    assert not runner.sources.multi_repository, 'Planning doubles require explicit compatibility mode'
     cases = []
 
     def save(label):
