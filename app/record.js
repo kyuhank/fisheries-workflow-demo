@@ -53,7 +53,7 @@ function renderRecord() {
     panel.append(banner);
   }
   const cards = uiElement("div", "record-cards");
-  const source = record.source || {};
+  const source = record.analysis_source || record.source || {};
   const software = record.software || {};
   const image = record.execution?.container || software.container;
   for (
@@ -104,7 +104,7 @@ function renderRecord() {
   const repository = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/.test(source.repository || "")
     ? source.repository : "https://github.com/kyuhank/fisheries-workflow-demo";
   const recordedRevision = /^[a-f0-9]{40}$/.test(source.commit || "") &&
-      Object.hasOwn(record.code || {}, `jobs/${key}/run.R`) ? source.commit : null;
+      (record.analysis_source?.sha256 || Object.hasOwn(record.code || {}, `jobs/${key}/run.R`)) ? source.commit : null;
   const jobSource = uiElement("a", "record-source",
     recordedRevision ? "Job code & guide ↗" : "Current job code & guide ↗");
   const jobRepository = recordedRevision ? repository : "https://github.com/kyuhank/fisheries-workflow-demo";

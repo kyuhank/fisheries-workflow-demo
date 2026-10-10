@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from workflow.spec import HANDOVERS, SPEC, STAGES
 from workflow.r_bridge import RBridge
-from workflow.engine import FROZEN_SOURCE
+from workflow.engine import source_payload, FROZEN_SOURCE
 
 CONFIG = json.loads((ROOT / 'cloud/config.json').read_text())
 BASE = CONFIG['url'].rstrip('/')
@@ -142,6 +142,12 @@ def check_identity(run, value, previous):
         assert record['run_id'] == value['run_id'], 'Job has a different analysis run identity.'
         assert record['source'] == {'repository': 'https://github.com/' + REPOSITORY,
                                     'commit': commit}, 'Recorded source differs.'
+        if record.get('analysis_source'):
+            from workflow.sources import SourceResolver
+            resolver = SourceResolver(ROOT)
+            assert record['analysis_source'] == resolver.origin(key), 'Component source differs.'
+            for name, origin in resolver.code_sources(key).items():
+                assert record['code_sources'][name] == origin, 'Loaded component source bytes differ.'
     for key in value['retained']:
         assert previous is not None, 'Fresh session unexpectedly retained a result.'
         assert value['records'][key] == previous['records'][key], 'Retained record changed: ' + key
@@ -294,8 +300,8 @@ def reproduce(session, value, job=None):
             for name, checksum in manifest.items():
                 assert hashlib.sha256(archive.read(name)).hexdigest() == checksum, 'Bundle checksum mismatch.'
                 if not name.startswith('reference/') and name not in ('settings.json', FROZEN_SOURCE):
-                    source = ROOT / name
-                    assert source.is_file() and hashlib.sha256(source.read_bytes()).hexdigest() == checksum, 'Bundle source differs from the checked checkout.'
+                    source = source_payload().get(name)
+                    assert source is not None and hashlib.sha256(source).hexdigest() == checksum, 'Bundle source differs from the checked checkout.'
             state = json.loads(archive.read('reference/state.json'))
             assert state['records'] == value['records'], 'Bundle records differ from completed execution.'
             assert state['settings'] == value['settings'], 'Bundle settings differ from completed execution.'

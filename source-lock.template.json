@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "repositories": {
+    "cpue": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+      "commit": "c1c12a04c51d5677ae50747f30f774d2f6a0d69c",
+      "checkout": "components/cpue",
+      "jobs": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report"
+      ]
+    },
+    "assessment": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
+      "commit": "86374e31b4de5bd65d19e772b78b788d55a3a8de",
+      "checkout": "components/assessment",
+      "jobs": [
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report"
+      ]
+    },
+    "mse": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
+      "commit": "9d733ca29c3008deea79b76e127c8e412efe1b5d",
+      "checkout": "components/mse",
+      "jobs": [
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ]
+    }
+  },
+  "libraries": {
+    "cpue": {
+      "repository": "cpue",
+      "path": "R/cpue.R"
+    },
+    "assessment": {
+      "repository": "assessment",
+      "path": "R/assessment.R"
+    },
+    "mse": {
+      "repository": "mse",
+      "path": "R/mse.R"
+    }
+  }
+}

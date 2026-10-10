@@ -64,15 +64,23 @@ workflow_execute_json <- function(input_json, root = getwd()) {
   context <- jsonlite::fromJSON(input_json, simplifyVector = FALSE)
   key <- context$key
   if (length(key) != 1L || !grepl("^[a-z][a-z0-9_]+$", key)) stop("Invalid job key")
-  job <- file.path(root, "jobs", key, "run.R")
-  if (!file.exists(job)) stop("Missing R job source: ", key)
+  sources <- context$sources
+  if (is.null(sources)) {
+    job <- file.path(root, "jobs", key, "run.R")
+    shared <- c(file.path(root, "workflow", "r", "common.R"),
+                file.path(root, "workflow", "r", "models.R"),
+                file.path(root, "workflow", "r", "mse.R"))
+  } else {
+    job <- sources$job
+    shared <- unlist(sources$libraries, use.names = FALSE)
+    if (!is.character(job) || length(job) != 1L || !length(shared) ||
+        normalizePath(shared[1], mustWork = TRUE) !=
+        normalizePath(file.path(root, "workflow", "r", "common.R"), mustWork = TRUE)) {
+      stop("Invalid resolved source contract")
+    }
+  }
+  if (!file.exists(job) || !all(file.exists(shared))) stop("Missing resolved R source")
   environment <- new.env(parent = globalenv())
-  shared <- list.files(file.path(root, "workflow", "r"), pattern = "\\.R$", full.names = TRUE)
-  common <- file.path(root, "workflow", "r", "common.R")
-  if (!common %in% shared) stop("Missing shared R contract")
-  shared <- c(common, file.path(root, "workflow", "r", "models.R"),
-              file.path(root, "workflow", "r", "mse.R"))
-  if (!all(file.exists(shared))) stop("Missing shared R source")
   for (path in shared) source(path, local = environment, echo = FALSE)
   source(job, local = environment, echo = FALSE)
   if (!is.function(environment$calculate)) stop("R job does not define calculate(context)")

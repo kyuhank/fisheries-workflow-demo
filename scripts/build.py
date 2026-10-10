@@ -12,7 +12,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from workflow.engine import Workflow, job_files, calculation_files
+from workflow.engine import Workflow, source_payload
 from workflow.r_bridge import RBridge
 from workflow.spec import SPEC
 
@@ -57,15 +57,10 @@ def build():
         shutil.rmtree(example_dir, ignore_errors=True)
         shutil.copytree(runner.directory, example_dir)
         (example_dir/'index.html').write_text('<!doctype html><html lang="en-NZ"><meta charset="utf-8"><title>Saved workflow example</title><style>body{font:17px/1.6 system-ui;max-width:850px;margin:50px auto;padding:0 24px}a{color:#1779a0}li{margin:12px 0}</style><h1>Saved workflow example</h1><p>These outputs were calculated when this version was built. Open them without running code or connecting to the internet.</p><ol>' + ''.join(f'<li><a href="{key}/report.html">{job["title"]}</a> — {job["description"]}</li>' for key, job in SPEC.items()) + '</ol><p><a href="../index.html">Open the interactive demo</a></p></html>')
-    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *calculation_files(), *ROOT.glob('data/*'),
-             *ROOT.glob('tests/*.py'), *ROOT.glob('tests/*.R'), *ROOT.glob('cloud/*.py'), *ROOT.glob('vendor/analysis/*')]
-    files += [ROOT/name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json']]
-    files += [ROOT/'scripts/generate-data.R', ROOT/'scripts/import-r-data.py']
-    files += job_files() + [ROOT/'ADAPT.md', ROOT/'cloud/README.md',
-                           ROOT/'examples/analyst-repositories.yaml']
+    files = source_payload(runner.sources)
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE'])
     payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'notices': notices,
-               'files': {str(p.relative_to(ROOT)):base64_file(p) for p in files},
+               'files': {name: base64.b64encode(data).decode() for name, data in files.items()},
                'calculationBackend': 'container', 'offlineMode': 'saved'}
     template = (ROOT/'app/index.html').read_text()
     inserts = {'CSS':(ROOT/'app/style.css').read_text(),

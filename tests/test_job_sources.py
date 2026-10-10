@@ -132,7 +132,7 @@ class JobSourceTests(unittest.TestCase):
                     self.assertEqual(archive.namelist().count(document), 1)
                     self.assertEqual(archive.read(document), data)
                     self.assertEqual(checksums[document], hashlib.sha256(data).hexdigest())
-                self.assertIn(b'status: illustration_only', archive.read(name))
+                self.assertIn(b'status: registered_sources', archive.read(name))
 
 
 if __name__ == '__main__':

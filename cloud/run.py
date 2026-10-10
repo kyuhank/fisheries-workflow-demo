@@ -27,10 +27,10 @@ _token, _expires = '', 0
 PARALLEL_JOBS = {key for stage in STAGES if len(stage) > 1 for key in stage}
 
 
-def calculate_independent_job(directory, key, settings, run_id):
+def calculate_independent_job(directory, key, settings, run_id, source_lock=None):
     if key not in PARALLEL_JOBS:
         raise ValueError('This job requires the workflow coordinator.')
-    runner = Workflow(directory)
+    runner = Workflow(directory, source_lock=source_lock)
     runner.configure(settings)
     return asyncio.run(runner.calculate(key, run_id))
 
@@ -162,7 +162,8 @@ class HostedWorkflow(Workflow):
             self.pool = ProcessPoolExecutor(max_workers=4,
                                             mp_context=multiprocessing.get_context('spawn'))
         return await asyncio.get_running_loop().run_in_executor(
-            self.pool, calculate_independent_job, str(self.directory), key, self.settings, run_id)
+            self.pool, calculate_independent_job, str(self.directory), key, self.settings, run_id,
+            str(self.sources.lock_path) if self.sources.lock_path else None)
 
     async def run(self, start='submission', scope='workflow'):
         try:

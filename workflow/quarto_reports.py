@@ -8,7 +8,7 @@ from .r_bridge import RBridge, make_command, process_environment, run_command
 REPORT_JOBS = {'cpue_report', 'assessment_report', 'mse_report'}
 
 
-def render_report(root, key, result, record, folder, result_html):
+def render_report(root, key, result, record, folder, result_html, source_path=None):
     destination = folder / 'report.html'
     if key not in REPORT_JOBS:
         destination.write_text(result_html)
@@ -20,7 +20,7 @@ def render_report(root, key, result, record, folder, result_html):
     if executable is None:
         raise RuntimeError('Quarto is required for native report jobs.')
     # Render recorded results without refitting the models.
-    source = root / 'jobs' / key / 'report.qmd'
+    source = source_path or root / 'jobs' / key / 'report.qmd'
     (folder / 'report.qmd').write_bytes(source.read_bytes())
     (folder / 'report-data.json').write_text(json.dumps({'result': result, 'record': record}, allow_nan=False))
     # Give Quarto writable XDG directories when Docker uses a non-root UID.

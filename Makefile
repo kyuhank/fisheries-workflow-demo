@@ -1,8 +1,10 @@
 .DEFAULT_GOAL := run
-.PHONY: run container job reproduce compare check html inside-run inside-job inside-reproduce inside-compare inside-check inside-html inside-live
+.PHONY: hydrate-sources run container job reproduce compare check html inside-run inside-job inside-reproduce inside-compare inside-check inside-html inside-live
 
 IMAGE := ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
 IMAGE_URL := https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow
+PAPER_SOURCE_MODE ?= multi-repository
+export PAPER_SOURCE_MODE
 OUTPUT ?= runs
 SETTINGS ?=
 JOB ?=
@@ -27,35 +29,38 @@ reproduce inside-reproduce: export SETTINGS = $(REPRO_SETTINGS)
 reproduce inside-reproduce: export START = $(or $(JOB),submission)
 reproduce inside-reproduce: export SCOPE = $(if $(JOB),job,workflow)
 
-run container job reproduce:
+hydrate-sources:
+	@if [ "$$PAPER_SOURCE_MODE" != monorepo ]; then python3 scripts/hydrate-sources.py --if-needed; fi
+
+run container job reproduce: hydrate-sources
 	@if [ "$$SCOPE" = job ] && [ -z "$$START" ]; then echo 'Use make job JOB=cpue_a' >&2; exit 1; fi
 	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
 	@set -e; mkdir -p "$$OUTPUT"; \
 	output=$$(cd "$$OUTPUT" && pwd); \
 	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
+		--env PAPER_SOURCE_MODE --env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
 		--env SETTINGS --env START --env SCOPE \
 		-v "$(CURDIR):/workspace:ro" -v "$$output:/outputs" -w /workspace \
 		$(IMAGE) make --no-print-directory --silent inside-run OUTPUT=/outputs
 
-compare:
+compare: hydrate-sources
 	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
 	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env REFERENCE --env RESULT --env JOB \
+		--env PAPER_SOURCE_MODE --env REFERENCE --env RESULT --env JOB \
 		-v "$(CURDIR):/workspace:ro" -w /workspace \
 		$(IMAGE) make --no-print-directory --silent inside-compare
 
-check:
+check: hydrate-sources
 	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
 	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
+		--env PAPER_SOURCE_MODE --env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
 		--env PAPER_NATIVE_INTEGRATION=1 -v "$(CURDIR):/workspace:ro" -w /workspace \
 		$(IMAGE) make --no-print-directory --silent inside-check
 
-html:
+html: hydrate-sources
 	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
 	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
+		--env PAPER_SOURCE_MODE --env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
 		-v "$(CURDIR):/workspace" -w /workspace \
 		$(IMAGE) make --no-print-directory --silent inside-html
 
@@ -72,7 +77,7 @@ inside-compare:
 inside-check:
 	@command -v make && make --version | head -n 1
 	@Rscript --vanilla tests/test-r-models.R
-	@python3 -m unittest discover -s tests -v
+	@PAPER_SOURCE_MODE=monorepo python3 -m unittest discover -s tests -v
 
 inside-html:
 	@python3 scripts/build.py

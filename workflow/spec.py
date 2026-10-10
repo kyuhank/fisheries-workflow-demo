@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import re
+from .sources import SourceResolver
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -20,6 +21,7 @@ def load_spec(path=ROOT / 'workflow/jobs.json'):
     if set(config) != {'jobs', 'defaults', 'stages', 'handovers'}:
         raise ValueError('Expected jobs, defaults, stages and handovers')
     fields = {'key', 'title', 'module', 'owner', 'parents', 'run', 'description'}
+    sources = None
     seen = set()
     for job in config['jobs']:
         key, parents = job.get('key', ''), job.get('parents', [])
@@ -27,7 +29,11 @@ def load_spec(path=ROOT / 'workflow/jobs.json'):
             raise ValueError(f'Invalid or duplicate job: {key}')
         if not isinstance(parents, list) or len(parents) != len(set(parents)) or not set(parents) <= seen:
             raise ValueError(f'Parents must be distinct preceding jobs: {key}')
-        if job['run'] != f'jobs/{key}/run.R' or not (ROOT / job['run']).is_file():
+        exists = (ROOT / job['run']).is_file() if isinstance(job.get('run'), str) else False
+        if not exists and job.get('run') == f'jobs/{key}/run.R':
+            sources = sources or SourceResolver(ROOT)
+            exists = sources.job_path(key).is_file()
+        if job['run'] != f'jobs/{key}/run.R' or not exists:
             raise ValueError(f'Missing or unexpected R entry point: {key}')
         if any(not isinstance(job[name], str) or not job[name].strip()
                for name in ['title', 'module', 'owner', 'description']):

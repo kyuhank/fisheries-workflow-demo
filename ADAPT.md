@@ -41,18 +41,13 @@ for images and containers.
 
 ## Separate analyst repositories
 
-The [job guide](jobs/README.md#separate-repositories) follows a concrete CPUE →
-preparation → assessment handover. The
-[illustrative catalogue](examples/analyst-repositories.yaml) gives each analyst's
-repository a source commit and identifies the shared code, container and artifacts.
-Its values are placeholders; the current coordinator does not read this YAML.
-[`workflow/jobs.json`](workflow/jobs.json) remains the executable configuration.
+The default execution uses three exact source pins in [source-lock.template.json](source-lock.template.json): preparation/CPUE owns eight jobs, assessment owns eight (including `prepare_a`/`prepare_b`), and MSE owns six. `scripts/hydrate-sources.py` checks the selected Git commits and clean source bytes, then assembles an offline snapshot. Hosted Actions hydrate before entering the preserved container. `make run`, `make check` and `make html` verify that assembly; an unassembled checkout stops rather than silently using another source tree.
 
-A service would need to retrieve the pinned source and shared dependencies,
-transfer artifacts and verify their checksums, check fields, units and years,
-and assemble each job's `context`. It would then run the job through an approved
-execution route and preserve outputs and records. Repository access, artifact
-storage and these adapters require implementation and validation.
+The coordinator owns shared `common.R`, the driver, input graph, SQLite adapters, source resolver, reports and software image. CPUE owns `R/cpue.R`, assessment owns `R/assessment.R`, and MSE owns `R/mse.R`. The exact per-job library declarations in `workflow/sources.py` control both loading and fingerprints. MSE preparation also loads assessment's `surplus_path`. A library revision invalidates jobs loading those bytes and their descendants; changing unrelated documentation or a component commit alone does not invalidate unchanged dependencies.
+
+`workflow/contracts.py` checks relative CPUE indices, annual catch in tonnes, years and admissible values before assessment preparation, and the four assessment cases and required fields before MSE preparation. Records distinguish component `analysis_source` and `code_sources` from the coordinator's `source`/`execution`; inputs retain producer runs, source pins, signatures and artifact checksums. Downloaded runs preserve the component sources, source lock and origin manifest for network-disabled reproduction.
+
+For the preserved monorepo fallback use `PAPER_SOURCE_MODE=monorepo make run`. Its original job and library bytes remain available for regression comparison. The [repository map](examples/analyst-repositories.yaml) is a reader guide; the executable registered pins are the JSON lock and `workflow/jobs.json`. A single host coordinates the synthetic jobs; repository separation does not establish multiple human analysts or operational fisheries use.
 
 ## Change the example
 

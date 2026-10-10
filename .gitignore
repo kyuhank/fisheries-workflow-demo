@@ -7,3 +7,9 @@ dist/
 .DS_Store
 .state/
 supabase/.temp/
+
+# Verified runtime assembly; committed pins are in source-lock.template.json
+/components/
+/source-lock.json
+/source-origins.json
+/coordinator-origin.json

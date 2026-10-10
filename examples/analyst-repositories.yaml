@@ -1,46 +1,20 @@
-# Adaptation example only: every <...> value must be replaced.
-# The demo does not read this file. Its executable config is workflow/jobs.json.
-# Repository retrieval and artifact transfer require new, validated adapters.
-status: illustration_only
-
-# All three jobs need preserved supporting source as well as their own source.
-# Include shared R libraries, the driver, bridge, coordinator and build recipes;
-# also preserve any contributing SQL, data and report templates.
-supporting_source:
-  repository: "<SHARED_WORKFLOW_REPOSITORY_URL>"
-  commit: "<FULL_SHARED_SOURCE_COMMIT>"
-container: "<REGISTRY>/<IMAGE>@sha256:<64_HEX_IMAGE_DIGEST>"
-
-# These are preserved output files, identified by producer run and file bytes.
-artifacts:
-  extract:
-    run: "<EXTRACT_RUN_ID>"
-    uri: "<PRESERVED_EXTRACT_OUTPUT_URI>"
-    sha256: "<64_HEX_EXTRACT_OUTPUT_SHA256>"
-  cpue_a:
-    run: "<CPUE_RUN_ID>"
-    uri: "<PRESERVED_CPUE_OUTPUT_URI>"
-    sha256: "<64_HEX_CPUE_OUTPUT_SHA256>"
-  prepare_a:
-    run: "<PREPARATION_RUN_ID>"
-    uri: "<PRESERVED_PREPARATION_OUTPUT_URI>"
-    sha256: "<64_HEX_PREPARATION_OUTPUT_SHA256>"
-
-# Input names match context$parents in the R examples in jobs/README.md.
-# Each input refers to an artifact above; settings must also be saved per run.
-jobs:
-  cpue_a:
-    owner: CPUE analyst
-    source: {repository: "<CPUE_ANALYST_REPOSITORY_URL>", commit: "<FULL_CPUE_SOURCE_COMMIT>"}
-    entry_point: jobs/cpue_a/run.R
-    inputs: {extract: extract}
-  prepare_a:
-    owner: Assessment input analyst
-    source: {repository: "<PREPARATION_ANALYST_REPOSITORY_URL>", commit: "<FULL_PREPARATION_SOURCE_COMMIT>"}
-    entry_point: jobs/prepare_a/run.R
-    inputs: {extract: extract, cpue_a: cpue_a}
-  assessment_a1:
-    owner: Assessment analyst
-    source: {repository: "<ASSESSMENT_ANALYST_REPOSITORY_URL>", commit: "<FULL_ASSESSMENT_SOURCE_COMMIT>"}
-    entry_point: jobs/assessment_a1/run.R
-    inputs: {prepare_a: prepare_a}
+# Reader map; execution uses source-lock.template.json and workflow/jobs.json.
+status: registered_sources
+source_lock: ../source-lock.template.json
+container: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
+repositories:
+  cpue:
+    repository: https://github.com/kyuhank/fisheries-workflow-cpue-demo
+    commit: c1c12a04c51d5677ae50747f30f774d2f6a0d69c
+    jobs: [submission, qc, database, extract, cpue_a, cpue_b, cpue_summary, cpue_report]
+    library: R/cpue.R
+  assessment:
+    repository: https://github.com/kyuhank/fisheries-workflow-assessment-demo
+    commit: 86374e31b4de5bd65d19e772b78b788d55a3a8de
+    jobs: [prepare_a, prepare_b, assessment_a1, assessment_a2, assessment_b1, assessment_b2, assessment_summary, assessment_report]
+    library: R/assessment.R
+  mse:
+    repository: https://github.com/kyuhank/fisheries-workflow-mse-demo
+    commit: 9d733ca29c3008deea79b76e127c8e412efe1b5d
+    jobs: [mse_prepare, mse_constant, mse_index, mse_buffered, mse_summary, mse_report]
+    library: R/mse.R

@@ -34,8 +34,8 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     page.locator('[data-output="record"]').click()
     expect(page.locator('.record-heading')).to_contain_text('Job 12 · Assessment A2 · Run 001')
     assert 'Prepare inputs A' in page.locator('.record-input').inner_text()
-    assert page.evaluate('Object.hasOwn(currentOutput.record.code, "jobs/assessment_a2/run.R")')
-    commit = page.evaluate('currentOutput.record.source.commit')
+    assert page.evaluate('Object.keys(currentOutput.record.code).some(name => name.endsWith("jobs/assessment_a2/run.R"))')
+    commit = page.evaluate('(currentOutput.record.analysis_source || currentOutput.record.source).commit')
     assert page.locator('a.record-source').filter(has_text='Job code & guide').get_attribute('href').endswith('/' + commit + '/jobs/assessment_a2')
     assert page.locator('.record-image-digest').inner_text() == page.evaluate('currentOutput.record.execution.container.split("@")[1]')
     assert page.locator('.record-image-link').get_attribute('href') == 'https://github.com/orgs/pacificcommunity/packages/container/package/fisheries-workflow'

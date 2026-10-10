@@ -3,8 +3,11 @@ import hashlib
 import json
 from pathlib import Path
 import zipfile
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from workflow.engine import source_payload
 version = json.loads((ROOT/'build-info.json').read_text())['version']
 destination = ROOT/'dist'
 destination.mkdir(exist_ok=True)
@@ -15,6 +18,7 @@ for folder in ['jobs','workflow','data','diagnostics','app','scripts','tests','v
             files[str(path.relative_to(ROOT))] = path.read_bytes()
 for name in ['run.py','verify.py','Makefile','Dockerfile','.dockerignore','README.md','ADAPT.md','LICENSE','THIRD_PARTY.md','CITATION.cff','build-info.json','examples/analyst-repositories.yaml']:
     files[name] = (ROOT/name).read_bytes()
+files.update(source_payload())
 files['index.html'] = (ROOT/'docs/offline.html').read_bytes()
 for path in (ROOT/'docs/example').rglob('*'):
     if path.is_file():

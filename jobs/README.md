@@ -1,8 +1,7 @@
 # Jobs and their connections
 
 Each of the 22 job folders contains an R script and a guide to its inputs,
-settings and outputs. Start with the [CPUE A script](cpue_a/run.R), then follow
-its shared functions in [models.R](../workflow/r/models.R).
+settings and outputs. The default source pins are described under [Separate repositories](#separate-repositories). The local [CPUE A script](cpue_a/run.R) and [models.R](../workflow/r/models.R) preserve the monorepo fallback.
 
 The example uses Poisson GLMs for CPUE, a one-parameter RTMB Schaefer assessment
 with fixed growth sensitivities, and management trials with fixed random seeds.
@@ -80,8 +79,7 @@ individual jobs and their input records.
 | Management strategy evaluation | Four fitted assessment cases | `mse_summary/output.json`: management-trial comparisons for the MSE report |
 
 These paths are relative to `runs/`. Each receiving job records the producer's
-run and file checksum. The live example keeps the tasks in one repository;
-the [separate-repository example](#separate-repositories) describes their handover.
+run and file checksum. The default example loads actual sources from the three [pinned repositories](#separate-repositories).
 
 ### Data preparation
 
@@ -176,23 +174,16 @@ uses these surrounding dependencies.
 
 ## Separate repositories
 
-The demo keeps one repository for convenient inspection and download. In an
-assessment programme, analysts could maintain CPUE, input preparation and
-assessment in their own repositories. The same handover would apply:
+The default source lock uses three actual component Git repositories:
 
-| Analyst's task | Reads | Produces |
+| Repository | Jobs | Calculation library |
 | --- | --- | --- |
-| CPUE: `cpue_a` | Fishing `sets` from `extract` | Index `series`: `year`, `index` |
-| Preparation: `prepare_a` | CPUE `series` and annual `catch` from `extract` | Joined `rows`: `year`, `index`, `catch_t` |
-| Assessment: `assessment_a1` | Prepared `rows` | Fit, biomass series and diagnostics |
+| [Preparation/CPUE](https://github.com/kyuhank/fisheries-workflow-cpue-demo) | submission through CPUE report (8) | `R/cpue.R` |
+| [Assessment](https://github.com/kyuhank/fisheries-workflow-assessment-demo) | prepare inputs A/B through assessment report (8) | `R/assessment.R` |
+| [MSE](https://github.com/kyuhank/fisheries-workflow-mse-demo) | prepare MSE through MSE report (6) | `R/mse.R` |
 
-The index is relative; `catch_t` is in tonnes. The receiving job needs the expected
-fields and annual coverage. Each run would retain its full source commit, container
-image digest, settings, and each input artifact's producer run, preserved location
-and SHA-256 checksum. Shared R libraries and supporting code must also have pinned,
-preserved source alongside the software image.
+The coordinator retrieves the full commit pins from [source-lock.template.json](../source-lock.template.json), verifies their source bytes and passes only the declared libraries to each R job. Shared row and JSON plumbing remain in `workflow/r/common.R`. MSE preparation explicitly depends on the assessment library as well as the MSE library.
 
-[ADAPT.md](../ADAPT.md#separate-analyst-repositories) describes the service needed
-for this arrangement and links an illustrative catalogue. Independent repository
-execution is not implemented or tested in this demo. See
-[cloud/README.md](../cloud/README.md) for its current hosted execution.
+CPUE transfers supply relative index `series` (`year`, `index`) and annual `catch` (`year`, `catch_t` in tonnes). Preparation joins matching consecutive years before fitting. MSE preparation receives the four declared assessment cases, positive finite capacity/growth/catchability, their annual catches and observed relative indices, and a compatible next-year biomass. File contracts reject incompatible inputs before fitting or simulation. Input records preserve producer run, signature, source revision and SHA-256 checksum.
+
+The Code link opens the responsible component's recorded commit; the actual-run link identifies the coordinator execution. Downloaded runs contain the exact component source snapshot and origin manifest, alongside settings, software and outputs. Unchanged dependencies can retain their original producing records when another component changes. [ADAPT.md](../ADAPT.md#separate-analyst-repositories) describes loading, invalidation and the explicit monorepo fallback. The synthetic example still uses one coordinator and does not demonstrate several human operators or an operational assessment.

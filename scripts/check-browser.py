@@ -130,7 +130,7 @@ def main():
             page.frame_locator('#output-frame').locator('h1').wait_for()
             assert page.evaluate('currentOutput.record.job') == key
             record = page.evaluate('currentOutput.record')
-            assert 'jobs/' + key + '/run.R' in record['code'], key
+            assert any(name.endswith('jobs/' + key + '/run.R') for name in record['code']), key
             assert re.fullmatch(r'ghcr.io/pacificcommunity/fisheries-workflow@sha256:[a-f0-9]{64}', record['execution']['container'])
             assert record['software'].get('R') or record['software'].get('r'), key
             page.locator('[data-output="record"]').click()
@@ -148,7 +148,7 @@ def main():
             assert 'REPRODUCE.txt' in names
             assert any(name.endswith('report.qmd') for name in names)
             for key in keys:
-                assert 'jobs/' + key + '/run.R' in names
+                assert any(name.endswith('jobs/' + key + '/run.R') for name in names)
         page.locator('[data-tab="jobs"]').click()
         assert page.locator('#tasks .task').count() == 4
         for task, count in [('data', 4), ('cpue', 4), ('assessment', 8), ('mse', 6)]:

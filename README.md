@@ -48,11 +48,12 @@ and outputs. [CPUE A](jobs/cpue_a/README.md), for example, reads catch and effor
 produces an index and supplies [assessment preparation A](jobs/prepare_a/README.md).
 The demo's **Record** view links to the corresponding job folder.
 
-The jobs are kept in one repository so readers can inspect and download the
-example together. The [repository guide](jobs/README.md#separate-repositories)
-shows the files analysts would exchange if they maintained their tasks in
-separate repositories. [ADAPT.md](ADAPT.md) explains the configuration, shared
-R functions and Make recipes.
+The coordinator loads preparation/CPUE, assessment and MSE code from three
+[exactly pinned repositories](jobs/README.md#separate-repositories). Their source
+bytes, input producer records and container remain together in each downloaded
+run. [ADAPT.md](ADAPT.md) explains source hydration and the explicit monorepo
+fallback. Repository separation uses the same synthetic calculations and does
+not establish multiple human operators or operational fisheries use.
 
 ## Download and repeat
 

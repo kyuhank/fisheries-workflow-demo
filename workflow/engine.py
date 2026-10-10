@@ -15,6 +15,8 @@ from . import reports
 from .r_bridge import RBridge
 from .quarto_reports import render_report
 from .spec import DEFAULTS, SPEC, STAGES, active_spec, downstream, handover_groups
+from .sources import SourceResolver
+from .contracts import validate_transfer
 
 ROOT = Path(__file__).resolve().parents[1]
 FROZEN_SOURCE = 'data/frozen-source.json'
@@ -46,9 +48,27 @@ def calculation_files():
                    *(ROOT / 'workflow/r').glob('*.R')])
 
 
+def source_payload(sources=None):
+    """Canonical exact source closure used by run, page and release downloads."""
+    sources = sources or SourceResolver(ROOT)
+    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*'),
+             *calculation_files(), *ROOT.glob('tests/*.py'), *ROOT.glob('tests/*.R'),
+             *ROOT.glob('cloud/*.py'), *ROOT.glob('vendor/analysis/*')]
+    files += job_files()
+    files += [ROOT / name for name in ['run.py', 'verify.py', 'Makefile', 'Dockerfile', 'README.md',
+              'LICENSE', 'THIRD_PARTY.md', 'build-info.json', 'ADAPT.md', 'cloud/README.md',
+              'examples/analyst-repositories.yaml', 'scripts/generate-data.R', 'scripts/import-r-data.py',
+              'scripts/hydrate-sources.py', 'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md']]
+    result = {p.relative_to(ROOT).as_posix(): p.read_bytes() for p in files if p.is_file()}
+    result.update(sources.archive_payload())
+    if (ROOT / 'coordinator-origin.json').is_file():
+        result['coordinator-origin.json'] = (ROOT / 'coordinator-origin.json').read_bytes()
+    return result
+
+
 class Workflow:
     def __init__(self, directory='runs', notify=None, pause=0, before_job=None,
-                 manual_transfer=None, r_bridge=None):
+                 manual_transfer=None, r_bridge=None, source_lock=None):
         self.directory = Path(directory)
         self.directory.mkdir(parents=True, exist_ok=True)
         self.notify = notify or (lambda event: None)
@@ -56,6 +76,9 @@ class Workflow:
         self.before_job = before_job
         self.manual_transfer = manual_transfer
         self.calculator = r_bridge or RBridge()
+        self.sources = SourceResolver(ROOT, source_lock)
+        if r_bridge is None and self.sources.multi_repository and not self.sources.coordinator_identity()['commit']:
+            raise ValueError('Actual component execution requires a committed coordinator-origin.json; hydrate sources before running')
         self.settings = dict(DEFAULTS)
         self.records = {}
         self.events = []
@@ -98,6 +121,19 @@ class Workflow:
     def output(self, key):
         return read_json(self.directory / key / 'output.json')
 
+    def transferred_output(self, parent):
+        """Decode the same current producer bytes that were checksum-verified."""
+        record = self.records.get(parent)
+        if not record or record.get('signature') != self.signature(parent):
+            raise ValueError('Transfer input stale or checksum mismatch: ' + parent)
+        path = self.directory / parent / 'output.json'
+        if not path.is_file():
+            raise ValueError('Transfer input missing: ' + parent)
+        data = path.read_bytes()
+        if digest(data) != record.get('outputs', {}).get('output.json'):
+            raise ValueError('Transfer input checksum mismatch: ' + parent)
+        return json.loads(data)
+
     def job_settings(self, key):
         if key == 'submission':
             return {'last_year': self.settings['last_year']}
@@ -112,15 +148,16 @@ class Workflow:
         return {}
 
     def code_record(self, key):
-        names = ['Makefile', 'workflow/Makefile', 'workflow/jobs.json', 'workflow/engine.py', 'workflow/spec.py', 'workflow/reports.py',
-                 'workflow/r_bridge.py', 'workflow/r_driver.R',
-                 'workflow/quarto_reports.py', f'jobs/{key}/run.R']
-        names += [path.relative_to(ROOT).as_posix() for path in (ROOT / 'workflow/r').glob('*.R')]
-        if key in ('cpue_report', 'assessment_report', 'mse_report'):
-            names.append(f'jobs/{key}/report.qmd')
+        self.sources.verify()
+        names = ['Makefile', 'workflow/Makefile', 'workflow/jobs.json', 'workflow/engine.py',
+                 'workflow/spec.py', 'workflow/reports.py', 'workflow/r_bridge.py',
+                 'workflow/r_driver.R', 'workflow/quarto_reports.py',
+                 'workflow/sources.py', 'workflow/contracts.py']
         if key == 'extract':
             names += ['workflow/extract.sql', 'workflow/extract-catch.sql']
-        return {name: digest((ROOT / name).read_bytes()) for name in names}
+        files = {name: ROOT / name for name in names}
+        files.update(self.sources.required_files(key))
+        return {name: digest(path.read_bytes()) for name, path in files.items()}
 
     def signature(self, key):
         parents = {parent: {'signature': self.records.get(parent, {}).get('signature'),
@@ -143,6 +180,17 @@ class Workflow:
         record = self.records.get(key)
         if not record or record['signature'] != self.signature(key):
             return False
+        if self.sources.multi_repository:
+            expected = self.sources.origin(key)
+            actual = record.get('analysis_source', {})
+            if any(actual.get(field) != expected[field] for field in ('repository', 'path', 'sha256')):
+                return False
+            if not isinstance(actual.get('commit'), str) or len(actual['commit']) != 40:
+                return False
+            for name, origin in self.sources.code_sources(key).items():
+                saved = record.get('code_sources', {}).get(name, {})
+                if any(saved.get(field) != origin[field] for field in ('repository', 'path', 'sha256')):
+                    return False
         return all((self.directory / key / name).is_file()
                    and digest((self.directory / key / name).read_bytes()) == checksum
                    for name, checksum in record['outputs'].items())
@@ -236,11 +284,25 @@ class Workflow:
                   'inputs': {parent: {'run_id': self.records[parent]['run_id'],
                                       'checksum': self.records[parent]['outputs']['output.json']}
                              for parent in SPEC[key]['parents']}}
+        if self.sources.multi_repository:
+            record['analysis_source'] = self.sources.origin(key)
+            record['code_sources'] = self.sources.code_sources(key)
+            for name, checksum in record['code'].items():
+                if name not in record['code_sources']:
+                    record['code_sources'][name] = {**self.sources.coordinator_identity(), 'path': name, 'sha256': checksum}
+            for parent, details in record['inputs'].items():
+                details['signature'] = self.records[parent]['signature']
+                details['analysis_source'] = self.records[parent].get('analysis_source')
+            transferred = validate_transfer(key, {p: self.output(p) for p in SPEC[key]['parents']}, self.records, self.settings)
+            if transferred:
+                record['input_contract'] = transferred
         if self.execution:
             record['execution'] = dict(self.execution)
         build = ROOT / 'build-info.json'
         if build.exists():
             record['source'] = read_json(build)
+        if self.sources.multi_repository and self.sources.coordinator_identity()['commit']:
+            record['source'] = self.sources.coordinator_identity()
         if self.execution.get('commit'):
             record['source'] = {'repository': 'https://github.com/' + self.execution['repository'],
                                 'commit': self.execution['commit']}
@@ -249,7 +311,10 @@ class Workflow:
         self.records[key] = record
         lineage = [{'job': SPEC[parent]['title'], **details} for parent, details in record['inputs'].items()]
         page = reports.output_page(SPEC[key], result, record, lineage)
-        rendered = render_report(ROOT, key, result, record, folder, page)
+        if self.sources.multi_repository and key.endswith('_report'):
+            rendered = render_report(ROOT, key, result, record, folder, page, source_path=self.sources.job_path(key, 'report.qmd'))
+        else:
+            rendered = render_report(ROOT, key, result, record, folder, page)
         record['report_rendering'] = rendered
         record['outputs']['report.html'] = digest((folder / 'report.html').read_bytes())
         if rendered['quarto_executed']:
@@ -269,15 +334,24 @@ class Workflow:
     async def calculate(self, key, run_id):
         if key not in SPEC:
             raise ValueError('No calculation registered for this job.')
-        parents = {parent: self.output(parent) for parent in SPEC[key]['parents']}
+        self.sources.verify()
+        if self.sources.multi_repository:
+            for parent in SPEC[key]['parents']:
+                if not self.valid(parent):
+                    raise ValueError('Transfer input stale or checksum mismatch: ' + parent)
+        load = self.transferred_output if self.sources.multi_repository else self.output
+        parents = {parent: load(parent) for parent in SPEC[key]['parents']}
         if key == 'database':
-            parents['submission'] = self.output('submission')
+            parents['submission'] = load('submission')
         context = {'key': key, 'settings': self.settings, 'job_settings': self.job_settings(key),
                    'run_id': run_id, 'parents': parents}
         if key in ('submission', 'qc'):
             context['source'] = self.source_context()
         if key == 'extract':
             context['extracted'] = self.extracted_context()
+        if self.sources.multi_repository:
+            validate_transfer(key, parents, self.records, self.settings)
+        context['sources'] = self.sources.runtime(key)
         response = await self.calculator.calculate(context)
         result, effects = response['result'], response['effects']
         if effects:
@@ -367,22 +441,12 @@ class Workflow:
     def bundle(self):
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as archive:
-            files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*'),
-                     *calculation_files()]
-            files += list(ROOT.glob('tests/*.py')) + list(ROOT.glob('tests/*.R'))
-            files += list(ROOT.glob('cloud/*.py'))
-            files += [ROOT / 'scripts/generate-data.R', ROOT / 'scripts/import-r-data.py']
-            files += job_files()
-            files += [ROOT / 'ADAPT.md', ROOT / 'cloud/README.md',
-                      ROOT / 'examples/analyst-repositories.yaml']
-            files += [ROOT / name for name in ['run.py','verify.py','Makefile','Dockerfile','README.md','LICENSE','THIRD_PARTY.md','build-info.json'] if (ROOT / name).exists()]
-            files += list(ROOT.glob('vendor/analysis/*'))
             checksums = {}
-            for path in files:
-                name = str(path.relative_to(ROOT)); data = path.read_bytes()
+            for name, data in source_payload(self.sources).items():
                 if name == FROZEN_SOURCE and hasattr(self, 'hosted_data'):
                     continue
-                archive.writestr(name, data); checksums[name] = digest(data)
+                archive.writestr(name, data)
+                checksums[name] = digest(data)
             if hasattr(self, 'hosted_data'):
                 # Freeze hosted inputs; the checkout may contain a different example.
                 data = encoded(self.hosted_data)
@@ -409,6 +473,8 @@ class Workflow:
             software = self.software()
             image = software['container']
             image_option = ' IMAGE=' + shlex.quote(image)
+            if not self.sources.multi_repository:
+                image_option += ' PAPER_SOURCE_MODE=monorepo'
             image_option += ' IMAGE_URL=' + shlex.quote(software.get('container_url', ''))
             pull = 'docker pull --platform linux/amd64 ' + image
             selected = ' JOB=' + shlex.quote(job_target) if job_target else ''

@@ -18,6 +18,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Verify and assemble pinned analysis repositories
+        run: python3 scripts/hydrate-sources.py
       - name: Check real hosted execution and downloaded reproduction
         run: |
           docker pull "$IMAGE"
