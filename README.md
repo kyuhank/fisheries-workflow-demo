@@ -92,9 +92,10 @@ not repeat every earlier result still in use.
 
 ## Work with the repository
 
-For a Git checkout, assemble the pinned component sources first. This development
-route needs Docker, Make, Python 3 and Git and may retrieve source repositories
-and the image. From the repository root:
+For a Git checkout, the commands below assemble the pinned component sources
+before starting the analyses. This development route needs Docker, Make,
+Python 3 and Git and may retrieve source repositories and the image.
+From the repository root:
 
 ```sh
 make run                 # full workflow

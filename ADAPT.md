@@ -42,7 +42,7 @@ for images and containers.
 
 ## Separate analyst repositories
 
-The default execution uses three exact source pins in [source-lock.template.json](source-lock.template.json): preparation/CPUE owns eight jobs, assessment owns eight (including `prepare_a`/`prepare_b`), and MSE owns six. `scripts/hydrate-sources.py` checks the selected Git commits and clean source bytes, then assembles an offline snapshot. Hosted Actions hydrate before entering the preserved container. `make run`, `make check` and `make html` verify that assembly; an unassembled checkout stops rather than silently using another source tree.
+The default execution uses three exact source pins in [source-lock.template.json](source-lock.template.json): preparation/CPUE owns eight jobs, assessment owns eight (including `prepare_a`/`prepare_b`), and MSE owns six. `scripts/hydrate-sources.py` checks the selected Git commits and clean source bytes, then assembles an offline snapshot. Hosted Actions hydrate before entering the preserved container. `make run`, `make check` and `make html` assemble and verify the pinned sources before entering the container; source checks stop execution if the required assembly is missing or inconsistent.
 
 The coordinator owns shared `common.R`, the driver, input graph, SQLite adapters, source resolver, reports and software image. CPUE owns `R/cpue.R`, assessment owns `R/assessment.R`, and MSE owns `R/mse.R`. The exact per-job library declarations in `workflow/sources.py` control both loading and fingerprints. MSE preparation also loads assessment's `surplus_path`. A library revision invalidates jobs loading those bytes and their descendants; changing unrelated documentation or a component commit alone does not invalidate unchanged dependencies.
 
