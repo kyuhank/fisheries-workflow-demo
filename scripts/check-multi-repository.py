@@ -449,7 +449,9 @@ class EvidenceSuite:
                         'source_lock': {'path': str(self.lock), 'sha256': sha256(self.lock)},
                         'coordinator_script_sha256': sha256(Path(__file__)),
                         'reference': {'path': str(self.reference_root), 'commit': reference_commit},
-                        'actual_client': 'codex', 'runtime_image': RBridge.require_container()}
+                        'actual_client': os.environ.get('PAPER_VALIDATION_CLIENT', 'unspecified reader'),
+                        'client_identity_verification': 'caller-supplied label; not independently attested',
+                        'runtime_image': RBridge.require_container()}
         if self.continuation:
             self.receipt['continuation_request'] = {**self.continuation,
                                                      'status': 'REQUESTED_NOT_YET_VERIFIED'}
