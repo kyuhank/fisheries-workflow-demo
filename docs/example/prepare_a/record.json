@@ -2,23 +2,23 @@
   "job": "prepare_a",
   "owner": "Assessment analyst",
   "run_id": "Run 001",
-  "signature": "708ef8d4fa8897113d3bda57759fda5e8a77076379a5a8e510e5ebeabdfae379",
+  "signature": "df5e4e721761452a924665ce2b6775d45315bade2f5da8ce23d1f0f245e858ce",
   "settings": {},
   "snapshot": 2023,
   "code": {
-    "Makefile": "e41825f04fc35a282462e2b26eb9c0f12b3ab7d0a158c803d0ef6c910343b82e",
+    "Makefile": "ccd6327d76cdcd1ef0b0c798f4a7751a8babfd8ec9bc5afeb654b63ff8604d72",
     "workflow/Makefile": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
     "workflow/jobs.json": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
-    "workflow/engine.py": "0f6157fb206f794382bd1713d2818aa3729f8ad1ffda028742238dc5ddb2a8fb",
-    "workflow/spec.py": "ae5455de889c2d544aab55f0e579d02614713a081768bf1a0d9937fda1de0e92",
+    "workflow/engine.py": "ae7dc617dda4bd23007edca9718bdb3df3a7cbe7b11dcfc598436937fa67d1a8",
+    "workflow/spec.py": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127",
     "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
     "workflow/r_bridge.py": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
-    "workflow/r_driver.R": "b3e4328bddb45d5be44503ba4a336aca71f857d6f408bd0d252a1c174d97851e",
-    "workflow/quarto_reports.py": "e8dad1a6d9454e5394d4bb9f239d2e9b24d1e97b7d1aa9ed0a041ad05b52f3b8",
-    "jobs/prepare_a/run.R": "2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9",
-    "workflow/r/common.R": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
-    "workflow/r/mse.R": "da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956",
-    "workflow/r/models.R": "597d1e92c36be68950d888ff1ad0183b352eb2fde6dda7218017b59c52db53d8"
+    "workflow/r_driver.R": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039",
+    "workflow/quarto_reports.py": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d",
+    "workflow/sources.py": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd",
+    "workflow/contracts.py": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b",
+    "components/assessment/jobs/prepare_a/run.R": "2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9",
+    "workflow/r/common.R": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191"
   },
   "software": {
     "r": "4.6.0",
@@ -38,8 +38,8 @@
     "sqlite": "3.45.1"
   },
   "outputs": {
-    "output.json": "fe721f4fb641e75f10ddade0587edbe49e2dfa4f4a7cd13da9cc239ac9d843b1",
-    "report.html": "2b39e3adc1c6973550bf417b0c96ae2ecbc620e437a30e4e42eebe14c00e78ad"
+    "output.json": "60702c74e791193beb56abf03cf390bc5e3ab9e2c36dc829e58f46cc3aea5085",
+    "report.html": "9bad42c29490872b756080e6b97ab69f34afe593b2a4f72cfd2993a46145cca9"
   },
   "log": [
     "Join index A to annual catches and check the model inputs.",
@@ -48,25 +48,158 @@
   "inputs": {
     "extract": {
       "run_id": "Run 001",
-      "checksum": "6d58d03b80a4bc9f2a6748ae7ba1cb39ffb135439d5abcbfd6008d021a91498c"
+      "checksum": "6d58d03b80a4bc9f2a6748ae7ba1cb39ffb135439d5abcbfd6008d021a91498c",
+      "signature": "54424e33f8abd91e98e68987e292653244fa0307b95963a16167498dac1cefe7",
+      "analysis_source": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+        "commit": "c1c12a04c51d5677ae50747f30f774d2f6a0d69c",
+        "path": "jobs/extract/run.R",
+        "sha256": "6b768a98204b33eab339a69086bfe823439a9775adc3a3936f3ace0bf22400e7"
+      }
     },
     "cpue_a": {
       "run_id": "Run 001",
-      "checksum": "36dbaf747965165564a67c3453994cf983b92346b547f0c701173231000869f3"
+      "checksum": "314b4236a7e5b237325c908e5eb266702bc8f1a4872b449d46a83c60e577978a",
+      "signature": "9634854020e84bab16962471fa44bdc811d68975bd0a5d12647b8e73a33f9831",
+      "analysis_source": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+        "commit": "c1c12a04c51d5677ae50747f30f774d2f6a0d69c",
+        "path": "jobs/cpue_a/run.R",
+        "sha256": "3eb055fbe1f8de2e31405017bf650cb34f20742027e3c0d9d994ed42d2169ad2"
+      }
+    }
+  },
+  "analysis_source": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
+    "commit": "86374e31b4de5bd65d19e772b78b788d55a3a8de",
+    "path": "jobs/prepare_a/run.R",
+    "sha256": "2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9"
+  },
+  "code_sources": {
+    "components/assessment/jobs/prepare_a/run.R": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
+      "commit": "86374e31b4de5bd65d19e772b78b788d55a3a8de",
+      "path": "jobs/prepare_a/run.R",
+      "sha256": "2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9"
+    },
+    "workflow/r/common.R": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/r/common.R",
+      "sha256": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191"
+    },
+    "Makefile": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "Makefile",
+      "sha256": "ccd6327d76cdcd1ef0b0c798f4a7751a8babfd8ec9bc5afeb654b63ff8604d72"
+    },
+    "workflow/Makefile": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/Makefile",
+      "sha256": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157"
+    },
+    "workflow/jobs.json": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/jobs.json",
+      "sha256": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a"
+    },
+    "workflow/engine.py": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/engine.py",
+      "sha256": "ae7dc617dda4bd23007edca9718bdb3df3a7cbe7b11dcfc598436937fa67d1a8"
+    },
+    "workflow/spec.py": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/spec.py",
+      "sha256": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127"
+    },
+    "workflow/reports.py": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/reports.py",
+      "sha256": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c"
+    },
+    "workflow/r_bridge.py": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/r_bridge.py",
+      "sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93"
+    },
+    "workflow/r_driver.R": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/r_driver.R",
+      "sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039"
+    },
+    "workflow/quarto_reports.py": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/quarto_reports.py",
+      "sha256": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d"
+    },
+    "workflow/sources.py": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/sources.py",
+      "sha256": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd"
+    },
+    "workflow/contracts.py": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+      "path": "workflow/contracts.py",
+      "sha256": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b"
+    }
+  },
+  "input_contract": {
+    "boundary": "CPUE-to-assessment",
+    "schema_version": 1,
+    "units": {
+      "catch_t": "tonnes",
+      "index": "relative CPUE",
+      "biomass_t": "tonnes"
+    },
+    "producers": {
+      "extract": {
+        "run_id": "Run 001",
+        "signature": "54424e33f8abd91e98e68987e292653244fa0307b95963a16167498dac1cefe7",
+        "checksum": "6d58d03b80a4bc9f2a6748ae7ba1cb39ffb135439d5abcbfd6008d021a91498c",
+        "analysis_source": {
+          "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+          "commit": "c1c12a04c51d5677ae50747f30f774d2f6a0d69c",
+          "path": "jobs/extract/run.R",
+          "sha256": "6b768a98204b33eab339a69086bfe823439a9775adc3a3936f3ace0bf22400e7"
+        }
+      },
+      "cpue_a": {
+        "run_id": "Run 001",
+        "signature": "9634854020e84bab16962471fa44bdc811d68975bd0a5d12647b8e73a33f9831",
+        "checksum": "314b4236a7e5b237325c908e5eb266702bc8f1a4872b449d46a83c60e577978a",
+        "analysis_source": {
+          "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+          "commit": "c1c12a04c51d5677ae50747f30f774d2f6a0d69c",
+          "path": "jobs/cpue_a/run.R",
+          "sha256": "3eb055fbe1f8de2e31405017bf650cb34f20742027e3c0d9d994ed42d2169ad2"
+        }
+      }
     }
   },
   "execution": {
     "provider": "GitHub Actions",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4",
-    "github_run": "37568937127",
+    "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+    "github_run": "38058493618",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow"
   },
   "source": {
     "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
-    "commit": "cc72ab4c63a7894a0ccb5e48ac4c82224967afb4"
+    "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845"
   },
   "data_files": {
     "fishery.sqlite": "4a8b4a45d7b3f86f908b7b1d04cc3ebfb62963a6fe1a6aaa79fb3678123151b0",

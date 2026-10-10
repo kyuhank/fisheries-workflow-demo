@@ -1,0 +1,1409 @@
+{
+  "schema_version": 1,
+  "status": "PASSED",
+  "version": "1.9.0",
+  "scope": "Open synthetic, simple-model workflow implementation and reproduction evidence; no operational or multiple-human trial.",
+  "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+  "source_closures": {
+    "actual_offline_conformance": "868afb487d87f6e0e592428eb6482eacbe1efef4",
+    "imported_offline_checkpoint": "5cca42bedf3ea61027b282799400adf8483980b9",
+    "standalone_conformance_archive": "e4df38e3355bb41a35038c4f6fbf072f7bf4389a",
+    "Saved_and_standard_release": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+    "final_hosted_verification": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+    "whole_closure_equivalence_claim": false
+  },
+  "component_sources": {
+    "cpue": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+      "commits": {
+        "main": "c1c12a04c51d5677ae50747f30f774d2f6a0d69c"
+      }
+    },
+    "assessment": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
+      "commits": {
+        "main": "86374e31b4de5bd65d19e772b78b788d55a3a8de"
+      }
+    },
+    "mse": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
+      "commits": {
+        "main": "9d733ca29c3008deea79b76e127c8e412efe1b5d",
+        "validation/mr04-code": "655968b0c2a042c03307e26a781fbe82feaa5d6c",
+        "validation/mr04-code-0p6": "2f432e34f798753ad77bf7d6fecdad23642929b9",
+        "validation/mr08-failure": "f40281765b7347f9ca60289ffd0ed244cd14e481"
+      }
+    }
+  },
+  "offline_conformance": {
+    "schema_version": 1,
+    "kind": "sanitized_actual_conformance_summary",
+    "status": "PASSED",
+    "executed_coordinator_commit": "868afb487d87f6e0e592428eb6482eacbe1efef4",
+    "imported_coordinator_commits": [
+      "5cca42bedf3ea61027b282799400adf8483980b9"
+    ],
+    "image": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "accounting": {
+      "total_declared_attempts": 18,
+      "actual_new_attempts": 12,
+      "imported_attempts": 6,
+      "invocations": 2,
+      "automatic_retry": false,
+      "test_doubles": false,
+      "actual_attempts_across_invocations": 19,
+      "prior_failed_attempts": 1
+    },
+    "case_results": [
+      {
+        "case_id": "MR-01",
+        "status": "PASSED"
+      },
+      {
+        "case_id": "MR-02",
+        "status": "PASSED"
+      },
+      {
+        "case_id": "MR-03",
+        "status": "PASSED"
+      },
+      {
+        "case_id": "MR-04",
+        "status": "PASSED"
+      },
+      {
+        "case_id": "MR-05",
+        "status": "PASSED"
+      },
+      {
+        "case_id": "MR-06",
+        "status": "PASSED"
+      },
+      {
+        "case_id": "MR-07",
+        "status": "PASSED"
+      },
+      {
+        "case_id": "MR-08",
+        "status": "PASSED"
+      }
+    ],
+    "evidence_receipt_sha256": [
+      "c1e545a9faacc19ea04d13eeab510f3bbb66846b54c47414e461a03752b09f22",
+      "a25bce5bb0f47228d119fd817a09b11f0ab96a9024264470fd29d35078ae302a"
+    ],
+    "execution_invocation_sha256": [
+      "96dd7f4f5fba7f14c8f44e065bd8dc0dd1960a45c7381fe252d8df51ebb5613c",
+      "8eb361ec3e458bdfb5255012cb36fd29d1904cb37125793d50ba1c607f0c37b3"
+    ],
+    "limitations": [
+      "Synthetic data and simple models; technical conformance, not real-stock model validation.",
+      "Three independently versioned code repositories; no trial involving multiple human analysts or an institutional production workflow.",
+      "Analyst time savings and larger workflow performance were not measured.",
+      "First invocation stopped on an invalid code fixture producing unsupported0.72; its raw failure and exact source remain preserved. The corrected fixture selects supported0.6 with fixed configuration0.8.",
+      "Six earlier successful attempts were imported with exact source/output checks; twelve remaining attempts were actually executed. The failed original attempt is not included among successful attempts.",
+      "Public source delivery differs from the actual868 execution only in reader guide and caller identity metadata; calculation and comparison bytes are unchanged.",
+      "This is a public derivative summary; private administrative host/route records and checkpoint outputs are excluded. Original raw receipts are preserved separately."
+    ]
+  },
+  "interface": {
+    "run_id": 38058493618,
+    "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+    "result": "passed",
+    "artifact_sha256": "df3c5ba5fdc4ecd4514c889423b94bca8592bfd120dcaeeb6e520cee652940f3",
+    "source_reader_sha256": "a746029b16c463ae4f9a033351b9974961471b7c20793ecb1b09bd65397a3271",
+    "source_files_verified": 110
+  },
+  "native": {
+    "run_id": 38058490857,
+    "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845",
+    "result": "passed"
+  },
+  "later_native": {
+    "run_id": 38062383188,
+    "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+    "result": "passed"
+  },
+  "hosted": {
+    "run_id": 38062797320,
+    "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+    "result": "passed",
+    "run_attempt": 1,
+    "nonsecret_report_sha256": "19c3f760cdeae2852297e06cecdbb849f062bf96bbf3e0fb791a4bd25f1af215",
+    "checks": [
+      {
+        "start": "submission",
+        "scope": "workflow",
+        "handover": "manual",
+        "github_run": "38062833968",
+        "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+        "executed": [
+          "submission",
+          "qc",
+          "database",
+          "extract",
+          "cpue_a",
+          "cpue_b",
+          "cpue_summary",
+          "cpue_report",
+          "prepare_a",
+          "prepare_b",
+          "assessment_a1",
+          "assessment_a2",
+          "assessment_b1",
+          "assessment_b2",
+          "assessment_summary",
+          "assessment_report",
+          "mse_prepare",
+          "mse_constant",
+          "mse_index",
+          "mse_buffered",
+          "mse_summary",
+          "mse_report"
+        ],
+        "retained": [],
+        "retained_records_preserved": true,
+        "execution_identity_verified": true,
+        "manual_transfer_checked": true,
+        "peer_barriers_checked": true,
+        "manual_transfer_boundaries": [
+          "data",
+          "cpue",
+          "assessment"
+        ],
+        "report_completed_before_cpue_transfer": true,
+        "report_completed_before_assessment_transfer": true,
+        "events": [
+          {
+            "state": "phase"
+          },
+          {
+            "state": "plan"
+          },
+          {
+            "job": "submission",
+            "state": "running",
+            "group": [
+              "submission"
+            ]
+          },
+          {
+            "job": "submission",
+            "state": "complete"
+          },
+          {
+            "job": "qc",
+            "state": "running",
+            "group": [
+              "qc"
+            ]
+          },
+          {
+            "job": "qc",
+            "state": "failed"
+          },
+          {
+            "job": "submission",
+            "state": "returned"
+          },
+          {
+            "job": "submission",
+            "state": "running"
+          },
+          {
+            "job": "submission",
+            "state": "complete"
+          },
+          {
+            "job": "qc",
+            "state": "running"
+          },
+          {
+            "job": "qc",
+            "state": "complete"
+          },
+          {
+            "job": "database",
+            "state": "running",
+            "group": [
+              "database"
+            ]
+          },
+          {
+            "job": "database",
+            "state": "complete"
+          },
+          {
+            "job": "extract",
+            "state": "running",
+            "group": [
+              "extract"
+            ]
+          },
+          {
+            "job": "extract",
+            "state": "complete"
+          },
+          {
+            "job": "cpue_a",
+            "state": "handover",
+            "group": [
+              "cpue_a",
+              "cpue_b"
+            ],
+            "boundary": "data"
+          },
+          {
+            "job": "cpue_a",
+            "state": "received",
+            "group": [
+              "cpue_a",
+              "cpue_b"
+            ],
+            "boundary": "data"
+          },
+          {
+            "job": "cpue_a",
+            "state": "running",
+            "group": [
+              "cpue_a",
+              "cpue_b"
+            ]
+          },
+          {
+            "job": "cpue_b",
+            "state": "running",
+            "group": [
+              "cpue_a",
+              "cpue_b"
+            ]
+          },
+          {
+            "job": "cpue_a",
+            "state": "complete"
+          },
+          {
+            "job": "cpue_b",
+            "state": "complete"
+          },
+          {
+            "job": "prepare_a",
+            "state": "handover",
+            "group": [
+              "prepare_a",
+              "prepare_b"
+            ],
+            "boundary": "cpue"
+          },
+          {
+            "job": "cpue_summary",
+            "state": "running",
+            "group": [
+              "cpue_summary"
+            ]
+          },
+          {
+            "job": "cpue_summary",
+            "state": "complete"
+          },
+          {
+            "job": "cpue_report",
+            "state": "running",
+            "group": [
+              "cpue_report"
+            ]
+          },
+          {
+            "job": "cpue_report",
+            "state": "complete"
+          },
+          {
+            "job": "prepare_a",
+            "state": "received",
+            "group": [
+              "prepare_a",
+              "prepare_b"
+            ],
+            "boundary": "cpue"
+          },
+          {
+            "job": "prepare_a",
+            "state": "running",
+            "group": [
+              "prepare_a",
+              "prepare_b"
+            ]
+          },
+          {
+            "job": "prepare_b",
+            "state": "running",
+            "group": [
+              "prepare_a",
+              "prepare_b"
+            ]
+          },
+          {
+            "job": "prepare_a",
+            "state": "complete"
+          },
+          {
+            "job": "prepare_b",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_a1",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2",
+              "assessment_b1",
+              "assessment_b2"
+            ]
+          },
+          {
+            "job": "assessment_a2",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2",
+              "assessment_b1",
+              "assessment_b2"
+            ]
+          },
+          {
+            "job": "assessment_b1",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2",
+              "assessment_b1",
+              "assessment_b2"
+            ]
+          },
+          {
+            "job": "assessment_b2",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2",
+              "assessment_b1",
+              "assessment_b2"
+            ]
+          },
+          {
+            "job": "assessment_a1",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_a2",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_b1",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_b2",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_summary",
+            "state": "running",
+            "group": [
+              "assessment_summary"
+            ]
+          },
+          {
+            "job": "mse_prepare",
+            "state": "handover",
+            "group": [
+              "mse_prepare"
+            ],
+            "boundary": "assessment"
+          },
+          {
+            "job": "assessment_summary",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_report",
+            "state": "running",
+            "group": [
+              "assessment_report"
+            ]
+          },
+          {
+            "job": "assessment_report",
+            "state": "complete"
+          },
+          {
+            "job": "mse_prepare",
+            "state": "received",
+            "group": [
+              "mse_prepare"
+            ],
+            "boundary": "assessment"
+          },
+          {
+            "job": "mse_prepare",
+            "state": "running",
+            "group": [
+              "mse_prepare"
+            ]
+          },
+          {
+            "job": "mse_prepare",
+            "state": "complete"
+          },
+          {
+            "job": "mse_constant",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_index",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_buffered",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_constant",
+            "state": "complete"
+          },
+          {
+            "job": "mse_index",
+            "state": "complete"
+          },
+          {
+            "job": "mse_buffered",
+            "state": "complete"
+          },
+          {
+            "job": "mse_summary",
+            "state": "running",
+            "group": [
+              "mse_summary"
+            ]
+          },
+          {
+            "job": "mse_summary",
+            "state": "complete"
+          },
+          {
+            "job": "mse_report",
+            "state": "running",
+            "group": [
+              "mse_report"
+            ]
+          },
+          {
+            "job": "mse_report",
+            "state": "complete"
+          }
+        ]
+      },
+      {
+        "start": "cpue_summary",
+        "scope": "workflow",
+        "handover": "connected",
+        "github_run": "38063061769",
+        "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+        "executed": [
+          "cpue_summary",
+          "cpue_report"
+        ],
+        "retained": [
+          "submission",
+          "qc",
+          "database",
+          "extract",
+          "cpue_a",
+          "cpue_b",
+          "prepare_a",
+          "prepare_b",
+          "assessment_a1",
+          "assessment_a2",
+          "assessment_b1",
+          "assessment_b2",
+          "assessment_summary",
+          "assessment_report",
+          "mse_prepare",
+          "mse_constant",
+          "mse_index",
+          "mse_buffered",
+          "mse_summary",
+          "mse_report"
+        ],
+        "retained_records_preserved": true,
+        "execution_identity_verified": true,
+        "manual_transfer_checked": false,
+        "peer_barriers_checked": true,
+        "manual_transfer_boundaries": [],
+        "report_completed_before_cpue_transfer": false,
+        "report_completed_before_assessment_transfer": false,
+        "events": [
+          {
+            "state": "phase"
+          },
+          {
+            "state": "plan"
+          },
+          {
+            "job": "cpue_summary",
+            "state": "running",
+            "group": [
+              "cpue_summary"
+            ]
+          },
+          {
+            "job": "cpue_summary",
+            "state": "complete"
+          },
+          {
+            "job": "cpue_report",
+            "state": "running",
+            "group": [
+              "cpue_report"
+            ]
+          },
+          {
+            "job": "cpue_report",
+            "state": "complete"
+          }
+        ]
+      },
+      {
+        "start": "prepare_a",
+        "scope": "workflow",
+        "handover": "connected",
+        "github_run": "38063163745",
+        "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+        "executed": [
+          "prepare_a",
+          "assessment_a1",
+          "assessment_a2",
+          "assessment_summary",
+          "assessment_report",
+          "mse_prepare",
+          "mse_constant",
+          "mse_index",
+          "mse_buffered",
+          "mse_summary",
+          "mse_report"
+        ],
+        "retained": [
+          "submission",
+          "qc",
+          "database",
+          "extract",
+          "cpue_a",
+          "cpue_b",
+          "cpue_summary",
+          "cpue_report",
+          "prepare_b",
+          "assessment_b1",
+          "assessment_b2"
+        ],
+        "retained_records_preserved": true,
+        "execution_identity_verified": true,
+        "manual_transfer_checked": false,
+        "peer_barriers_checked": true,
+        "manual_transfer_boundaries": [],
+        "report_completed_before_cpue_transfer": false,
+        "report_completed_before_assessment_transfer": false,
+        "events": [
+          {
+            "state": "phase"
+          },
+          {
+            "state": "plan"
+          },
+          {
+            "job": "prepare_a",
+            "state": "running",
+            "group": [
+              "prepare_a"
+            ]
+          },
+          {
+            "job": "prepare_a",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_a1",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2"
+            ]
+          },
+          {
+            "job": "assessment_a2",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2"
+            ]
+          },
+          {
+            "job": "assessment_a1",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_a2",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_summary",
+            "state": "running",
+            "group": [
+              "assessment_summary"
+            ]
+          },
+          {
+            "job": "mse_prepare",
+            "state": "running",
+            "group": [
+              "mse_prepare"
+            ]
+          },
+          {
+            "job": "assessment_summary",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_report",
+            "state": "running",
+            "group": [
+              "assessment_report"
+            ]
+          },
+          {
+            "job": "mse_prepare",
+            "state": "complete"
+          },
+          {
+            "job": "mse_constant",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_index",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_buffered",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "assessment_report",
+            "state": "complete"
+          },
+          {
+            "job": "mse_constant",
+            "state": "complete"
+          },
+          {
+            "job": "mse_index",
+            "state": "complete"
+          },
+          {
+            "job": "mse_buffered",
+            "state": "complete"
+          },
+          {
+            "job": "mse_summary",
+            "state": "running",
+            "group": [
+              "mse_summary"
+            ]
+          },
+          {
+            "job": "mse_summary",
+            "state": "complete"
+          },
+          {
+            "job": "mse_report",
+            "state": "running",
+            "group": [
+              "mse_report"
+            ]
+          },
+          {
+            "job": "mse_report",
+            "state": "complete"
+          }
+        ]
+      },
+      {
+        "start": "cpue_a",
+        "scope": "workflow",
+        "handover": "manual",
+        "github_run": "38063307431",
+        "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+        "executed": [
+          "cpue_a",
+          "cpue_summary",
+          "cpue_report",
+          "prepare_a",
+          "assessment_a1",
+          "assessment_a2",
+          "assessment_summary",
+          "assessment_report",
+          "mse_prepare",
+          "mse_constant",
+          "mse_index",
+          "mse_buffered",
+          "mse_summary",
+          "mse_report"
+        ],
+        "retained": [
+          "submission",
+          "qc",
+          "database",
+          "extract",
+          "cpue_b",
+          "prepare_b",
+          "assessment_b1",
+          "assessment_b2"
+        ],
+        "retained_records_preserved": true,
+        "execution_identity_verified": true,
+        "manual_transfer_checked": true,
+        "peer_barriers_checked": true,
+        "manual_transfer_boundaries": [
+          "cpue",
+          "assessment"
+        ],
+        "report_completed_before_cpue_transfer": true,
+        "report_completed_before_assessment_transfer": true,
+        "events": [
+          {
+            "state": "phase"
+          },
+          {
+            "state": "plan"
+          },
+          {
+            "job": "cpue_a",
+            "state": "running",
+            "group": [
+              "cpue_a"
+            ]
+          },
+          {
+            "job": "cpue_a",
+            "state": "complete"
+          },
+          {
+            "job": "prepare_a",
+            "state": "handover",
+            "group": [
+              "prepare_a"
+            ],
+            "boundary": "cpue"
+          },
+          {
+            "job": "cpue_summary",
+            "state": "running",
+            "group": [
+              "cpue_summary"
+            ]
+          },
+          {
+            "job": "cpue_summary",
+            "state": "complete"
+          },
+          {
+            "job": "cpue_report",
+            "state": "running",
+            "group": [
+              "cpue_report"
+            ]
+          },
+          {
+            "job": "cpue_report",
+            "state": "complete"
+          },
+          {
+            "job": "prepare_a",
+            "state": "received",
+            "group": [
+              "prepare_a"
+            ],
+            "boundary": "cpue"
+          },
+          {
+            "job": "prepare_a",
+            "state": "running",
+            "group": [
+              "prepare_a"
+            ]
+          },
+          {
+            "job": "prepare_a",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_a1",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2"
+            ]
+          },
+          {
+            "job": "assessment_a2",
+            "state": "running",
+            "group": [
+              "assessment_a1",
+              "assessment_a2"
+            ]
+          },
+          {
+            "job": "assessment_a1",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_a2",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_summary",
+            "state": "running",
+            "group": [
+              "assessment_summary"
+            ]
+          },
+          {
+            "job": "mse_prepare",
+            "state": "handover",
+            "group": [
+              "mse_prepare"
+            ],
+            "boundary": "assessment"
+          },
+          {
+            "job": "assessment_summary",
+            "state": "complete"
+          },
+          {
+            "job": "assessment_report",
+            "state": "running",
+            "group": [
+              "assessment_report"
+            ]
+          },
+          {
+            "job": "assessment_report",
+            "state": "complete"
+          },
+          {
+            "job": "mse_prepare",
+            "state": "received",
+            "group": [
+              "mse_prepare"
+            ],
+            "boundary": "assessment"
+          },
+          {
+            "job": "mse_prepare",
+            "state": "running",
+            "group": [
+              "mse_prepare"
+            ]
+          },
+          {
+            "job": "mse_prepare",
+            "state": "complete"
+          },
+          {
+            "job": "mse_constant",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_index",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_buffered",
+            "state": "running",
+            "group": [
+              "mse_constant",
+              "mse_index",
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_constant",
+            "state": "complete"
+          },
+          {
+            "job": "mse_index",
+            "state": "complete"
+          },
+          {
+            "job": "mse_buffered",
+            "state": "complete"
+          },
+          {
+            "job": "mse_summary",
+            "state": "running",
+            "group": [
+              "mse_summary"
+            ]
+          },
+          {
+            "job": "mse_summary",
+            "state": "complete"
+          },
+          {
+            "job": "mse_report",
+            "state": "running",
+            "group": [
+              "mse_report"
+            ]
+          },
+          {
+            "job": "mse_report",
+            "state": "complete"
+          }
+        ]
+      },
+      {
+        "start": "mse_report",
+        "scope": "workflow",
+        "handover": "connected",
+        "github_run": "38063554135",
+        "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+        "executed": [
+          "mse_buffered",
+          "mse_summary",
+          "mse_report"
+        ],
+        "retained": [
+          "submission",
+          "qc",
+          "database",
+          "extract",
+          "cpue_a",
+          "cpue_b",
+          "cpue_summary",
+          "cpue_report",
+          "prepare_a",
+          "prepare_b",
+          "assessment_a1",
+          "assessment_a2",
+          "assessment_b1",
+          "assessment_b2",
+          "assessment_summary",
+          "assessment_report",
+          "mse_prepare",
+          "mse_constant",
+          "mse_index"
+        ],
+        "retained_records_preserved": true,
+        "execution_identity_verified": true,
+        "manual_transfer_checked": false,
+        "peer_barriers_checked": true,
+        "manual_transfer_boundaries": [],
+        "report_completed_before_cpue_transfer": false,
+        "report_completed_before_assessment_transfer": false,
+        "events": [
+          {
+            "state": "phase"
+          },
+          {
+            "state": "plan"
+          },
+          {
+            "job": "mse_buffered",
+            "state": "running",
+            "group": [
+              "mse_buffered"
+            ]
+          },
+          {
+            "job": "mse_buffered",
+            "state": "complete"
+          },
+          {
+            "job": "mse_summary",
+            "state": "running",
+            "group": [
+              "mse_summary"
+            ]
+          },
+          {
+            "job": "mse_summary",
+            "state": "complete"
+          },
+          {
+            "job": "mse_report",
+            "state": "running",
+            "group": [
+              "mse_report"
+            ]
+          },
+          {
+            "job": "mse_report",
+            "state": "complete"
+          }
+        ]
+      },
+      {
+        "start": "cpue_a",
+        "scope": "job",
+        "handover": "connected",
+        "github_run": "38063713241",
+        "commit": "8b5b4e63c0d14b4a7e02db6594537f2c967d1b09",
+        "executed": [
+          "submission",
+          "qc",
+          "database",
+          "extract",
+          "cpue_a"
+        ],
+        "retained": [],
+        "retained_records_preserved": true,
+        "execution_identity_verified": true,
+        "manual_transfer_checked": false,
+        "peer_barriers_checked": true,
+        "manual_transfer_boundaries": [],
+        "report_completed_before_cpue_transfer": false,
+        "report_completed_before_assessment_transfer": false,
+        "events": [
+          {
+            "state": "phase"
+          },
+          {
+            "state": "plan"
+          },
+          {
+            "job": "submission",
+            "state": "running",
+            "group": [
+              "submission"
+            ]
+          },
+          {
+            "job": "submission",
+            "state": "complete"
+          },
+          {
+            "job": "qc",
+            "state": "running",
+            "group": [
+              "qc"
+            ]
+          },
+          {
+            "job": "qc",
+            "state": "failed"
+          },
+          {
+            "job": "submission",
+            "state": "returned"
+          },
+          {
+            "job": "submission",
+            "state": "running"
+          },
+          {
+            "job": "submission",
+            "state": "complete"
+          },
+          {
+            "job": "qc",
+            "state": "running"
+          },
+          {
+            "job": "qc",
+            "state": "complete"
+          },
+          {
+            "job": "database",
+            "state": "running",
+            "group": [
+              "database"
+            ]
+          },
+          {
+            "job": "database",
+            "state": "complete"
+          },
+          {
+            "job": "extract",
+            "state": "running",
+            "group": [
+              "extract"
+            ]
+          },
+          {
+            "job": "extract",
+            "state": "complete"
+          },
+          {
+            "job": "cpue_a",
+            "state": "running",
+            "group": [
+              "cpue_a"
+            ]
+          },
+          {
+            "job": "cpue_a",
+            "state": "complete"
+          }
+        ]
+      }
+    ],
+    "workflow_bundle": {
+      "bundle_sha256": "8de07a3b3aa45535c83b75bd770a5ae6e54458da1298fd4ac261ae5ea7cae794",
+      "checksummed_files": 249,
+      "source_files_match_checkout": true,
+      "frozen_input_matches_original_submission": true,
+      "native_outputs_compared": 22,
+      "selected_job": null,
+      "result": "passed"
+    },
+    "selected_job_bundle": {
+      "bundle_sha256": "2b29d3b0fb50a89e0423dea9f7cb9a5a8785506b6c63b4b1cbb37dfac07ae837",
+      "checksummed_files": 192,
+      "source_files_match_checkout": true,
+      "frozen_input_matches_original_submission": true,
+      "native_outputs_compared": 1,
+      "selected_job": "cpue_a",
+      "result": "passed"
+    },
+    "session_isolation": {
+      "own_state_output_bundle": "passed",
+      "second_reader_own_state": "passed",
+      "cross_reader_denials": {
+        "/state": 403,
+        "/output": 403,
+        "/bundle": 403
+      },
+      "result": "passed"
+    },
+    "runtime": {
+      "r": "4.6.0",
+      "r_platform": "x86_64-pc-linux-gnu",
+      "quarto": "1.9.37",
+      "jsonlite": "2.0.0",
+      "RTMB": "2.0",
+      "TMB": "1.9.25",
+      "knitr": "1.52",
+      "rmarkdown": "2.32",
+      "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+      "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow",
+      "python": "3.12.3",
+      "platform": "linux",
+      "sqlite": "3.45.1"
+    },
+    "github_read_verification": [
+      {
+        "endpoint": "source_commit",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4996,
+        "x-ratelimit-reset": 1791647057
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4999,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "source_commit",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4995,
+        "x-ratelimit-reset": 1791647057
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4998,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "source_commit",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4994,
+        "x-ratelimit-reset": 1791647057
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4997,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "source_commit",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4993,
+        "x-ratelimit-reset": 1791647057
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4991,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4990,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4989,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4988,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "source_commit",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4992,
+        "x-ratelimit-reset": 1791647057
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4987,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "source_commit",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4991,
+        "x-ratelimit-reset": 1791647057
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4986,
+        "x-ratelimit-reset": 1791649094
+      },
+      {
+        "endpoint": "workflow_run",
+        "authenticated": true,
+        "http_status": 200,
+        "x-ratelimit-remaining": 4985,
+        "x-ratelimit-reset": 1791649094
+      }
+    ],
+    "backend_finish_verification": {
+      "status": "PASS",
+      "atomic_receipt_definition_unchanged": true,
+      "atomic_receipt_md5": "295e8eb27c8ce6db0f7ac17b1fe73da6",
+      "finish_function_md5": "96c0ba332212115d817f817119ca2bee",
+      "finish_body_md5": "1c14c5ecd9d8cfee30abd9999cad4834",
+      "statement_budget_seconds": 20,
+      "role_global_timeouts_unchanged": true,
+      "finish_security_invoker": true,
+      "public_anon_authenticated_execute": false,
+      "service_role_execute": true,
+      "adapter_reloaded_source_sha256": "51026da6c7b95c39ce0b9c3cb5e4ccce7e999f02d702669a5bcb6361ff2e40a8",
+      "all7_reloaded_sources_exact": true,
+      "credentials_or_global_access_changed": false
+    }
+  },
+  "preserved_prior_failures": [
+    {
+      "run_id": 38056642636,
+      "scope": "Scheduling software doubles exposed to newly required input contracts; corrected test compatibility."
+    },
+    {
+      "run_id": 38057545662,
+      "scope": "Hosted parallel-worker fingerprint context differed from coordinator; corrected cloud adapter."
+    },
+    {
+      "run_id": 38058491624,
+      "scope": "Public GitHub identity GET failed after successful 22-job child; historical HTTP/network cause unknown. Later check uses authenticated read-only GET and sanitized status diagnostics."
+    },
+    {
+      "run_id": 38059123396,
+      "scope": "Third hosted child failed receiving a finish acknowledgement after two completed children. Historical backend/network cause remains unproven; later finish-only client timeout accounts for the explicit server DB retry budget, while existing operation receipts and identity checks remain required."
+    },
+    {
+      "run_id": 38060442437,
+      "scope": "The first hosted child completed22 analyses; a later child failed at finish with databaseHTTP500. Existing backend logs in the matching failure window showSQLSTATE57014 statement timeout. The deployed atomic write function had no per-function timeout and authenticator had8s statement and lock limits. Historical sizes and exact contention cause remain unknown; the failed run is not counted as a complete acceptance gate."
+    }
+  ],
+  "cancelled_redundant_checks": [
+    {
+      "run_id": 38059109246,
+      "reason": "Unchanged interface already verified at Saved293; transport-only correction checked separately."
+    }
+  ],
+  "later_source_difference": "Standalone companion guide/reader attribution differs from offline868. Cloud source293 preserves hosted-worker fingerprint context. Online source5fba adds read-only GitHub verification transport and a source-pinned authored test. The final hosted source adds a 120s request timeout for finish calls only with transport tests; other runner calls retain 30s, bounded three attempts, exact operation ID/payload and receipt verification. Historical timeout cause is unproven and the service full-request duration is not guaranteed. A later finish-specific RPC and database adapter correction is recorded by the separate deployed-backend verification; its finite execution budget preserves the atomic receipt write and restricted access. Engine, analysis models, contracts, image and numerical comparator remain unchanged; these are distinct complete source snapshots.",
+  "companion_plan_only": "Standalone Git-free archive checksums and an 18-attempt fresh plan verified. Full fresh wrapper execution is not claimed; author validation used 6 verified earlier successes and 12 new attempts, with the original failed fixture retained.",
+  "limits": [
+    "Synthetic data and simple models.",
+    "No institutional deployment or multiple-person collaboration trial.",
+    "No measured analyst time savings or large-workflow performance.",
+    "Input compatibility and numerical agreement do not establish scientific validity."
+  ]
+}
