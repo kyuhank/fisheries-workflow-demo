@@ -96,6 +96,73 @@ class RunnerTransportTest(unittest.TestCase):
         requests = [call.args[0] for call in transport.call_args_list]
         self.assertEqual(requests[0].data, requests[1].data)
 
+    def test_slow_finish_acknowledges_the_same_committed_receipt(self):
+        body = {'checkpoint': 'preserved checkpoint', 'bundle': 'preserved bundle',
+                'state': {'records': {'mse_report': {'run_id': 'Run 001'}}},
+                'result': {'run_id': 'Run 001'}, 'error': None, 'pending_events': []}
+        receipts, calls = {}, []
+
+        def transport(request, *, timeout):
+            calls.append((request.data, timeout))
+            operation = json.loads(request.data)['operation_id']
+            if operation not in receipts:
+                # Model a committed receipt whose acknowledgement was lost.
+                receipts[operation] = request.data
+                body['state']['records'].clear()
+                raise URLError('private connection detail')
+            if receipts[operation] != request.data:
+                raise self.error(400, 'Operation identifier already used.')
+            # Advance no real clock: the response arrives after the server's
+            # 100.5s explicit database retry window, beyond the old 30s limit.
+            if timeout < 101:
+                raise TimeoutError('private slow response detail')
+            return io.BytesIO(b'{"ok":true}')
+
+        with patch.object(self.module, 'urlopen', transport), patch.object(self.module.time, 'sleep'):
+            self.assertEqual(self.module.api('finish', body), {'ok': True})
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(calls[0][0], calls[1][0])
+        self.assertEqual(json.loads(calls[1][0])['state']['records'],
+                         {'mse_report': {'run_id': 'Run 001'}})
+        self.assertTrue(self.module.uuid.UUID(json.loads(calls[1][0])['operation_id']))
+        self.assertTrue(all(101 <= timeout <= 120 for _, timeout in calls))
+
+    def test_finish_keeps_short_identity_and_other_operation_timeouts(self):
+        self.module._expires = 0
+        environment = {'ACTIONS_ID_TOKEN_REQUEST_URL': 'https://example.invalid/identity?request=test',
+                       'ACTIONS_ID_TOKEN_REQUEST_TOKEN': 'test-only'}
+        with patch.dict(os.environ, environment), patch.object(self.module, 'urlopen', side_effect=[
+            io.BytesIO(b'{"value":"test-only"}'), io.BytesIO(b'{"ok":true}'),
+            io.BytesIO(b'{"ok":true}'),
+        ]) as transport:
+            self.assertEqual(self.module.api('finish', {'result': {}}), {'ok': True})
+            self.assertEqual(self.module.api('event', {'event': {'state': 'running'}}), {'ok': True})
+        self.assertEqual([call.kwargs['timeout'] for call in transport.call_args_list], [30, 120, 30])
+
+    def test_finish_rejects_invalid_receipts_and_untrusted_identity_without_retry(self):
+        for code, message in [(400, 'Operation identifier already used.'),
+                              (400, 'Different code version.'),
+                              (401, 'Runner identity required.'), (403, 'Untrusted runner.')]:
+            with self.subTest(code=code, message=message):
+                with patch.object(self.module, 'urlopen', side_effect=lambda *_a, **_k: (_ for _ in ()).throw(
+                    self.error(code, message))) as transport, patch.object(self.module.time, 'sleep') as sleep:
+                    with self.assertRaises(RuntimeError) as failure:
+                        self.module.api('finish', {'result': {}})
+                self.assertNotIsInstance(failure.exception, self.module.TemporaryAPIError)
+                self.assertEqual(transport.call_count, 1)
+                sleep.assert_not_called()
+
+    def test_finish_without_acknowledgement_still_fails_after_three_attempts(self):
+        with patch.object(self.module, 'urlopen', side_effect=TimeoutError('private detail')) as transport, \
+                patch.object(self.module.time, 'sleep') as sleep:
+            with self.assertRaises(self.module.TemporaryAPIError) as failure:
+                self.module.api('finish', {'result': {}})
+        self.assertEqual(transport.call_count, 3)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list], [.5, 1])
+        self.assertEqual(len({call.args[0].data for call in transport.call_args_list}), 1)
+        self.assertTrue(all(call.kwargs['timeout'] == 120 for call in transport.call_args_list))
+        self.assertNotIn('private', str(failure.exception))
+
     def test_exhausted_network_failure_is_bounded_and_private(self):
         with patch.object(self.module, 'urlopen', side_effect=URLError('private credential')) as transport, \
                 patch.object(self.module.time, 'sleep') as sleep:

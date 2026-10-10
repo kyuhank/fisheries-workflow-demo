@@ -50,6 +50,9 @@ def api(path, body=None):
     if body is not None and path in ('event', 'finish'):
         body = {'operation_id': str(uuid.uuid4()), **body}
     payload = json.dumps(body).encode() if body is not None else None
+    # A bound finish may spend 100.5s across the run read and receipt RPC
+    # database retries. Allow response overhead; the workflow deadline still applies.
+    service_timeout = 120 if path == 'finish' else 30
     for attempt in range(3):
         identity = False
         try:
@@ -64,7 +67,7 @@ def api(path, body=None):
             request = Request(API + '/runner/' + path + '?request=' + REQUEST,
                               data=payload, headers={'Authorization': 'Bearer ' + _token,
                                                      'Content-Type': 'application/json'})
-            with urlopen(request, timeout=30) as response:
+            with urlopen(request, timeout=service_timeout) as response:
                 return json.load(response)
         except HTTPError as error:
             try:
