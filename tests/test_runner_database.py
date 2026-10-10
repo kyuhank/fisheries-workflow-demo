@@ -65,6 +65,12 @@ class RunnerDatabaseTest(unittest.TestCase):
         return self.sql(f"select public.paper_runner_write('{self.request}',{literal(operation)},"
                         f"{literal(action)},{literal(json.dumps(body))}::jsonb);", success)
 
+    def finish_rpc(self, operation, action, body, success=True):
+        action_sql = 'null' if action is None else literal(action)
+        return self.sql(f"set role service_role; select public.paper_runner_finish("
+                        f"'{self.request}',{literal(operation)},{action_sql},"
+                        f"{literal(json.dumps(body))}::jsonb);", success)
+
     def value(self, expression, table):
         column = 'id' if table == 'paper_runs' else 'request_id'
         return self.sql(f"select {expression} from public.{table} where {column}='{self.request}';")
@@ -183,6 +189,63 @@ class RunnerDatabaseTest(unittest.TestCase):
         self.write(operation, 'finish', failed)
         self.assertEqual(self.value('status', 'paper_runs'), 'failed')
         self.assertEqual(self.value('error', 'paper_runs'), 'Preparation failed.')
+
+    def test_finish_rpc_replays_and_acknowledges_the_same_atomic_receipt(self):
+        first, second, final = str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4())
+        invalid = {**self.finish(), 'result': None}
+        self.assertIn('Invalid completed execution',
+                      self.finish_rpc(final, 'finish', invalid, success=False))
+        self.assertEqual(self.value('count(*)', 'paper_runner_receipts'), '0')
+        self.assertEqual(self.value('status', 'paper_runs'), 'running')
+        start, completed = self.event('running', 'start'), self.event('complete', 'done')
+        self.write(first, 'event', start)
+        body = self.finish([{'operation_id': first, **start}, {'operation_id': second, **completed}])
+        self.finish_rpc(final, 'finish', body)
+        self.finish_rpc(final, 'finish', body)
+        self.write(final, 'finish', body)  # Legacy path shares exactly the same receipt.
+        self.assertEqual(self.value('count(*)', 'paper_events'), '2')
+        self.assertEqual(self.value('count(*)', 'paper_runner_receipts'), '3')
+        self.assertEqual(self.value('status', 'paper_runs'), 'complete')
+        self.assertEqual(self.state(), 'final')
+        altered = {**body, 'bundle': 'changed bytes'}
+        self.assertIn('Operation identifier already used',
+                      self.finish_rpc(final, 'finish', altered, success=False))
+        self.assertIn('Run is no longer active',
+                      self.finish_rpc(str(uuid.uuid4()), 'finish', body, success=False))
+        self.assertEqual(self.sql(f"select bundle from public.paper_sessions where id='{self.session}';"),
+                         body['bundle'])
+        self.assertEqual(self.value('count(*)', 'paper_runner_receipts'), '3')
+
+    def test_finish_rpc_rejects_other_actions_and_public_roles(self):
+        for action in ('event', '', None):
+            error = self.finish_rpc(str(uuid.uuid4()), action, self.finish(), success=False)
+            self.assertIn('Invalid completed execution action', error)
+        self.assertEqual(self.value('count(*)', 'paper_runner_receipts'), '0')
+        self.assertEqual(self.value('status', 'paper_runs'), 'running')
+        for role in ('anon', 'authenticated'):
+            error = self.sql(f"set role {role}; select public.paper_runner_finish('{self.request}',"
+                             f"'{uuid.uuid4()}','finish','{{}}');", success=False)
+            self.assertIn('permission denied', error)
+        self.write(str(uuid.uuid4()), 'event', self.event('handover', 'original event path'))
+        self.assertEqual(self.value('status', 'paper_runs'), 'handover')
+
+    def test_finish_rpc_has_a_scoped_budget_and_no_new_definer_privilege(self):
+        metadata = json.loads(self.sql("select jsonb_build_object('definer',prosecdef,"
+                                       "'settings',proconfig) from pg_proc where "
+                                       "oid='public.paper_runner_finish(uuid,uuid,text,jsonb)'::regprocedure;"))
+        self.assertFalse(metadata['definer'])
+        self.assertEqual(set(metadata['settings']), {'search_path=""', 'statement_timeout=20s'})
+        original = json.loads(self.sql("select to_jsonb(proconfig) from pg_proc where "
+                                      "oid='public.paper_runner_write(uuid,uuid,text,jsonb)'::regprocedure;"))
+        self.assertEqual(original, ['search_path=""'])
+        # Direct SQL is not a PostgREST hoisting test. These finite settings must
+        # still be restored after returning to an ordinary event caller.
+        settings = self.sql("set statement_timeout='8s'; set lock_timeout='8s'; "
+                            "set role service_role; "
+                            f"select public.paper_runner_finish('{self.request}','{uuid.uuid4()}',"
+                            f"'finish',{literal(json.dumps(self.finish()))}::jsonb); "
+                            "select current_setting('statement_timeout')||','||current_setting('lock_timeout');")
+        self.assertEqual(settings, '8s,8s')
 
     def test_late_setup_message_does_not_move_a_handover_backwards(self):
         self.write(str(uuid.uuid4()), 'event', self.event('handover', 'waiting'))

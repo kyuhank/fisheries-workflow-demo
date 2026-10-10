@@ -7,16 +7,20 @@ export class DatabaseError extends Error {
 /** Retry reads, repeatable patches and the transactional runner receipt RPC. */
 export function createDatabase(url: string, key: string, transport = fetch) {
   return async function db(path: string, method = "GET", body?: unknown) {
-    const repeatable = ["GET", "PATCH"].includes(method) ||
-      (method === "POST" && path === "rpc/paper_runner_write");
+    const runnerWrite = method === "POST" &&
+      ["rpc/paper_runner_write", "rpc/paper_runner_finish"].includes(path);
+    const repeatable = ["GET", "PATCH"].includes(method) || runnerWrite;
     const attempts = repeatable ? 3 : 1;
-    const finish = method === "POST" && path === "rpc/paper_runner_write" &&
+    const finish = runnerWrite &&
       (body as { p_action?: unknown } | undefined)?.p_action === "finish";
+    // PostgREST hoists the finish RPC's finite SQL budget before executing it.
+    // Preserve the request envelope and the original receipt implementation.
+    const transportPath = finish ? "rpc/paper_runner_finish" : path;
     // A finish carries the checkpoint and reproducibility bundle. Give that
     // transport more time; PostgreSQL's own statement/lock limits still apply.
     const deadline = finish ? 25000 : 8000;
     const phase = finish ? "runner_finish"
-      : method === "POST" && path === "rpc/paper_runner_write" ? "runner_write"
+      : runnerWrite ? "runner_write"
       : method === "GET" && path.startsWith("paper_runs?") ? "run_read"
       : method === "GET" ? "read" : "write";
     // A caller changing its object while a response is lost must not change
@@ -26,7 +30,7 @@ export function createDatabase(url: string, key: string, transport = fetch) {
       let response: Response | undefined;
       const started = performance.now();
       try {
-        response = await transport(url + "/rest/v1/" + path, {
+        response = await transport(url + "/rest/v1/" + transportPath, {
           method,
           headers: {
             apikey: key,

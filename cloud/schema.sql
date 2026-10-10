@@ -155,6 +155,21 @@ end $$;
 revoke all on function public.paper_runner_write from public,anon,authenticated;
 grant execute on function public.paper_runner_write to service_role;
 
+-- Only completed executions need a larger statement budget. PostgREST hoists
+-- this setting for the called RPC; event writes retain their existing limits.
+-- Delegate to the same atomic receipt function without changing its payload.
+create or replace function public.paper_runner_finish(
+ p_request uuid,p_operation uuid,p_action text,p_body jsonb
+) returns void language plpgsql security invoker set search_path='' set statement_timeout='20s' as $$
+begin
+ if p_action is distinct from 'finish' then
+  raise exception 'Invalid completed execution action';
+ end if;
+ perform public.paper_runner_write(p_request,p_operation,p_action,p_body);
+end $$;
+revoke all on function public.paper_runner_finish(uuid,uuid,text,jsonb) from public,anon,authenticated;
+grant execute on function public.paper_runner_finish(uuid,uuid,text,jsonb) to service_role;
+
 create extension if not exists pg_cron;
 do $$ begin
  if not exists(select 1 from cron.job where jobname='paper-demo-expiry') then

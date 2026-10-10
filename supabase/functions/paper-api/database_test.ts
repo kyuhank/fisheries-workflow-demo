@@ -189,11 +189,12 @@ Deno.test("a large finish keeps its original bytes and receipt after a lost resp
         pending_events: [],
       },
     };
-    const original = JSON.stringify(body), requests: string[] = [];
+    const original = JSON.stringify(body), requests: string[] = [], urls: string[] = [];
     const db = createDatabase(
       "https://private.invalid",
       "private-key",
-      async (_url, options) => {
+      async (url, options) => {
+        urls.push(String(url));
         requests.push(String(options!.body));
         if (requests.length === 1) {
           // A changed caller object must not mutate an already submitted receipt.
@@ -208,6 +209,7 @@ Deno.test("a large finish keeps its original bytes and receipt after a lost resp
       result !== null || requests.length !== 2 ||
       requests.some((value) => value !== original) ||
       requests.some((value) => JSON.parse(value).p_operation !== operation) ||
+      urls.some((url) => url !== "https://private.invalid/rest/v1/rpc/paper_runner_finish") ||
       JSON.stringify(deadlines) !== "[25000,25000]"
     ) throw Error("Large result custody changed during its receipt retry.");
     const observed = diagnostics[0]?.[1] as Record<string, unknown>;
@@ -222,8 +224,9 @@ Deno.test("a large finish keeps its original bytes and receipt after a lost resp
       p_action: "event",
       p_body: { event: { state: "running" } },
     });
-    if (deadlines[2] !== 8000) {
-      throw Error("The longer deadline leaked into ordinary event delivery.");
+    if (deadlines[2] !== 8000 ||
+      urls[2] !== "https://private.invalid/rest/v1/rpc/paper_runner_write") {
+      throw Error("The finish path or deadline leaked into ordinary event delivery.");
     }
   });
 });
@@ -260,5 +263,50 @@ Deno.test("an interrupted finish remains bounded and cannot claim success", asyn
           Object.keys(value).sort().join(",") !== "class,elapsed_ms,phase,status";
       }) || JSON.stringify(diagnostics).includes("private")
     ) throw Error("An exhausted finish exposed private diagnostic content.");
+  });
+});
+
+Deno.test("the restricted finish endpoint rejects an event without retries or a larger deadline", async () => {
+  await inspectTransport(async (deadlines) => {
+    let attempts = 0;
+    const db = createDatabase("https://example.invalid", "test-only", async (url) => {
+      attempts++;
+      if (String(url) !== "https://example.invalid/rest/v1/rpc/paper_runner_finish") {
+        throw Error("An invalid finish action escaped the restricted endpoint.");
+      }
+      return new Response("private SQL rejection", { status: 400 });
+    });
+    try {
+      await db("rpc/paper_runner_finish", "POST", { p_action: "event" });
+      throw Error("The restricted RPC accepted an event.");
+    } catch (error) {
+      if (!(error instanceof DatabaseError) || error.retryable || attempts !== 1 ||
+        JSON.stringify(deadlines) !== "[8000]" || error.message.includes("private")) {
+        throw Error("The invalid finish action changed its bounds or exposed SQL details.");
+      }
+    }
+  });
+});
+
+Deno.test("a direct finish RPC retries only the same acknowledged receipt", async () => {
+  await inspectTransport(async (deadlines) => {
+    const body = { p_request: "fixed-run", p_operation: "fixed-operation", p_action: "finish", p_body: {} };
+    const original = JSON.stringify(body), requests: string[] = [];
+    const db = createDatabase("https://example.invalid", "test-only", async (url, options) => {
+      if (String(url) !== "https://example.invalid/rest/v1/rpc/paper_runner_finish") {
+        throw Error("The direct finish receipt changed endpoints.");
+      }
+      requests.push(String(options!.body));
+      if (requests.length === 1) {
+        body.p_operation = "changed caller";
+        throw new TypeError("lost response after commit");
+      }
+      return Response.json(null);
+    });
+    const result = await db("rpc/paper_runner_finish", "POST", body);
+    if (result !== null || requests.length !== 2 || requests.some((r) => r !== original) ||
+      JSON.stringify(deadlines) !== "[25000,25000]") {
+      throw Error("The direct finish receipt was not repeated safely.");
+    }
   });
 });
