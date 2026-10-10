@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "status": "PASSED",
+  "tool_version": "1.9.1",
+  "saved_analysis_version": "1.9.0",
+  "tested_commands": [
+    "sh scripts/offline.sh reproduce",
+    "sh scripts/offline.sh compare"
+  ],
+  "offline_archive": {
+    "file": "fisheries-workflow-offline-1.9.1.zip",
+    "sha256": "9dc9be10e52fcce1b613adcbad8aba6666725dbaafd4c026704dd0eb236ad84c"
+  },
+  "sources": {
+    "manifest_sha256": "34cab61ecfdc7d93e30e08da85d30ecafab05c122d25d5d198c4676eb71bcd33",
+    "checksummed_files": 258,
+    "coordinator_origin": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+      "commit": "293a9c3532296f9cf169b93a0e40c2a5bf0e8845"
+    },
+    "component_origins": {
+      "cpue": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+        "commit": "c1c12a04c51d5677ae50747f30f774d2f6a0d69c"
+      },
+      "assessment": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
+        "commit": "86374e31b4de5bd65d19e772b78b788d55a3a8de"
+      },
+      "mse": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
+        "commit": "9d733ca29c3008deea79b76e127c8e412efe1b5d"
+      }
+    }
+  },
+  "actual_execution": {
+    "provider": "Local Docker",
+    "network": "none",
+    "host_tools": [
+      "Docker",
+      "POSIX shell"
+    ],
+    "GitHub_environment_removed": true,
+    "jobs_executed": [
+      "submission",
+      "qc",
+      "database",
+      "extract",
+      "cpue_a",
+      "cpue_b",
+      "cpue_summary",
+      "cpue_report",
+      "prepare_a",
+      "prepare_b",
+      "assessment_a1",
+      "assessment_a2",
+      "assessment_b1",
+      "assessment_b2",
+      "assessment_summary",
+      "assessment_report",
+      "mse_prepare",
+      "mse_constant",
+      "mse_index",
+      "mse_buffered",
+      "mse_summary",
+      "mse_report"
+    ],
+    "jobs_retained": [],
+    "state_sha256": "7a70b564d2cef5994eaadab1dc5e9d35297a11694d1a1b7dcc00e111bea30ebf",
+    "receipt_sha256": "0a1733743bee508399d9b70be5b844e3561d9a8044bc0d41ef8cb252de5e86bb",
+    "output_checksums_in_state": true
+  },
+  "actual_comparison": {
+    "status": "PASSED",
+    "outputs_compared": 22,
+    "receipt_sha256": "9b0d6eb6026bd2576aa1fa4331ec79dbc76e253b792cc788ab00ea825aa2760e"
+  },
+  "runtime": {
+    "schema_version": 1,
+    "upstream_registry_digest": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "config_id": "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158",
+    "platform": "linux/amd64",
+    "rootfs_diff_ids": [
+      "sha256:98effb2dfe85d4c431f97d90482075f19e5fc3a57c2dd423d8bdfd4813620043",
+      "sha256:613659109016edd06de370f7bc2025e102bdcddaeac9de63a7b539d8bf3b1ae1",
+      "sha256:0b37a25965e9e9119a64e622f3101c8b7ef9f6eacab3a6dd9a4b062e9550f948",
+      "sha256:b52c4fe3ae39d7f3c34a04f72ac1e8ea873cbb9645bd2ea9bfe58f841059b60b",
+      "sha256:26cd91d7da066e47b7463ffd3d6e1795f3ba2d036f4a078b73cf3579830bc009",
+      "sha256:3a4afdc4e1d09235c386e112b3f8c8779ca06dcdeac06099001ba3260d49639d",
+      "sha256:853a19e9d9bf3fee97141848b791a845454f147bf9a3c61707b124c676288c6c",
+      "sha256:56accf9e26339a6b30b33f4f17954bb9931861898b4e82f41fc3ddce60c59f54",
+      "sha256:9d662917e398066bfc676c31a09d46648e38baf92db0ef55a76f1ae800732fca",
+      "sha256:655fde5934fb72434f5b0212542cb467d110a5d8c9e6fc2c8d5304643245afd3",
+      "sha256:616cadc63d516bc79ef6ffd13f95736739bdd9f8711ed03f93228276e318f545",
+      "sha256:60860921f93d2910563d7bb8e2bdcc06b93f70698e6e5c63b96de67f8dbb0700"
+    ],
+    "identity_note": "Docker save/load may omit registry RepoDigests. Verify and launch the config ID with these ordered rootfs diff IDs; the upstream digest remains a source pin.",
+    "launch_reference": "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158",
+    "local_repo_digests": [
+      "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+    ],
+    "upstream_reference_present_locally": true,
+    "verification_basis": "config ID, platform and ordered rootfs diff IDs",
+    "registry_digest_verified_locally": true,
+    "pull_policy": "never",
+    "network": "none"
+  },
+  "image_archive": {
+    "file": "fisheries-workflow-runtime.tar.gz",
+    "sha256": "77d76c4e84d5d0966788007e047f1867e56ece5c7aefcced12e620304db66fe6",
+    "bytes": 613060435
+  },
+  "image_archive_config_and_layer_bytes_verified": true,
+  "actual_Docker_load": true,
+  "local_navigation_checked": {
+    "jobs": 22,
+    "all_relative_targets_and_source_anchors_exist": true
+  },
+  "implementation_checks": {
+    "passed": 15,
+    "skipped": 0
+  },
+  "scope": [
+    "Synthetic data and simplified models illustrate execution and preservation.",
+    "Local reproduction used an existing Docker daemon on an ARM Mac with AMD64 emulation. Uncached clean-machine restoration was not tested.",
+    "The built image is preserved separately from each run archive. Registry RepoDigests may not survive Docker save/load; the config ID, platform and ordered layer identities are checked.",
+    "The original saved-run source is retained. Local support tools are recorded separately.",
+    "No institutional deployment, human usability, time-saving or long-term archival deposit is established."
+  ]
+}

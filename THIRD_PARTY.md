@@ -16,6 +16,8 @@ storage adapters, under their respective PSF licence and public-domain terms.
 
 The execution image is pinned by digest in `Dockerfile` and the live workflow.
 Job records retain that image and observed package versions. Code and data are
-preserved separately. The website and downloadable HTML display saved outputs
+preserved separately. The runtime archive is an unchanged copy of that image;
+its installed licence notices remain in place. This repository's MIT licence
+does not replace those third-party licences. The website and downloadable HTML display saved outputs
 without a browser calculation runtime. Earlier releases retain their earlier
 runtime files and notices.

@@ -58,7 +58,9 @@ def source_payload(sources=None):
     files += [ROOT / name for name in ['run.py', 'verify.py', 'Makefile', 'Dockerfile', 'README.md',
               'LICENSE', 'THIRD_PARTY.md', 'build-info.json', 'ADAPT.md', 'cloud/README.md',
               'examples/analyst-repositories.yaml', 'scripts/generate-data.R', 'scripts/import-r-data.py',
-              'scripts/hydrate-sources.py', 'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md']]
+              'scripts/hydrate-sources.py', 'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md',
+              'OFFLINE.md', 'runtime-preservation.json', 'scripts/offline.sh',
+              'scripts/offline-runtime.py', 'scripts/preserve-runtime.sh']]
     result = {p.relative_to(ROOT).as_posix(): p.read_bytes() for p in files if p.is_file()}
     result.update(sources.archive_payload())
     if (ROOT / 'coordinator-origin.json').is_file():
@@ -484,11 +486,17 @@ class Workflow:
             if job_target:
                 note = (f'This check compares only {job_target}. Other saved results retain their earlier '
                         'records and may use earlier inputs; they are not reproduced by this command.\n')
-            archive.writestr('REPRODUCE.txt', f'Pull: {pull}\nRun: {run}\nCheck: {check}\n{note}'
-                            'Run these commands from the extracted folder with Docker and Make available. '
-                            'Make uses the recorded image, pulling it if needed, and starts the coordinator inside it; no host '
-                            'Python, R or Quarto is needed. The coordinator checks inputs and schedules jobs; '
-                            'workflow/Makefile launches the R calculations and three Quarto reports. The '
-                            'offline page displays saved outputs. Container digest and original run identities '
-                            'are in reference/state.json.\n')
+            offline_job = ' ' + shlex.quote(job_target) if job_target else ''
+            archive.writestr('REPRODUCE.txt',
+                            f'Local repeat: sh scripts/offline.sh reproduce{offline_job}\n'
+                            f'Compare: sh scripts/offline.sh compare{offline_job}\n{note}'
+                            'Run from the extracted folder with Docker and a POSIX shell. '
+                            'The recorded image must already be present or restored from your saved runtime archive. '
+                            'See OFFLINE.md for restoration and preservation. Offline commands never retrieve '
+                            'an image or source repository and disable container network access. '
+                            'Inputs, analysis sources and runtime identity are checked before calculation. '
+                            'The saved reference stays in reference/; new results go into offline-runs/.\n\n'
+                            f'Development route (may retrieve software):\nPull: {pull}\nRun: {run}\nCheck: {check}\n'
+                            'This Make route requires host Docker, Make and Python 3. R and Quarto run inside '
+                            'the recorded image. Original run identities are in reference/state.json.\n')
         return buffer.getvalue()

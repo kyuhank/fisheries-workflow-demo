@@ -13,6 +13,7 @@
 | `Makefile` | Reader commands for container runs and reproduction. |
 | `workflow/Makefile` | R calculation and Quarto report recipes inside the container. |
 | `workflow/r_bridge.py` | Container guard, JSON interface and process control. |
+| `scripts/offline.sh` | Repeat a preserved run locally, without retrieving sources or software. |
 | `app/diagram.json` | The same job graph shown as a dependency diagram. |
 
 ## Add a job
@@ -66,7 +67,23 @@ must use those same generated observations and annual catches.
 If software requirements change, build and check a new image version before
 updating the immutable digest in the workflow. The browser and downloaded HTML
 display saved results; calculations run in the container. Code, inputs and results
-are preserved separately from the software image.
+are preserved separately from the software image. Keep a copy of the built image
+with each release; [OFFLINE.md](OFFLINE.md) gives the save and restoration commands.
+
+## Maintain a release
+
+Edit source files, not generated pages in `docs/`. Check changed calculations
+and their input contracts in the pinned container before updating a component
+source pin. The existing calculation, interface and server checks can be run
+through the repository workflows; a local preserved run can be checked without
+the hosting service.
+
+Keep earlier release archives and image copies. A new release should retain its
+own source pins, input snapshots, settings, outputs, execution records and
+checksums. `scripts/release.py` adds local reading and execution tools to the
+saved run without replacing its recorded analysis sources. Support-tool versions
+can therefore differ from the saved analysis version. Change software only by
+checking and recording a new image, then preserving that image as well.
 
 ## Numerical comparisons
 
