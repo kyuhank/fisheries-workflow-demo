@@ -88,6 +88,10 @@ class HostedSourceContextTest(unittest.TestCase):
             self.assertTrue(restored.valid(key))
         result = self.calculate(CoordinatorBridge())
         self.assertEqual(result['job'], 'cpue_a')
+        # Production workers return results; Workflow.run saves them in the parent.
+        with patch('workflow.engine.reports.output_page', return_value='TEST DOUBLE'), \
+             patch('workflow.engine.render_report', side_effect=test_report):
+            self.runner.save('cpue_a', result, 'Software worker fixture')
         record = json.loads((Path(self.temp.name) / 'cpue_a/record.json').read_text())
         self.assertEqual(record['execution'], self.runner.execution)
         self.assertIn('cloud/run.py', record['code'])
