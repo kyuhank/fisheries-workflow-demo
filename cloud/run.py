@@ -27,10 +27,16 @@ _token, _expires = '', 0
 PARALLEL_JOBS = {key for stage in STAGES if len(stage) > 1 for key in stage}
 
 
-def calculate_independent_job(directory, key, settings, run_id, source_lock=None):
+def calculate_independent_job(directory, key, settings, run_id, source_lock=None,
+                              hosted_data=None, execution=None):
     if key not in PARALLEL_JOBS:
         raise ValueError('This job requires the workflow coordinator.')
-    runner = Workflow(directory, source_lock=source_lock)
+    if hosted_data is None:
+        runner = Workflow(directory, source_lock=source_lock)
+    else:
+        runner = HostedCalculationWorkflow(directory, source_lock=source_lock)
+        runner.hosted_data = json.loads(json.dumps(hosted_data))
+        runner.execution = json.loads(json.dumps(execution or {}))
     runner.configure(settings)
     return asyncio.run(runner.calculate(key, run_id))
 
@@ -129,7 +135,20 @@ def checkpoint(directory):
     return base64.b64encode(buffer.getvalue()).decode()
 
 
-class HostedWorkflow(Workflow):
+class HostedCalculationWorkflow(Workflow):
+    """Share hosted fingerprints with workers without contacting the service."""
+
+    def code_record(self, key):
+        return {**super().code_record(key), 'cloud/run.py': digest(Path(__file__).read_bytes())}
+
+    def signature(self, key):
+        value = super().signature(key)
+        if key == 'submission':
+            return digest(encoded({'calculation': value, 'hosted_data': digest(encoded(self.hosted_data))}))
+        return value
+
+
+class HostedWorkflow(HostedCalculationWorkflow):
     def __init__(self, context):
         container = RBridge.require_container()
         self.context = context
@@ -146,15 +165,6 @@ class HostedWorkflow(Workflow):
                           'data_checksum': digest(encoded(self.hosted_data))}
         self.configure({'mse': False, **context['settings']})
 
-    def code_record(self, key):
-        return {**super().code_record(key), 'cloud/run.py': digest(Path(__file__).read_bytes())}
-
-    def signature(self, key):
-        value = super().signature(key)
-        if key == 'submission':
-            return digest(encoded({'calculation': value, 'hosted_data': digest(encoded(self.hosted_data))}))
-        return value
-
     async def calculate(self, key, run_id):
         if key not in PARALLEL_JOBS:
             return await super().calculate(key, run_id)
@@ -163,7 +173,8 @@ class HostedWorkflow(Workflow):
                                             mp_context=multiprocessing.get_context('spawn'))
         return await asyncio.get_running_loop().run_in_executor(
             self.pool, calculate_independent_job, str(self.directory), key, self.settings, run_id,
-            str(self.sources.lock_path) if self.sources.lock_path else None)
+            str(self.sources.lock_path) if self.sources.lock_path else None,
+            self.hosted_data, self.execution)
 
     async def run(self, start='submission', scope='workflow'):
         try:
