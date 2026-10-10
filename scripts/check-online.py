@@ -95,15 +95,49 @@ def poll(path, session):
         time.sleep(2 ** attempt)
 
 
+class GitHubReadRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Keep verification credentials on the explicitly requested API host."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def github_rate_headers(headers):
+    result = {}
+    for name in ('x-ratelimit-remaining', 'x-ratelimit-reset', 'retry-after'):
+        value = headers.get(name, '') if headers else ''
+        if isinstance(value, str) and re.fullmatch(r'[0-9]{1,12}', value.strip()):
+            result[name] = int(value.strip())
+    return result
+
+
 def github(path):
+    if not re.fullmatch(r'(?:commits/[a-f0-9]{40}|actions/runs/[0-9]+)', path):
+        raise ValueError('Unsupported public GitHub verification GET.')
+    headers = {'Accept': 'application/vnd.github+json',
+               'User-Agent': 'fisheries-workflow-online-check'}
+    token = os.environ.get('GITHUB_TOKEN')
+    if token:
+        headers['Authorization'] = 'Bearer ' + token
     req = urllib.request.Request('https://api.github.com/repos/' + REPOSITORY + '/' + path,
-                                 headers={'Accept': 'application/vnd.github+json',
-                                          'User-Agent': 'fisheries-workflow-online-check'})
+                                 headers=headers, method='GET')
+    diagnostic = {'endpoint': 'source_commit' if path.startswith('commits/') else 'workflow_run',
+                  'authenticated': bool(token)}
     try:
-        with urllib.request.urlopen(req, timeout=40) as response:
+        opener = urllib.request.build_opener(GitHubReadRedirectHandler())
+        with opener.open(req, timeout=40) as response:
+            diagnostic['http_status'] = response.status
+            diagnostic.update(github_rate_headers(response.headers))
             return json.load(response)
+    except urllib.error.HTTPError as error:
+        diagnostic['http_status'] = error.code
+        diagnostic.update(github_rate_headers(error.headers))
+        raise RuntimeError(f'Public GitHub execution verification failed (HTTP {error.code}).') from None
     except (urllib.error.URLError, TimeoutError, ConnectionError, json.JSONDecodeError):
-        raise RuntimeError('Public GitHub execution verification failed.') from None
+        diagnostic['failure'] = 'connection_or_invalid_json'
+        raise RuntimeError('Public GitHub execution verification failed (connection or invalid JSON).') from None
+    finally:
+        REPORT.setdefault('github_read_verification', []).append(diagnostic)
 
 
 def check_identity(run, value, previous):

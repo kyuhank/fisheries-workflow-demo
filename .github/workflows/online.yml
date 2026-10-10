@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: fisheries-workflow-online-check
   cancel-in-progress: false
@@ -21,9 +22,12 @@ jobs:
       - name: Verify and assemble pinned analysis repositories
         run: python3 scripts/hydrate-sources.py
       - name: Check real hosted execution and downloaded reproduction
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           docker pull "$IMAGE"
           docker run --rm --user "$(id -u):$(id -g)" \
+            --env GITHUB_TOKEN \
             --env PAPER_EXPECTED_COMMIT="$GITHUB_SHA" \
             --env PAPER_RUNTIME_IMAGE="$IMAGE" \
             --env PAPER_RUNTIME_IMAGE_URL=https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow \
