@@ -1,4 +1,7 @@
 FROM ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
+# Optional embedded monorepo compatibility recipe.
+# Default split execution mounts the verified hydrated checkout in the SPC image.
+ENV PAPER_SOURCE_MODE=monorepo
 WORKDIR /workspace
 COPY jobs/ jobs/
 COPY workflow/ workflow/

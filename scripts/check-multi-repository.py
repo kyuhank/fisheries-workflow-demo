@@ -24,7 +24,7 @@ sys.path.insert(0, str(ROOT))
 
 from workflow.engine import Workflow
 from workflow.r_bridge import RBridge
-from workflow.spec import SPEC
+from workflow.spec import SPEC, DEFAULTS
 from verify import compare, verify
 
 BUFFER = ('mse_buffered', 'mse_summary', 'mse_report')
@@ -35,7 +35,7 @@ CPUE = ('cpue_a', 'cpue_summary', 'cpue_report', 'prepare_a',
 ALL = tuple(SPEC)
 REFERENCE_COMMIT = 'b6dc067d5346d3809edf0ad66a0f6c7e7d07ce93'
 CODE_OLD = 'buffer = context$settings$mse_buffer'
-CODE_NEW = 'buffer = 0.9 * context$settings$mse_buffer'
+CODE_NEW = 'buffer = min(context$settings$mse_buffer, 0.6)'
 FAILURE_TEXT = 'MR08 intentional Buffered simulation failure'
 ATTEMPTS = (
     ('MR-01', 'reference-baseline', 'reference subprocess', ALL),
@@ -68,14 +68,18 @@ def require(condition, message):
         raise AssertionError(message)
 
 
-def plan(timeout=180):
+def plan(timeout=180, continuation=False):
     return {'schema_version': 1, 'status': 'PLANNED_NOT_EXECUTED',
             'case_ids': [f'MR-{number:02d}' for number in range(1, 9)],
-            'maximum_attempts': len(ATTEMPTS), 'timeout_seconds_per_attempt': timeout,
+            'maximum_attempts': len(ATTEMPTS[6:] if continuation else ATTEMPTS),
+            'maximum_new_attempts': len(ATTEMPTS[6:] if continuation else ATTEMPTS),
+            'imported_attempt_count': 6 if continuation else 0,
+            'total_declared_attempt_count': len(ATTEMPTS),
+            'timeout_seconds_per_attempt': timeout,
             'timeout_mechanism': 'cooperative asyncio cancellation; R/Quarto subprocess limits retained; parent enforces outer container wall bound',
             'attempts': [{'case': case, 'name': name, 'kind': kind,
                           'expected_selected': list(selected)}
-                         for case, name, kind, selected in ATTEMPTS],
+                         for case, name, kind, selected in (ATTEMPTS[6:] if continuation else ATTEMPTS)],
             'code_edit': {'path': 'jobs/mse_buffered/run.R', 'before': CODE_OLD,
                           'after': CODE_NEW, 'fixed_mse_buffer': 0.8,
                           'expected_selected': list(BUFFER)},
@@ -149,7 +153,7 @@ def set_local_execution(runner):
     return execution
 
 
-def sources_and_lineage(runner, produced=ALL):
+def sources_and_lineage(runner, produced=ALL, retained_records=None):
     evidence = {}
     coordinator = runner.sources.coordinator_identity()
     for key in ALL:
@@ -184,7 +188,12 @@ def sources_and_lineage(runner, produced=ALL):
             require(sha256(runner.directory / key / name) == checksum,
                     f'Output checksum differs: {key}/{name}')
         require(runner.valid(key), f'Invalid final producing record: {key}')
-        if runner.execution:
+        if key not in produced:
+            require(retained_records is not None and record == retained_records.get(key),
+                    f'Retained producing record differs from its verified checkpoint: {key}')
+            require(record.get('execution', {}).get('container') == RBridge.require_container(),
+                    f'Retained record uses a different preserved image: {key}')
+        if runner.execution and key in produced:
             require(record.get('source') == coordinator,
                     f'Producing record has a different coordinator source identity: {key}')
             for field, value in runner.execution.items():
@@ -295,9 +304,133 @@ def variant_lock(original, destination, edit):
                   'lock_sha256': sha256(path), 'path': 'jobs/mse_buffered/run.R'}
 
 
+CHECKPOINT_COMMIT = '5cca42bedf3ea61027b282799400adf8483980b9'
+ALLOWED_PROOF_CHANGES = {
+    'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md',
+    'tests/test_multi_repository.py', 'tests/test_multi_repository_continuation.py', 'Dockerfile',
+}
+
+
+def validate_checkpoint(receipt_path, expected_sha256, origin_path, current_origin, image,
+                        *, expected_origin_sha256=None):
+    """Read immutable prior material; never calculate, repair or rewrite it."""
+    from workflow.sources import contained
+    receipt_path, origin_path = Path(receipt_path).resolve(), Path(origin_path).resolve()
+    require(re.fullmatch(r'[0-9a-f]{64}', expected_sha256 or '') is not None
+            and sha256(receipt_path) == expected_sha256, 'Checkpoint receipt SHA256 differs.')
+    if expected_origin_sha256 is not None:
+        require(re.fullmatch(r'[0-9a-f]{64}', expected_origin_sha256) is not None
+                and sha256(origin_path) == expected_origin_sha256, 'Checkpoint origin SHA256 differs.')
+    prior = json.loads(receipt_path.read_text())
+    origin = json.loads(origin_path.read_text())
+    require(origin.get('schema_version') == 1 and origin.get('commit') == CHECKPOINT_COMMIT
+            and origin.get('repository') == 'https://github.com/kyuhank/fisheries-workflow-demo',
+            'Checkpoint coordinator origin differs from the exact original executable commit.')
+    require(current_origin.get('schema_version') == 1
+            and current_origin.get('repository') == origin['repository']
+            and re.fullmatch(r'[0-9a-f]{40}', current_origin.get('commit', '')) is not None
+            and current_origin['commit'] != CHECKPOINT_COMMIT,
+            'Current committed coordinator origin is invalid.')
+    old_files, current_files = origin.get('files', {}), current_origin.get('files', {})
+    require(isinstance(old_files, dict) and isinstance(current_files, dict)
+            and 'workflow/engine.py' in old_files and 'verify.py' in old_files,
+            'Checkpoint core source hashes are missing.')
+    require((set(old_files) ^ set(current_files)) <= ALLOWED_PROOF_CHANGES,
+            'Coordinator source membership changed beyond the proof-only correction.')
+    for name in set(old_files) | set(current_files):
+        for files in (old_files, current_files):
+            if name in files:
+                require(re.fullmatch(r'[0-9a-f]{64}', files[name]) is not None,
+                        'Invalid coordinator source checksum: ' + name)
+        if name not in ALLOWED_PROOF_CHANGES:
+            require(old_files.get(name) == current_files.get(name),
+                    'Analytical/core coordinator source bytes changed: ' + name)
+    require(prior.get('status') == 'FAILED' and prior.get('actual_client') == 'codex'
+            and prior.get('automatic_retry') is False and prior.get('test_doubles') is False,
+            'Continuation requires the preserved actual FAILED receipt, without retry/doubles.')
+    require(prior.get('runtime_image') == image, 'Checkpoint runtime image differs.')
+    execution = prior.get('execution_identity', {})
+    require(execution.get('provider') == 'Local Docker validation'
+            and execution.get('repository') == 'kyuhank/fisheries-workflow-demo'
+            and execution.get('commit') == CHECKPOINT_COMMIT and execution.get('container') == image,
+            'Checkpoint actual executable/image identity differs.')
+    require(prior.get('comparison', {}).get('sha256') == old_files['verify.py']
+            and prior.get('comparison', {}).get('source') == 'verify.py',
+            'Checkpoint comparison policy differs.')
+    attempts = prior.get('attempts', [])
+    require(len(attempts) == 7 and attempts[-1].get('case') == 'MR-04'
+            and attempts[-1].get('name') == 'code-selective'
+            and attempts[-1].get('kind') == ATTEMPTS[6][2]
+            and attempts[-1].get('expected_selected') == list(BUFFER)
+            and attempts[-1].get('status') == 'FAILED', 'Checkpoint failed MR-04 attempt is missing/different.')
+    names = []
+    for entry, (case, name, kind, selected) in zip(attempts[:6], ATTEMPTS[:6]):
+        require(entry.get('case') == case and entry.get('name') == name
+                and entry.get('kind') == kind and entry.get('expected_selected') == list(selected)
+                and entry.get('status') == 'PASSED', 'Checkpoint first six completed attempts differ.')
+        names.append(name)
+    cases = prior.get('cases', {})
+    require(set(cases) == {'MR-01', 'MR-02', 'MR-03'}
+            and all(value.get('status') == 'PASSED' for value in cases.values()),
+            'Checkpoint completed case inventory differs.')
+    root, manifest = receipt_path.parent, prior.get('artifacts', {})
+    require(isinstance(manifest, dict) and manifest, 'Checkpoint artifact manifest is missing.')
+    for name, item in manifest.items():
+        path = contained(root, name)
+        require(path.is_file() and type(item.get('bytes')) is int
+                and path.stat().st_size == item['bytes'] and sha256(path) == item.get('sha256'),
+                'Checkpoint artifact checksum/size differs: ' + name)
+    states = {}
+    verified = {}
+    for name in names:
+        directory = contained(root, name)
+        require(directory.is_dir(), 'Checkpoint completed output directory is missing: ' + name)
+        entries = list(directory.rglob('*'))
+        require(not any(path.is_symlink() for path in entries), 'Checkpoint output contains a symlink: ' + name)
+        actual = {path.relative_to(root).as_posix() for path in entries if path.is_file()}
+        declared = {path for path in manifest if path.startswith(name + '/')}
+        require(actual == declared, 'Checkpoint output membership differs: ' + name)
+        require(name + '/state.json' in manifest, 'Checkpoint saved state is missing: ' + name)
+        state = json.loads((directory / 'state.json').read_text())
+        settings = {**DEFAULTS, 'mse': True}
+        if name.startswith('cpue-'):
+            settings['min_hooks_a'] = 1200
+        if name.startswith('buffer-'):
+            settings['mse_buffer'] = 0.6
+        require(state.get('settings') == settings and set(state.get('records', {})) == set(ALL),
+                'Checkpoint configuration or complete job inventory differs: ' + name)
+        for key, record in state['records'].items():
+            record_file = contained(directory, key + '/record.json')
+            require(record_file.is_file() and json.loads(record_file.read_text()) == record,
+                    'Checkpoint state/producing record differs: ' + name + '/' + key)
+            require(re.fullmatch(r'[0-9a-f]{64}', record.get('signature', '')) is not None
+                    and 'output.json' in record.get('outputs', {}), 'Checkpoint signature/output pin missing.')
+            for output, checksum in record['outputs'].items():
+                require(sha256(contained(directory, key + '/' + output)) == checksum,
+                        'Checkpoint producing output differs: ' + name + '/' + key + '/' + output)
+            if name != 'reference-baseline':
+                require(record.get('source') == {'repository': origin['repository'], 'commit': CHECKPOINT_COMMIT}
+                        and record.get('execution') == execution,
+                        'Checkpoint record has a different genuine producing coordinator/execution.')
+                for path, checksum in record.get('code', {}).items():
+                    if path in old_files:
+                        require(checksum == old_files[path], 'Checkpoint loaded core source differs: ' + path)
+                for path, checksum in record.get('data_files', {}).items():
+                    source = path if path.startswith('data/') else 'data/' + path
+                    require(source in old_files and checksum == old_files[source],
+                            'Checkpoint input source differs: ' + source)
+        states[name] = state
+        verified.update({path: manifest[path] for path in declared})
+    return {'receipt': prior, 'root': root, 'imported_names': names,
+            'imported_cases': ['MR-01', 'MR-02', 'MR-03'], 'verified_artifacts': verified,
+            'states': states, 'origin': origin, 'origin_sha256': sha256(origin_path)}
+
+
 class EvidenceSuite:
     def __init__(self, output, source_lock, reference_root, reference_commit, timeout,
-                 reference_manifest=None, code_source_lock=None, failure_source_lock=None):
+                 reference_manifest=None, code_source_lock=None, failure_source_lock=None,
+                 continue_from=None, continue_sha256=None, checkpoint_origin=None,
+                 checkpoint_origin_sha256=None):
         self.output = Path(output).resolve()
         self.lock = Path(source_lock).resolve()
         self.reference_root = Path(reference_root).resolve()
@@ -305,12 +438,21 @@ class EvidenceSuite:
         self.timeout = timeout
         self.reference_manifest = reference_manifest
         self.variant_locks = {'code': code_source_lock, 'failure': failure_source_lock}
+        self.continuation = {'path': str(Path(continue_from).resolve()), 'sha256': continue_sha256,
+                             'origin': str(Path(checkpoint_origin).resolve()),
+                             'origin_sha256': checkpoint_origin_sha256} if continue_from else None
+        self.invocation_attempts = ATTEMPTS[6:] if self.continuation else ATTEMPTS
         self.output.mkdir(parents=True, exist_ok=False)
-        self.receipt = {**plan(timeout), 'status': 'RUNNING', 'attempts': [], 'cases': {},
+        self.receipt = {**plan(timeout, bool(self.continuation)), 'status': 'RUNNING',
+                        'attempts': [], 'imported_attempts': [], 'cases': {},
+                        'imported_attempt_count': 0,
                         'source_lock': {'path': str(self.lock), 'sha256': sha256(self.lock)},
                         'coordinator_script_sha256': sha256(Path(__file__)),
                         'reference': {'path': str(self.reference_root), 'commit': reference_commit},
                         'actual_client': 'codex', 'runtime_image': RBridge.require_container()}
+        if self.continuation:
+            self.receipt['continuation_request'] = {**self.continuation,
+                                                     'status': 'REQUESTED_NOT_YET_VERIFIED'}
         self.persist()
 
     def persist(self):
@@ -335,11 +477,12 @@ class EvidenceSuite:
         return artifacts
 
     async def attempt(self, name, action, expected_error=None):
-        declared = next((entry for entry in ATTEMPTS if entry[1] == name), None)
+        allowed = getattr(self, 'invocation_attempts', ATTEMPTS)
+        declared = next((entry for entry in allowed if entry[1] == name), None)
         require(declared is not None, 'Undeclared execution attempt.')
         require(not any(item['name'] == name for item in self.receipt['attempts']),
                 'An attempt may execute once; automatic replay is prohibited.')
-        require(len(self.receipt['attempts']) < len(ATTEMPTS), 'Finite attempt budget exhausted.')
+        require(len(self.receipt['attempts']) < len(allowed), 'Finite attempt budget exhausted.')
         entry = {'case': declared[0], 'name': name, 'kind': declared[2],
                  'expected_selected': list(declared[3]), 'status': 'STARTED'}
         self.receipt['attempts'].append(entry)
@@ -402,7 +545,7 @@ class EvidenceSuite:
         self.receipt['cases'][case] = {'status': 'PASSED', **details}
         self.persist()
 
-    async def reference(self):
+    def verify_reference_sources(self):
         if self.reference_manifest is None:
             pinned_git(self.reference_root, self.reference_commit)
             self.receipt['reference']['verification'] = 'clean pinned Git checkout'
@@ -424,6 +567,9 @@ class EvidenceSuite:
                         'Pinned reference byte mismatch: ' + name)
             self.receipt['reference'].update(verification='parent-pinned snapshot; actual byte hashes verified',
                                             manifest_sha256=sha256(manifest_path))
+
+    async def reference(self):
+        self.verify_reference_sources()
         settings = self.output / 'reference-settings.json'
         settings.write_text(json.dumps({'mse': True}) + '\n')
         destination = self.output / 'reference-baseline'
@@ -500,40 +646,103 @@ class EvidenceSuite:
             runner.records[parent] = original_record
             runner.calculator.calculate = adapter
 
+    def import_checkpoint(self):
+        """Validate/copy six completed attempts, without running their calculations."""
+        from workflow.sources import SourceResolver, contained
+        resolver = SourceResolver(root=ROOT, lock_path=self.lock)
+        resolver.verify(); resolver.coordinator_identity()
+        current = json.loads((ROOT / 'coordinator-origin.json').read_text())
+        data = validate_checkpoint(self.continuation['path'], self.continuation['sha256'],
+                                   self.continuation['origin'], current, RBridge.require_container(),
+                                   expected_origin_sha256=self.continuation['origin_sha256'])
+        prior = data['receipt']
+        require(sha256(self.lock) == prior['source_lock']['sha256'],
+                'Continuation baseline component lock differs from the actual prior run.')
+        require(self.reference_manifest is not None
+                and sha256(self.reference_manifest) == prior['reference']['manifest_sha256']
+                and self.reference_commit == prior['reference']['commit'],
+                'Continuation monorepo reference identity differs.')
+        self.verify_reference_sources()
+        provenance = {'receipt_sha256': self.continuation['sha256'],
+                      'receipt_path': str(Path(self.continuation['path']).resolve()),
+                      'original_coordinator_commit': CHECKPOINT_COMMIT,
+                      'origin_sha256': data['origin_sha256'],
+                      'imported_without_recalculation': True}
+        for name in data['imported_names']:
+            shutil.copytree(contained(data['root'], name), self.output / name)
+        for name, item in data['verified_artifacts'].items():
+            copied = contained(self.output, name)
+            require(copied.stat().st_size == item['bytes'] and sha256(copied) == item['sha256'],
+                    'Imported checkpoint copy differs: ' + name)
+        for name in ('reference-settings.json', 'reference.stdout.log', 'reference.stderr.log'):
+            if name in prior['artifacts']:
+                shutil.copyfile(contained(data['root'], name), self.output / name)
+                require(sha256(self.output / name) == prior['artifacts'][name]['sha256'],
+                        'Imported reference log/settings copy differs: ' + name)
+        loaded = {}
+        for name in data['imported_names'][1:]:
+            runner = self.runner(name)
+            require(runner.records == data['states'][name]['records']
+                    and runner.settings == data['states'][name]['settings'],
+                    'Imported checkpoint state changed during loading: ' + name)
+            sources_and_lineage(runner, produced=(), retained_records=data['states'][name]['records'])
+            loaded[name] = runner
+        # Rechecking copied existing output bytes is not an analytical rerun.
+        require(verify(self.output / 'reference-baseline', loaded['split-baseline'].directory) == 22,
+                'Imported mono/split output comparison differs.')
+        self.compare(loaded['cpue-fresh'], loaded['cpue-selective'])
+        self.compare(loaded['buffer-fresh'], loaded['buffer-selective'])
+        self.receipt['imported_attempts'] = [{**copy.deepcopy(entry), 'import_provenance': provenance}
+                                           for entry in prior['attempts'][:6]]
+        self.receipt['imported_attempt_count'] = 6
+        self.receipt['cases'] = {case: {**copy.deepcopy(prior['cases'][case]),
+                                      'import_provenance': provenance} for case in data['imported_cases']}
+        self.receipt['continuation'] = {**provenance, 'prior_status': prior['status'],
+                                        'preserved_failed_attempt': copy.deepcopy(prior['attempts'][6]),
+                                        'verified_imported_artifacts': data['verified_artifacts'],
+                                        'analytical_core_and_input_sources_unchanged': True,
+                                        'remaining_actual_attempts': 12}
+        self.receipt['continuation_request']['status'] = 'VERIFIED_IMPORTED'
+        self.persist()
+        return loaded['split-baseline'], loaded['cpue-selective']
+
     async def run(self):
         from workflow.sources import SourceResolver
         SourceResolver(root=ROOT, lock_path=self.lock).verify()
-        mono = await self.attempt('reference-baseline', self.reference)
-        baseline = self.runner('split-baseline')
-        full = await self.execute('split-baseline', baseline)
-        require(full['run'] == list(ALL) and not full['retained'], 'Split baseline was not a fresh full run.')
-        require(verify(mono, baseline.directory) == 22, 'Split baseline differs from mono reference.')
-        self.finish_case('MR-01', {'executed': full['run'], 'retained': full['retained'],
-                                 'agreeing_reference_outputs': 22, 'records': sources_and_lineage(baseline),
-                                 'paired_rules': paired_rules(baseline)})
+        if self.continuation:
+            baseline, cpue = self.import_checkpoint()
+        else:
+            mono = await self.attempt('reference-baseline', self.reference)
+            baseline = self.runner('split-baseline')
+            full = await self.execute('split-baseline', baseline)
+            require(full['run'] == list(ALL) and not full['retained'], 'Split baseline was not a fresh full run.')
+            require(verify(mono, baseline.directory) == 22, 'Split baseline differs from mono reference.')
+            self.finish_case('MR-01', {'executed': full['run'], 'retained': full['retained'],
+                                     'agreeing_reference_outputs': 22, 'records': sources_and_lineage(baseline),
+                                     'paired_rules': paired_rules(baseline)})
 
-        cpue = self.runner('cpue-selective', baseline=baseline)
-        before = copy.deepcopy(cpue.records)
-        cpue.configure({'min_hooks_a': 1200})
-        changed = await self.execute('cpue-selective', cpue, 'cpue_a')
-        update = expected_update(cpue, changed, before, CPUE)
-        fresh = self.runner('cpue-fresh')
-        fresh.configure({'min_hooks_a': 1200})
-        await self.execute('cpue-fresh', fresh)
-        self.finish_case('MR-02', {**update, **self.compare(fresh, cpue),
-                                 'records': sources_and_lineage(cpue)})
+            cpue = self.runner('cpue-selective', baseline=baseline)
+            before = copy.deepcopy(cpue.records)
+            cpue.configure({'min_hooks_a': 1200})
+            changed = await self.execute('cpue-selective', cpue, 'cpue_a')
+            update = expected_update(cpue, changed, before, CPUE)
+            fresh = self.runner('cpue-fresh')
+            fresh.configure({'min_hooks_a': 1200})
+            await self.execute('cpue-fresh', fresh)
+            self.finish_case('MR-02', {**update, **self.compare(fresh, cpue),
+                                     'records': sources_and_lineage(cpue, CPUE, before)})
 
-        buffered = self.runner('buffer-selective', baseline=baseline)
-        before = copy.deepcopy(buffered.records)
-        buffered.configure({'mse_buffer': 0.6})
-        changed = await self.execute('buffer-selective', buffered, 'mse_report')
-        update = expected_update(buffered, changed, before, BUFFER)
-        fresh_buffer = self.runner('buffer-fresh')
-        fresh_buffer.configure({'mse_buffer': 0.6})
-        await self.execute('buffer-fresh', fresh_buffer)
-        self.finish_case('MR-03', {**update, **self.compare(fresh_buffer, buffered),
-                                 'paired_rules': paired_rules(buffered),
-                                 'records': sources_and_lineage(buffered)})
+            buffered = self.runner('buffer-selective', baseline=baseline)
+            before = copy.deepcopy(buffered.records)
+            buffered.configure({'mse_buffer': 0.6})
+            changed = await self.execute('buffer-selective', buffered, 'mse_report')
+            update = expected_update(buffered, changed, before, BUFFER)
+            fresh_buffer = self.runner('buffer-fresh')
+            fresh_buffer.configure({'mse_buffer': 0.6})
+            await self.execute('buffer-fresh', fresh_buffer)
+            self.finish_case('MR-03', {**update, **self.compare(fresh_buffer, buffered),
+                                     'paired_rules': paired_rules(buffered),
+                                     'records': sources_and_lineage(buffered, BUFFER, before)})
 
         code_lock, edit = self.variant('code')
         code = self.runner('code-selective', source_lock=code_lock, baseline=baseline)
@@ -547,7 +756,7 @@ class EvidenceSuite:
         fresh_code = self.runner('code-fresh', source_lock=code_lock)
         await self.execute('code-fresh', fresh_code)
         self.finish_case('MR-04', {**update, **self.compare(fresh_code, code), 'edit': edit,
-                                 'paired_rules': paired_rules(code), 'records': sources_and_lineage(code, BUFFER)})
+                                 'paired_rules': paired_rules(code), 'records': sources_and_lineage(code, BUFFER, before)})
 
         invalid = self.runner('contract-fixtures', baseline=baseline)
         bad_cpue = await self.contract_fixture('invalid-cpue', invalid, 'prepare_a', 'cpue_a',
@@ -580,7 +789,7 @@ class EvidenceSuite:
             require(not runner.valid('cpue_a'), 'Transferred output damage did not block reuse.')
             changed = await self.execute(name, runner, 'assessment_report')
             integrity.append({'fixture': name, **expected_update(runner, changed, before, CPUE),
-                              **self.compare(baseline, runner), 'records': sources_and_lineage(runner)})
+                              **self.compare(baseline, runner), 'records': sources_and_lineage(runner, CPUE, before)})
         self.finish_case('MR-06', {'checks': integrity})
 
         stale = self.runner('stale-corrected', baseline=baseline)
@@ -597,7 +806,7 @@ class EvidenceSuite:
                                  'older_well_formed_producer_record': before['cpue_a'],
                                  **expected_update(stale, changed, before, CPUE), **self.compare(cpue, stale),
                                  'unchanged_branch_historical_run': stale.records['cpue_b']['run_id'],
-                                 'records': sources_and_lineage(stale)})
+                                 'records': sources_and_lineage(stale, CPUE, before)})
 
         failure_lock, edit = self.variant('failure')
         failed = self.runner('failed-rule', source_lock=failure_lock, baseline=baseline)
@@ -622,9 +831,14 @@ class EvidenceSuite:
                                  'earlier_report_record': before['mse_report'],
                                  'previous_summary_and_report_retained_during_failure': True,
                                  **expected_update(recovered, changed, before, BUFFER),
-                                 **self.compare(baseline, recovered), 'records': sources_and_lineage(recovered)})
-        require(len(self.receipt['attempts']) == len(ATTEMPTS), 'Declared case inventory was not completed.')
-        self.receipt.update(status='PASSED', software=baseline.software(),
+                                 **self.compare(baseline, recovered), 'records': sources_and_lineage(recovered, BUFFER, before)})
+        require(len(self.receipt['attempts']) == len(self.invocation_attempts),
+                'Declared new actual attempt inventory was not completed.')
+        require(len(self.receipt['attempts']) + len(self.receipt['imported_attempts']) == len(ATTEMPTS),
+                'Combined actual/imported case inventory differs.')
+        self.receipt.update(status='PASSED', completed_new_attempts=len(self.receipt['attempts']),
+                            completed_imported_attempts=len(self.receipt['imported_attempts']),
+                            software=baseline.software(),
                             artifacts=self.artifact_manifest(),
                             scientific_status='UNREVIEWED; technical conformance only')
         self.persist()
@@ -640,21 +854,34 @@ def main():
     parser.add_argument('--reference-manifest', type=Path, help='Explicit parent-pinned mono snapshot manifest, when Git is absent.')
     parser.add_argument('--code-source-lock', type=Path, help='Parent-precommitted and hydrated MR-04 source variant.')
     parser.add_argument('--failure-source-lock', type=Path, help='Parent-precommitted and hydrated MR-08 source variant.')
+    parser.add_argument('--continue-from', type=Path, help='Explicit immutable first FAILED evidence.json; import only completed MR-01--03.')
+    parser.add_argument('--continue-sha256', help='Required full SHA256 of that preserved FAILED receipt.')
+    parser.add_argument('--checkpoint-origin', type=Path, help='Preserved original coordinator-origin.json at the first executable commit.')
+    parser.add_argument('--checkpoint-origin-sha256', help='Required full SHA256 of the preserved original coordinator origin.')
     parser.add_argument('--output', type=Path)
     parser.add_argument('--timeout', type=int, default=180)
     args = parser.parse_args()
     if not 1 <= args.timeout <= 1800:
         parser.error('--timeout must be a finite 1--1800 seconds; changing it requires a newly pinned invocation.')
     if args.plan:
-        print(json.dumps(plan(args.timeout), indent=2))
+        print(json.dumps(plan(args.timeout, bool(args.continue_from)), indent=2))
         return 0
     if args.reference_root is None or args.output is None:
         parser.error('Numerical execution requires --reference-root and a fresh --output directory.')
+    continuation_fields = (args.continue_sha256, args.checkpoint_origin, args.checkpoint_origin_sha256)
+    if args.continue_from:
+        if (not all(continuation_fields) or args.reference_manifest is None
+                or args.code_source_lock is None or args.failure_source_lock is None):
+            parser.error('Explicit continuation requires both receipt/origin SHA pins, the preserved origin, reference manifest and both supplied variant locks.')
+    elif any(continuation_fields):
+        parser.error('Checkpoint pins require explicit --continue-from; no automatic continuation is allowed.')
     suite = None
     try:
         suite = EvidenceSuite(args.output, args.source_lock, args.reference_root,
                               args.reference_commit, args.timeout, args.reference_manifest,
-                              args.code_source_lock, args.failure_source_lock)
+                              args.code_source_lock, args.failure_source_lock,
+                              args.continue_from, args.continue_sha256,
+                              args.checkpoint_origin, args.checkpoint_origin_sha256)
         asyncio.run(suite.run())
     except Exception as error:
         if suite is not None:
@@ -663,7 +890,8 @@ def main():
             suite.persist()
         print(json.dumps({'status': 'FAILED', 'error_type': type(error).__name__, 'error': str(error)}), file=sys.stderr)
         return 1
-    print(json.dumps({'status': 'PASSED', 'cases': 8, 'attempts': len(suite.receipt['attempts']),
+    print(json.dumps({'status': 'PASSED', 'cases': 8, 'new_attempts': len(suite.receipt['attempts']),
+                      'imported_attempts': len(suite.receipt['imported_attempts']),
                       'receipt': str(suite.output / 'evidence.json')}))
     return 0
 

@@ -99,6 +99,13 @@ def test_report(root, key, result, record, folder, page, *args, **kwargs):
 
 class MultiRepositoryTests(unittest.TestCase):
     def setUp(self):
+        if self._testMethodName in (
+                "test_finite_inventory_names_real_failures_and_disallows_duplicate_attempts",
+                "test_local_execution_requires_verified_commit_and_only_explicit_host_refs"):
+            return
+        if shutil.which("git") is None:
+            self.skipTest("Git is required to create source-checkout software fixtures; "
+                          "run them on a Git-enabled host. Numerical MR snapshots need no Git.")
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.fixture = SourceFixture(self.temporary.name)
