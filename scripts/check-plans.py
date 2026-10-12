@@ -1,7 +1,8 @@
 """Compare live previews and scheduler scopes using explicit software fixtures.
 
 The minimal CoordinatorWorkflow doubles select monorepo compatibility here;
-this planning check performs no numerical or scientific input-contract validation.
+public source selection retains native byte and metadata checks. Downstream
+results remain scheduler fixtures, without numerical or scientific validation.
 """
 import asyncio
 from copy import deepcopy
@@ -15,6 +16,7 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tests.coordinator_fixtures import CoordinatorBridge, CoordinatorWorkflow
+from workflow.engine import Workflow as NativeWorkflow
 
 
 class PublicPlanningBridge(CoordinatorBridge):
@@ -36,6 +38,9 @@ class Workflow(CoordinatorWorkflow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.calculator = PublicPlanningBridge()
+
+    def source_context(self):
+        return NativeWorkflow.source_context(self)
 
 
 async def scenarios(directory):
