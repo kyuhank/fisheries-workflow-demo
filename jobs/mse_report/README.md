@@ -2,37 +2,32 @@
 
 Render the saved management-trial comparison as a Quarto report. Trial fractions describe this conditional illustration; they are not validated risk estimates.
 
-Analyst role: MSE analyst. [run.R](run.R) supplies the saved results; [report.qmd](report.qmd) renders the report.
+**Path:** Saved management comparison → describe trade-offs and limits → MSE report.
 
-## Inputs and settings
+**Inputs:** `runs/mse_summary/output.json` and the report job's saved run record.
 
-Previous jobs: [MSE results summary (`mse_summary`)](../mse_summary/README.md)
+**From:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
-Input files: `runs/mse_summary/output.json` and the report job's saved run record.
-
-Saved settings: No job-specific settings (`{}`).
-
-## Run in the container
-
-Inside the declared container, from the repository root:
-
-```sh
-make inside-job JOB=mse_report
-```
-
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+**Settings:** No job-specific settings (`{}`).
 
 MSE must be enabled (`"mse": true`). The declared trials use 15 years, 20 paired replicates per fitted case and growth scenario, with catches capped at 40% of current biomass.
 
-## Outputs and downstream jobs
+From the repository root, run this job and prepare any required inputs:
 
-- `runs/mse_report/output.json`: the R calculation result.
-- `runs/mse_report/report.html`: the Quarto report from [report.qmd](report.qmd).
-- `runs/mse_report/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+```sh
+make job JOB=mse_report
+```
 
-Downstream jobs: None.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/record.json).
+| Saved file | Contents |
+| --- | --- |
+| `runs/mse_report/output.json` | saved calculation result |
+| `runs/mse_report/report.html` | result page from [report.qmd](report.qmd) |
+| `runs/mse_report/record.json` | producing inputs, settings, exact code and software |
+
+**Used by:** None.
+
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/record.json)

@@ -2,6 +2,8 @@
 
 This is execution consistency and workflow custody evidence. The separate R
 science script owns mathematical and declared synthetic-data checks.
+This legacy suite is selected with PAPER_DATA_MODE=synthetic; the released
+aggregate contract has its own test_public_integration.py gate.
 """
 import asyncio
 import copy
@@ -20,6 +22,7 @@ from workflow.engine import FROZEN_SOURCE, Workflow, digest, encoded
 from workflow.r_bridge import RBridge
 from workflow.spec import SPEC
 from verify import compare, verify
+from tests.native_evidence import NativeEvidence
 
 REPORTS = ('cpue_report', 'assessment_report', 'mse_report')
 BUFFER = ('mse_buffered', 'mse_summary', 'mse_report')
@@ -27,18 +30,30 @@ BUFFER = ('mse_buffered', 'mse_summary', 'mse_report')
 
 @unittest.skipUnless(os.environ.get('PAPER_NATIVE_INTEGRATION') == '1',
                      'Enable PAPER_NATIVE_INTEGRATION=1 inside the frozen actual container.')
+@unittest.skipUnless(os.environ.get('PAPER_DATA_MODE') == 'synthetic',
+                     'Legacy vessel fixtures require explicit PAPER_DATA_MODE=synthetic.')
 class NativeIntegrationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.evidence = NativeEvidence('synthetic-native')
+        cls.evidence.install()
+        cls.addClassCleanup(cls.evidence.close)
         RBridge.require_container()
         cls.baseline = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls.baseline.cleanup)
         cls.runner = Workflow(Path(cls.baseline.name) / 'baseline')
-        cls.runner.configure({'mse': True})
+        cls.runner.configure({'last_year': 2023, 'mse': True})
         cls.full = asyncio.run(cls.runner.run())
 
     @classmethod
     def tearDownClass(cls):
-        cls.baseline.cleanup()
+        pass
+
+    def setUp(self):
+        self.evidence.begin_case(self.id())
+
+    def tearDown(self):
+        self.evidence.end_case()
 
     def clone(self):
         folder = tempfile.TemporaryDirectory()
@@ -157,6 +172,7 @@ class NativeIntegrationTest(unittest.TestCase):
                     self.assertEqual(hashlib.sha256(archive.read(name)).hexdigest(), checksum)
                 recipe = archive.read('REPRODUCE.txt').decode()
                 self.assertIn('make reproduce', recipe)
+                self.assertIn('PAPER_DATA_MODE=synthetic', recipe)
                 self.assertIn(os.environ['PAPER_RUNTIME_IMAGE'], recipe)
                 archive.extractall(extracted)
             # This test is already inside that declared container; no nested Docker daemon.

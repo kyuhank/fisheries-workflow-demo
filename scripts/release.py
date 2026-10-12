@@ -76,7 +76,8 @@ preserved['REPRODUCE.txt'] = ('Open START-HERE.html and follow OFFLINE.md.\n'
     'Docker and a POSIX shell are required. Restore the recorded image from the separate\n'
     'runtime archive if necessary. These commands never retrieve software or source.\n'
     'Original analysis sources are preserved; local support tools are separately recorded\n'
-    'in PRESERVATION.json. Results remain synthetic demonstration results.\n').encode()
+    'in PRESERVATION.json. Public observations feed simplified teaching models; '\
+    'their outputs are not a validated stock assessment.\n').encode()
 preserved['SHA256SUMS.json'] = (json.dumps({n:hashlib.sha256(v).hexdigest()
     for n,v in sorted(preserved.items()) if n != 'SHA256SUMS.json'},indent=2)+'\n').encode()
 offline_archive = destination/f'fisheries-workflow-offline-{version}.zip'

@@ -10,24 +10,35 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Verify and assemble pinned analysis repositories
         run: python3 scripts/hydrate-sources.py
-      - name: Check actual R calculations and Quarto reports in the preserved container
+      - name: Check synthetic and public data with monorepo and pinned-component R/Quarto runs
         env:
           IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
           PAPER_RUNTIME_IMAGE_URL: https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow
         run: |
+          mkdir -p "$RUNNER_TEMP/fisheries-native-evidence"
           docker pull "$IMAGE"
           docker run --rm --network none \
             --user "$(id -u):$(id -g)" \
             --env PAPER_RUNTIME_IMAGE="$IMAGE" --env PAPER_RUNTIME_IMAGE_URL \
             --env PAPER_NATIVE_INTEGRATION=1 \
+            --env PAPER_SOURCE_MODE=multi-repository --env PAPER_DATA_MODE=public \
+            --env PAPER_TEST_EVIDENCE=/evidence \
             --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID \
+            --volume "$RUNNER_TEMP/fisheries-native-evidence:/evidence" \
             --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
             "$IMAGE" make --no-print-directory --silent inside-check
+      - name: Preserve native outputs, failed attempts and timing receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: native-check-evidence
+          path: ${{ runner.temp }}/fisheries-native-evidence
+          if-no-files-found: warn
   server:
     runs-on: ubuntu-latest
     timeout-minutes: 5

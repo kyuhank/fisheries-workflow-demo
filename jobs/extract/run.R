@@ -5,5 +5,8 @@ calculate <- function(context) {
                     "The saved SQLite extraction input is missing.")
   check_sets(extracted$sets)
   check_catches(extracted$catch)
-  list(sets = extracted$sets, catch = extracted$catch, sql = extracted$sql)
+  result <- list(sets = extracted$sets, catch = extracted$catch, sql = extracted$sql)
+  if (!is.null(extracted$data_kind)) result$data_kind <- extracted$data_kind
+  if (!is.null(extracted$metadata)) result$metadata <- extracted$metadata
+  result
 }

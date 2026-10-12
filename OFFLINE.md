@@ -1,14 +1,14 @@
 # Repeat and preserve the analyses
 
 Keep the offline ZIP and the execution-image archive together. The ZIP contains
-the saved run's exact synthetic inputs, settings, source snapshots, outputs and
+the saved run's exact inputs, settings, source snapshots, outputs and
 execution records. The image contains its R packages, Python, Make and Quarto.
 The offline tools are supplied with these older analysis sources so that a new
 tool release does not replace the code used to produce the saved results.
 
 ## Read the example
 
-Unpack `fisheries-workflow-offline-1.9.1.zip` and open `START-HERE.html`. Follow
+Unpack the versioned offline ZIP and open `START-HERE.html`. Follow
 the links from a result to its input records, job script and calculation library.
 `code.html` displays the preserved sources. These pages use local files and need
 no login or internet connection. The interactive HTML displays saved results;

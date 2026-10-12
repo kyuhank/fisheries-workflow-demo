@@ -89,8 +89,7 @@ h1 {
 }
 .eyebrow {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.6px;
+  letter-spacing: .3px;
   color: var(--muted);
   font-weight: 700;
   margin: 0;
@@ -1312,11 +1311,11 @@ dialog iframe {
   border-right: 1px solid var(--line);
 }
 .workspace-brand {
-  padding: 0 10px 22px;
+  padding: 0 10px 16px;
 }
 .workspace-brand strong {
   display: block;
-  margin-top: 6px;
+  margin-top: 0;
   font-size: 14px;
   color: var(--ink);
 }

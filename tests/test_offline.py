@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -147,13 +148,15 @@ class PreservedSourceTest(unittest.TestCase):
         self.assertNotIn('Executed on GitHub Actions', page)
         self.assertIn(offline.IMAGE_ID, page)
 
-    def test_helper_keeps_local_execution_default_and_binds_external_receipt(self):
+    def test_helper_records_local_provider_and_binds_external_receipt(self):
         # Explicit orchestration double: no R backend or numerical calculation.
         output = self.root / 'local-fixture'
         seen = {}
+        origin = json.loads(self.old_origin)
         class PresentationFixture:
             def __init__(self, directory, **kwargs):
                 self.execution = {}; seen['runner'] = self
+                self.sources = SimpleNamespace(coordinator_identity=lambda: origin)
             def configure(self, settings):
                 seen['settings'] = settings
             async def run(self, start, scope):
@@ -163,7 +166,10 @@ class PreservedSourceTest(unittest.TestCase):
         args = argparse.Namespace(command='run', job=None, reference=None, settings=None, output=output)
         with patch('workflow.engine.Workflow', PresentationFixture):
             result = offline.run_offline(self.root, args, inspect_image())
-        self.assertEqual(seen['execution_at_run'], {})
+        self.assertEqual(seen['execution_at_run']['provider'], 'Local Docker')
+        self.assertEqual(seen['execution_at_run']['purpose'], 'offline run')
+        self.assertEqual(seen['execution_at_run']['commit'], origin['commit'])
+        self.assertEqual(seen['execution_at_run']['container'], offline.UPSTREAM_IMAGE)
         self.assertEqual(result['provider'], 'Local Docker')
         self.assertEqual(result['purpose'], 'offline run')
         self.assertEqual(result['analysis_run_id'], 'EXPLICIT PRESENTATION TEST DOUBLE')

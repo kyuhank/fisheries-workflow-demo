@@ -1,36 +1,33 @@
 # Data submission (`submission`)
 
-Assemble the supplied synthetic catch and effort records in R through the selected final year. Set the first effort value to zero to demonstrate the correction cycle.
+Select the requested years from the supplied public catch and effort records.
 
-Analyst role: Data provider. The entry point is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
+**Path:** Source records → select final year → submitted rows.
 
-## Inputs and settings
+**Inputs:** [`data/public-source.json`](../../data/public-source.json), including aggregate fishing rows and the separate annual catch series.
 
-Previous jobs: None.
+**From:** None.
 
-Input files: [`data/fishery.sqlite`](../../data/fishery.sqlite): base `sets` and `removals`; [`data/submission.json`](../../data/submission.json): the additional 2024 batch. R selects and assembles the requested snapshot.
+**Settings:** `last_year` (default: 2021).
 
-Saved settings: `last_year` (default: 2023).
+The public input preserves released values. The invalid-effort correction cycle is retained only for synthetic fixtures.
 
-## Run in the container
-
-Inside the declared container, from the repository root:
+From the repository root, run this job and prepare any required inputs:
 
 ```sh
-make inside-job JOB=submission
+make job JOB=submission
 ```
 
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-## Outputs and downstream jobs
+| Saved file | Contents |
+| --- | --- |
+| `runs/submission/output.json` | saved calculation result |
+| `runs/submission/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/submission/record.json` | producing inputs, settings, exact code and software |
 
-- `runs/submission/output.json`: the R calculation result.
-- `runs/submission/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
-- `runs/submission/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+**Used by:** [Quality check (`qc`)](../qc/README.md).
 
-Downstream jobs: [Quality check (`qc`)](../qc/README.md)
-
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/record.json).
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/record.json)

@@ -1,12 +1,12 @@
 # Hosted execution
 
-The browser requests a fixed synthetic calculation from a Supabase Edge Function.
+The browser requests a small public-data calculation from a Supabase Edge Function.
 A private GitHub App starts `live.yml` in this repository. Its installation token
 is restricted to this repository, with Actions write and Contents read permission;
 no GitHub credential is returned to the visitor.
 
 The standard GitHub runner downloads the image pinned in `live.yml`. The container
-retrieves synthetic observations from PostgreSQL, runs the `jobs/*/run.R` entry
+retrieves the preserved WCPFC projection from PostgreSQL, runs the `jobs/*/run.R` entry
 points and renders the three QMD reports. It saves the outputs, reports and a
 portable run bundle. The runner authenticates with GitHub OIDC;
 the API verifies the repository, owner, workflow, branch, event, commit and run.
@@ -35,7 +35,10 @@ The API accepts supplied settings, not arbitrary commands, repositories or queri
 The service is configured for this demonstration repository. To host another copy:
 
 1. Create a Free Supabase project and apply `schema.sql` to its database.
-2. Load the fixed records from `data/`; grant public users no table access.
+2. Apply `public-data.sql`. Run `python3 scripts/seed-public-data.py` and apply
+   its `public-data-seed.sql` to load the checked records from `data/`.
+   Grant public users no table access. The runner checks database rows and source
+   identity against the preserved snapshot before calculation.
 3. Update repository IDs, project URL and callback URL in the server, runner and
    `config.json`. Deploy `supabase/functions/paper-api` with JWT verification
    disabled: the function performs its own session and OIDC checks.
@@ -47,3 +50,10 @@ The service is configured for this demonstration repository. To host another cop
 
 Changing the cloud provider does not require changing the scientific calculations.
 A production service requires its own data-access controls and operational support.
+
+The paper project is `gvunwnpsfmylmqfqowzp`; the new inputs use only
+`paper_public_sources`, `paper_public_sets` and `paper_public_catches`.
+The workshop presentation links use separate repositories and the project
+`tgusnkwvfzwdeufzevhk`. Do not apply these migrations or deploy `paper-api` there.
+[Source links, units and the selection query](../data/public/README.md) remain
+publicly inspectable without a database account.

@@ -1,4 +1,4 @@
-"""Explicit file contracts at the synthetic CPUE/assessment/MSE boundaries."""
+"""Explicit file contracts at the CPUE/assessment/MSE boundaries."""
 import math
 
 CASES = ('assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2')

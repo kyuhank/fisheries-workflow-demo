@@ -1,36 +1,33 @@
 # CPUE analysis A (`cpue_a`)
 
-Fit a Poisson GLM with year and vessel effects and a log(hooks / 1000) effort offset. Apply the selected effort filter and normalise the reference-vessel index to its first year.
+Estimate annual CPUE with a quasipoisson GLM adjusting for year and cell–quarter stratum.
 
-Analyst role: CPUE analyst. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+**Path:** Catch and effort rows → adjusted GLM → annual CPUE index A.
 
-## Inputs and settings
+**Inputs:** The aggregate `sets` rows in `runs/extract/output.json`.
 
-Previous jobs: [Extract data (`extract`)](../extract/README.md)
+**From:** [Extract data (`extract`)](../extract/README.md).
 
-Input files: The `sets` rows in `runs/extract/output.json`.
+**Settings:** `min_hooks_a`, recorded as `min_hooks` (default: 0).
 
-Saved settings: `min_hooks_a` saved as `min_hooks` (default: 0).
+Use a log(hooks / 1000) offset. Predict each supported stratum at 1,000 hooks and average on the response scale with equal fixed weights; divide by the first-year mean. The existing 1,200-hook filter excludes no public rows and is hidden in the public-data app. Synthetic fixtures retain the vessel-effect Poisson example.
 
-## Run in the container
-
-Inside the declared container, from the repository root:
+From the repository root, run this job and prepare any required inputs:
 
 ```sh
-make inside-job JOB=cpue_a
+make job JOB=cpue_a
 ```
 
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-## Outputs and downstream jobs
+| Saved file | Contents |
+| --- | --- |
+| `runs/cpue_a/output.json` | annual indices, absolute CPUE, prediction support and model checks |
+| `runs/cpue_a/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/cpue_a/record.json` | producing inputs, settings, exact code and software |
 
-- `runs/cpue_a/output.json`: the R calculation result.
-- `runs/cpue_a/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
-- `runs/cpue_a/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+**Used by:** [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md).
 
-Downstream jobs: [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md)
-
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_a/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_a/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_a/record.json).
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_a/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_a/record.json)

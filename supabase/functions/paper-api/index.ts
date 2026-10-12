@@ -154,10 +154,13 @@ async function runner(request: Request, id: string, finishing = false) {
   return { ...run, github_run: claims.run_id };
 }
 async function dataRows(year: number) {
+  const source = await db("paper_public_sources?version=eq.albacore-2026-04&select=metadata,source_sha256");
+  if (source.length !== 1) throw Error("The public-data source is not available.");
   const sets = [];
   for (let offset = 0;; offset += 1000) {
     const rows = await db(
-      "paper_sets?year=lte." + year + "&order=year,set_id&limit=1000&offset=" +
+      "paper_public_sets?version=eq.albacore-2026-04&year=lte." + year +
+        "&select=set_id,source_row,year,fleet,quarter,cell,stratum,hooks,catch_n&order=source_row&limit=1000&offset=" +
         offset,
     );
     sets.push(...rows);
@@ -165,7 +168,11 @@ async function dataRows(year: number) {
   }
   return {
     sets,
-    catch: await db("paper_catches?year=lte." + year + "&order=year"),
+    catch: await db("paper_public_catches?version=eq.albacore-2026-04&year=lte." + year + "&select=year,catch_t&order=year"),
+    submission: null,
+    data_kind: "public-wcpfc-albacore",
+    metadata: source[0].metadata,
+    source_sha256: source[0].source_sha256,
   };
 }
 

@@ -25,7 +25,7 @@ export function runSettings(body: any, jobs: string[]) {
       "growth_rate_2,last_year,min_hooks_a,mse",
       "growth_rate_2,last_year,min_hooks_a,mse,mse_buffer",
     ].includes(keys) ||
-    ![2021, 2022, 2023, 2024].includes(settings.last_year) ||
+    ![2021, 2022].includes(settings.last_year) ||
     ![0, 1200].includes(settings.min_hooks_a) ||
     ![.25, .30, .35].includes(settings.growth_rate_2) ||
     ("mse" in settings && typeof settings.mse !== "boolean") ||

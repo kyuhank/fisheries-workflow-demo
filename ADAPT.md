@@ -8,7 +8,8 @@
 | `jobs/<job_id>/README.md` | Inputs, settings, outputs and connected jobs. |
 | `workflow/r/` | Shared GLM, RTMB surplus-production and management-trial functions. |
 | `jobs/*_report/report.qmd` | Three concise Quarto reports rendered from saved results. |
-| `scripts/generate-data.R` | Declared synthetic catch history and observations. |
+| `scripts/import-public-data.py` | Verify WCPFC releases and prepare the small albacore example. |
+| `workflow/extract-public.sql` | Select common cell–quarter strata for CPUE. |
 | `workflow/engine.py` | Coordination, SQLite/file adapters and execution records. |
 | `Makefile` | Reader commands for container runs and reproduction. |
 | `workflow/Makefile` | R calculation and Quarto report recipes inside the container. |
@@ -52,7 +53,7 @@ The coordinator owns shared `common.R`, the driver, input graph, SQLite adapters
 
 `workflow/contracts.py` checks relative CPUE indices, annual catch in tonnes, years and admissible values before assessment preparation, and the four assessment cases and required fields before MSE preparation. Records distinguish component `analysis_source` and `code_sources` from the coordinator's `source`/`execution`; inputs retain producer runs, source pins, signatures and artifact checksums. Downloaded runs preserve the component sources, source lock and origin manifest for network-disabled reproduction.
 
-For the preserved monorepo fallback use `PAPER_SOURCE_MODE=monorepo make run`. Its original job and library bytes remain available for regression comparison. The [repository map](examples/analyst-repositories.yaml) is a reader guide; the executable registered pins are the JSON lock and `workflow/jobs.json`. A single host coordinates the synthetic jobs; repository separation does not establish multiple human analysts or operational fisheries use.
+For the monorepo fallback use `PAPER_SOURCE_MODE=monorepo make run`. The [repository map](examples/analyst-repositories.yaml) is a reader guide; the executable registered pins are the JSON lock and `workflow/jobs.json`. A single host coordinates these jobs; repository separation does not establish multiple human analysts or operational fisheries use.
 
 ## Change the example
 
@@ -63,10 +64,17 @@ revision retains the prepared cases, common errors and other rules. The summary
 checks that every rule uses the same operating models, assumptions and recorded
 random streams before producing a comparison.
 
-Generate synthetic data with `scripts/generate-data.R` inside the pinned image,
-then use `scripts/import-r-data.py` to store its JSON as SQLite and a submission.
-Preserve the JSON, generating source, seed and scenario. A hosted PostgreSQL copy
-must use those same generated observations and annual catches.
+The default example uses the [preserved public releases](data/public/README.md).
+`scripts/import-public-data.py` checks archive and member hashes, converts the
+declared units and writes the source projection. The SQL selects common observed
+strata; the R model standardises catch per effort on a fixed prediction grid.
+Keep source rows, transformations, units and sampling support explicit when
+substituting data. The annual stock catch series is a separate input.
+`scripts/seed-public-data.py` writes a PostgreSQL seed for the same snapshot.
+
+The earlier synthetic fixture remains available with `PAPER_DATA_MODE=synthetic`.
+Its generator and SQLite importer are retained for regression checks. Label any
+new simulations and preserve their generating code, seed and scenario.
 
 If software requirements change, build and check a new image version before
 updating the immutable digest in the workflow. The browser and downloaded HTML

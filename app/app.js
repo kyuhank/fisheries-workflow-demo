@@ -1,5 +1,7 @@
 const payload = JSON.parse(document.getElementById("demo-payload").textContent);
 const $ = (id) => document.getElementById(id);
+const publicExample = !!payload.saved?.outputs?.extract?.output?.sets?.[0]?.stratum;
+$("filter").closest("label").hidden = publicExample;
 let planVersion = 0,
   jobs = payload.jobs,
   records = {},
@@ -1037,7 +1039,7 @@ function render() {
   $("handover-help").textContent = $("handover").value === "manual"
     ? "Confirm each file transfer to continue."
     : "Pass recorded inputs automatically.";
-  $("revise-cpue").hidden = busy || !records.cpue_a;
+  $("revise-cpue").hidden = publicExample || busy || !records.cpue_a;
   $("handover-panel").hidden = !waitingTransfer;
   $("transfer-files").disabled = confirmingTransfer;
   $("connect-workflow").disabled = confirmingTransfer;
@@ -1348,7 +1350,7 @@ $("reset").onclick = async () => {
     liveExecutionLink = "";
     $("github-run").hidden = true;
     selected = "submission";
-    $("snapshot").value = "2023";
+    $("snapshot").value = "2021";
     $("filter").value = "0";
     $("growth-rate").value = "0.30";
     $("mse-buffer").value = "0.8";
@@ -1386,7 +1388,7 @@ function renderViewGuide() {
       ? "Arrows show the results passed between analysts. Confirm each file transfer to continue the receiving analyses."
       : mode === "saved"
       ? "Explore saved results: CPUE indices feed assessments, whose results inform MSE. Open a result, then use Inputs & versions to trace the earlier results it used."
-      : "Arrows show which results become inputs to later analyses. Change CPUE A records and choose Update workflow to follow the effect through assessment and MSE.";
+      : "Arrows show which results become inputs. Change a setting and choose Update workflow to follow its effect.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
   $("view-guide-link").textContent = orchestration ? "See workflow diagram →"
     : manual ? "Inspect job outputs →" : "Open Orchestration tool →";
@@ -1504,7 +1506,7 @@ async function openOutput(key) {
       uiElement("p", "", job.description),
       uiElement("p", "", job.parents.length
         ? "Required inputs: " + job.parents.map(jobLabel).join("; ") + "."
-        : "Starts with the supplied synthetic data."),
+        : "Starts with the supplied catch and effort data."),
       uiElement("p", "", "Run this job to produce its output. Missing inputs are prepared first."));
     page.body.append(content);
     displayOutput(job.title, { job: key, html: "<!doctype html>" + page.documentElement.outerHTML }, "Job details");

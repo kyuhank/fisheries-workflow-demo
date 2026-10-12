@@ -2,35 +2,30 @@
 
 Join CPUE index B to annual catches by year and reject an index year without a matching catch.
 
-Analyst role: Assessment analyst. The entry point is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
+**Path:** Index B and annual catches → join by year → assessment inputs B.
 
-## Inputs and settings
+**Inputs:** The index `series` in `runs/cpue_b/output.json` and annual `catch` in `runs/extract/output.json`.
 
-Previous jobs: [Extract data (`extract`)](../extract/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md)
+**From:** [Extract data (`extract`)](../extract/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md).
 
-Input files: The index `series` in `runs/cpue_b/output.json` and annual `catch` in `runs/extract/output.json`.
+**Settings:** No job-specific settings (`{}`).
 
-Saved settings: No job-specific settings (`{}`).
-
-## Run in the container
-
-Inside the declared container, from the repository root:
+From the repository root, run this job and prepare any required inputs:
 
 ```sh
-make inside-job JOB=prepare_b
+make job JOB=prepare_b
 ```
 
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-## Outputs and downstream jobs
+| Saved file | Contents |
+| --- | --- |
+| `runs/prepare_b/output.json` | saved calculation result |
+| `runs/prepare_b/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/prepare_b/record.json` | producing inputs, settings, exact code and software |
 
-- `runs/prepare_b/output.json`: the R calculation result.
-- `runs/prepare_b/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
-- `runs/prepare_b/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+**Used by:** [Assessment B1 (`assessment_b1`)](../assessment_b1/README.md), [Assessment B2 (`assessment_b2`)](../assessment_b2/README.md).
 
-Downstream jobs: [Assessment B1 (`assessment_b1`)](../assessment_b1/README.md), [Assessment B2 (`assessment_b2`)](../assessment_b2/README.md)
-
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/record.json).
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/record.json)

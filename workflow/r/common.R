@@ -34,19 +34,33 @@ source_rows <- function(source, last_year) {
     sets <- c(sets, batch)
     catches <- c(catches, list(list(year = 2024, catch_t = source$submission$catch)))
   }
-  list(sets = Filter(function(row) row$year <= last_year, sets),
-       catch = Filter(function(row) row$year <= last_year, catches))
+  result <- list(sets = Filter(function(row) row$year <= last_year, sets),
+                 catch = Filter(function(row) row$year <= last_year, catches))
+  if (!is.null(source$data_kind)) result$data_kind <- source$data_kind
+  if (!is.null(source$metadata)) result$metadata <- source$metadata
+  result
 }
 
 check_sets <- function(sets) {
   require_condition(length(sets) > 0, "No fishing observations supplied.")
-  check_row_fields(sets, c("set_id", "year", "vessel", "hooks", "catch_n"))
+  public <- !is.null(sets[[1]]$stratum)
+  group <- if (public) "stratum" else "vessel"
+  fields <- c("set_id", "year", group, "hooks", "catch_n")
+  if (public) fields <- c(fields, "fleet", "cell", "quarter")
+  check_row_fields(sets, fields)
   for (row in sets) {
     require_condition(is.character(row$set_id) && nzchar(row$set_id) &&
-                        is.character(row$vessel) && nzchar(row$vessel) &&
+                        is.character(row[[group]]) && nzchar(row[[group]]) &&
                         is.numeric(row$year) && is.finite(row$year) && row$year == floor(row$year) &&
                         is.numeric(row$hooks) && is.numeric(row$catch_n),
                       "Fishing rows need identifiers, integer years and numeric effort/counts.")
+    if (public) {
+      require_condition(is.character(row$fleet) && nzchar(trimws(row$fleet)) &&
+                          is.character(row$cell) && nzchar(row$cell) &&
+                          is.numeric(row$quarter) && row$quarter %in% 1:4 &&
+                          row$stratum == paste0(row$cell, "_Q", row$quarter),
+                        "Public records require their released fleet, cell and quarter.")
+    }
   }
   hooks <- rows_values(sets, "hooks")
   catches <- rows_values(sets, "catch_n")

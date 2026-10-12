@@ -2,37 +2,32 @@
 
 Render the saved assessment comparison as a Quarto report. The report describes the fixed assumptions, convergence and bounds without refitting or claiming confidence intervals.
 
-Analyst role: Assessment analyst. [run.R](run.R) supplies the saved results; [report.qmd](report.qmd) renders the report.
+**Path:** Saved assessment comparison → describe cases and checks → assessment report.
 
-## Inputs and settings
+**Inputs:** `runs/assessment_summary/output.json` and the report job's saved run record.
 
-Previous jobs: [Compare assessments (`assessment_summary`)](../assessment_summary/README.md)
+**From:** [Compare assessments (`assessment_summary`)](../assessment_summary/README.md).
 
-Input files: `runs/assessment_summary/output.json` and the report job's saved run record.
-
-Saved settings: No job-specific settings (`{}`).
+**Settings:** No job-specific settings (`{}`).
 
 Biomass is reported as B/K and catches in tonnes. Growth and initial depletion are fixed sensitivity assumptions; convergence does not establish real-stock validity or uncertainty.
 
-## Run in the container
-
-Inside the declared container, from the repository root:
+From the repository root, run this job and prepare any required inputs:
 
 ```sh
-make inside-job JOB=assessment_report
+make job JOB=assessment_report
 ```
 
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-## Outputs and downstream jobs
+| Saved file | Contents |
+| --- | --- |
+| `runs/assessment_report/output.json` | saved calculation result |
+| `runs/assessment_report/report.html` | result page from [report.qmd](report.qmd) |
+| `runs/assessment_report/record.json` | producing inputs, settings, exact code and software |
 
-- `runs/assessment_report/output.json`: the R calculation result.
-- `runs/assessment_report/report.html`: the Quarto report from [report.qmd](report.qmd).
-- `runs/assessment_report/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+**Used by:** None.
 
-Downstream jobs: None.
-
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/record.json).
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/record.json)

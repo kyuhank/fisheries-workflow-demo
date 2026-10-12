@@ -1,36 +1,33 @@
 # Compare CPUE results (`cpue_summary`)
 
-Collect the two fitted CPUE series for comparison without fitting another model.
+Compare the two saved CPUE indices without fitting another model.
 
-Analyst role: CPUE analyst. The entry point is [run.R](run.R), using shared [common.R](../../workflow/r/common.R).
+**Path:** Indices A and B → align years → index comparison.
 
-## Inputs and settings
+**Inputs:** The `series` and method metadata in `runs/cpue_a/output.json` and `runs/cpue_b/output.json`.
 
-Previous jobs: [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md)
+**From:** [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md).
 
-Input files: The `series` in `runs/cpue_a/output.json` and `runs/cpue_b/output.json`.
+**Settings:** No job-specific settings (`{}`).
 
-Saved settings: No job-specific settings (`{}`).
+The result preserves both producing methods, prediction support, weights, units and checks. A uses a cell–quarter adjustment; B uses year only.
 
-## Run in the container
-
-Inside the declared container, from the repository root:
+From the repository root, run this job and prepare any required inputs:
 
 ```sh
-make inside-job JOB=cpue_summary
+make job JOB=cpue_summary
 ```
 
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-## Outputs and downstream jobs
+| Saved file | Contents |
+| --- | --- |
+| `runs/cpue_summary/output.json` | saved calculation result |
+| `runs/cpue_summary/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/cpue_summary/record.json` | producing inputs, settings, exact code and software |
 
-- `runs/cpue_summary/output.json`: the R calculation result.
-- `runs/cpue_summary/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
-- `runs/cpue_summary/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+**Used by:** [CPUE report (`cpue_report`)](../cpue_report/README.md).
 
-Downstream jobs: [CPUE report (`cpue_report`)](../cpue_report/README.md)
-
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/record.json).
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/record.json)

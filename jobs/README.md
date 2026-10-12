@@ -1,189 +1,120 @@
 # Jobs and their connections
 
-Each of the 22 job folders contains an R script and a guide to its inputs,
-settings and outputs. The default source pins are described under [Separate repositories](#separate-repositories). The local [CPUE A script](cpue_a/run.R) and [models.R](../workflow/r/models.R) preserve the monorepo fallback.
+The 22 jobs pass public catch and effort data through CPUE, assessment and MSE.
+Each guide states its input → method → output path. The calculations use
+quasipoisson CPUE GLMs, fixed-growth RTMB Schaefer fits and seeded management
+trials. These simplified models provide no real-stock advice.
 
-The example uses Poisson GLMs for CPUE, a one-parameter RTMB Schaefer assessment
-with fixed growth sensitivities, and management trials with fixed random seeds.
+| Job | Required producing jobs |
+| --- | --- |
+| [Data submission](submission/README.md) | supplied records |
+| [Quality check](qc/README.md) | `submission` |
+| [Prepare and load](database/README.md) | `qc` |
+| [Extract data](extract/README.md) | `database` |
+| [CPUE analysis A](cpue_a/README.md) | `extract` |
+| [CPUE analysis B](cpue_b/README.md) | `extract` |
+| [Compare CPUE results](cpue_summary/README.md) | `cpue_a`, `cpue_b` |
+| [CPUE report](cpue_report/README.md) | `cpue_summary` |
+| [Prepare inputs A](prepare_a/README.md) | `extract`, `cpue_a` |
+| [Prepare inputs B](prepare_b/README.md) | `extract`, `cpue_b` |
+| [Assessment A1](assessment_a1/README.md) | `prepare_a` |
+| [Assessment A2](assessment_a2/README.md) | `prepare_a` |
+| [Assessment B1](assessment_b1/README.md) | `prepare_b` |
+| [Assessment B2](assessment_b2/README.md) | `prepare_b` |
+| [Compare assessments](assessment_summary/README.md) | `assessment_a1`, `assessment_a2`, `assessment_b1`, `assessment_b2` |
+| [Assessment report](assessment_report/README.md) | `assessment_summary` |
+| [Prepare MSE](mse_prepare/README.md) | `assessment_a1`, `assessment_a2`, `assessment_b1`, `assessment_b2` |
+| [Constant catch](mse_constant/README.md) | `mse_prepare` |
+| [Index rule](mse_index/README.md) | `mse_prepare` |
+| [Buffered rule](mse_buffered/README.md) | `mse_prepare` |
+| [MSE results summary](mse_summary/README.md) | `mse_constant`, `mse_index`, `mse_buffered` |
+| [MSE report](mse_report/README.md) | `mse_summary` |
 
-```text
-jobs/cpue_a/run.R       CPUE A R script
-jobs/assessment_a1/run.R  fixed-growth RTMB fit
-jobs/mse_index/run.R    index-based management trials
-jobs/*/README.md        job inputs, settings, outputs and connected jobs
-jobs/*_report/report.qmd  reports rendered by Quarto
-workflow/r/common.R    row checks, snapshot assembly and input joins
-workflow/r/models.R    GLMs, Schaefer objective and RTMB fitting
-workflow/r/mse.R       management trials with shared random errors
-workflow/jobs.json     job declarations and input links
-workflow/Makefile      R and report recipes inside the container
-workflow/engine.py     coordination, file handovers and saved records
-```
+For **Prepare and load**, QC is the scheduling gate. The accepted submission is
+the source artifact stored in SQLite; its record is retained alongside the QC result.
 
-The coordinator follows the input connections, passes outputs between jobs and
-records each execution. Each R job runs inside the recorded container. The browser displays results and
-execution records. These records let readers follow inputs back to the database
-snapshot. The `mse` setting enables the management-trial jobs.
+## Read and adapt a job
 
-## Declare the connections
+The [job declarations](../workflow/jobs.json) name the entry point and its parent
+jobs. The coordinator starts a job when required inputs are ready and records
+the producing run, signature and file checksum before passing its result onward.
 
-[`workflow/jobs.json`](../workflow/jobs.json) is the actual job configuration. This
-excerpt shows one CPUE-to-assessment path; titles and analyst metadata are omitted:
-
-```json
-[
-  {"key": "cpue_a", "parents": ["extract"], "run": "jobs/cpue_a/run.R"},
-  {"key": "prepare_a", "parents": ["extract", "cpue_a"], "run": "jobs/prepare_a/run.R"},
-  {"key": "assessment_a1", "parents": ["prepare_a"], "run": "jobs/assessment_a1/run.R"}
-]
-```
-
-`workflow/spec.py` checks the declarations. The coordinator prepares required
-inputs, starts ready jobs through `workflow/Makefile`, and saves their outputs and
-records before dependent jobs continue. The configuration also declares parallel
-groups and manual handovers. The demo reads JSON with Python's standard library.
-
-The R scripts use the named inputs supplied by the coordinator:
+An R entry point receives a named `context` and returns a result. For example,
+[CPUE A](cpue_a/run.R) uses the shared CPUE function:
 
 ```r
-# jobs/cpue_a/run.R
 calculate <- function(context) {
-  cpue(context$parents$extract$sets, vessel_effect = TRUE,
+  cpue(context$parents$extract$sets, stratum_effect = TRUE,
        min_hooks = context$settings$min_hooks_a)
-}
-
-# jobs/prepare_a/run.R
-calculate <- function(context) {
-  prepare_inputs(context$parents$cpue_a$series, context$parents$extract$catch)
-}
-
-# jobs/assessment_a1/run.R
-calculate <- function(context) {
-  assessment(context$parents$prepare_a$rows, r = 0.25)
 }
 ```
 
-These are three separate files. The driver loads their shared functions from
-`workflow/r/` and supplies `context`; a copied `run.R` is not standalone.
+For public records, this fits year and cell–quarter effects with a log effort
+offset. The saved result contains the prediction grid and weights as well as the
+annual index. The same entry point retains the earlier synthetic-vessel example.
+Shared libraries are loaded by the R driver; a copied `run.R` is not standalone.
 
-## Follow the jobs
+To adapt a fishery, first map its source fields and units, then review the saved
+SQL and CPUE prediction support. Change later assessment and management assumptions
+only after checking their inputs and receiving contracts. [ADAPT.md](../ADAPT.md)
+explains adding jobs, declaring connections and changing source pins.
 
-The four tasks exchange the following files. The job guides below identify the
-individual jobs and their input records.
-
-| Task | Receives | Produces |
-| --- | --- | --- |
-| Data preparation | Supplied fishing records and annual catches | `extract/output.json`: fishing `sets` for CPUE and annual `catch` for assessment preparation |
-| CPUE analysis | Extracted fishing `sets` | `cpue_a/output.json` and `cpue_b/output.json`: index `series` for assessment preparation |
-| Stock assessment | CPUE indices and annual catches | `output.json` from `assessment_a1`, `assessment_a2`, `assessment_b1` and `assessment_b2`: four fitted cases for MSE preparation |
-| Management strategy evaluation | Four fitted assessment cases | `mse_summary/output.json`: management-trial comparisons for the MSE report |
-
-These paths are relative to `runs/`. Each receiving job records the producer's
-run and file checksum. The default example loads actual sources from the three [pinned repositories](#separate-repositories).
-
-### Data preparation
-
-| Job | Receives from |
+| File | Purpose |
 | --- | --- |
-| [Data submission](submission/README.md) | Supplied synthetic records |
-| [Quality check](qc/README.md) | [submission](submission/README.md) |
-| [Prepare and load](database/README.md) | [qc](qc/README.md) |
-| [Extract data](extract/README.md) | [database](database/README.md) |
+| `jobs/*/run.R` | one named calculation |
+| `jobs/*_report/report.qmd` | render saved results without refitting |
+| `workflow/r/common.R` | row checks, source selection and annual joins |
+| `workflow/r/models.R` | monorepo CPUE and Schaefer functions |
+| `workflow/r/mse.R` | management trials with shared random errors |
+| `workflow/jobs.json` | parents, execution stages and handovers |
+| `workflow/engine.py` | scheduling, saved records and reuse |
 
-### CPUE analysis
+## Run and inspect a job
 
-| Job | Receives from |
-| --- | --- |
-| [CPUE analysis A](cpue_a/README.md) | [extract](extract/README.md) |
-| [CPUE analysis B](cpue_b/README.md) | [extract](extract/README.md) |
-| [Compare CPUE results](cpue_summary/README.md) | [cpue_a](cpue_a/README.md), [cpue_b](cpue_b/README.md) |
-| [CPUE report](cpue_report/README.md) | [cpue_summary](cpue_summary/README.md) |
-
-### Stock assessment
-
-| Job | Receives from |
-| --- | --- |
-| [Prepare inputs A](prepare_a/README.md) | [extract](extract/README.md), [cpue_a](cpue_a/README.md) |
-| [Prepare inputs B](prepare_b/README.md) | [extract](extract/README.md), [cpue_b](cpue_b/README.md) |
-| [Assessment A1](assessment_a1/README.md) | [prepare_a](prepare_a/README.md) |
-| [Assessment A2](assessment_a2/README.md) | [prepare_a](prepare_a/README.md) |
-| [Assessment B1](assessment_b1/README.md) | [prepare_b](prepare_b/README.md) |
-| [Assessment B2](assessment_b2/README.md) | [prepare_b](prepare_b/README.md) |
-| [Compare assessments](assessment_summary/README.md) | [assessment_a1](assessment_a1/README.md), [assessment_a2](assessment_a2/README.md), [assessment_b1](assessment_b1/README.md), [assessment_b2](assessment_b2/README.md) |
-| [Assessment report](assessment_report/README.md) | [assessment_summary](assessment_summary/README.md) |
-
-### Management strategy evaluation
-
-| Job | Receives from |
-| --- | --- |
-| [Prepare MSE](mse_prepare/README.md) | [assessment_a1](assessment_a1/README.md), [assessment_a2](assessment_a2/README.md), [assessment_b1](assessment_b1/README.md), [assessment_b2](assessment_b2/README.md) |
-| [Constant catch](mse_constant/README.md) | [mse_prepare](mse_prepare/README.md) |
-| [Index rule](mse_index/README.md) | [mse_prepare](mse_prepare/README.md) |
-| [Buffered rule](mse_buffered/README.md) | [mse_prepare](mse_prepare/README.md) |
-| [MSE results summary](mse_summary/README.md) | [mse_constant](mse_constant/README.md), [mse_index](mse_index/README.md), [mse_buffered](mse_buffered/README.md) |
-| [MSE report](mse_report/README.md) | [mse_summary](mse_summary/README.md) |
-
-For **Prepare and load**, QC is the scheduling gate: after the check passes,
-the job reads the corrected submission and writes the database snapshot. The
-folder guide distinguishes this source artifact from its declared QC dependency.
-
-## Run a job
-
-From the repository root:
+From the repository root, with Docker, Make, Python 3 and Git available:
 
 ```sh
 make job JOB=cpue_a
 ```
 
-Make uses the declared image, pulling it if needed, and starts the coordinator
-inside it. The coordinator prepares missing or outdated inputs and uses
-`workflow/Makefile` to call `jobs/cpue_a/run.R`. `OUTPUT=DIR` selects an output
-directory; `SETTINGS=FILE` supplies settings. When already inside the container,
-use `make inside-job JOB=cpue_a`. The run record identifies the container digest
-and R/package versions used.
+The coordinator prepares missing or changed inputs and calls the R script in
+the recorded container. `OUTPUT=DIR` selects the result directory;
+`SETTINGS=FILE` supplies JSON settings. Inside the declared container, use
+`make inside-job JOB=cpue_a`.
 
-The R bridge passes a named `context` containing settings, decoded parent
-results and raw source or SQLite query rows. `calculate(context)` returns
-the result. QC can also return corrected submission rows for the coordinator to
-save. Database storage and SQL extraction use SQLite; R jobs check their inputs and
-calculate results. Report jobs render saved results and records through
-`report.qmd` templates without refitting.
+| File | Contents |
+| --- | --- |
+| `runs/cpue_a/output.json` | numerical result and method metadata |
+| `runs/cpue_a/report.html` | readable result page |
+| `runs/cpue_a/record.json` | input producers, settings, exact code and software |
+| `runs/database/snapshot.sqlite` | accepted data snapshot |
+| `runs/state.json` | execution state and events |
 
-```text
-runs/cpue_a/output.json  R result
-runs/cpue_a/report.html  result page
-runs/cpue_a/record.json  inputs, settings, source hashes and container and software
-runs/database/snapshot.sqlite  accepted fixed database snapshot
-runs/state.json         workflow execution state
-```
+CPUE transfers supply annual relative `index` values. Preparation joins these
+to `catch_t` in tonnes for matching consecutive years. Assessment records retain
+convergence, gradient, boundary, positive-biomass and annual balance checks.
+Differences among the four fixed-growth cases are not confidence intervals.
 
-Biomass uses B/K, intrinsic growth is fixed in each sensitivity case, and MSE
-fractions are conditional on the declared stocks, scenarios and seeded trials.
-This synthetic example supplies no confidence intervals or real-stock advice.
-Assessment records include objective and projected gradients, boundary status,
-positive-biomass feasibility and the annual biomass balance residual. The balance
-checks the declared recurrence using known catches rather than estimating catches.
-The generating truth and units are declared by
-[scripts/generate-data.R](../scripts/generate-data.R) and the saved data metadata.
-
-[Browse saved results](https://kyuhank.github.io/fisheries-workflow-demo/example/)
-or use **Record** in the [demo](https://kyuhank.github.io/fisheries-workflow-demo/)
-to inspect a result's inputs, R source and container. Downloaded runs
-include the shared R code, job folders, data and records; one copied job folder
-uses these surrounding dependencies.
+MSE preparation receives positive finite growth, capacity and catchability,
+the observed indices and catches, and the declared next-year biomass. The
+management trials use the same seeded errors for each rule. Trial fractions are
+conditional comparisons under the supplied cases and scenarios.
 
 ## Separate repositories
 
-The default source lock uses three actual component Git repositories:
+The source lock records exact revisions from three component repositories:
 
 | Repository | Jobs | Calculation library |
 | --- | --- | --- |
 | [Preparation/CPUE](https://github.com/kyuhank/fisheries-workflow-cpue-demo) | submission through CPUE report (8) | `R/cpue.R` |
-| [Assessment](https://github.com/kyuhank/fisheries-workflow-assessment-demo) | prepare inputs A/B through assessment report (8) | `R/assessment.R` |
-| [MSE](https://github.com/kyuhank/fisheries-workflow-mse-demo) | prepare MSE through MSE report (6) | `R/mse.R` |
+| [Assessment](https://github.com/kyuhank/fisheries-workflow-assessment-demo) | input preparation through assessment report (8) | `R/assessment.R` |
+| [MSE](https://github.com/kyuhank/fisheries-workflow-mse-demo) | MSE preparation through MSE report (6) | `R/mse.R` |
 
-The coordinator retrieves the full commit pins from [source-lock.template.json](../source-lock.template.json), verifies their source bytes and passes only the declared libraries to each R job. Shared row and JSON plumbing remain in `workflow/r/common.R`. MSE preparation explicitly depends on the assessment library as well as the MSE library.
-
-CPUE transfers supply relative index `series` (`year`, `index`) and annual `catch` (`year`, `catch_t` in tonnes). Preparation joins matching consecutive years before fitting. MSE preparation receives the four declared assessment cases, positive finite capacity/growth/catchability, their annual catches and observed relative indices, and a compatible next-year biomass. File contracts reject incompatible inputs before fitting or simulation. Input records preserve producer run, signature, source revision and SHA-256 checksum.
-
-The Code link opens the responsible component's recorded commit; the actual-run link identifies the coordinator execution. Downloaded runs contain the exact component source snapshot and origin manifest, alongside settings, software and outputs. Unchanged dependencies can retain their original producing records when another component changes. [ADAPT.md](../ADAPT.md#separate-analyst-repositories) describes loading, invalidation and the explicit monorepo fallback. The synthetic example still uses one coordinator and does not demonstrate several human operators or an operational assessment.
+The coordinator verifies the source bytes named in
+[source-lock.template.json](../source-lock.template.json). Shared row and JSON
+handling stays in `workflow/r/common.R`. MSE preparation also uses the declared
+assessment library. Downloaded runs contain the exact component snapshots and
+origin manifests; unchanged dependencies keep their producing records.
+[ADAPT.md](../ADAPT.md#separate-analyst-repositories) describes source assembly and
+the explicit monorepo fallback. Repository separation uses one coordinator and
+does not establish collaboration by several human operators.

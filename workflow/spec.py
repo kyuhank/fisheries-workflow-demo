@@ -1,5 +1,6 @@
 """Read the declared jobs and follow their input connections."""
 import json
+import os
 from pathlib import Path
 import re
 from .sources import SourceResolver
@@ -58,7 +59,9 @@ CONFIG = load_spec()
 SPEC = {job['key']: job for job in CONFIG['jobs']}
 JOBS = [(job['key'], job['title'], job['module'], job['owner'], job['parents'], job['description'])
         for job in CONFIG['jobs']]
-DEFAULTS = CONFIG['defaults']
+DEFAULTS = dict(CONFIG['defaults'])
+if os.environ.get('PAPER_DATA_MODE') != 'synthetic':
+    DEFAULTS['last_year'] = 2021
 STAGES = CONFIG['stages']
 HANDOVERS = CONFIG['handovers']
 

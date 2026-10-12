@@ -25,7 +25,7 @@ export async function setup(path: string, body: any, db: any) {
       manifest: {
         name: "Fisheries paper demo",
         url: SITE,
-        description: "Runs the synthetic fisheries workflow demonstration.",
+        description: "Runs the public-data fisheries workflow demonstration.",
         redirect_url: SITE + "setup.html",
         setup_url: SITE + "setup.html?installed=1",
         public: false,

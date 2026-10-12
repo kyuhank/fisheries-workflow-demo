@@ -3,6 +3,7 @@ import asyncio
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import platform
 import shutil
@@ -21,7 +22,7 @@ from .contracts import validate_transfer
 ROOT = Path(__file__).resolve().parents[1]
 FROZEN_SOURCE = 'data/frozen-source.json'
 DATA_FILES = ('fishery.sqlite', 'submission.json', 'scenario.json', 'source-data.json',
-              'generation.json', 'frozen-source.json')
+              'generation.json', 'frozen-source.json', 'public-source.json', 'public-data.json')
 
 
 def digest(data):
@@ -34,6 +35,19 @@ def encoded(value):
 
 def read_json(path):
     return json.loads(path.read_text())
+
+
+def validate_public_projection(source, reference, last_year, checksum):
+    """Check hosted rows and every source declaration against the saved inputs."""
+    if (source.get('data_kind') != reference['data_kind'] or
+            source.get('metadata') != reference['metadata'] or
+            source.get('source_sha256') != checksum):
+        raise ValueError('Hosted source metadata or identity differ from the preserved public-data snapshot.')
+    expected_sets = [row for row in reference['sets'] if row['year'] <= last_year]
+    expected_catch = [row for row in reference['catch'] if row['year'] <= last_year]
+    if (sorted(source['sets'], key=lambda row: row['source_row']) != expected_sets or
+            source['catch'] != expected_catch):
+        raise ValueError('Hosted rows differ from the preserved public-data projection.')
 
 
 def job_files():
@@ -51,13 +65,15 @@ def calculation_files():
 def source_payload(sources=None):
     """Canonical exact source closure used by run, page and release downloads."""
     sources = sources or SourceResolver(ROOT)
-    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/*'),
+    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/**/*'),
              *calculation_files(), *ROOT.glob('tests/*.py'), *ROOT.glob('tests/*.R'),
-             *ROOT.glob('cloud/*.py'), *ROOT.glob('vendor/analysis/*')]
+             *ROOT.glob('cloud/*.py'), *ROOT.glob('cloud/*.sql'), *ROOT.glob('vendor/analysis/*')]
     files += job_files()
     files += [ROOT / name for name in ['run.py', 'verify.py', 'Makefile', 'Dockerfile', 'README.md',
               'LICENSE', 'THIRD_PARTY.md', 'build-info.json', 'ADAPT.md', 'cloud/README.md',
               'examples/analyst-repositories.yaml', 'scripts/generate-data.R', 'scripts/import-r-data.py',
+              'scripts/import-public-data.py',
+              'scripts/seed-public-data.py',
               'scripts/hydrate-sources.py', 'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md',
               'OFFLINE.md', 'runtime-preservation.json', 'scripts/offline.sh',
               'scripts/offline-runtime.py', 'scripts/preserve-runtime.sh']]
@@ -105,6 +121,13 @@ class Workflow:
             raise ValueError('Unknown analysis setting.')
         if candidate['last_year'] not in (2021, 2022, 2023, 2024):
             raise ValueError('Select a supplied data snapshot.')
+        source = self.source_context()
+        if source.get('data_kind') == 'public-wcpfc-albacore':
+            available = ({row['year'] for row in source['sets']} &
+                         {row['year'] for row in source['catch']})
+            if candidate['last_year'] not in (2021, 2022) or candidate['last_year'] not in available:
+                raise ValueError('The public-data example supplies the 2021 and 2022 snapshots; '
+                                 'the requested year is not available in this snapshot.')
         if candidate['min_hooks_a'] not in (0, 1200):
             raise ValueError('Select one of the supplied CPUE filters.')
         if candidate['growth_rate_2'] not in (0.25, 0.30, 0.35):
@@ -156,7 +179,7 @@ class Workflow:
                  'workflow/r_driver.R', 'workflow/quarto_reports.py',
                  'workflow/sources.py', 'workflow/contracts.py']
         if key == 'extract':
-            names += ['workflow/extract.sql', 'workflow/extract-catch.sql']
+            names += ['workflow/extract.sql', 'workflow/extract-public.sql', 'workflow/extract-catch.sql']
         files = {name: ROOT / name for name in names}
         files.update(self.sources.required_files(key))
         return {name: digest(path.read_bytes()) for name, path in files.items()}
@@ -168,8 +191,7 @@ class Workflow:
         material = {'code': self.code_record(key), 'settings': self.job_settings(key),
                     'parents': parents, 'software': self.software()}
         if key == 'submission':
-            material['data'] = {name: digest((ROOT / 'data' / name).read_bytes())
-                                for name in DATA_FILES if (ROOT / 'data' / name).is_file()}
+            material['data'] = self.data_files()
         return digest(encoded(material))
 
     def software(self):
@@ -243,19 +265,61 @@ class Workflow:
         frozen = ROOT / FROZEN_SOURCE
         if frozen.is_file():
             return {**read_json(frozen), 'submission': None}
+        public = ROOT / 'data/public-source.json'
+        if os.environ.get('PAPER_DATA_MODE') != 'synthetic':
+            if not public.is_file():
+                raise ValueError('The preserved public-data snapshot is missing; prepare it with scripts/import-public-data.py.')
+            source = read_json(public)
+            if source.get('data_kind') != 'public-wcpfc-albacore':
+                raise ValueError('The public-data snapshot has an unknown observation contract.')
+            receipt = read_json(ROOT / 'data/public-data.json')
+            if (digest(public.read_bytes()) != receipt['output_sha256'] or
+                    source['metadata'] != receipt['metadata'] or
+                    source['metadata']['sources'] != receipt['sources']):
+                raise ValueError('The prepared public data differ from their source receipt.')
+            adapter = ROOT / receipt['adapter']['path']
+            if digest(adapter.read_bytes()) != receipt['adapter']['sha256']:
+                raise ValueError('The public-data preparation code differs from its receipt.')
+            for item in receipt['sources']:
+                path = ROOT / item['file']
+                if not path.resolve().is_relative_to((ROOT / 'data/public').resolve()):
+                    raise ValueError('Public source archive path escapes the preserved data directory.')
+                if digest(path.read_bytes()) != item['sha256']:
+                    raise ValueError('The preserved public source archive changed: ' + item['file'])
+            return source
         with sqlite3.connect(f'file:{ROOT / "data/fishery.sqlite"}?mode=ro', uri=True) as db:
             db.row_factory = sqlite3.Row
             rows = [dict(r) for r in db.execute('SELECT * FROM sets ORDER BY year,set_id')]
             catch = [dict(r) for r in db.execute('SELECT * FROM removals ORDER BY year')]
         return {'sets': rows, 'catch': catch, 'submission': read_json(ROOT / 'data/submission.json')}
 
+    def data_files(self):
+        """Fingerprint the selected input contract and its preserved originals."""
+        if self.source_context().get('data_kind') == 'public-wcpfc-albacore':
+            paths = ['data/public-source.json', 'data/public-data.json']
+            paths += [item['file'] for item in read_json(ROOT / 'data/public-data.json')['sources']]
+            files = {name: digest((ROOT / name).read_bytes()) for name in paths}
+            if hasattr(self, 'hosted_data'):
+                files[FROZEN_SOURCE] = digest(encoded(self.hosted_data))
+            elif (ROOT / FROZEN_SOURCE).is_file():
+                files[FROZEN_SOURCE] = digest((ROOT / FROZEN_SOURCE).read_bytes())
+            return files
+        return {name: digest((ROOT / 'data' / name).read_bytes())
+                for name in DATA_FILES if name not in ('public-source.json', 'public-data.json')
+                and (ROOT / 'data' / name).is_file()}
+
     def extracted_context(self):
-        sql = (ROOT / 'workflow/extract.sql').read_text()
+        public = self.source_context().get('data_kind') == 'public-wcpfc-albacore'
+        sql = (ROOT / ('workflow/extract-public.sql' if public else 'workflow/extract.sql')).read_text()
         catch_sql = (ROOT / 'workflow/extract-catch.sql').read_text()
         with sqlite3.connect(self.directory / 'database/snapshot.sqlite') as db:
             db.row_factory = sqlite3.Row
-            return {'sets': [dict(r) for r in db.execute(sql)],
-                    'catch': [dict(r) for r in db.execute(catch_sql)], 'sql': sql + '\n' + catch_sql}
+            result = {'sets': [dict(r) for r in db.execute(sql)],
+                      'catch': [dict(r) for r in db.execute(catch_sql)], 'sql': sql + '\n' + catch_sql}
+        if public:
+            source = self.source_context()
+            result.update(data_kind=source['data_kind'], metadata=source['metadata'])
+        return result
 
     def store_snapshot(self, data):
         """Load rows accepted by R into the SQLite snapshot."""
@@ -264,9 +328,16 @@ class Workflow:
         dbfile = folder / 'snapshot.sqlite'
         dbfile.unlink(missing_ok=True)
         with sqlite3.connect(dbfile) as db:
-            db.execute('CREATE TABLE sets(set_id TEXT PRIMARY KEY,year INTEGER,vessel TEXT,hooks INTEGER CHECK(hooks>0),catch_n INTEGER CHECK(catch_n>=0))')
+            public = data.get('data_kind') == 'public-wcpfc-albacore'
+            if public:
+                columns = ('set_id', 'source_row', 'year', 'fleet', 'quarter', 'cell', 'stratum', 'hooks', 'catch_n')
+                db.execute('CREATE TABLE sets(set_id TEXT PRIMARY KEY,source_row INTEGER,year INTEGER,fleet TEXT,quarter INTEGER,cell TEXT,stratum TEXT,hooks REAL CHECK(hooks>0),catch_n INTEGER CHECK(catch_n>=0))')
+            else:
+                columns = ('set_id', 'year', 'vessel', 'hooks', 'catch_n')
+                db.execute('CREATE TABLE sets(set_id TEXT PRIMARY KEY,year INTEGER,vessel TEXT,hooks INTEGER CHECK(hooks>0),catch_n INTEGER CHECK(catch_n>=0))')
             db.execute('CREATE TABLE removals(year INTEGER PRIMARY KEY,catch_t REAL CHECK(catch_t>=0))')
-            db.executemany('INSERT INTO sets VALUES(?,?,?,?,?)', [[row[name] for name in ('set_id','year','vessel','hooks','catch_n')] for row in data['sets']])
+            placeholders = ','.join('?' for _ in columns)
+            db.executemany('INSERT INTO sets VALUES(' + placeholders + ')', [[row[name] for name in columns] for row in data['sets']])
             db.executemany('INSERT INTO removals VALUES(?,?)', [[row['year'],row['catch_t']] for row in data['catch']])
 
     def save(self, key, result, run_id):
@@ -300,6 +371,9 @@ class Workflow:
                 record['input_contract'] = transferred
         if self.execution:
             record['execution'] = dict(self.execution)
+        source = self.source_context()
+        if source.get('data_kind') == 'public-wcpfc-albacore':
+            record['data_source'] = source['metadata']
         build = ROOT / 'build-info.json'
         if build.exists():
             record['source'] = read_json(build)
@@ -308,8 +382,7 @@ class Workflow:
         if self.execution.get('commit'):
             record['source'] = {'repository': 'https://github.com/' + self.execution['repository'],
                                 'commit': self.execution['commit']}
-        record['data_files'] = {name: digest((ROOT / 'data' / name).read_bytes())
-                                for name in DATA_FILES if (ROOT / 'data' / name).is_file()}
+        record['data_files'] = self.data_files()
         self.records[key] = record
         lineage = [{'job': SPEC[parent]['title'], **details} for parent, details in record['inputs'].items()]
         page = reports.output_page(SPEC[key], result, record, lineage)
@@ -475,6 +548,9 @@ class Workflow:
             software = self.software()
             image = software['container']
             image_option = ' IMAGE=' + shlex.quote(image)
+            data_mode = ('public' if self.source_context().get('data_kind') == 'public-wcpfc-albacore'
+                         else 'synthetic')
+            image_option += ' PAPER_DATA_MODE=' + data_mode
             if not self.sources.multi_repository:
                 image_option += ' PAPER_SOURCE_MODE=monorepo'
             image_option += ' IMAGE_URL=' + shlex.quote(software.get('container_url', ''))
@@ -487,16 +563,25 @@ class Workflow:
                 note = (f'This check compares only {job_target}. Other saved results retain their earlier '
                         'records and may use earlier inputs; they are not reproduced by this command.\n')
             offline_job = ' ' + shlex.quote(job_target) if job_target else ''
-            archive.writestr('REPRODUCE.txt',
-                            f'Local repeat: sh scripts/offline.sh reproduce{offline_job}\n'
-                            f'Compare: sh scripts/offline.sh compare{offline_job}\n{note}'
-                            'Run from the extracted folder with Docker and a POSIX shell. '
-                            'The recorded image must already be present or restored from your saved runtime archive. '
-                            'See OFFLINE.md for restoration and preservation. Offline commands never retrieve '
-                            'an image or source repository and disable container network access. '
-                            'Inputs, analysis sources and runtime identity are checked before calculation. '
-                            'The saved reference stays in reference/; new results go into offline-runs/.\n\n'
-                            f'Development route (may retrieve software):\nPull: {pull}\nRun: {run}\nCheck: {check}\n'
-                            'This Make route requires host Docker, Make and Python 3. R and Quarto run inside '
-                            'the recorded image. Original run identities are in reference/state.json.\n')
+            if not self.sources.multi_repository:
+                archive.writestr('REPRODUCE.txt',
+                                'Monorepo development snapshot.\n'
+                                'This bundle supports the Make development route below; '
+                                'the offline restoration tools require a pinned component bundle.\n'
+                                f'{note}Pull: {pull}\nRun: {run}\nCheck: {check}\n'
+                                'Docker, Make and Python 3 are required. The Make route may retrieve '
+                                'software; recorded data and calculation source are included.\n')
+            else:
+                archive.writestr('REPRODUCE.txt',
+                                f'Local repeat: sh scripts/offline.sh reproduce{offline_job}\n'
+                                f'Compare: sh scripts/offline.sh compare{offline_job}\n{note}'
+                                'Run from the extracted folder with Docker and a POSIX shell. '
+                                'The recorded image must already be present or restored from your saved runtime archive. '
+                                'See OFFLINE.md for restoration and preservation. Offline commands never retrieve '
+                                'an image or source repository and disable container network access. '
+                                'Inputs, analysis sources and runtime identity are checked before calculation. '
+                                'The saved reference stays in reference/; new results go into offline-runs/.\n\n'
+                                f'Development route (may retrieve software):\nPull: {pull}\nRun: {run}\nCheck: {check}\n'
+                                'This Make route requires host Docker, Make and Python 3. R and Quarto run inside '
+                                'the recorded image. Original run identities are in reference/state.json.\n')
         return buffer.getvalue()

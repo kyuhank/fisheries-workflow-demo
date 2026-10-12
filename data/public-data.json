@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "type": "public-source-preparation",
+  "adapter": {
+    "path": "scripts/import-public-data.py",
+    "sha256": "4c0368c659bcd24e259be9d33321039ce2d4509106e2af7f433e62a8594cf770"
+  },
+  "sources": [
+    {
+      "file": "data/public/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip",
+      "sha256": "d9b6904cdf2fd2f43016136992526ad355efb3c105d1796fde299cb3cec482cf",
+      "member": "WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.csv",
+      "member_sha256": "7baba3d0cf41c8577eb16588d99dacc095444e8d5f5b0acdc8b81d28d170e7c0",
+      "url": "https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip"
+    },
+    {
+      "file": "data/public/WCPFC_Yearbook_Raw_Data.zip",
+      "sha256": "aefe9d2ee675ef11b4706dfeaaeb8ffc78c29d5bae3f6815e7f567dfc1424648",
+      "member": "XLS_SouthPacific_2026-02-25.csv",
+      "member_sha256": "99f7321beaa50bf0c152d0aafd738ca6d33f8f30959ceadba1d04629508bd19c",
+      "url": "https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip"
+    }
+  ],
+  "source_records": 662,
+  "reference_records": 138,
+  "annual_catch_source_records": 599,
+  "annual_catch_records": 23,
+  "output_sha256": "0503bfb9a7f114fa41bcbd91315cb57fcf02542ffa019429912b03b211aab30e",
+  "metadata": {
+    "title": "South Pacific albacore: a small public-data example",
+    "observation_unit": "Released fleet–quarter–5-degree-cell aggregate",
+    "set_id_meaning": "Original CSV row key; not a fishing set",
+    "cpue_scope": "Fiji fleet; six observed cell–quarter strata, 2000–2022",
+    "catch_scope": "South Pacific albacore nominal catch estimates; all gears and fleets",
+    "years": [
+      2000,
+      2022
+    ],
+    "reference_strata": [
+      "20S_170E_Q4",
+      "20S_175E_Q1",
+      "20S_175E_Q2",
+      "20S_175E_Q3",
+      "20S_175E_Q4",
+      "25S_175E_Q3"
+    ],
+    "prediction_effort_hooks": 1000,
+    "prediction_weights": [
+      0.16666666666666666,
+      0.16666666666666666,
+      0.16666666666666666,
+      0.16666666666666666,
+      0.16666666666666666,
+      0.16666666666666666
+    ],
+    "normalisation": "First supplied year = 1",
+    "units": {
+      "hooks": "hooks; source HHOOKS multiplied by 100",
+      "catch_n": "albacore in numbers",
+      "catch_t": "metric tonnes"
+    },
+    "sources": [
+      {
+        "file": "data/public/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip",
+        "sha256": "d9b6904cdf2fd2f43016136992526ad355efb3c105d1796fde299cb3cec482cf",
+        "member": "WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.csv",
+        "member_sha256": "7baba3d0cf41c8577eb16588d99dacc095444e8d5f5b0acdc8b81d28d170e7c0",
+        "url": "https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip"
+      },
+      {
+        "file": "data/public/WCPFC_Yearbook_Raw_Data.zip",
+        "sha256": "aefe9d2ee675ef11b4706dfeaaeb8ffc78c29d5bae3f6815e7f567dfc1424648",
+        "member": "XLS_SouthPacific_2026-02-25.csv",
+        "member_sha256": "99f7321beaa50bf0c152d0aafd738ca6d33f8f30959ceadba1d04629508bd19c",
+        "url": "https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip"
+      }
+    ],
+    "source_terms": "WCPFC/SPC public statistical data; retain attribution and source notices.",
+    "limits": [
+      "The small Fiji index is not a validated stock-wide abundance index.",
+      "Blank fleet codes identify suppressed cells; their zeros are not observed catches.",
+      "The released data omit vessel identities and detailed targeting information.",
+      "The catch series contains nominal estimates; discards enter totals only from 2017.",
+      "Recent eastern Pacific coverage is unresolved, so this example ends in 2022.",
+      "Assessment and management trials use simplified teaching assumptions."
+    ]
+  }
+}

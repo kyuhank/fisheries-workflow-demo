@@ -3,9 +3,23 @@ import { runScope, runSettings } from "./request.ts";
 const body = {
   start: "submission",
   handover: "connected",
-  settings: { last_year: 2023, min_hooks_a: 0, growth_rate_2: .3 },
+  settings: { last_year: 2021, min_hooks_a: 0, growth_rate_2: .3 },
 };
 const jobs = ["submission", "mse_report"];
+
+Deno.test("public data accepts only the supplied annual snapshots", () => {
+  for (const last_year of [2021, 2022]) {
+    if (runSettings({ ...body, settings: { ...body.settings, last_year } }, jobs).last_year !== last_year) {
+      throw Error("Public snapshot changed.");
+    }
+  }
+  for (const last_year of [2000, 2020, 2023, 2024, "2021", null]) {
+    let rejected = false;
+    try { runSettings({ ...body, settings: { ...body.settings, last_year } }, jobs); }
+    catch { rejected = true; }
+    if (!rejected) throw Error("Unavailable public snapshot accepted.");
+  }
+});
 
 Deno.test("execution scope defaults to workflow and stays outside analysis settings", () => {
   if (runScope(body) !== "workflow") throw Error("Legacy run scope changed.");

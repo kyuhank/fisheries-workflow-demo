@@ -272,13 +272,16 @@ def run_offline(root, args, inspect):
     runtime = verify_image(inspect, read_json(root / 'runtime-preservation.json'))
     if args.command == 'check':
         return {'status': 'SOURCE_AND_LOCAL_IMAGE_VERIFIED', 'sources': source, 'runtime': runtime}
+    reference = args.reference or ('reference' if (root / 'reference/state.json').is_file() else 'example')
+    state = read_json(safe_file(root, reference + '/state.json'))
+    public = bool(state['records'].get('submission', {}).get('data_source'))
+    os.environ['PAPER_DATA_MODE'] = 'public' if public else 'synthetic'
     from .engine import Workflow
     from .r_bridge import RBridge
     from .spec import SPEC
     from verify import verify
     if args.job is not None and args.job not in SPEC:
         raise ValueError('Unknown job: ' + args.job)
-    reference = args.reference or ('reference' if (root / 'reference/state.json').is_file() else 'example')
     # Validate source/reference paths before opening them; checksum verification above
     # includes the complete preserved reference. Caller-supplied settings are recorded.
     if args.command in ('reproduce', 'compare'):
@@ -320,9 +323,11 @@ def run_offline(root, args, inspect):
     try:
         runner = Workflow(output, r_bridge=PreservedBridge(),
                           notify=lambda event: print(event.get('job', 'Workflow'), event['state'], event.get('message', ''), flush=True))
-        # Preserve the original local execution={} default. The frozen report
-        # renderer interprets a nonempty execution as GitHub Actions. Actual local
-        # custody belongs in this separate receipt and the per-job software fields.
+        origin = runner.sources.coordinator_identity()
+        runner.execution = {'provider': 'Local Docker', 'purpose': 'offline ' + args.command,
+                            'container': UPSTREAM_IMAGE}
+        if origin.get('commit'):
+            runner.execution.update(repository='kyuhank/fisheries-workflow-demo', commit=origin['commit'])
         if args.settings:
             path = safe_file(root, args.settings)
             settings = read_json(path)

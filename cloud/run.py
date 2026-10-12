@@ -17,7 +17,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from workflow.engine import Workflow, digest, encoded
+from workflow.engine import Workflow, digest, encoded, validate_public_projection
 from workflow.spec import SPEC, STAGES
 from workflow.r_bridge import RBridge
 
@@ -156,6 +156,18 @@ class HostedWorkflow(HostedCalculationWorkflow):
         container = RBridge.require_container()
         self.context = context
         self.hosted_data = api('data')
+        public = ROOT / 'data/public-source.json'
+        if public.is_file():
+            expected = json.loads(public.read_text())
+            if self.hosted_data.get('data_kind') != expected['data_kind']:
+                raise ValueError('The hosted public-data tables have not been prepared for this code version.')
+            # Hosted retrieval retains the same released fields and source identity.
+            receipt = json.loads((ROOT / 'data/public-data.json').read_text())
+            if (digest(public.read_bytes()) != receipt['output_sha256'] or
+                    expected['metadata'] != receipt['metadata']):
+                raise ValueError('The preserved public-data snapshot differs from its preparation receipt.')
+            validate_public_projection(self.hosted_data, expected, context['settings']['last_year'],
+                                       receipt['output_sha256'])
         self.transfer_count = 0
         self.delivery = EventDelivery()
         super().__init__('/tmp/paper-results', notify=self.publish, pause=.1,
@@ -164,7 +176,9 @@ class HostedWorkflow(HostedCalculationWorkflow):
         self.execution = {'provider': 'GitHub Actions', 'repository': 'kyuhank/fisheries-workflow-demo',
                           'commit': context['commit_sha'], 'github_run': context['github_run'],
                           'container': container,
-                          'data_source': 'Supabase PostgreSQL: fixed synthetic records',
+                          'data_source': ('Preserved WCPFC public albacore tables'
+                                          if self.hosted_data.get('data_kind') == 'public-wcpfc-albacore'
+                                          else 'Supabase PostgreSQL: fixed synthetic records'),
                           'data_checksum': digest(encoded(self.hosted_data))}
         self.configure({'mse': False, **context['settings']})
 

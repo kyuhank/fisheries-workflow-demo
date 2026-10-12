@@ -14,6 +14,7 @@ import zipfile
 from .engine import Workflow, ROOT, digest, encoded, read_json
 from .r_bridge import RBridge, make_command, process_environment, kill_process_group
 from .spec import SPEC
+from .reports import STYLE, plot, table
 
 IMAGE = 'ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d'
 TOLERANCE = {'absolute': 1e-12, 'relative': 1e-12}
@@ -270,15 +271,49 @@ class StudyWorkflow(Workflow):
                   'log': [event['message'] for event in self.events if event['job'] == key]}
         if key != 'cpue_summary':
             record['producer'] = result['producer']
-        page = '<!doctype html><meta charset="utf-8"><title>' + html.escape(SPEC[key]['title']) + '</title>'
-        page += '<h1>' + html.escape(SPEC[key]['title']) + '</h1><p>Conditional source-scale teaching predictions. No optimisation, biological validation or advice.</p>'
+        page = '<!doctype html><html lang="en-NZ"><meta charset="utf-8">'
+        page += '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        page += '<title>' + html.escape(SPEC[key]['title']) + '</title><style>' + STYLE + '</style><body>'
+        page += '<h1>' + html.escape(SPEC[key]['title']) + '</h1>'
         if key == 'cpue_summary':
-            page += '<table><thead><tr><th>Year</th><th>Observed CPUE (linear source scale; unit unspecified)</th><th>Reference ln CPUE</th><th>Active ln CPUE</th><th>Difference</th><th>Ratio</th></tr></thead><tbody>'
-            for row in result['rows']:
-                page += '<tr>' + ''.join('<td>' + html.escape(str(row[name])) + '</td>' for name in
-                    ('year', 'observed_cpue', 'reference_predicted_log_cpue', 'active_predicted_log_cpue', 'log_difference', 'source_scale_ratio')) + '</tr>'
-            page += '</tbody></table>'
-        page += '<p>Producer records and exact source closure are preserved in record.json.</p><pre>' + html.escape(json.dumps(record, indent=2)) + '</pre>'
+            rows = result['rows']
+            page += '<p>Compare the active MQMF prediction with its direct native reference.</p>'
+            page += '<p class="feedback-flow">Two saved predictions → check scale and producer → annual comparison</p>'
+            series = {'Observed': [{'year': row['year'], 'cpue': row['observed_cpue']} for row in rows]}
+            for label, field in [('Reference', 'reference_predicted_log_cpue'), ('Active', 'active_predicted_log_cpue')]:
+                series[label] = [{'year': row['year'], 'cpue': math.exp(row[field])} for row in rows]
+            columns = [('year', 'Year'), ('observed_cpue', 'Observed CPUE'),
+                       ('reference_predicted_log_cpue', 'Reference ln CPUE'),
+                       ('active_predicted_log_cpue', 'Active ln CPUE'),
+                       ('log_difference', 'Log difference'), ('source_scale_ratio', 'Active / reference')]
+            page += plot(series, 'cpue', 'CPUE on the original numerical scale; physical unit unspecified', points=('Observed',))
+            if result.get('baseline_preservation') is True:
+                page += '<p class="note">The mapped and direct predictions agree within the recorded tolerance.</p>'
+            elif result.get('perturbation_detectable') is True:
+                page += '<p class="note">Changing the active growth setting changed the conditional predictions.</p>'
+            page += '<details><summary>All annual comparisons</summary>' + table(rows, columns) + '</details>'
+        else:
+            rows = result['series']
+            page += '<p>Predict CPUE with the unchanged MQMF routine and supplied teaching parameters.</p>'
+            page += '<p class="feedback-flow">' + html.escape(result['input_route'])
+            page += ' → unchanged simpspm() → annual log predictions</p>'
+            parameters = result['parameters']
+            page += '<p>Fixed growth: ' + str(parameters['r']) + ' per year; carrying capacity: '
+            page += str(parameters['K']) + ' tonnes; initial biomass: ' + str(parameters['Binit']) + ' tonnes.</p>'
+            series = {'Observed': [{'year': row['year'], 'cpue': row['observed_cpue']} for row in rows],
+                      'Predicted': [{'year': row['year'], 'cpue': math.exp(row['predicted_log_cpue'])} for row in rows]}
+            page += plot(series, 'cpue', 'CPUE on the original numerical scale; physical unit unspecified', points=('Observed',))
+            page += '<details><summary>All annual predictions</summary>' + table(rows, [
+                ('year', 'Year'), ('observed_cpue', 'Observed CPUE'),
+                ('predicted_log_cpue', 'Predicted ln CPUE')]) + '</details>'
+            page += '<details><summary>Calculation assumptions</summary><pre>'
+            page += html.escape(json.dumps(result['semantics'], indent=2)) + '</pre></details>'
+        page += '<p>Predictions are exponentiated only for this plot; saved predictions retain their natural-log scale. '
+        page += 'The observed CPUE unit is undocumented. This example does not reproduce CPUE standardisation, '
+        page += 'fit population parameters, validate a stock assessment or provide management advice.</p>'
+        page += '<p class="muted">Produced in ' + html.escape(run_id) + '.</p>'
+        page += '<details><summary>Producer records and exact source closure</summary><pre>'
+        page += html.escape(json.dumps(record, indent=2)) + '</pre></details></body></html>'
         report_bytes = page.encode()
         record['outputs']['report.html'] = digest(report_bytes)
         record['report_rendering'] = {'engine': 'study HTML', 'source': 'workflow/study_adapter.py', 'quarto_executed': False}

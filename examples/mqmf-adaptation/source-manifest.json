@@ -482,8 +482,8 @@
       }
     },
     "workflow/study_adapter.py": {
-      "sha256": "ed83bb5826005665dc759f21fb83ce0dfd5788cddc7cd8d4bc7d462f556b1f9c",
-      "bytes": 18502,
+      "sha256": "3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2",
+      "bytes": 21361,
       "license": "GPL-3.0-only",
       "origin": {
         "kind": "new local study bytes",

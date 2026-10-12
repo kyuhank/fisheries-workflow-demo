@@ -2,36 +2,31 @@
 
 Check the accepted records and calculate snapshot coverage in R. The coordinator stores these same records in the SQLite snapshot.
 
-Analyst role: Data curator. The entry point is [run.R](run.R), using shared [models.R](../../workflow/r/models.R).
+**Path:** Accepted rows → save SQLite snapshot → fixed data inputs.
 
-## Inputs and settings
+**Inputs:** QC is the declared scheduling gate. The calculation reads accepted `runs/submission/output.json` rows; the QC result is recorded as the declared parent.
 
-Previous jobs: [Quality check (`qc`)](../qc/README.md)
+**From:** [Quality check (`qc`)](../qc/README.md).
 
-Input files: QC is the declared scheduling gate. The calculation reads accepted `runs/submission/output.json` rows; the QC result is recorded as the declared parent.
+**Settings:** No job-specific settings (`{}`).
 
-Saved settings: No job-specific settings (`{}`).
-
-## Run in the container
-
-Inside the declared container, from the repository root:
+From the repository root, run this job and prepare any required inputs:
 
 ```sh
-make inside-job JOB=database
+make job JOB=database
 ```
 
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-## Outputs and downstream jobs
+| Saved file | Contents |
+| --- | --- |
+| `runs/database/output.json` | saved calculation result |
+| `runs/database/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/database/record.json` | producing inputs, settings, exact code and software |
+| `runs/database/snapshot.sqlite` | accepted fixed database snapshot |
 
-- `runs/database/output.json`: the R calculation result.
-- `runs/database/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
-- `runs/database/record.json`: inputs, settings, R source hashes, actual container identity and software used.
-- `runs/database/snapshot.sqlite`: the accepted database snapshot.
+**Used by:** [Extract data (`extract`)](../extract/README.md).
 
-Downstream jobs: [Extract data (`extract`)](../extract/README.md)
-
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/database/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/database/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/database/record.json) · [SQLite snapshot](https://kyuhank.github.io/fisheries-workflow-demo/example/database/snapshot.sqlite).
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/database/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/database/record.json)

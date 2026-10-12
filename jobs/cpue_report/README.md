@@ -2,35 +2,30 @@
 
 Render the saved CPUE comparison as a Quarto report. The report reads the result and run record without refitting the GLMs.
 
-Analyst role: CPUE analyst. [run.R](run.R) supplies the saved results; [report.qmd](report.qmd) renders the report.
+**Path:** Saved index comparison → describe methods and values → CPUE report.
 
-## Inputs and settings
+**Inputs:** `runs/cpue_summary/output.json` and the report job's saved run record.
 
-Previous jobs: [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md)
+**From:** [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md).
 
-Input files: `runs/cpue_summary/output.json` and the report job's saved run record.
+**Settings:** No job-specific settings (`{}`).
 
-Saved settings: No job-specific settings (`{}`).
-
-## Run in the container
-
-Inside the declared container, from the repository root:
+From the repository root, run this job and prepare any required inputs:
 
 ```sh
-make inside-job JOB=cpue_report
+make job JOB=cpue_report
 ```
 
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-## Outputs and downstream jobs
+| Saved file | Contents |
+| --- | --- |
+| `runs/cpue_report/output.json` | saved calculation result |
+| `runs/cpue_report/report.html` | result page from [report.qmd](report.qmd) |
+| `runs/cpue_report/record.json` | producing inputs, settings, exact code and software |
 
-- `runs/cpue_report/output.json`: the R calculation result.
-- `runs/cpue_report/report.html`: the Quarto report from [report.qmd](report.qmd).
-- `runs/cpue_report/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+**Used by:** None.
 
-Downstream jobs: None.
-
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/record.json).
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/record.json)

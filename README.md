@@ -1,112 +1,92 @@
 # Fisheries workflow demonstration
 
-[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Orchestration tool](https://kyuhank.github.io/fisheries-workflow-demo/#orchestration) · [Download](https://github.com/kyuhank/fisheries-workflow-demo/releases)
+[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Code by job](jobs/README.md) · [Preserved releases](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
-Reproduce earlier analyses before building on them or reviewing the basis of
-advice. Follow catch per unit effort (CPUE) indices through stock assessment into
-management strategy evaluation (MSE), tracing the inputs, code and software
-behind each result. The synthetic data and simplified models illustrate the
-process; they provide no advice for a real fishery.
+Follow public catch and effort data through CPUE standardisation, stock
+assessment and management strategy evaluation (MSE). Each result links to its
+inputs, code, settings and software. The assessment and management models are
+teaching examples and provide no advice for South Pacific albacore.
 
-## Run the demo
+## Data and methods
 
-| Mode | What happens |
-| --- | --- |
-| **Live run** | GitHub Actions retrieves the recorded Docker image on a remote computer and runs the R jobs and reports inside its container. No login is needed. |
-| **View example** | Explore saved outputs and execution records without running the analyses. |
+The default input contains released WCPFC longline records for the FJ fleet,
+2000–2022, in six fixed cell–quarter strata. A row aggregates a fleet, year,
+five-degree cell and quarter; it is not an individual fishing set. Vessel IDs
+are unavailable. `hooks` is reported effort (`HHOOKS × 100`) and `catch_n` is
+albacore catch in numbers (`ALB_N`). The legacy `set_id` field identifies an
+aggregate source row. See [data/public-source.json](data/public-source.json) for
+the supplied rows and source metadata, and [data/public-data.json](data/public-data.json)
+for the extraction record.
 
-[GitHub Actions](https://docs.github.com/en/actions/get-started/understand-github-actions)
-provides the remote execution service. The
-[container image](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/)
-packages the software needed by the R scripts and reports, so runs use the same
-recorded software environment.
+Recorded SQL extracts the CPUE rows from a SQLite snapshot. Annual South Pacific
+albacore catches, in tonnes, come from a separate yearbook series; they are not
+a sum of the selected fleet's catch numbers.
 
-The **Workflow diagram** shows the inputs passed between analyses. The
-**Orchestration tool** uses these connections to start jobs when their inputs are
-ready. Its task view groups related jobs and shows progress and execution records.
+CPUE A fits a quasipoisson GLM with year and cell–quarter effects and a
+`log(hooks / 1000)` offset. It predicts fish per 1,000 hooks in each stratum and
+averages those predictions with equal fixed weights. CPUE B uses year effects
+only. Both indices are divided by their first-year value. The outputs preserve
+nominal and standardised CPUE, prediction support, weights and model checks.
+These selected released strata do not represent the whole stock; the example
+supplies no confidence intervals. The selected Fiji fleet index is not a validated
+stock-wide abundance measure. Synthetic vessel records remain available as
+regression fixtures.
 
-1. Choose **View example** to explore the 22 completed jobs.
-2. Under **Tasks**, select an analysis. Open **Output** to read its result or
-   **Record** to follow the exact earlier results it used.
-3. Choose **Live run**, then **Run full workflow** to repeat the analyses.
-4. Change **CPUE A records**, **Growth rate setting 2** or **MSE catch buffer**,
-   then choose **Update workflow**. Affected jobs rerun; unchanged results keep
-   their records.
+The four Schaefer assessment cases combine these indices with fixed growth
+assumptions. Seeded MSE trials compare constant catch, an index rule and a
+buffered rule under shared simulated conditions. Case differences and trial
+fractions describe those assumptions, rather than calibrated uncertainty or risk.
+All rules share a simulator catch cap of 40% of true starting biomass; the
+low-biomass results are conditional on that guardrail.
 
-**Run** executes one selected job after preparing its required inputs.
-**Dependencies** shows inputs and later analyses. **Reproduce & compare** repeats
-the workflow with recorded settings and compares the selected result with its
-saved reference.
-**Manual handover** pauses a transfer until **Confirm file transfer** is selected,
-while independent jobs continue. No file upload is required in this example.
+## Use the demo
 
-## Explore the code
+1. Choose **View example** to inspect the saved results, or **Live run** to
+   execute the R jobs and Quarto reports on GitHub Actions.
+2. Select a job and open **Output**. Use **Inputs & versions** to trace its
+   producing records and exact source.
+3. Choose **Run full workflow**. The default snapshot ends in 2021; select 2022
+   to include the final available year.
+4. Change a setting and choose **Update workflow**. Affected jobs rerun;
+   unchanged inputs retain their original records.
 
-Start with [jobs/](jobs/README.md), which lists all 22 jobs in execution order.
-Each folder contains an R entry point and a short guide to its inputs, settings
-and outputs. [CPUE A](jobs/cpue_a/README.md), for example, reads catch and effort records,
-produces an index and supplies [assessment preparation A](jobs/prepare_a/README.md).
-The demo's **Record** view links to the corresponding job folder. For the saved example,
-[read reports alongside their exact code](https://kyuhank.github.io/fisheries-workflow-demo/offline-guide/START-HERE.html).
+**Run** prepares a job's required inputs and stops at that job.
+**Reproduce & compare** repeats the recorded workflow and compares the selected
+result with its reference. **Manual handover** waits for **Confirm file transfer**
+while other ready jobs continue. **Download this run** keeps source, inputs,
+records and outputs before live results expire after about ten minutes.
 
-The coordinator loads preparation/CPUE, assessment and MSE code from three
-[exactly pinned repositories](jobs/README.md#separate-repositories). Their source
-bytes, input producer records and the identity of the container image used are
-preserved in each downloaded run. [ADAPT.md](ADAPT.md) explains how to assemble
-these sources and when to use the single-repository fallback. Repository separation uses the same synthetic calculations and does
-not establish multiple human operators or operational fisheries use.
+## Run or adapt the code
 
-A separate [worked adaptation of an existing fisheries calculation](EXISTING-ANALYSIS.md)
-preserves MQMF code and historical teaching data, with records linking revised
-predictions to an earlier reference.
+The [22 job guides](jobs/README.md) show each input → method → output path.
+The coordinator loads code from [pinned component repositories](jobs/README.md#separate-repositories)
+and records each producing run and file checksum.
 
-## Run locally and keep a copy
-
-The [versioned release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)
-provides an offline archive and a separate copy of the execution image. Keep
-both to repeat the saved analyses if the website, GitHub account or image
-registry becomes unavailable. The archive preserves the saved run's original
-code and adds instructions for local use.
-
-1. Unpack `fisheries-workflow-offline-1.9.1.zip` and open `START-HERE.html`.
-   It links to saved reports, input records and the exact code, without a network
-   connection. The interactive HTML also browses saved results offline.
-2. Install and start Docker, then restore the supplied image as described in
-   [OFFLINE.md](OFFLINE.md). Docker and a POSIX shell are the only host tools
-   needed for this route; Windows users can use WSL. ARM computers require
-   AMD64 emulation.
-3. From the extracted folder, repeat and compare the saved analyses:
+From a checkout, with Docker, Make, Python 3 and Git available:
 
 ```sh
-sh scripts/offline.sh reproduce
-sh scripts/offline.sh compare
+make run                 # all jobs
+make job JOB=cpue_a       # CPUE A and required inputs
 ```
 
-These commands run the R calculations and Quarto reports locally, with container
-network access disabled. They use the preserved sources and image, without
-GitHub Actions, a login, or host installations of Python, R, Quarto or Make.
-New results go into `offline-runs/`; the saved reference remains available for
-comparison. [OFFLINE.md](OFFLINE.md) also covers single jobs and updates.
+To use another fishery, start with the source mapping and saved SQL, then
+choose the CPUE covariates and prediction support explicitly. Review annual
+catch units, assessment assumptions and the receiving file contracts before
+running later jobs. [ADAPT.md](ADAPT.md) describes the connections and source
+pins; [cloud/README.md](cloud/README.md) covers hosting.
 
-**Download this run** saves the code, exact synthetic inputs, settings, records
-and outputs. Save it before live results expire, about ten minutes after the last
-run activity. Follow its `REPRODUCE.txt`; preserve the corresponding image as
-well. A single-job download repeats that job and its required inputs; it does
-not repeat every earlier result still in use.
+The separate [MQMF adaptation](EXISTING-ANALYSIS.md) preserves an existing
+prediction routine and historical abalone teaching data. It compares direct
+and mapped inputs, then a growth-setting update. It does not reconstruct the
+original CPUE standardisation.
 
-## Work with the repository
+## Preserve a run
 
-For a Git checkout, the commands below assemble the pinned component sources
-before starting the analyses. This development route needs Docker, Make,
-Python 3 and Git and may retrieve source repositories and the image.
-From the repository root:
+Keep a downloaded run and its recorded execution image together. Follow the
+bundle's `REPRODUCE.txt` to repeat its declared scope. The archived
+[v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)
+preserves the earlier synthetic example and its separate image archive.
+[OFFLINE.md](OFFLINE.md) explains restoration and offline comparison; current
+source changes do not alter that preserved release.
 
-```sh
-make run                 # full workflow
-make job JOB=cpue_a       # one job and its required inputs
-```
-
-Use [ADAPT.md](ADAPT.md) to change jobs and check their connections. See
-[cloud/README.md](cloud/README.md) for hosting and [THIRD_PARTY.md](THIRD_PARTY.md)
-for software sources and licences. Local calculations use the same analysis
-code as hosted runs; the hosting service is a separate, optional facility.
+Software attribution and licences are in [THIRD_PARTY.md](THIRD_PARTY.md).

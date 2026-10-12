@@ -45,6 +45,83 @@ invalid <- sets
 invalid[[1]]$catch_n <- list(0, 1)
 rejects(cpue(invalid))
 
+# Public aggregate fixture: changing spatial effort composition changes nominal
+# CPUE, while the known equal-stratum standardised trend is preserved.
+# These are synthetic test rows, not released WCPFC observations.
+aggregates <- list()
+for (year in 1:3) {
+  for (stratum in c("20S_175E_Q1", "20S_175E_Q2")) {
+    first <- stratum == "20S_175E_Q1"
+    hooks <- 1000 * (if (first) 4 - year else year)
+    rate <- 10 * c(1, 1.5, 2)[year] * if (first) 1 else 2
+    for (observation in 1:2) {
+      aggregates[[length(aggregates) + 1L]] <- list(
+        set_id = paste(year, stratum, observation), year = 2000 + year,
+        fleet = "TEST", cell = "20S_175E", quarter = if (first) 1 else 2,
+        stratum = stratum, hooks = hooks,
+        catch_n = if (observation == 1) 0 else 2 * rate * hooks / 1000)
+    }
+  }
+}
+public_a <- cpue(aggregates, stratum_effect = TRUE)
+public_b <- cpue(aggregates, stratum_effect = FALSE)
+close(rows_values(public_a$series, "index"), c(1, 1.5, 2))
+close(rows_values(public_a$series, "standardised_cpue"), c(15, 22.5, 30))
+close(rows_values(public_a$series, "nominal_cpue"), c(12.5, 22.5, 35))
+close(rows_values(public_b$series, "standardised_cpue"),
+      rows_values(public_b$series, "nominal_cpue"))
+stopifnot(public_a$sets_used == 12, public_a$released_zero_rows == 6,
+          public_a$data_kind == "public-wcpfc", public_a$converged,
+          public_a$rank == public_a$model_columns,
+          public_a$year_score_residual < 1e-7, public_a$stratum_score_residual < 1e-7,
+          is.finite(public_a$dispersion), public_a$dispersion >= 0,
+          public_a$normalisation$reference_year == 2001,
+          length(public_a$prediction_grid) == 6, length(public_a$weights) == 2,
+          all(rows_values(public_a$weights, "weight") == 0.5),
+          all(rows_values(public_a$prediction_grid, "hooks") == 1000),
+          is.null(public_a$reference_vessel))
+filtered <- cpue(aggregates, min_hooks = 2000)
+stopifnot(filtered$rows_excluded == 4, length(filtered$prediction_grid) == 6,
+          identical(filtered$weights, public_a$weights))
+rejects(cpue(aggregates, min_hooks = 3000))
+rejects(cpue(aggregates, min_hooks = -1))
+disconnected <- Filter(function(row) {
+  (row$year == 2001 && row$quarter == 1) || (row$year == 2002 && row$quarter == 2)
+}, aggregates)
+rejects(cpue(disconnected))
+missing <- aggregates
+missing[[1]]$catch_n <- NULL
+rejects(cpue(missing))
+mixed_fleets <- aggregates
+mixed_fleets[[1]]$fleet <- "OTHER"
+rejects(cpue(mixed_fleets))
+zero_year <- lapply(aggregates, function(row) {
+  if (row$year == 2001) row$catch_n <- 0
+  row
+})
+rejects(cpue(zero_year))
+aggregate_catches <- lapply(2001:2003, function(year) list(year = year, catch_t = 10))
+description <- describe_data(aggregates, aggregate_catches)
+stopifnot(description$grouping_field == "stratum", length(description$strata) == 2,
+          identical(description$fleets, list("TEST")), is.null(description$vessels),
+          any(rows_values(description$fields, "name") == "fleet"),
+          !any(rows_values(description$fields, "name") == "vessel"),
+          all(rows_values(description$annual, "observations") == 4))
+submission_job <- new.env(parent = globalenv())
+source("jobs/submission/run.R", local = submission_job)
+submitted <- submission_job$calculate(list(
+  source = list(sets = aggregates, catch = aggregate_catches), settings = list(last_year = 2003)))
+stopifnot(identical(submitted$sets, aggregates))
+qc_job <- new.env(parent = globalenv())
+source("jobs/qc/run.R", local = qc_job)
+quality <- qc_job$calculate(list(parents = list(submission = submitted)))
+stopifnot(length(quality$returned) == 0, is.null(attr(quality, "workflow_effects")))
+summary_job <- new.env(parent = globalenv())
+source("jobs/cpue_summary/run.R", local = summary_job)
+comparison <- summary_job$calculate(list(parents = list(cpue_a = public_a, cpue_b = public_b)))
+stopifnot(comparison$data_kind == "public-wcpfc", length(comparison$analyses) == 2,
+          identical(comparison$analyses[[1]]$weights, public_a$weights))
+
 # Hosted all-years rows are complete and must not append a NULL submission batch.
 hosted_row <- sets[[1]]
 hosted_row$year <- 2024

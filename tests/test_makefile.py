@@ -26,6 +26,7 @@ class MakefileTests(unittest.TestCase):
     def recipe(self, folder, target, *settings):
         environment = dict(os.environ)
         environment['PATH'] = str(folder) + os.pathsep + environment['PATH']
+        environment.pop('PAPER_TEST_EVIDENCE', None)
         for name in ('MAKEFLAGS', 'MFLAGS', 'GNUMAKEFLAGS'):
             environment.pop(name, None)
         result = subprocess.run(['make', '--no-print-directory', '--silent', target, *settings],
@@ -61,12 +62,16 @@ class MakefileTests(unittest.TestCase):
                                 f'if sys.argv[1:3] == ["image", "inspect"]: sys.exit({0 if present else 1})\n'
                                 'if sys.argv[1] == "run":\n'
                                 ' print(json.dumps({"args":sys.argv[1:], "start":os.environ["START"], '
-                                '"scope":os.environ["SCOPE"], "settings":os.environ["SETTINGS"]}))\n')
-                result = self.recipe(folder, 'job', 'JOB=cpue_a', 'OUTPUT=' + str(folder / 'results'))
+                                '"scope":os.environ["SCOPE"], "settings":os.environ["SETTINGS"], '
+                                '"data_mode":os.environ["PAPER_DATA_MODE"]}))\n')
+                result = self.recipe(folder, 'job', 'JOB=cpue_a', 'PAPER_DATA_MODE=synthetic',
+                                     'OUTPUT=' + str(folder / 'results'))
                 self.assertEqual((result['start'], result['scope']), ('cpue_a', 'job'))
+                self.assertEqual(result['data_mode'], 'synthetic')
                 self.assertEqual(result['args'][-5:],
                                  ['make', '--no-print-directory', '--silent', 'inside-run', 'OUTPUT=/outputs'])
                 self.assertIn('none', result['args'])
+                self.assertIn('PAPER_DATA_MODE', result['args'])
                 calls = [json.loads(line) for line in log.read_text().splitlines()]
                 self.assertEqual([call[0] for call in calls],
                                  ['image', 'run'] if present else ['image', 'pull', 'run'])

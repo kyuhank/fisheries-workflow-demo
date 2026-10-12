@@ -56,14 +56,14 @@ def reader_pages(files, tool_version):
         links = ' · '.join(f'<a href="code.html#{source_anchor(n)}">{html.escape(label)}</a>'
                            for n, label in linked)
         inputs = ', '.join(f'<a href="reference/{quote(p)}/record.json">{html.escape(p)}</a>'
-                           for p in job['parents']) or 'Supplied synthetic records'
+                           for p in job['parents']) or ('WCPFC public records' if record.get('data_source') else 'Supplied synthetic records')
         rows.append(f'<tr><td><strong>{html.escape(job["title"])}</strong><br>'
                     f'<span class="muted">{html.escape(key)}</span></td><td>{inputs}</td>'
                     f'<td><a href="reference/{key}/report.html">Result</a> · '
                     f'<a href="reference/{key}/record.json">Record</a></td><td>{links}</td></tr>')
     start = '<h1>Fisheries workflow: read, repeat, preserve</h1>'
     start += ('<p>Follow the saved CPUE indices through stock assessment and management trials. '
-              'All links below open local files. The synthetic data and simple models illustrate '
+              'All links below open local files. The preserved data and simple models illustrate '
               'the workflow; they provide no advice for a real fishery.</p><div class="steps">'
               '<section><h2>1. Read a result</h2><p>Choose a result below, then inspect its record '
               'and the earlier results it used. The guide, R script and library show how it was calculated.</p></section>'

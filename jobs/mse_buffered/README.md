@@ -2,37 +2,32 @@
 
 Test index-based catch steps with the selected buffer and a 15% annual advice-change limit in the common seeded Schaefer management trials.
 
-Analyst role: MSE analyst. The entry point is [run.R](run.R), using shared [mse.R](../../workflow/r/mse.R).
+**Path:** Shared trials → buffered catch target → catch and biomass outcomes.
 
-## Inputs and settings
+**Inputs:** Stocks, scenarios and saved `error_streams` in `runs/mse_prepare/output.json`.
 
-Previous jobs: [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md)
+**From:** [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md).
 
-Input files: Stocks, scenarios and saved `error_streams` in `runs/mse_prepare/output.json`.
-
-Saved settings: `mse_buffer` saved as `buffer` (default: 0.8).
-
-## Run in the container
-
-Inside the declared container, from the repository root:
-
-```sh
-make inside-job JOB=mse_buffered
-```
-
-The coordinator refreshes required inputs and calls this job through
-`workflow/Makefile`. `OUTPUT=DIR` changes the default `runs` directory;
-`SETTINGS=FILE` supplies JSON settings. The run record identifies the image and
-software versions used.
+**Settings:** `mse_buffer` saved as `buffer` (default: 0.8).
 
 MSE must be enabled (`"mse": true`). The declared trials use 15 years, 20 paired replicates per fitted case and growth scenario, with catches capped at 40% of current biomass.
 
-## Outputs and downstream jobs
+From the repository root, run this job and prepare any required inputs:
 
-- `runs/mse_buffered/output.json`: the R calculation result.
-- `runs/mse_buffered/report.html`: a result page from the shared [renderer](../../workflow/reports.py).
-- `runs/mse_buffered/record.json`: inputs, settings, R source hashes, actual container identity and software used.
+```sh
+make job JOB=mse_buffered
+```
 
-Downstream jobs: [MSE results summary (`mse_summary`)](../mse_summary/README.md)
+[run.R](run.R) is the entry point. It receives the coordinator’s named
+`context` and uses the recorded shared libraries; a copied script is not standalone.
+See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
 
-Saved example: [Report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/report.html) · [Output JSON](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/output.json) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/record.json).
+| Saved file | Contents |
+| --- | --- |
+| `runs/mse_buffered/output.json` | saved calculation result |
+| `runs/mse_buffered/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/mse_buffered/record.json` | producing inputs, settings, exact code and software |
+
+**Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
+
+[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/record.json)
