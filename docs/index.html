@@ -4164,7 +4164,17 @@ function displayOutput(title, output, kind = "Job output") {
   $("output-title").textContent = title;
   $("output-kind").textContent = [jobNumber(output.record?.job || output.job), kind]
     .filter(Boolean).join(" · ");
-  $("output-frame").srcdoc = output.html;
+  // Keep saved report bytes intact; narrow screens scroll wide tables locally.
+  const reportStyle = `<style>@media(max-width:640px){
+    html,body{max-width:100%;overflow-wrap:anywhere}
+    body{box-sizing:border-box}
+    table,pre{display:block;max-width:100%;overflow-x:auto}
+    code{overflow-wrap:anywhere;word-break:break-word}
+    svg,img{max-width:100%;height:auto}
+    .page-columns{display:block!important}
+    main.content{min-width:0;max-width:100%;width:auto!important}
+  }</style>`;
+  $("output-frame").srcdoc = output.html.replace(/<body\b/i, reportStyle + "<body");
   $("output-frame").hidden = false;
   $("output-json").hidden = true;
   $("output-record").hidden = true;
