@@ -4,6 +4,7 @@ The minimal CoordinatorWorkflow doubles select monorepo compatibility here;
 this planning check performs no numerical or scientific input-contract validation.
 """
 import asyncio
+from copy import deepcopy
 import json
 from pathlib import Path
 import sys
@@ -13,7 +14,28 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tests.coordinator_fixtures import CoordinatorWorkflow as Workflow
+from tests.coordinator_fixtures import CoordinatorBridge, CoordinatorWorkflow
+
+
+class PublicPlanningBridge(CoordinatorBridge):
+    """Preserve actual public rows for SQLite; downstream calculations remain doubles."""
+    async def calculate(self, context):
+        response = await super().calculate(context)
+        if context['key'] == 'submission':
+            source = context['source']
+            assert source['data_kind'] == 'public-wcpfc-albacore'
+            last_year = context['settings']['last_year']
+            response['result'].update(
+                data_kind=source['data_kind'], metadata=deepcopy(source['metadata']),
+                sets=deepcopy([row for row in source['sets'] if row['year'] <= last_year]),
+                catch=deepcopy([row for row in source['catch'] if row['year'] <= last_year]))
+        return response
+
+
+class Workflow(CoordinatorWorkflow):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.calculator = PublicPlanningBridge()
 
 
 async def scenarios(directory):
