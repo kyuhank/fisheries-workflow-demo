@@ -55,7 +55,7 @@ of a stock or collaboration by several human analysts.
 
 ## Inspect or repeat
 
-Unpack the current results archive and open `study/selective/cpue_summary/report.html`. 
+Unpack the current results archive and open `study/selective/cpue_summary/report.html`.
 Its `record.json` links the two producing records; the neighbouring `cpue_a/`
 and `cpue_b/` folders preserve their inputs, settings and source closure.
 `reports/` contains the check reports, `preflight.json` records input conversion,

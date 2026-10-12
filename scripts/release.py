@@ -36,6 +36,7 @@ if "--offline-only" not in sys.argv:
     files.update(source_payload())
     files.update(reader_files)
     files['index.html'] = (ROOT/'docs/offline.html').read_bytes()
+    files['offline.html'] = files['index.html']
     for path in (ROOT/'docs/example').rglob('*'):
         if path.is_file():
             files['example/'+str(path.relative_to(ROOT/'docs/example'))] = path.read_bytes()
@@ -59,6 +60,7 @@ for name in support:
         raise ValueError('Support tools must not replace recorded source: ' + name)
     preserved[name] = (ROOT/name).read_bytes()
 preserved['index.html'] = (ROOT/'docs/offline.html').read_bytes()
+preserved['offline.html'] = preserved['index.html']
 preserved.update(reader_files)
 preserved.update(reader.reader_pages(preserved, version))
 # The public guide points to the same saved reports already served by Pages.
