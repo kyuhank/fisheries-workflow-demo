@@ -11,6 +11,7 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -107,7 +108,23 @@ def build():
                                     ('PAPER_COMPUTE_SELECTION_RECEIPT', 'compute_selection_receipt')]:
                 if os.environ.get(variable):
                     runner.execution[field] = os.environ[variable]
+        started = time.perf_counter()
         asyncio.run(runner.run())
+        elapsed = time.perf_counter() - started
+        build_record = {
+            'schema_version': 1, 'type': 'saved-example-build',
+            'execution': runner.execution, 'settings': runner.settings,
+            'jobs_executed': runner.last_plan['run'],
+            'analysis_and_reports_seconds': elapsed,
+            'timing_scope': 'Fresh workflow including R analyses, checks and all report rendering; '
+                            'excludes source retrieval, container image download and runner queue.',
+            'source_lock_sha256': hashlib.sha256(runner.sources.lock_path.read_bytes()).hexdigest(),
+            'builder_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            'extracted_records': len(runner.output('extract')['sets']),
+            'annual_catches': len(runner.output('extract')['catch']),
+            'report_jobs': [key for key, record in runner.records.items()
+                            if record['report_rendering']['quarto_executed']]}
+        (ROOT / 'docs/build-record.json').write_text(json.dumps(build_record, indent=2) + '\n')
         saved = runner.state()
         saved['outputs'] = {key: {'html': (runner.directory/key/'report.html').read_text(),
                                  'record': runner.records[key], 'output': runner.output(key)}
