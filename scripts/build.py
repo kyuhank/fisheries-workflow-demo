@@ -83,6 +83,8 @@ def build():
         raise ValueError('Diagram connections must match the calculation dependencies')
     with tempfile.TemporaryDirectory() as directory:
         runner = Workflow(directory)
+        if not runner.sources.multi_repository:
+            raise ValueError('The saved site requires pinned components; use make run for the monorepo fallback.')
         provenance = {name: os.environ.get(name) for name in
                       ('GITHUB_SHA', 'GITHUB_REPOSITORY', 'GITHUB_RUN_ID')}
         if any(provenance.values()):

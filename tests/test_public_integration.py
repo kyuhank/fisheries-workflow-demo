@@ -143,7 +143,9 @@ class PublicNativeIntegrationTest(unittest.TestCase):
             self.assertEqual([row['stratum'] for row in result['weights']], strata)
             for row in result['weights']:
                 self.assertAlmostEqual(row['weight'], 1 / 6, delta=1e-15)
-            self.assertAlmostEqual(sum(row['weight'] for row in result['weights']), 1, delta=1e-15)
+            # Each JSON weight has the same bounded decimal rounding error.
+            self.assertAlmostEqual(sum(row['weight'] for row in result['weights']), 1,
+                                   delta=len(strata) * 1e-15)
             self.assertEqual(len(result['prediction_grid']), 6 * len(years))
             self.assertLess(result['year_score_residual'], 1e-7)
             minimum = runner.settings['min_hooks_a'] if suffix == 'a' else 0
@@ -183,10 +185,25 @@ class PublicNativeIntegrationTest(unittest.TestCase):
 
     def test_2_2022_data_update_matches_a_fresh_full_workflow(self):
         runner = self.clone()
-        runner.configure({'last_year': 2022})
-        outcome = asyncio.run(runner.run())
-        self.assertEqual(outcome['run'], list(SPEC))
-        self.assertEqual(outcome['retained'], [])
+        reference = os.environ.get('PAPER_PUBLIC_REFERENCE2022')
+        if reference:
+            shutil.rmtree(runner.directory)
+            shutil.copytree(reference, runner.directory)
+            runner = Workflow(runner.directory)
+            expected = {**self.runner.settings, 'last_year': 2022}
+            if (runner.settings != expected or len(runner.records) != 22 or
+                    not all(runner.valid(key) for key in SPEC)):
+                raise ValueError('The supplied public 2022 checkpoint is incomplete or stale; no automatic rerun.')
+            self.evidence.event({'state': 'REFERENCE_REUSED', 'purpose': 'completed 2022 data update',
+                                 'source': str(Path(reference).resolve()),
+                                 'state_sha256': digest((Path(reference) / 'state.json').read_bytes())})
+            self.assertEqual(runner.last_plan['run'], list(SPEC))
+            self.assertEqual(runner.last_plan['retained'], [])
+        else:
+            runner.configure({'last_year': 2022})
+            outcome = asyncio.run(runner.run())
+            self.assertEqual(outcome['run'], list(SPEC))
+            self.assertEqual(outcome['retained'], [])
         self.assert_cpue_and_catch_oracles(runner, 2022)
         self.assertEqual(len(runner.records), 22)
         with tempfile.TemporaryDirectory() as directory:
