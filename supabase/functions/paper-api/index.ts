@@ -221,14 +221,23 @@ export async function handle(request: Request) {
   try {
     if (path === "/info") {
       let configured = false;
+      let source: any = null;
       try {
         await connection.installationToken();
-        configured = true;
+        const sources = await db(
+          "paper_public_sources?version=eq.albacore-2026-04&select=source_sha256",
+        );
+        if (sources.length === 1) {
+          source = sources[0];
+          configured = true;
+        }
       } catch { /* No credentials or errors exposed. */ }
       return reply({
         configured,
         repository: REPO,
         provider: "GitHub Actions + Supabase PostgreSQL",
+        data_kind: source ? "public-wcpfc-albacore" : null,
+        source_sha256: source?.source_sha256 ?? null,
       });
     }
     if (path.startsWith("/setup/") && request.method === "POST") {

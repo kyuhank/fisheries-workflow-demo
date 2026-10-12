@@ -3,6 +3,8 @@ class CloudRun {
   constructor(config, jobs, onEvent, onPhase) {
     this.url = config.url;
     this.repository = config.repository;
+    this.dataKind = config.data_kind;
+    this.sourceSha256 = config.source_sha256;
     this.jobs = jobs;
     this.onEvent = onEvent;
     this.onPhase = onPhase;
@@ -70,6 +72,10 @@ class CloudRun {
         throw Error("The live service is unavailable.");
       }
       if (!this.repository || info.repository !== this.repository) {
+        throw Error("The live service is being updated. Use View example for this version.");
+      }
+      if ((this.dataKind && info.data_kind !== this.dataKind) ||
+          (this.sourceSha256 && info.source_sha256 !== this.sourceSha256)) {
         throw Error("The live service is being updated. Use View example for this version.");
       }
       this.session = await this.request(
