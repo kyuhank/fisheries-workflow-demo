@@ -28,6 +28,17 @@ REPORTS = ('cpue_report', 'assessment_report', 'mse_report')
 BUFFER = ('mse_buffered', 'mse_summary', 'mse_report')
 
 
+def assert_entrypoint_custody(test, sources, key, record):
+    entrypoint = sources.job_path(key)
+    name = sources.archive_name(entrypoint)
+    test.assertEqual(record['code'][name], digest(entrypoint.read_bytes()))
+    if sources.multi_repository:
+        origin = sources.origin(key)
+        test.assertRegex(origin['commit'], r'^[a-f0-9]{40}$')
+        test.assertEqual(record['analysis_source'], origin)
+        test.assertEqual(record['code_sources'][name], origin)
+
+
 @unittest.skipUnless(os.environ.get('PAPER_NATIVE_INTEGRATION') == '1',
                      'Enable PAPER_NATIVE_INTEGRATION=1 inside the frozen actual container.')
 @unittest.skipUnless(os.environ.get('PAPER_DATA_MODE') == 'synthetic',
@@ -70,7 +81,7 @@ class NativeIntegrationTest(unittest.TestCase):
             self.assertEqual(record['software']['runtime'], 'Rscript (container)')
             self.assertIn('RTMB', record['software'])
             self.assertIn('quarto', record['software'])
-            self.assertIn(f'jobs/{key}/run.R', record['code'])
+            assert_entrypoint_custody(self, self.runner.sources, key, record)
         for key in REPORTS:
             record = self.runner.records[key]
             self.assertTrue(record['report_rendering']['quarto_executed'])
