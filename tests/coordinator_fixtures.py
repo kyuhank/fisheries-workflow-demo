@@ -45,7 +45,7 @@ class CoordinatorBridge:
         return {'result': result, 'effects': effects}
 
 
-def test_report(root, key, result, record, folder, page):
+def test_report(root, key, result, record, folder, result_html, source_path=None):
     (folder / 'report.html').write_text('Explicit scheduler test double: ' + key + ' · ' + record['run_id'])
     return {'engine': 'TEST DOUBLE', 'quarto_executed': False}
 
