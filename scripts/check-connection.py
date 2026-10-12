@@ -61,7 +61,7 @@ try:
           const first = cloud.initialise(), second = cloud.initialise();
           window.sameAttempt = first === second;
           window.attempt = first.catch(error => { window.failure = error.message; });
-        }""")
+        }""", CONFIG)
         assert unit.evaluate('sameAttempt && calls.length === 1')
         unit.clock.fast_forward(8001)
         unit.wait_for_function("window.failure?.includes('8 seconds')")
