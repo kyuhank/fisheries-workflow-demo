@@ -207,11 +207,16 @@ class MultiRepositoryTests(unittest.TestCase):
 
     def test_component_commit_change_invalidates_only_actual_changed_bytes_and_descendants(self):
         run_directory = self.fixture.base / 'run'
+        # The bridge reuses this saved input contract, regardless of the outer
+        # suite's synthetic defaults. Match its SQLite schema and snapshot year.
+        frozen_source = json.loads((ROOT / 'docs/example/submission/output.json').read_text())
+        snapshot = json.loads((ROOT / 'docs/example/state.json').read_text())['settings']['last_year']
         patches = [patch('workflow.engine.reports.output_page', return_value='SOFTWARE TEST DOUBLE'),
-                   patch('workflow.engine.render_report', side_effect=test_report)]
-        with patches[0], patches[1]:
+                   patch('workflow.engine.render_report', side_effect=test_report),
+                   patch.object(Workflow, 'source_context', return_value=frozen_source)]
+        with patches[0], patches[1], patches[2]:
             runner = Workflow(run_directory, source_lock=self.fixture.path, r_bridge=FrozenOutputBridge())
-            runner.configure({'mse': True})
+            runner.configure({'mse': True, 'last_year': snapshot})
             full = asyncio.run(runner.run())
             self.assertEqual(full['run'], list(SPEC))
             before = copy.deepcopy(runner.records)
