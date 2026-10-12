@@ -138,15 +138,24 @@ class PreservedSourceTest(unittest.TestCase):
         record = copy.deepcopy(offline.read_json(self.root / 'reference/state.json')['records']['submission'])
         result = offline.read_json(self.root / 'reference/submission/output.json')
         record['execution'] = {'provider': 'Local Docker', 'purpose': 'explicit regression fixture'}
-        with self.assertRaises(KeyError):
-            reports.output_page(job, result, record, [])
-        record.pop('execution')
         record['software'].update(container_config_id=offline.IMAGE_ID,
                                   container_rootfs_diff_ids=list(offline.DIFF_IDS),
                                   container_reference_kind='upstream registry source pin')
-        page = reports.output_page(job, result, record, [])
+        if result.get('data_kind') == 'public-wcpfc-albacore':
+            page = reports.output_page(job, result, record, [])
+            self.assertIn('<p>Execution: Local Docker.</p>', page)
+        else:
+            # The preserved historical synthetic renderer requires GitHub
+            # metadata whenever execution is present; it cannot render Local.
+            with self.assertRaises(KeyError):
+                reports.output_page(job, result, record, [])
+            record.pop('execution')
+            page = reports.output_page(job, result, record, [])
         self.assertNotIn('Executed on GitHub Actions', page)
+        self.assertNotIn('actions/runs/', page)
         self.assertIn(offline.IMAGE_ID, page)
+        for layer in offline.DIFF_IDS:
+            self.assertIn(layer, page)
 
     def test_helper_records_local_provider_and_binds_external_receipt(self):
         # Explicit orchestration double: no R backend or numerical calculation.

@@ -23,9 +23,9 @@ saved run, validate a stock assessment or provide management advice.
 
 ## Read the results
 
-Open the [comparison](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_summary/report.html),
-then the [active prediction](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_a/report.html)
-and [native reference](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_b/report.html).
+Open the [comparison](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_summary/view.html),
+then the [active prediction](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_a/view.html)
+and [native reference](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_b/view.html).
 Each report starts with the input → calculation → result and keeps detailed
 settings and records below it.
 

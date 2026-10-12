@@ -38,6 +38,12 @@ class CoordinatorWorkflow(NativeWorkflow):
         kwargs['r_bridge'] = CoordinatorBridge()
         super().__init__(*args, **kwargs)
 
+    def source_context(self):
+        # The bridge supplies empty synthetic rows and the corresponding SQLite
+        # schema. Public/hosted/frozen input selection belongs to native tests.
+        return {'data_kind': 'synthetic-scheduler-fixture', 'sets': [], 'catch': [],
+                'submission': None}
+
     def save(self, key, result, run_id):
         with patch('workflow.engine.reports.output_page', return_value='TEST DOUBLE'), \
              patch('workflow.engine.render_report', side_effect=test_report):

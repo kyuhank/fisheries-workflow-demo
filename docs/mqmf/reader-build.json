@@ -1,0 +1,18 @@
+{
+  "scope": "Narrow-screen report presentation; original reports and results unchanged",
+  "style_sha256": "a305a93c488dfb8ea14e82d2d3b24300d2cdd3ebac76cfb9cb2ac8a005aa9966",
+  "files": {
+    "cpue_b": {
+      "report_sha256": "4caf56c68d9ad802be1f1e072788652b6bbd006c071a32b0a08117cd21482a3c",
+      "view_sha256": "1d216d02ea9864324d6042875153022365a1df71282e8afaed3356a1a6e2c5b3"
+    },
+    "cpue_a": {
+      "report_sha256": "0ff32387eaac60b98d9fed8e9318cc0219c7635ba91f7975f4f81cda72dc4e3c",
+      "view_sha256": "c051fafcc21f092b2cb733886402a27c61adee59b91f62cfa2ab87618c45401a"
+    },
+    "cpue_summary": {
+      "report_sha256": "bcf85311707cee4deb113e78790e53f03c3548881d7755e22fc5c42ed71694c1",
+      "view_sha256": "4b513e5d95c4388f828a7833e54aefb6a0a61cb0b86b6b2b142736774f87932c"
+    }
+  }
+}
