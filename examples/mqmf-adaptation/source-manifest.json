@@ -1,0 +1,524 @@
+{
+  "schema_version": 1,
+  "status": "SOURCE_BYTES_PINNED",
+  "created_utc": "2026-10-12T03:14:48.113948+00:00",
+  "scope": "Three-node adaptation calling unchanged MQMF simpspm through direct and mapped inputs.",
+  "licence": "GPL-3.0-only combined study; unchanged original coordinator retains MIT notice",
+  "files": {
+    "LICENSE": {
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149,
+      "license": "GNU GPL v3 legal text",
+      "origin": {
+        "url": "https://www.gnu.org/licenses/gpl-3.0.txt",
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "bytes": 35149
+      }
+    },
+    "README.md": {
+      "sha256": "70b7affed651deb81e0a6bc54356fc3d873cd97962bdeaacaab414bd0d6cb1d4",
+      "bytes": 2242,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "README.md"
+      }
+    },
+    "STUDY.md": {
+      "sha256": "ae5f38ab796fbc2ea5693d91469fe41098a3e14c1f916d60ff56bb1cd092bee4",
+      "bytes": 9858,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "STUDY.md"
+      }
+    },
+    "THIRD_PARTY.md": {
+      "sha256": "d43fb22a12cb6dcac3653ae8b6db0ab4d4a4f887686cc6b3d74d23f03b0e1a9c",
+      "bytes": 2638,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "THIRD_PARTY.md"
+      }
+    },
+    "external/MQMF/DESCRIPTION": {
+      "sha256": "af0b9407d5b1a1d9753b2f2a3e021b1a3ef4a5f9af1d2c0f4d17c490e0c6b6a6",
+      "bytes": 805,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "repository": "https://github.com/haddonm/MQMF",
+        "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+        "path": "DESCRIPTION",
+        "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/DESCRIPTION",
+        "sha256": "af0b9407d5b1a1d9753b2f2a3e021b1a3ef4a5f9af1d2c0f4d17c490e0c6b6a6",
+        "bytes": 805,
+        "licence": "GPL-3",
+        "unchanged_copy": true,
+        "git_blob_sha1": "6564373ad599b0c7cbaab25fb3c4982c1eb3d8e0"
+      }
+    },
+    "external/MQMF/R/spm.r": {
+      "sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a",
+      "bytes": 63244,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "repository": "https://github.com/haddonm/MQMF",
+        "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+        "path": "R/spm.r",
+        "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/R/spm.r",
+        "sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a",
+        "bytes": 63244,
+        "licence": "GPL-3",
+        "unchanged_copy": true,
+        "git_blob_sha1": "21bfcbccb6c85a8ed59cee43c7838498431829c5"
+      }
+    },
+    "external/MQMF/data/abdat.RData": {
+      "sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+      "bytes": 502,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "repository": "https://github.com/haddonm/MQMF",
+        "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+        "path": "data/abdat.RData",
+        "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/data/abdat.RData",
+        "sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+        "bytes": 502,
+        "licence": "GPL-3",
+        "unchanged_copy": true,
+        "git_blob_sha1": "9fac454a95e9d4c55295b16984b23829f4e87ddb"
+      }
+    },
+    "external/MQMF/man/abdat.Rd": {
+      "sha256": "f6233aff9e5aed9ad9352e3b46d54a2dde70ad32912d44aff35ccc8ca6b98aa3",
+      "bytes": 1890,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "repository": "https://github.com/haddonm/MQMF",
+        "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+        "path": "man/abdat.Rd",
+        "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/man/abdat.Rd",
+        "sha256": "f6233aff9e5aed9ad9352e3b46d54a2dde70ad32912d44aff35ccc8ca6b98aa3",
+        "bytes": 1890,
+        "licence": "GPL-3",
+        "unchanged_copy": true,
+        "git_blob_sha1": "4c35963e456dcdc4587c7c4773d796fd61b661fd"
+      }
+    },
+    "external/MQMF/man/simpspm.Rd": {
+      "sha256": "85e4c519ca6edebd3762eebff11da77f7022bb814fcac7ca6b4d41dff4004693",
+      "bytes": 2170,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "repository": "https://github.com/haddonm/MQMF",
+        "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+        "path": "man/simpspm.Rd",
+        "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/man/simpspm.Rd",
+        "sha256": "85e4c519ca6edebd3762eebff11da77f7022bb814fcac7ca6b4d41dff4004693",
+        "bytes": 2170,
+        "licence": "GPL-3",
+        "unchanged_copy": true,
+        "git_blob_sha1": "e9b220e4e09a6b42a82e87661ac9560afbf0e1d2"
+      }
+    },
+    "jobs/cpue_a/run.R": {
+      "sha256": "545d5f9e26c19caef73614c3032de00068f4535ee42c1d0ef41a4e48e89e0f73",
+      "bytes": 156,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "jobs/cpue_a/run.R"
+      }
+    },
+    "jobs/cpue_b/run.R": {
+      "sha256": "4c9ebf875ed8d3c6730417d8952fca9c03d7b3111d6ed79c16fabce914dcbe8b",
+      "bytes": 155,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "jobs/cpue_b/run.R"
+      }
+    },
+    "jobs/cpue_summary/run.R": {
+      "sha256": "e364d4b4d157f44f3a499981d87604d69e43f9e2c215e91fbe6cd114f44afa97",
+      "bytes": 126,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "jobs/cpue_summary/run.R"
+      }
+    },
+    "notices/LICENSE-coordinator-MIT.txt": {
+      "sha256": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
+      "bytes": 1088,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "LICENSE",
+        "sha256": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
+        "bytes": 1088,
+        "unchanged_copy": true,
+        "git_blob_sha1": "e097c727b9bf6790410adc3662439878a493ee36"
+      }
+    },
+    "parameters/active-baseline.json": {
+      "sha256": "c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326",
+      "bytes": 82,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "parameters/active-baseline.json"
+      }
+    },
+    "parameters/active-revised.json": {
+      "sha256": "c5b11804987a02c35e14402507d84d66c8f7f9819952eab50b1cc5b514c7da6a",
+      "bytes": 83,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "parameters/active-revised.json"
+      }
+    },
+    "parameters/reference.json": {
+      "sha256": "c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326",
+      "bytes": 82,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "parameters/reference.json"
+      }
+    },
+    "prepare-inputs.R": {
+      "sha256": "6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449",
+      "bytes": 1475,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "prepare-inputs.R"
+      }
+    },
+    "run-study.py": {
+      "sha256": "0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1",
+      "bytes": 15256,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "run-study.py"
+      }
+    },
+    "runtime-preservation.json": {
+      "sha256": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197",
+      "bytes": 1449,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "runtime-preservation.json",
+        "sha256": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197",
+        "bytes": 1449,
+        "unchanged_copy": true,
+        "git_blob_sha1": "0267a93fbc8fdb16605e883adb3a1aad3e71f62e"
+      }
+    },
+    "study-case.json": {
+      "sha256": "7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63",
+      "bytes": 2934,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "study-case.json"
+      }
+    },
+    "study.sh": {
+      "sha256": "940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb",
+      "bytes": 2259,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "study.sh"
+      }
+    },
+    "upstream/original-jobs.json": {
+      "sha256": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
+      "bytes": 6908,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/jobs.json",
+        "sha256": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
+        "bytes": 6908,
+        "unchanged_copy": true,
+        "git_blob_sha1": "e11741d78dedda172f41954fa17dfae5b5d1f154"
+      }
+    },
+    "upstream/origins.json": {
+      "sha256": "6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc",
+      "bytes": 9063,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "upstream/origins.json"
+      }
+    },
+    "workflow/Makefile": {
+      "sha256": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+      "bytes": 306,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/Makefile",
+        "sha256": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+        "bytes": 306,
+        "unchanged_copy": true,
+        "git_blob_sha1": "8dbc6673a94bc7cfe0fce55f33f68091fc5fbb47"
+      }
+    },
+    "workflow/__init__.py": {
+      "sha256": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09",
+      "bytes": 82,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/__init__.py",
+        "sha256": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09",
+        "bytes": 82,
+        "unchanged_copy": true,
+        "git_blob_sha1": "58c65578efb9647ada91d0374d079985e9a86c01"
+      }
+    },
+    "workflow/contracts.py": {
+      "sha256": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b",
+      "bytes": 4095,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/contracts.py",
+        "sha256": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b",
+        "bytes": 4095,
+        "unchanged_copy": true,
+        "git_blob_sha1": "cf21bfc0b8d75e75fc884786503608e2eb4b01c8"
+      }
+    },
+    "workflow/engine.py": {
+      "sha256": "08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb",
+      "bytes": 27115,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/engine.py",
+        "sha256": "08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb",
+        "bytes": 27115,
+        "unchanged_copy": true,
+        "git_blob_sha1": "da4f479a7327688b7904d08f44493dbd2ef1d0df"
+      }
+    },
+    "workflow/jobs.json": {
+      "sha256": "4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710",
+      "bytes": 1327,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "workflow/jobs.json"
+      }
+    },
+    "workflow/offline.py": {
+      "sha256": "e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788",
+      "bytes": 19898,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/offline.py",
+        "sha256": "e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788",
+        "bytes": 19898,
+        "unchanged_copy": true,
+        "git_blob_sha1": "e4d3734f5b9a07d1c74b3ec7ef2461a6da43a55e"
+      }
+    },
+    "workflow/quarto_reports.py": {
+      "sha256": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d",
+      "bytes": 2220,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/quarto_reports.py",
+        "sha256": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d",
+        "bytes": 2220,
+        "unchanged_copy": true,
+        "git_blob_sha1": "865ddf39d3c5e5d328edd95b88a4186b49cbff59"
+      }
+    },
+    "workflow/r/common.R": {
+      "sha256": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
+      "bytes": 4816,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/r/common.R",
+        "sha256": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
+        "bytes": 4816,
+        "unchanged_copy": true,
+        "git_blob_sha1": "f3c627b2b60827d683111f64742967e41d1087aa"
+      }
+    },
+    "workflow/r/study.R": {
+      "sha256": "5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a",
+      "bytes": 8716,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "workflow/r/study.R"
+      }
+    },
+    "workflow/r_bridge.py": {
+      "sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
+      "bytes": 4576,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/r_bridge.py",
+        "sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
+        "bytes": 4576,
+        "unchanged_copy": true,
+        "git_blob_sha1": "8cee0910312d69af7a6eeffd625fee6b14e25fde"
+      }
+    },
+    "workflow/r_driver.R": {
+      "sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039",
+      "bytes": 4590,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/r_driver.R",
+        "sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039",
+        "bytes": 4590,
+        "unchanged_copy": true,
+        "git_blob_sha1": "bca74f846bad8ae86a0619328016d2183a90b697"
+      }
+    },
+    "workflow/reports.py": {
+      "sha256": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
+      "bytes": 31344,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/reports.py",
+        "sha256": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
+        "bytes": 31344,
+        "unchanged_copy": true,
+        "git_blob_sha1": "bbad82b041848efcc8f530c138e83efea989cba2"
+      }
+    },
+    "workflow/sources.py": {
+      "sha256": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd",
+      "bytes": 15075,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/sources.py",
+        "sha256": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd",
+        "bytes": 15075,
+        "unchanged_copy": true,
+        "git_blob_sha1": "ddba1a168632bbda15d1ef95d558149a101865e2"
+      }
+    },
+    "workflow/spec.py": {
+      "sha256": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127",
+      "bytes": 3898,
+      "license": "MIT",
+      "origin": {
+        "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+        "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "path": "workflow/spec.py",
+        "sha256": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127",
+        "bytes": 3898,
+        "unchanged_copy": true,
+        "git_blob_sha1": "f58d57fb7ddc911e30eb9b234bd157fd597de93d"
+      }
+    },
+    "workflow/study_adapter.py": {
+      "sha256": "ed83bb5826005665dc759f21fb83ce0dfd5788cddc7cd8d4bc7d462f556b1f9c",
+      "bytes": 18502,
+      "license": "GPL-3.0-only",
+      "origin": {
+        "kind": "new local study bytes",
+        "repository": null,
+        "commit": null,
+        "path": "workflow/study_adapter.py"
+      }
+    }
+  },
+  "file_count": 38,
+  "total_file_bytes": 306174,
+  "manifest_self_identity": "SHA-256 of this file is recorded separately in execution receipts; no circular self checksum.",
+  "original_orchestrator_pin": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+    "unchanged_copy_files": 15
+  },
+  "external_source_pin": {
+    "repository": "https://github.com/haddonm/MQMF",
+    "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+    "package_source_version": "0.1.5",
+    "installed_package_claim": false
+  },
+  "prepared_mapping": {
+    "status": "GENERATED_BY_PREPARATION",
+    "generated_outside_read_only_source": true,
+    "source": "external/MQMF/data/abdat.RData",
+    "helper": "prepare-inputs.R",
+    "outputs": [
+      "abdat.csv",
+      "abdat.json",
+      "mapping-manifest.json"
+    ],
+    "acceptance": "All 72 numeric values/order exactly equal original matrix; no tolerance",
+    "signature_inputs": "Actual export/receipt bytes, raw input and both helper hashes"
+  },
+  "claim_limit": "New within-study native/adapter calls, not reproduction of author saved result or biological validation"
+}

@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "study": "MQMF unchanged simpspm receiving-boundary adaptation",
+  "source_commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+  "upstream_source_sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a",
+  "upstream_data_sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+  "data": "MQMF0.1.5 abdat,1985–2008,24annual rows; catchtonnes; CPUEsource scalephysicalunitunknown; early unpublished standardisation",
+  "baseline_parameters": {
+    "r": 0.4,
+    "K": 9400,
+    "Binit": 3400,
+    "sigma": 0.05,
+    "schaefer": true
+  },
+  "updated_parameters": {
+    "r": 0.35,
+    "K": 9400,
+    "Binit": 3400,
+    "sigma": 0.05,
+    "schaefer": true
+  },
+  "scientific_semantics": "Supplied population parameters; native function internally calculatesq, ignores sigma and retainsbiomassfloor40; no optimisation/newmodel/biologicalvalidation/advice",
+  "cases": [
+    {
+      "id": "ADAPT01",
+      "purpose": "Native reference and wrapped baseline, lossless72numericvalues,24logpredictions agree1e-12",
+      "job_invocations_max": 3
+    },
+    {
+      "id": "ADAPT02",
+      "purpose": "Onlyactive growth changed; producer+consumer rerun and fixedreference/outputrecord retainedbytewise",
+      "job_invocations_max": 2
+    },
+    {
+      "id": "ADAPT03",
+      "purpose": "Fresh full run at the same revised settings; compare 24 predictions and 120 consumer numeric values separately from producing RunIDs",
+      "job_invocations_max": 3
+    },
+    {
+      "id": "ADAPT04",
+      "purpose": "Consumer rejectsdeclaredlinear-scalefixture beforeaccepting newtable; preserves priorvalidartifacts",
+      "job_invocations_max": 1
+    }
+  ],
+  "comparison": {
+    "relative": 1e-12,
+    "absolute": 1e-12,
+    "no_posthoc_widening": true
+  },
+  "resources": {
+    "cpus": 2,
+    "memory_bytes": 4294967296,
+    "threads": 2,
+    "container_platform": "linux/amd64",
+    "network": "none",
+    "pull_policy": "never",
+    "source_mount": "read-only",
+    "total_seconds": 1200,
+    "per_R_call_seconds": 60,
+    "job_invocations_max": 9,
+    "external_routine_calls_max": 5,
+    "automatic_retry": false
+  },
+  "SPC_image": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+  "preexecution_gate": "Verify supplied source/data/settings hashes, GPL notice and local image identity before calculations; require exact 72-value preparation before native/adapter comparison.",
+  "original_22job_demo_and_models_unchanged": true,
+  "wrapper_and_external_code_provenance_separate": true,
+  "design_source": {
+    "id": "STUDY-DESIGN-MQMF-ABDAT-20261012",
+    "sha256": "17e56b554772ef24b8dc9f68fb684a03f801530978c9124e9c544808cd55571e"
+  },
+  "consumer_numeric_fields": [
+    "observed_cpue",
+    "reference_predicted_log_cpue",
+    "active_predicted_log_cpue",
+    "log_difference",
+    "source_scale_ratio"
+  ]
+}

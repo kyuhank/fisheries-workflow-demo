@@ -1,0 +1,56 @@
+{
+  "jobs": [
+    {
+      "key": "cpue_b",
+      "title": "MQMF direct native reference",
+      "module": "cpue",
+      "owner": "Study reference wrapper",
+      "parents": [],
+      "run": "jobs/cpue_b/run.R",
+      "description": "Call unchanged simpspm on original abdat with fixed teaching parameters."
+    },
+    {
+      "key": "cpue_a",
+      "title": "MQMF active adapter prediction",
+      "module": "cpue",
+      "owner": "Study adapter wrapper",
+      "parents": [],
+      "run": "jobs/cpue_a/run.R",
+      "description": "Map exact CSV and JSON annual inputs to unchanged simpspm."
+    },
+    {
+      "key": "cpue_summary",
+      "title": "MQMF conditional prediction comparison",
+      "module": "cpue",
+      "owner": "Study receiving wrapper",
+      "parents": [
+        "cpue_b",
+        "cpue_a"
+      ],
+      "run": "jobs/cpue_summary/run.R",
+      "description": "Validate source-scale natural-log annual predictions and actual producer links before comparison."
+    }
+  ],
+  "defaults": {
+    "last_year": 2008,
+    "active_parameters": "parameters/active-baseline.json",
+    "mse": false
+  },
+  "stages": [
+    [
+      "cpue_b",
+      "cpue_a"
+    ],
+    [
+      "cpue_summary"
+    ]
+  ],
+  "handovers": {
+    "predictions": {
+      "cpue_summary": [
+        "cpue_b",
+        "cpue_a"
+      ]
+    }
+  }
+}

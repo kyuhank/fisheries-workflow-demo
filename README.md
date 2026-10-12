@@ -56,6 +56,10 @@ preserved in each downloaded run. [ADAPT.md](ADAPT.md) explains how to assemble
 these sources and when to use the single-repository fallback. Repository separation uses the same synthetic calculations and does
 not establish multiple human operators or operational fisheries use.
 
+A separate [worked adaptation of an existing fisheries calculation](EXISTING-ANALYSIS.md)
+preserves MQMF code and historical teaching data, with records linking revised
+predictions to an earlier reference.
+
 ## Run locally and keep a copy
 
 The [versioned release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)

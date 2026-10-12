@@ -18,7 +18,11 @@
 
 ## Add a job
 
-1. Define its inputs, analyst and stage in `workflow/jobs.json`, placing parents before children.
+The example uses registered jobs and three pinned analysis repositories.
+Extending it requires declaring the contributing code and inputs; it does not
+automatically discover an arbitrary analysis or repository.
+
+1. Define its inputs, analyst and stage in `workflow/jobs.json`, placing parents before children. Register the job in `workflow/sources.py` (`GROUPS`) and declare its calculation libraries in `JOB_LIBRARIES`. For split execution, update the corresponding component sources and source lock as well.
 2. Create `jobs/<job_id>/run.R` with `calculate(context)`. Select named inputs from `context$parents` and return a named result list. Reusable R functions belong in `workflow/r/`.
 3. Record settings and contributing files in `job_settings()` and `code_record()`. Check input names, units and coverage before fitting.
 4. Add the node and connections to `app/diagram.json`; the build verifies these against the calculation graph. Write a concise job guide.
