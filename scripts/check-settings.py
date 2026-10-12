@@ -20,14 +20,10 @@ JOBS = [
     'assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2',
     'assessment_summary', 'assessment_report',
 ]
-CPUE = ['cpue_a', 'cpue_summary', 'cpue_report', 'prepare_a',
-        'assessment_a1', 'assessment_a2', 'assessment_summary', 'assessment_report']
 GROWTH = ['assessment_a2', 'assessment_b2', 'assessment_summary', 'assessment_report']
 MSE = ['mse_prepare', 'mse_constant', 'mse_index', 'mse_buffered', 'mse_summary', 'mse_report']
 JOBS += MSE
-CPUE += MSE
 GROWTH += MSE
-COMBINED = [key for key in JOBS if key in CPUE or key in GROWTH]
 PREPARE_A = ['prepare_a', 'assessment_a1', 'assessment_a2',
              'assessment_summary', 'assessment_report']
 PREPARE_A += MSE
@@ -180,9 +176,9 @@ def cloud_checks(page, mock, baseline):
     page.wait_for_function("mode === 'cloud' && ready", timeout=30000)
     observe_runs(page)
     for controls, start, run in [
-        ({'filter': '1200'}, 'cpue_a', CPUE),
+        ({'snapshot': '2022'}, 'submission', JOBS),
         ({'growth-rate': '0.35'}, 'assessment_a2', GROWTH),
-        ({'filter': '1200', 'growth-rate': '0.35'}, 'cpue_a', COMBINED),
+        ({'snapshot': '2022', 'growth-rate': '0.35'}, 'submission', JOBS),
         ({'mse-buffer': '0.6'}, 'mse_buffered', BUFFER),
         ({'mse-buffer': '1'}, 'mse_buffered', BUFFER),
         ({'growth-rate': '0.35', 'mse-buffer': '0.6'}, 'assessment_a2', GROWTH),
@@ -193,7 +189,7 @@ def cloud_checks(page, mock, baseline):
           records = structuredClone(baseline);
           cloud.records = structuredClone(baseline);
           states = {};
-          document.querySelector('#snapshot').value = '2023';
+          document.querySelector('#snapshot').value = '2021';
           document.querySelector('#filter').value = '0';
           document.querySelector('#growth-rate').value = '0.30';
           document.querySelector('#mse-buffer').value = '0.8';
@@ -207,7 +203,7 @@ def cloud_checks(page, mock, baseline):
         assert mock.dispatches[-1]['start'] == start
         assert mock.dispatches[-1]['handover'] == 'connected'
         assert mock.dispatches[-1]['settings'] == {
-            'last_year': 2023, 'min_hooks_a': int(controls.get('filter', '0')),
+            'last_year': int(controls.get('snapshot', '2021')), 'min_hooks_a': 0,
             'growth_rate_2': float(controls.get('growth-rate', '0.30')), 'mse': True,
             'mse_buffer': float(controls.get('mse-buffer', '0.8')),
         }
@@ -238,14 +234,16 @@ def main():
         page.evaluate("""async baseline => {
           records = structuredClone(baseline); cloud.records = structuredClone(baseline);
           states = {}; completedRun = null; settingsIntent = false;
-          $('filter').value = '0'; $('growth-rate').value = '0.30'; $('mse-buffer').value = '0.8';
+          $('snapshot').value = '2021'; $('filter').value = '0';
+          $('growth-rate').value = '0.30'; $('mse-buffer').value = '0.8';
           selectJob('cpue_summary'); await refreshPlan();
         }""", baseline)
         expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
-        page.locator('#filter').select_option('1200')
+        assert page.locator('#filter').is_hidden()
+        page.locator('#snapshot').select_option('2022')
         page.locator('#growth-rate').select_option('0.35')
-        expect_plan(page, 'cpue_a', COMBINED)
-        page.locator('#filter').select_option('0')
+        expect_plan(page, 'submission', JOBS)
+        page.locator('#snapshot').select_option('2021')
         expect_plan(page, 'assessment_a2', GROWTH)
         page.locator('#mode').select_option('saved')
         assert page.locator('#run').is_hidden()
@@ -256,9 +254,9 @@ def main():
         assert page.evaluate('selected') == 'cpue_summary'
         page.locator('#growth-rate').select_option('0.30')
         expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
-        page.locator('#snapshot').select_option('2024')
+        page.locator('#snapshot').select_option('2022')
         expect_plan(page, 'submission', JOBS)
-        page.locator('#snapshot').select_option('2023')
+        page.locator('#snapshot').select_option('2021')
         expect_plan(page, 'cpue_summary', CPUE_SUMMARY)
         page.locator('#mse-buffer').select_option('0.6')
         expect_plan(page, 'mse_buffered', BUFFER)

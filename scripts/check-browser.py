@@ -3,6 +3,7 @@
 These cases test browsing and requests. Container checks test calculations.
 """
 from copy import deepcopy
+import csv
 import hashlib
 import json
 from pathlib import Path
@@ -33,7 +34,8 @@ class MockCloud:
     def route(self, route):
         path = urlsplit(route.request.url).path.rsplit('/', 1)[-1]
         if path == 'info':
-            value = {'configured': True, 'repository': self.fixture['cloud']['repository']}
+            value = {'configured': True, **{key: self.fixture['cloud'][key]
+                     for key in ('repository', 'data_kind', 'source_sha256')}}
         elif path == 'session':
             value = {'id': 'mock-session', 'token': 'mock-token'}
         elif path == 'reset':
@@ -122,6 +124,9 @@ def main():
         assert page.locator('#reset').is_disabled()
         assert page.locator('.workflow-node.complete').count() == 22
         assert page.locator('#download').is_enabled()
+        assert page.locator('#filter').is_hidden()
+        assert page.locator('#snapshot').input_value() == '2021'
+        assert page.locator('#snapshot option').all_text_contents() == ['2021', '2022']
         assert 'does not run code' in page.locator('#mode-help').inner_text()
         assert page.evaluate('typeof Worker === "function" && !document.querySelector("#worker-source")')
         keys = page.evaluate('jobs.map(job => job.key)')
@@ -130,12 +135,15 @@ def main():
             page.frame_locator('#output-frame').locator('h1').wait_for()
             assert page.evaluate('currentOutput.record.job') == key
             record = page.evaluate('currentOutput.record')
+            assert record['data_source']['observation_unit'] == 'Released fleet–quarter–5-degree-cell aggregate', key
             assert any(name.endswith('jobs/' + key + '/run.R') for name in record['code']), key
             assert re.fullmatch(r'ghcr.io/pacificcommunity/fisheries-workflow@sha256:[a-f0-9]{64}', record['execution']['container'])
             assert record['software'].get('R') or record['software'].get('r'), key
             page.locator('[data-output="record"]').click()
             assert page.locator('.record-image-digest').inner_text() == record['execution']['container'].split('@')[1]
             assert page.locator('.record-source').count() >= 1
+            assert record['data_source']['observation_unit'] in page.locator('.record-card').first.inner_text()
+            assert 'Synthetic' not in page.locator('.record-card').first.inner_text()
             assert page.locator('#reproduce-job').is_disabled()
             page.locator('#output-close').click()
         with page.expect_download() as download:
@@ -149,6 +157,9 @@ def main():
             assert any(name.endswith('report.qmd') for name in names)
             for key in keys:
                 assert any(name.endswith('jobs/' + key + '/run.R') for name in names)
+            assert 'data/public-source.json' in names
+            assert hashlib.sha256(archive.read('data/public-source.json')).hexdigest() == \
+                payload()['cloud']['source_sha256']
         page.locator('[data-tab="jobs"]').click()
         assert page.locator('#tasks .task').count() == 4
         for task, count in [('data', 4), ('cpue', 4), ('assessment', 8), ('mse', 6)]:
@@ -157,6 +168,20 @@ def main():
             assert page.locator('#job-table-body tr').count() == count
         page.set_viewport_size({'width': 390, 'height': 844})
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+        # The companion data page and local downloads are available offline too.
+        page.goto((ROOT / 'docs/data.html').as_uri())
+        assert page.locator('h1').inner_text() == 'Public albacore data'
+        assert 'not validated' in page.locator('body').inner_text()
+        for name, count in [('fiji-source.csv', 662), ('annual-catch.csv', 23), ('extract.sql', None)]:
+            with page.expect_download() as download:
+                page.locator(f'a[download][href="data/{name}"]').click()
+            file = Path(directory) / name
+            download.value.save_as(file)
+            if count is not None:
+                with file.open(newline='') as stream:
+                    assert len(list(csv.DictReader(stream))) == count
+            else:
+                assert file.read_bytes() == (ROOT / 'workflow/extract-public.sql').read_bytes()
         assert not errors and not requests, (errors, requests)
         browser.close()
     print('PASS: 22 saved R job outputs, immutable container records, downloadable sources/QMD, '

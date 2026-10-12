@@ -256,8 +256,9 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.locator('#status-title').inner_text() == 'New settings · previous results kept'
 
     page.locator('#growth-rate').select_option('0.30')
-    page.locator('#filter').select_option('1200')
-    page.wait_for_function("plan.changed.includes('cpue_a')")
+    assert page.locator('#filter').is_hidden()
+    # An explicit job rerun creates a new producing record even with unchanged settings.
+    page.wait_for_function("settings().growth_rate_2 === 0.30")
     previous = page.evaluate('orchestrationRuns.length')
     page.locator('tr[data-job="cpue_a"] .run-job').click()
     expect_run(page, previous, ['cpue_a'], 'job')
@@ -283,11 +284,12 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     ancestors = ['submission', 'qc', 'database', 'extract', 'cpue_a', 'prepare_a']
     expect_run(page, previous, ancestors, 'job')
     assert set(page.evaluate('Object.keys(records)')) == set(ancestors)
-    page.locator('#filter').select_option('1200')
-    page.wait_for_function("plan.changed.includes('cpue_a')")
+    page.locator('#snapshot').select_option('2022')
+    page.wait_for_function("plan.changed.includes('submission')")
     previous = page.evaluate('orchestrationRuns.length')
     page.locator('tr[data-job="prepare_a"] .run-job').click()
-    expect_run(page, previous, ['cpue_a', 'prepare_a'], 'job')
+    expect_run(page, previous, ancestors, 'job')
+    assert page.evaluate('records.submission.settings.last_year') == 2022
     assert set(page.evaluate('Object.keys(records)')) == set(ancestors)
     browse_dependencies(page)
     for width in [1440, 1100, 900, 768, 650, 390, 320]:

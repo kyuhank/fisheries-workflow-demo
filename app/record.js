@@ -61,7 +61,7 @@ function renderRecord() {
       [
         "Data",
         `Snapshot ${record.snapshot}`,
-        "Synthetic catch and effort records",
+        record.data_source?.observation_unit || "Synthetic catch and effort records",
       ],
       [
         "Code",

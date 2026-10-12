@@ -10,7 +10,10 @@ from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = json.loads((ROOT / "cloud/config.json").read_text())["repository"]
+CONFIG = json.loads((ROOT / "cloud/config.json").read_text())
+REPOSITORY = CONFIG["repository"]
+INFO = {"configured": True, **{key: CONFIG[key] for key in
+        ("repository", "data_kind", "source_sha256")}}
 
 
 def preview():
@@ -43,7 +46,9 @@ try:
         unit = browser.new_page()
         unit.clock.install()
         unit.add_script_tag(content=(ROOT/'app/cloud.js').read_text())
-        unit.evaluate("""() => {
+        unit.evaluate("""config => {
+          window.expectedInfo = {configured: true, repository: "test/repo",
+            data_kind: config.data_kind, source_sha256: config.source_sha256};
           window.calls = [];
           window.fetch = (url, options) => {
             calls.push({url, headers: options.headers});
@@ -52,7 +57,7 @@ try:
                 reject(new DOMException('Aborted', 'AbortError')));
             });
           };
-          window.cloud = new CloudRun({url: 'https://example.test', repository: 'test/repo'}, [], () => {}, () => {});
+          window.cloud = new CloudRun({...config, url: 'https://example.test', repository: 'test/repo'}, [], () => {}, () => {});
           const first = cloud.initialise(), second = cloud.initialise();
           window.sameAttempt = first === second;
           window.attempt = first.catch(error => { window.failure = error.message; });
@@ -65,7 +70,7 @@ try:
           window.fetch = async (url, options) => {
             calls.push({url, headers: options.headers});
             return new Response(JSON.stringify(url.endsWith('/info')
-              ? {configured: true, repository: 'test/repo'} : {id: 'test-session', token: 'test-token'}));
+              ? expectedInfo : {id: 'test-session', token: 'test-token'}));
           };
           await cloud.initialise();
         }""")
@@ -84,6 +89,23 @@ try:
             .then(() => false, error => error.message.includes('being updated'));
         }""")
         assert unit.evaluate("mismatch && calls.length === 1 && cloud.session === null")
+        # Wrong or absent public-source identity must stop before /session.
+        for field, value in [('data_kind', 'synthetic-schaefer-poisson'),
+                             ('source_sha256', '0' * 64),
+                             ('data_kind', None), ('source_sha256', None)]:
+            unit.evaluate("""async ({field, value}) => {
+              calls.length = 0;
+              cloud.session = null;
+              const info = {...expectedInfo};
+              if (value === null) delete info[field]; else info[field] = value;
+              window.fetch = async (url, options) => {
+                calls.push({url, headers: options.headers});
+                return Response.json(info);
+              };
+              window.sourceMismatch = await cloud.initialise()
+                .then(() => false, error => error.message.includes('being updated'));
+            }""", {'field': field, 'value': value})
+            assert unit.evaluate("sourceMismatch && calls.length === 1 && cloud.session === null"), field
         unit.evaluate("cloud.session = {id: 'test-session', token: 'test-token'}")
 
         # Once a run is acknowledged, expiry or denial must never replay it.
@@ -148,7 +170,7 @@ try:
             if (url.includes('/run?session=old')) return Response.json({
               error: 'This demonstration session is unavailable. Select Start afresh.'
             }, {status: 400});
-            if (url.endsWith('/info')) return Response.json({configured: true, repository: 'test/repo'});
+            if (url.endsWith('/info')) return Response.json(expectedInfo);
             if (url.endsWith('/session')) return Response.json({id: 'replacement', token: 'new'});
             throw new TypeError('Lost replacement response');
           };
@@ -176,13 +198,14 @@ try:
         page = context.new_page()
         errors = []
         page.on('pageerror', lambda error: errors.append(str(error)))
+        page.route('https://**/*', lambda route: route.abort())
 
         def service(route):
             if not state['available']:
                 route.fulfill(status=503, content_type='application/json',
                               body=json.dumps({'error': 'The live service is unavailable.'}))
             else:
-                value = ({'configured': True, 'repository': REPOSITORY} if urlsplit(route.request.url).path.endswith('/info')
+                value = (INFO if urlsplit(route.request.url).path.endswith('/info')
                          else {'id': 'test-session', 'token': 'test-token'})
                 route.fulfill(content_type='application/json', body=json.dumps(value))
 
@@ -222,7 +245,7 @@ try:
             code = 200
             if path == 'info':
                 code = 503 if expiry['renewal_failure'] else 200
-                value = {'error': 'Unavailable'} if code == 503 else {'configured': True, 'repository': REPOSITORY}
+                value = {'error': 'Unavailable'} if code == 503 else INFO
             elif path == 'session':
                 expiry['snapshots'].append(page.evaluate("""() => ({
                   records: Object.keys(records).length,
@@ -299,8 +322,8 @@ try:
 
         # Saved fallback preserves the Live settings, handover and starting job.
         state['available'] = False
-        page.locator('#snapshot').select_option('2024')
-        page.locator('#filter').select_option('1200')
+        page.locator('#snapshot').select_option('2022')
+        page.locator('#growth-rate').select_option('0.35')
         page.locator('#handover').select_option('manual')
         page.locator('.job[data-job="cpue_a"]').click()
         page.evaluate("() => { cloudReady = false; return activateMode('cloud'); }")
@@ -318,8 +341,8 @@ try:
         state['available'] = True
         page.locator('#mode').select_option('cloud')
         page.locator('#run:enabled').wait_for()
-        assert page.locator('#snapshot').input_value() == '2024'
-        assert page.locator('#filter').input_value() == '1200'
+        assert page.locator('#snapshot').input_value() == '2022'
+        assert page.locator('#growth-rate').input_value() == '0.35'
         assert page.locator('#handover').input_value() == 'manual'
         assert page.evaluate("selected === 'cpue_a'")
 
@@ -363,6 +386,7 @@ try:
             race_page = race.new_page()
             race_errors, pending_info, race_runs = [], [], []
             race_page.on('pageerror', lambda error: race_errors.append(str(error)))
+            race_page.route('https://**/*', lambda route: route.abort())
             race_page.route('**/index.html', lambda route: route.fulfill(content_type='text/html', body=preview()))
             def held_service(route):
                 if route.request.url.endswith('/info'):
@@ -377,7 +401,7 @@ try:
             race_page.wait_for_function("$('mode').value === 'cloud'")
             assert pending_info
             race_page.locator('#mode').select_option('saved')
-            value = {'configured': True, 'repository': REPOSITORY} if success else {'error': 'Unavailable'}
+            value = INFO if success else {'error': 'Unavailable'}
             pending_info.pop().fulfill(status=200 if success else 503, content_type='application/json', body=json.dumps(value))
             race_page.wait_for_timeout(100)
             assert race_page.locator('#mode').input_value() == 'saved'

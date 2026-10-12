@@ -41,20 +41,34 @@ def inspect(page, key, report=False):
         assert len(frame.locator('h2').all_text_contents()) >= 2, key
         assert frame.locator('svg, img').count() >= 1, key
     body = frame.locator('body').inner_text()
-    assert 'Synthetic' in body or 'synthetic' in body
     output = page.evaluate('currentOutput')
     assert output['record']['job'] == key
+    assert output['record']['data_source']['cpue_scope'].startswith('Fiji fleet;')
+    assert 'Synthetic fisheries workflow' not in body
     if key == 'extract':
-        assert 'Observations → CPUE' in body and 'Annual catch → assessment inputs' in body
+        assert 'Records → CPUE' in body and 'Annual catch → assessment inputs' in body
         selected = output['output']
-        assert all(set(row) == {'set_id', 'year', 'vessel', 'hooks', 'catch_n'}
+        fields = {'set_id', 'source_row', 'year', 'fleet', 'quarter', 'cell', 'stratum', 'hooks', 'catch_n'}
+        assert all(set(row) == fields and row['fleet'] == 'FJ'
                    and row['hooks'] > 0 and row['catch_n'] >= 0 for row in selected['sets'])
+        assert len({row['stratum'] for row in selected['sets']}) == 6
+        assert len(selected['sets']) == 6 * len(selected['catch'])
         assert all(set(row) == {'year', 'catch_t'} for row in selected['catch'])
+        assert max(row['year'] for row in selected['sets']) == output['record']['snapshot']
+    if key == 'cpue_report':
+        assert 'quasipoisson' in body and 'cell–quarter' in body
+        assert output['output']['data_kind'] == 'public-wcpfc'
+    if key in ('assessment_report', 'mse_report'):
+        assert 'not a validated stock-wide abundance index' in body
+    if key == 'mse_report':
+        assert 'Shared guardrail' in body and 'true starting biomass' in body
     preview = page.context.new_page()
     preview.set_content(output['html'])
     preview.screenshot(path=str(destination / f'{key}.png'), full_page=True)
     preview.close()
     if report:
+        assert output['record']['report_rendering']['engine'] == 'Quarto'
+        assert output['record']['report_rendering']['quarto_executed'] is True
         page.locator('[data-output="record"]').click()
         assert page.locator('.record-input').count() == 1
         if page.locator('#mode').input_value() == 'cloud':
@@ -85,11 +99,10 @@ with sync_playwright() as playwright:
 
     growth_records = baseline
     if args.online:
-        page.locator('#filter').select_option('1200')
+        page.locator('#snapshot').select_option('2022')
         cpue_records = run(page)
-        assert cpue_records['extract'] == baseline['extract']
-        assert cpue_records['cpue_b'] == baseline['cpue_b']
-        assert cpue_records['assessment_b2'] == baseline['assessment_b2']
+        assert all(cpue_records[key]['run_id'] != baseline[key]['run_id'] for key in baseline)
+        assert cpue_records['submission']['settings']['last_year'] == 2022
         cpue_after, _ = inspect(page, 'cpue_report', True)
         assert cpue_after != cpue_before
 

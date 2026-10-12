@@ -31,10 +31,10 @@ async def scenarios(directory):
     save('Only CPUE summary and its inputs exist')
     await runner.run()
     save('Complete workflow')
-    runner.configure({'growth_rate_2': .35, 'min_hooks_a': 1200})
+    runner.configure({'last_year': 2022, 'growth_rate_2': .35})
     save('Two independent settings changed')
-    await runner.run('cpue_a', scope='job')
-    save('CPUE updated; existing descendants need an update')
+    await runner.run('extract', scope='job')
+    save('Snapshot updated; existing descendants need an update')
     await runner.run('assessment_a2', scope='job')
     save('Only one revised growth fit completed')
     return cases

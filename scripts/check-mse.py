@@ -35,8 +35,12 @@ with sync_playwright() as playwright:
     for key in PEERS:
         page.locator(f'tr[data-job="{key}"] .open-output').click()
         frame = page.frame_locator('#output-frame')
+        expect(frame.locator('table:visible').first).to_be_visible()
+        frame.get_by_text('Follow one trial', exact=True).click()
         expect(frame.locator('svg, img').first).to_be_visible()
-        assert 'synthetic' in frame.locator('body').inner_text().lower()
+        body = frame.locator('body').inner_text()
+        assert 'true starting biomass' in body and 'conditional on' in body
+        assert 'not a validated stock-wide abundance' in body
         assert page.evaluate('Object.keys(currentOutput.record.inputs)') == ['mse_prepare']
         page.locator('#output-close').click()
     reports = {}
@@ -48,7 +52,9 @@ with sync_playwright() as playwright:
             assert set(page.evaluate('Object.keys(currentOutput.record.inputs)')) == set(PEERS)
         else:
             assert page.evaluate('Object.keys(currentOutput.record.inputs)') == ['mse_summary']
-            assert 'Quarto' in reports[key]
+            rendering = page.evaluate('currentOutput.record.report_rendering')
+            assert rendering['engine'] == 'Quarto' and rendering['quarto_executed'] is True
+            assert 'Shared guardrail' in reports[key]
         page.locator('#output-close').click()
     assert reports['mse_report'] != reports['mse_summary']
     page.close()

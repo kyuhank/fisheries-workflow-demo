@@ -33,6 +33,9 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     page.locator('tr[data-job="assessment_a2"] .open-output').click()
     page.locator('[data-output="record"]').click()
     expect(page.locator('.record-heading')).to_contain_text('Job 12 · Assessment A2 · Run 001')
+    unit = page.evaluate('currentOutput.record.data_source.observation_unit')
+    expect(page.locator('.record-card').first).to_contain_text(unit)
+    assert 'Synthetic' not in page.locator('.record-card').first.inner_text()
     assert 'Prepare inputs A' in page.locator('.record-input').inner_text()
     assert page.evaluate('Object.keys(currentOutput.record.code).some(name => name.endsWith("jobs/assessment_a2/run.R"))')
     commit = page.evaluate('(currentOutput.record.analysis_source || currentOutput.record.source).commit')
@@ -60,7 +63,7 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
         fit_method: 'RTMB::MakeADFun + nlminb', gradient_tolerance: 1e-4,
         objective_gradient_logK: gradient, projected_gradient_logK: gradient,
         K: 1000, objective_value: 0.25,
-        series: [{year: 2023, observed_index: 1, fitted_index: Math.exp(-residual),
+        series: [{year: 2021, observed_index: 1, fitted_index: Math.exp(-residual),
                   log_residual: residual, B_over_K: 0.6}]
       });
       const left = fit(), right = fit(2.35247591981661e-8, 0.00198045831937885);
@@ -139,14 +142,15 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     }""") == ['software']
     if args.online:
         page.locator('#output-close').click()
-        page.locator('#filter').select_option('1200')
+        page.locator('#snapshot').select_option('2022')
         page.locator('#growth-rate').select_option('0.35')
         page.locator('tr[data-job="cpue_a"] .open-output').click()
         page.locator('[data-output="record"]').click()
         page.locator('#reproduce-job').click()
         page.wait_for_function("document.querySelector('.record-comparison') || (!busy && $('status').classList.contains('failed'))", timeout=600000)
         assert page.locator('.record-comparison strong').inner_text() == 'Reproduced · output agrees'
-        assert page.locator('#filter').input_value() == '0'
+        assert page.locator('#snapshot').input_value() == '2021'
+        assert page.locator('#filter').is_hidden() and page.locator('#filter').input_value() == '0'
         assert page.evaluate('currentOutput.comparison.changed_materials') == []
         result = page.evaluate('currentOutput.comparison')
     else:
