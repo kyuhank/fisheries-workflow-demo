@@ -18,6 +18,13 @@ reader_spec.loader.exec_module(reader)
 version = json.loads((ROOT/'build-info.json').read_text())['version']
 destination = ROOT/'dist'
 destination.mkdir(exist_ok=True)
+payload_match = re.search(r'<script id="demo-payload" type="application/json">\s*(.*?)\s*</script>',
+                          (ROOT/'docs/offline.html').read_text(), re.S)
+payload = json.loads(payload_match.group(1))
+reader_files = {}
+if payload['saved']['outputs']['submission']['output'].get('data_kind') == 'public-wcpfc-albacore':
+    for name in ['data.html', 'data/fiji-source.csv', 'data/annual-catch.csv', 'data/extract.sql']:
+        reader_files[name] = (ROOT/'docs'/name).read_bytes()
 if "--offline-only" not in sys.argv:
     files = {}
     for folder in ['jobs','workflow','data','diagnostics','app','scripts','tests','vendor/analysis','cloud','supabase/functions','.github/workflows']:
@@ -27,6 +34,7 @@ if "--offline-only" not in sys.argv:
     for name in ['run.py','verify.py','Makefile','Dockerfile','.dockerignore','README.md','ADAPT.md','OFFLINE.md','runtime-preservation.json','LICENSE','THIRD_PARTY.md','CITATION.cff','build-info.json','examples/analyst-repositories.yaml']:
         files[name] = (ROOT/name).read_bytes()
     files.update(source_payload())
+    files.update(reader_files)
     files['index.html'] = (ROOT/'docs/offline.html').read_bytes()
     for path in (ROOT/'docs/example').rglob('*'):
         if path.is_file():
@@ -39,9 +47,6 @@ if "--offline-only" not in sys.argv:
     (destination/'fisheries-workflow.html').write_bytes(files['index.html'])
 # Preserve the source used by the saved run, rather than replacing it with
 # whichever coordinator revision packages this release.
-payload_match = re.search(r'<script id="demo-payload" type="application/json">\s*(.*?)\s*</script>',
-                          (ROOT/'docs/offline.html').read_text(), re.S)
-payload = json.loads(payload_match.group(1))
 with zipfile.ZipFile(io.BytesIO(base64.b64decode(payload['saved']['bundle']))) as saved:
     assert saved.testzip() is None
     preserved = {name: saved.read(name) for name in saved.namelist()}
@@ -54,6 +59,7 @@ for name in support:
         raise ValueError('Support tools must not replace recorded source: ' + name)
     preserved[name] = (ROOT/name).read_bytes()
 preserved['index.html'] = (ROOT/'docs/offline.html').read_bytes()
+preserved.update(reader_files)
 preserved.update(reader.reader_pages(preserved, version))
 # The public guide points to the same saved reports already served by Pages.
 guide_directory = ROOT/'docs/offline-guide'
@@ -69,6 +75,7 @@ preserved['PRESERVATION.json'] = (json.dumps({
     'saved_analysis_version': json.loads(preserved['build-info.json'])['version'],
     'original_manifest': old_manifest,
     'support_files': support,
+    'reader_files': {name: hashlib.sha256(data).hexdigest() for name, data in reader_files.items()},
     'note': 'Original run sources and records are unchanged; local tools are added separately.'
 }, indent=2) + '\n').encode()
 preserved['REPRODUCE.txt'] = ('Open START-HERE.html and follow OFFLINE.md.\n'
