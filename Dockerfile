@@ -9,5 +9,6 @@ COPY cloud/ cloud/
 COPY data/ data/
 COPY tests/ tests/
 COPY scripts/generate-data.R scripts/import-r-data.py scripts/
+COPY scripts/import-public-data.py scripts/seed-public-data.py scripts/
 COPY run.py verify.py build-info.json README.md ADAPT.md LICENSE THIRD_PARTY.md Makefile Dockerfile ./
 CMD ["make", "--no-print-directory", "--silent", "inside-run", "OUTPUT=/outputs"]
