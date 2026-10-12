@@ -17,10 +17,27 @@ class CoordinatorBridge:
     async def calculate(self, context):
         key = context['key']
         result = {'job': key, 'job_settings': copy.deepcopy(context['job_settings']),
+                  'fixture': 'scheduler-only TEST DOUBLE; no scientific calculation',
                   'parents': {name: digest(encoded(value)) for name, value in context['parents'].items()}}
+        years = range(context['settings']['last_year'] - 2, context['settings']['last_year'] + 1)
         effects = {}
         if key == 'submission':
             result.update(sets=[], catch=[])
+        elif key == 'extract':
+            result.update(sets=[], catch=[{'year': year, 'catch_t': 1.0} for year in years])
+        elif key in ('cpue_a', 'cpue_b'):
+            result['series'] = [{'year': year, 'index': 1.0} for year in years]
+        elif key in ('prepare_a', 'prepare_b'):
+            catches = {row['year']: row['catch_t'] for row in context['parents']['extract']['catch']}
+            result['series'] = [{**row, 'catch_t': catches[row['year']]}
+                                for row in context['parents']['cpue_' + key[-1]]['series']]
+            result['units'] = {'catch_t': 'tonnes', 'index': 'relative CPUE'}
+        elif key in ('assessment_a1', 'assessment_a2', 'assessment_b1', 'assessment_b2'):
+            result.update(K=10.0, r=context['job_settings']['r'], q=1.0, next_biomass_t=5.0)
+            result['series'] = [{'year': row['year'], 'catch_t': row['catch_t'],
+                                 'observed_index': row['index']}
+                                for row in context['parents']['prepare_' + key[-2]]['series']]
+            result['units'] = {'catch_t': 'tonnes', 'biomass_t': 'tonnes', 'observed_index': 'relative CPUE'}
         if key == 'qc':
             corrected = copy.deepcopy(context['parents']['submission'])
             corrected['corrected'] = True
