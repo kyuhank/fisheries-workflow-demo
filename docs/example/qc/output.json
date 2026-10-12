@@ -1,1 +1,1 @@
-{"checks":[{"check":"Positive effort","result":"Pass"},{"check":"Non-negative catch","result":"Pass"},{"check":"Unique observation IDs","result":"Pass"}],"returned":["2000-A-01"],"rows":768}
+{"checks":[{"check":"Positive effort","result":"Pass"},{"check":"Non-negative released catch","result":"Pass"},{"check":"Unique aggregate source-row IDs","result":"Pass"}],"returned":[],"rows":639}

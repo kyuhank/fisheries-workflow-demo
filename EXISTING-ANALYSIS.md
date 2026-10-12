@@ -21,10 +21,19 @@ The routine calculates catchability analytically. This example does not
 reconstruct the original CPUE standardisation, reproduce an author's historical
 saved run, validate a stock assessment or provide management advice.
 
-## Preserved checks
+## Read the results
 
-The [mqmf-adaptation-v1.0 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/mqmf-adaptation-v1.0)
-records these checks of the calculation and selective update:
+Open the [comparison](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_summary/report.html),
+then the [active prediction](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_a/report.html)
+and [native reference](https://kyuhank.github.io/fisheries-workflow-demo/mqmf/cpue_b/report.html).
+Each report starts with the input → calculation → result and keeps detailed
+settings and records below it.
+
+## Checked execution
+
+The [current results archive](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-mqmf-1.10.0.zip)
+and its [checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-mqmf-1.10.0.zip.sha256)
+preserve these checks:
 
 | Check | Recorded result |
 | --- | --- |
@@ -35,7 +44,9 @@ records these checks of the calculation and selective update:
 | Selective versus fresh execution | All 24 predictions and 120 numerical comparison values agreed; years were checked separately. |
 | Declared scale mismatch | Linear-labelled predictions were rejected before the comparison's R calculation; accepted files were preserved. |
 
-Those cases ran on a Mac with Docker and the preserved SPC image. Source and
+The current checks ran in a local Linux container using the recorded SPC image.
+The nine workflow steps called the original prediction function five times.
+Source and
 prepared-input mounts were read-only; container networking was disabled. No
 optimisation was performed. The scale fixture checks a declared mismatch;
 wrong-scale values incorrectly labelled as natural logs were not tested.
@@ -44,13 +55,14 @@ of a stock or collaboration by several human analysts.
 
 ## Inspect or repeat
 
-Open `selective/cpue_summary/report.html` in the release's results archive.
+Unpack the current results archive and open `study/selective/cpue_summary/report.html`. 
 Its `record.json` links the two producing records; the neighbouring `cpue_a/`
 and `cpue_b/` folders preserve their inputs, settings and source closure.
 `reports/` contains the check reports, `preflight.json` records input conversion,
 and `checkpoints/baseline/` keeps the original result before the update.
 Each accepted execution also provides `study-bundle.zip` and checksums.
 
+The [earlier MQMF release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/mqmf-adaptation-v1.0) remains unchanged.
 Keep the source and results archives with the separate runtime image from
 [v1.9.1](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1).
 Follow the source README to restore the image and run the study using Docker and

@@ -1,0 +1,642 @@
+<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MQMF conditional prediction comparison</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}</style><body><h1>MQMF conditional prediction comparison</h1><p>Compare the active MQMF prediction with its direct native reference.</p><p class="feedback-flow">Two saved predictions → check scale and producer → annual comparison</p><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" aria-label="CPUE on the original numerical scale; physical unit unspecified"><path d="M65 280.0H730" stroke="#e1e8ee"/><text x="54" y="284.0" text-anchor="end" fill="#607080" font-size="12">0</text><path d="M65 205.0H730" stroke="#e1e8ee"/><text x="54" y="209.0" text-anchor="end" fill="#607080" font-size="12">1</text><path d="M65 130.0H730" stroke="#e1e8ee"/><text x="54" y="134.0" text-anchor="end" fill="#607080" font-size="12">2</text><path d="M65 55.0H730" stroke="#e1e8ee"/><text x="54" y="59.0" text-anchor="end" fill="#607080" font-size="12">3</text><text x="65.0" y="304" text-anchor="middle" fill="#607080" font-size="12">1985</text><text x="380.7" y="304" text-anchor="middle" fill="#607080" font-size="12">1996</text><text x="725.0" y="304" text-anchor="middle" fill="#607080" font-size="12">2008</text><circle cx="65.00" cy="205.00" r="3.5" fill="#1378a3"/><circle cx="93.70" cy="197.82" r="3.5" fill="#1378a3"/><circle cx="122.39" cy="195.23" r="3.5" fill="#1378a3"/><circle cx="151.09" cy="194.00" r="3.5" fill="#1378a3"/><circle cx="179.78" cy="190.95" r="3.5" fill="#1378a3"/><circle cx="208.48" cy="189.87" r="3.5" fill="#1378a3"/><circle cx="237.17" cy="185.11" r="3.5" fill="#1378a3"/><circle cx="265.87" cy="181.01" r="3.5" fill="#1378a3"/><circle cx="294.57" cy="172.87" r="3.5" fill="#1378a3"/><circle cx="323.26" cy="169.21" r="3.5" fill="#1378a3"/><circle cx="351.96" cy="153.60" r="3.5" fill="#1378a3"/><circle cx="380.65" cy="136.04" r="3.5" fill="#1378a3"/><circle cx="409.35" cy="126.14" r="3.5" fill="#1378a3"/><circle cx="438.04" cy="120.67" r="3.5" fill="#1378a3"/><circle cx="466.74" cy="113.89" r="3.5" fill="#1378a3"/><circle cx="495.43" cy="111.02" r="3.5" fill="#1378a3"/><circle cx="524.13" cy="122.12" r="3.5" fill="#1378a3"/><circle cx="552.83" cy="123.85" r="3.5" fill="#1378a3"/><circle cx="581.52" cy="129.35" r="3.5" fill="#1378a3"/><circle cx="610.22" cy="135.81" r="3.5" fill="#1378a3"/><circle cx="638.91" cy="139.73" r="3.5" fill="#1378a3"/><circle cx="667.61" cy="139.18" r="3.5" fill="#1378a3"/><circle cx="696.30" cy="141.28" r="3.5" fill="#1378a3"/><circle cx="725.00" cy="150.47" r="3.5" fill="#1378a3"/><text x="65" y="25" fill="#1378a3" font-size="14">Observed</text><polyline points="65.00,200.63 93.70,204.18 122.39,201.67 151.09,201.76 179.78,198.53 208.48,191.72 237.17,183.03 265.87,174.62 294.57,166.93 323.26,157.80 351.96,147.76 380.65,137.95 409.35,127.81 438.04,124.44 466.74,117.86 495.43,115.96 524.13,121.81 552.83,126.04 581.52,128.93 610.22,132.40 638.91,134.92 667.61,137.22 696.30,139.54 725.00,143.30" fill="none" stroke="#b56435" stroke-width="2.5"/><text x="235" y="25" fill="#b56435" font-size="14">Reference</text><polyline points="65.00,181.36 93.70,188.92 122.39,189.24 151.09,193.20 179.78,193.49 208.48,189.82 237.17,184.13 265.87,178.82 294.57,174.21 323.26,167.45 351.96,158.76 380.65,149.12 409.35,137.60 438.04,132.78 466.74,123.40 495.43,118.75 524.13,123.54 552.83,127.41 581.52,130.31 610.22,134.38 638.91,137.79 667.61,141.27 696.30,145.09 725.00,151.03" fill="none" stroke="#7357a8" stroke-width="2.5"/><text x="405" y="25" fill="#7357a8" font-size="14">Active</text><text x="65" y="332" fill="#607080" font-size="12">CPUE on the original numerical scale; physical unit unspecified</text></svg><p class="note">Changing the active growth setting changed the conditional predictions.</p><details><summary>All annual comparisons</summary><table><thead><tr><th>Year</th><th>Observed CPUE</th><th>Reference ln CPUE</th><th>Active ln CPUE</th><th>Log difference</th><th>Active / reference</th></tr></thead><tbody><tr><td>1985</td><td>1</td><td>0.05665</td><td>0.274</td><td>0.2173</td><td>1.243</td></tr><tr><td>1986</td><td>1.096</td><td>0.01094</td><td>0.1943</td><td>0.1834</td><td>1.201</td></tr><tr><td>1987</td><td>1.13</td><td>0.04344</td><td>0.1907</td><td>0.1473</td><td>1.159</td></tr><tr><td>1988</td><td>1.147</td><td>0.04226</td><td>0.1461</td><td>0.1039</td><td>1.109</td></tr><tr><td>1989</td><td>1.187</td><td>0.08279</td><td>0.1427</td><td>0.05996</td><td>1.062</td></tr><tr><td>1990</td><td>1.202</td><td>0.1631</td><td>0.1843</td><td>0.02126</td><td>1.021</td></tr><tr><td>1991</td><td>1.265</td><td>0.2569</td><td>0.2455</td><td>-0.01139</td><td>0.9887</td></tr><tr><td>1992</td><td>1.32</td><td>0.3401</td><td>0.2994</td><td>-0.04068</td><td>0.9601</td></tr><tr><td>1993</td><td>1.428</td><td>0.4106</td><td>0.3439</td><td>-0.06662</td><td>0.9356</td></tr><tr><td>1994</td><td>1.477</td><td>0.4882</td><td>0.4059</td><td>-0.08229</td><td>0.921</td></tr><tr><td>1995</td><td>1.685</td><td>0.5671</td><td>0.4803</td><td>-0.08685</td><td>0.9168</td></tr><tr><td>1996</td><td>1.919</td><td>0.6387</td><td>0.5568</td><td>-0.08191</td><td>0.9214</td></tr><tr><td>1997</td><td>2.051</td><td>0.7077</td><td>0.6412</td><td>-0.06648</td><td>0.9357</td></tr><tr><td>1998</td><td>2.124</td><td>0.7295</td><td>0.6744</td><td>-0.05511</td><td>0.9464</td></tr><tr><td>1999</td><td>2.215</td><td>0.771</td><td>0.7362</td><td>-0.03479</td><td>0.9658</td></tr><tr><td>2000</td><td>2.253</td><td>0.7826</td><td>0.7655</td><td>-0.01717</td><td>0.983</td></tr><tr><td>2001</td><td>2.105</td><td>0.7463</td><td>0.7353</td><td>-0.011</td><td>0.9891</td></tr><tr><td>2002</td><td>2.082</td><td>0.7192</td><td>0.7103</td><td>-0.008896</td><td>0.9911</td></tr><tr><td>2003</td><td>2.009</td><td>0.7002</td><td>0.6911</td><td>-0.009171</td><td>0.9909</td></tr><tr><td>2004</td><td>1.923</td><td>0.677</td><td>0.6635</td><td>-0.01354</td><td>0.9866</td></tr><tr><td>2005</td><td>1.87</td><td>0.6598</td><td>0.6398</td><td>-0.01995</td><td>0.9803</td></tr><tr><td>2006</td><td>1.878</td><td>0.6438</td><td>0.615</td><td>-0.02874</td><td>0.9717</td></tr><tr><td>2007</td><td>1.85</td><td>0.6274</td><td>0.5871</td><td>-0.0403</td><td>0.9605</td></tr><tr><td>2008</td><td>1.727</td><td>0.6003</td><td>0.5421</td><td>-0.05821</td><td>0.9435</td></tr></tbody></table></details><p>Predictions are exponentiated only for this plot; saved predictions retain their natural-log scale. The observed CPUE unit is undocumented. This example does not reproduce CPUE standardisation, fit population parameters, validate a stock assessment or provide management advice.</p><p class="muted">Produced in Run 002.</p><details><summary>Producer records and exact source closure</summary><pre>{
+  &quot;schema_version&quot;: 1,
+  &quot;job&quot;: &quot;cpue_summary&quot;,
+  &quot;owner&quot;: &quot;Study receiving wrapper&quot;,
+  &quot;run_id&quot;: &quot;Run 002&quot;,
+  &quot;signature&quot;: &quot;f3d58c6166340fc5679a867fa37fed2cad72454f2923a86bfe3f1f82ff57a8a3&quot;,
+  &quot;settings&quot;: {
+    &quot;absolute&quot;: 1e-12,
+    &quot;relative&quot;: 1e-12
+  },
+  &quot;snapshot&quot;: 2008,
+  &quot;code&quot;: {
+    &quot;workflow/__init__.py&quot;: &quot;bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09&quot;,
+    &quot;workflow/engine.py&quot;: &quot;08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb&quot;,
+    &quot;workflow/spec.py&quot;: &quot;22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127&quot;,
+    &quot;workflow/sources.py&quot;: &quot;a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd&quot;,
+    &quot;workflow/contracts.py&quot;: &quot;8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b&quot;,
+    &quot;workflow/reports.py&quot;: &quot;b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c&quot;,
+    &quot;workflow/quarto_reports.py&quot;: &quot;ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d&quot;,
+    &quot;workflow/r_bridge.py&quot;: &quot;89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93&quot;,
+    &quot;workflow/r_driver.R&quot;: &quot;9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039&quot;,
+    &quot;workflow/Makefile&quot;: &quot;9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157&quot;,
+    &quot;workflow/r/common.R&quot;: &quot;9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191&quot;,
+    &quot;workflow/jobs.json&quot;: &quot;4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710&quot;,
+    &quot;workflow/study_adapter.py&quot;: &quot;3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2&quot;,
+    &quot;workflow/r/study.R&quot;: &quot;5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a&quot;,
+    &quot;prepare-inputs.R&quot;: &quot;6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449&quot;,
+    &quot;run-study.py&quot;: &quot;0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1&quot;,
+    &quot;study-case.json&quot;: &quot;7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63&quot;,
+    &quot;workflow/offline.py&quot;: &quot;e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788&quot;,
+    &quot;runtime-preservation.json&quot;: &quot;e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197&quot;,
+    &quot;upstream/origins.json&quot;: &quot;6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc&quot;,
+    &quot;study.sh&quot;: &quot;940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb&quot;,
+    &quot;jobs/cpue_summary/run.R&quot;: &quot;e364d4b4d157f44f3a499981d87604d69e43f9e2c215e91fbe6cd114f44afa97&quot;
+  },
+  &quot;software&quot;: {
+    &quot;r&quot;: &quot;4.6.0&quot;,
+    &quot;r_platform&quot;: &quot;x86_64-pc-linux-gnu&quot;,
+    &quot;quarto&quot;: &quot;1.9.37&quot;,
+    &quot;jsonlite&quot;: &quot;2.0.0&quot;,
+    &quot;RTMB&quot;: &quot;2.0&quot;,
+    &quot;TMB&quot;: &quot;1.9.25&quot;,
+    &quot;knitr&quot;: &quot;1.52&quot;,
+    &quot;rmarkdown&quot;: &quot;2.32&quot;,
+    &quot;container&quot;: &quot;ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d&quot;,
+    &quot;container_url&quot;: &quot;https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow&quot;,
+    &quot;python&quot;: &quot;3.12.3&quot;,
+    &quot;platform&quot;: &quot;linux&quot;,
+    &quot;runtime&quot;: &quot;Rscript in protected SPC container&quot;,
+    &quot;adapter_runtime&quot;: &quot;CPython&quot;,
+    &quot;study&quot;: &quot;MQMF unchanged simpspm adoption&quot;
+  },
+  &quot;file_inputs&quot;: {},
+  &quot;source_closure&quot;: {
+    &quot;workflow/__init__.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/__init__.py&quot;,
+      &quot;sha256&quot;: &quot;bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09&quot;,
+      &quot;bytes&quot;: 82
+    },
+    &quot;workflow/engine.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/engine.py&quot;,
+      &quot;sha256&quot;: &quot;08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb&quot;,
+      &quot;bytes&quot;: 27115
+    },
+    &quot;workflow/spec.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/spec.py&quot;,
+      &quot;sha256&quot;: &quot;22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127&quot;,
+      &quot;bytes&quot;: 3898
+    },
+    &quot;workflow/sources.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/sources.py&quot;,
+      &quot;sha256&quot;: &quot;a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd&quot;,
+      &quot;bytes&quot;: 15075
+    },
+    &quot;workflow/contracts.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/contracts.py&quot;,
+      &quot;sha256&quot;: &quot;8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b&quot;,
+      &quot;bytes&quot;: 4095
+    },
+    &quot;workflow/reports.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/reports.py&quot;,
+      &quot;sha256&quot;: &quot;b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c&quot;,
+      &quot;bytes&quot;: 31344
+    },
+    &quot;workflow/quarto_reports.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/quarto_reports.py&quot;,
+      &quot;sha256&quot;: &quot;ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d&quot;,
+      &quot;bytes&quot;: 2220
+    },
+    &quot;workflow/r_bridge.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/r_bridge.py&quot;,
+      &quot;sha256&quot;: &quot;89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93&quot;,
+      &quot;bytes&quot;: 4576
+    },
+    &quot;workflow/r_driver.R&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/r_driver.R&quot;,
+      &quot;sha256&quot;: &quot;9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039&quot;,
+      &quot;bytes&quot;: 4590
+    },
+    &quot;workflow/Makefile&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/Makefile&quot;,
+      &quot;sha256&quot;: &quot;9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157&quot;,
+      &quot;bytes&quot;: 306
+    },
+    &quot;workflow/r/common.R&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/r/common.R&quot;,
+      &quot;sha256&quot;: &quot;9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191&quot;,
+      &quot;bytes&quot;: 4816
+    },
+    &quot;workflow/jobs.json&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/jobs.json&quot;,
+      &quot;sha256&quot;: &quot;4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710&quot;,
+      &quot;bytes&quot;: 1327
+    },
+    &quot;workflow/study_adapter.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/study_adapter.py&quot;,
+      &quot;sha256&quot;: &quot;3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2&quot;,
+      &quot;bytes&quot;: 21361
+    },
+    &quot;workflow/r/study.R&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/r/study.R&quot;,
+      &quot;sha256&quot;: &quot;5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a&quot;,
+      &quot;bytes&quot;: 8716
+    },
+    &quot;prepare-inputs.R&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/prepare-inputs.R&quot;,
+      &quot;sha256&quot;: &quot;6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449&quot;,
+      &quot;bytes&quot;: 1475
+    },
+    &quot;run-study.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/run-study.py&quot;,
+      &quot;sha256&quot;: &quot;0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1&quot;,
+      &quot;bytes&quot;: 15256
+    },
+    &quot;study-case.json&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/study-case.json&quot;,
+      &quot;sha256&quot;: &quot;7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63&quot;,
+      &quot;bytes&quot;: 2934
+    },
+    &quot;workflow/offline.py&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/workflow/offline.py&quot;,
+      &quot;sha256&quot;: &quot;e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788&quot;,
+      &quot;bytes&quot;: 19898
+    },
+    &quot;runtime-preservation.json&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/runtime-preservation.json&quot;,
+      &quot;sha256&quot;: &quot;e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197&quot;,
+      &quot;bytes&quot;: 1449
+    },
+    &quot;upstream/origins.json&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/upstream/origins.json&quot;,
+      &quot;sha256&quot;: &quot;6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc&quot;,
+      &quot;bytes&quot;: 9063
+    },
+    &quot;study.sh&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/study.sh&quot;,
+      &quot;sha256&quot;: &quot;940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb&quot;,
+      &quot;bytes&quot;: 2259
+    },
+    &quot;jobs/cpue_summary/run.R&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/jobs/cpue_summary/run.R&quot;,
+      &quot;sha256&quot;: &quot;e364d4b4d157f44f3a499981d87604d69e43f9e2c215e91fbe6cd114f44afa97&quot;,
+      &quot;bytes&quot;: 126
+    },
+    &quot;source-manifest.json&quot;: {
+      &quot;path&quot;: &quot;closure/Run_002/cpue_summary/source-manifest.json&quot;,
+      &quot;sha256&quot;: &quot;37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb&quot;,
+      &quot;bytes&quot;: 19731
+    }
+  },
+  &quot;inputs&quot;: {
+    &quot;cpue_b&quot;: {
+      &quot;run_id&quot;: &quot;Run 001&quot;,
+      &quot;signature&quot;: &quot;64e07c2213c0d489fb2c8f3646f8ac0404cb81fc3d118920c55b1d751b47b39d&quot;,
+      &quot;record_path&quot;: &quot;cpue_b/record.json&quot;,
+      &quot;record_checksum&quot;: &quot;8f841b2b51ee07f432b7c151848e1cd92e86661fbc80ba09f13c93435bb8f479&quot;,
+      &quot;checksum&quot;: &quot;52a52fc3b5477404051caa7a7de9bd30e9d964febd7b00efd94bef33b4372a03&quot;,
+      &quot;producer&quot;: {
+        &quot;case&quot;: &quot;baseline&quot;,
+        &quot;execution_id&quot;: &quot;8904c1fe-5db2-45d6-b032-1cd171009b96&quot;,
+        &quot;external_function&quot;: {
+          &quot;bytes&quot;: 63244,
+          &quot;commit&quot;: &quot;f171966258b9dd8d6cdfcc150930cdb45d23cf65&quot;,
+          &quot;function&quot;: &quot;simpspm&quot;,
+          &quot;git_blob_sha1&quot;: &quot;21bfcbccb6c85a8ed59cee43c7838498431829c5&quot;,
+          &quot;licence&quot;: &quot;GPL-3&quot;,
+          &quot;path&quot;: &quot;R/spm.r&quot;,
+          &quot;repository&quot;: &quot;https://github.com/haddonm/MQMF&quot;,
+          &quot;sha256&quot;: &quot;bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a&quot;,
+          &quot;unchanged_copy&quot;: true,
+          &quot;url&quot;: &quot;https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/R/spm.r&quot;
+        },
+        &quot;job&quot;: &quot;cpue_b&quot;,
+        &quot;parameter_file&quot;: {
+          &quot;path&quot;: &quot;parameters/reference.json&quot;,
+          &quot;sha256&quot;: &quot;c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326&quot;
+        },
+        &quot;raw_input&quot;: {
+          &quot;bytes&quot;: 502,
+          &quot;commit&quot;: &quot;f171966258b9dd8d6cdfcc150930cdb45d23cf65&quot;,
+          &quot;git_blob_sha1&quot;: &quot;9fac454a95e9d4c55295b16984b23829f4e87ddb&quot;,
+          &quot;licence&quot;: &quot;GPL-3&quot;,
+          &quot;path&quot;: &quot;data/abdat.RData&quot;,
+          &quot;repository&quot;: &quot;https://github.com/haddonm/MQMF&quot;,
+          &quot;sha256&quot;: &quot;e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d&quot;,
+          &quot;unchanged_copy&quot;: true,
+          &quot;url&quot;: &quot;https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/data/abdat.RData&quot;
+        },
+        &quot;run_directory&quot;: &quot;/evidence/mqmf-study/selective&quot;,
+        &quot;run_id&quot;: &quot;Run 001&quot;,
+        &quot;signature&quot;: &quot;64e07c2213c0d489fb2c8f3646f8ac0404cb81fc3d118920c55b1d751b47b39d&quot;,
+        &quot;wrapper&quot;: {
+          &quot;commit&quot;: null,
+          &quot;kind&quot;: &quot;local study file bytes&quot;,
+          &quot;manifest_sha256&quot;: &quot;37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb&quot;,
+          &quot;path&quot;: &quot;jobs/cpue_b/run.R&quot;,
+          &quot;repository&quot;: null,
+          &quot;sha256&quot;: &quot;4c9ebf875ed8d3c6730417d8952fca9c03d7b3111d6ed79c16fabce914dcbe8b&quot;
+        }
+      },
+      &quot;settings&quot;: {
+        &quot;Binit&quot;: 3400,
+        &quot;K&quot;: 9400,
+        &quot;r&quot;: 0.4,
+        &quot;schaefer&quot;: true,
+        &quot;sigma&quot;: 0.05
+      },
+      &quot;file_inputs&quot;: {
+        &quot;external/MQMF/data/abdat.RData&quot;: &quot;e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d&quot;,
+        &quot;parameters/reference.json&quot;: &quot;c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326&quot;
+      },
+      &quot;source_closure&quot;: {
+        &quot;external/MQMF/R/spm.r&quot;: {
+          &quot;bytes&quot;: 63244,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/external/MQMF/R/spm.r&quot;,
+          &quot;sha256&quot;: &quot;bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a&quot;
+        },
+        &quot;external/MQMF/data/abdat.RData&quot;: {
+          &quot;bytes&quot;: 502,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/external/MQMF/data/abdat.RData&quot;,
+          &quot;sha256&quot;: &quot;e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d&quot;
+        },
+        &quot;jobs/cpue_b/run.R&quot;: {
+          &quot;bytes&quot;: 155,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/jobs/cpue_b/run.R&quot;,
+          &quot;sha256&quot;: &quot;4c9ebf875ed8d3c6730417d8952fca9c03d7b3111d6ed79c16fabce914dcbe8b&quot;
+        },
+        &quot;parameters/reference.json&quot;: {
+          &quot;bytes&quot;: 82,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/parameters/reference.json&quot;,
+          &quot;sha256&quot;: &quot;c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326&quot;
+        },
+        &quot;prepare-inputs.R&quot;: {
+          &quot;bytes&quot;: 1475,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/prepare-inputs.R&quot;,
+          &quot;sha256&quot;: &quot;6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449&quot;
+        },
+        &quot;run-study.py&quot;: {
+          &quot;bytes&quot;: 15256,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/run-study.py&quot;,
+          &quot;sha256&quot;: &quot;0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1&quot;
+        },
+        &quot;runtime-preservation.json&quot;: {
+          &quot;bytes&quot;: 1449,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/runtime-preservation.json&quot;,
+          &quot;sha256&quot;: &quot;e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197&quot;
+        },
+        &quot;source-manifest.json&quot;: {
+          &quot;bytes&quot;: 19731,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/source-manifest.json&quot;,
+          &quot;sha256&quot;: &quot;37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb&quot;
+        },
+        &quot;study-case.json&quot;: {
+          &quot;bytes&quot;: 2934,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/study-case.json&quot;,
+          &quot;sha256&quot;: &quot;7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63&quot;
+        },
+        &quot;study.sh&quot;: {
+          &quot;bytes&quot;: 2259,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/study.sh&quot;,
+          &quot;sha256&quot;: &quot;940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb&quot;
+        },
+        &quot;upstream/origins.json&quot;: {
+          &quot;bytes&quot;: 9063,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/upstream/origins.json&quot;,
+          &quot;sha256&quot;: &quot;6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc&quot;
+        },
+        &quot;workflow/Makefile&quot;: {
+          &quot;bytes&quot;: 306,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/Makefile&quot;,
+          &quot;sha256&quot;: &quot;9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157&quot;
+        },
+        &quot;workflow/__init__.py&quot;: {
+          &quot;bytes&quot;: 82,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/__init__.py&quot;,
+          &quot;sha256&quot;: &quot;bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09&quot;
+        },
+        &quot;workflow/contracts.py&quot;: {
+          &quot;bytes&quot;: 4095,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/contracts.py&quot;,
+          &quot;sha256&quot;: &quot;8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b&quot;
+        },
+        &quot;workflow/engine.py&quot;: {
+          &quot;bytes&quot;: 27115,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/engine.py&quot;,
+          &quot;sha256&quot;: &quot;08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb&quot;
+        },
+        &quot;workflow/jobs.json&quot;: {
+          &quot;bytes&quot;: 1327,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/jobs.json&quot;,
+          &quot;sha256&quot;: &quot;4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710&quot;
+        },
+        &quot;workflow/offline.py&quot;: {
+          &quot;bytes&quot;: 19898,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/offline.py&quot;,
+          &quot;sha256&quot;: &quot;e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788&quot;
+        },
+        &quot;workflow/quarto_reports.py&quot;: {
+          &quot;bytes&quot;: 2220,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/quarto_reports.py&quot;,
+          &quot;sha256&quot;: &quot;ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d&quot;
+        },
+        &quot;workflow/r/common.R&quot;: {
+          &quot;bytes&quot;: 4816,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/r/common.R&quot;,
+          &quot;sha256&quot;: &quot;9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191&quot;
+        },
+        &quot;workflow/r/study.R&quot;: {
+          &quot;bytes&quot;: 8716,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/r/study.R&quot;,
+          &quot;sha256&quot;: &quot;5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a&quot;
+        },
+        &quot;workflow/r_bridge.py&quot;: {
+          &quot;bytes&quot;: 4576,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/r_bridge.py&quot;,
+          &quot;sha256&quot;: &quot;89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93&quot;
+        },
+        &quot;workflow/r_driver.R&quot;: {
+          &quot;bytes&quot;: 4590,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/r_driver.R&quot;,
+          &quot;sha256&quot;: &quot;9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039&quot;
+        },
+        &quot;workflow/reports.py&quot;: {
+          &quot;bytes&quot;: 31344,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/reports.py&quot;,
+          &quot;sha256&quot;: &quot;b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c&quot;
+        },
+        &quot;workflow/sources.py&quot;: {
+          &quot;bytes&quot;: 15075,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/sources.py&quot;,
+          &quot;sha256&quot;: &quot;a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd&quot;
+        },
+        &quot;workflow/spec.py&quot;: {
+          &quot;bytes&quot;: 3898,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/spec.py&quot;,
+          &quot;sha256&quot;: &quot;22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127&quot;
+        },
+        &quot;workflow/study_adapter.py&quot;: {
+          &quot;bytes&quot;: 21361,
+          &quot;path&quot;: &quot;closure/Run_001/cpue_b/workflow/study_adapter.py&quot;,
+          &quot;sha256&quot;: &quot;3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2&quot;
+        }
+      }
+    },
+    &quot;cpue_a&quot;: {
+      &quot;run_id&quot;: &quot;Run 002&quot;,
+      &quot;signature&quot;: &quot;b8e52558cfe9db4c2e9c4229872280a92568946c9a7234a4c065e75ff3537da6&quot;,
+      &quot;record_path&quot;: &quot;cpue_a/record.json&quot;,
+      &quot;record_checksum&quot;: &quot;ed1b3d9f1dc56cfc15ce79f521820666cf7e1b357c5135ae10cdb80e9a2e1af6&quot;,
+      &quot;checksum&quot;: &quot;c75054e1dc17234da0783eb64c746f3afe08ac7c80d535a2a0a8dbbae3ec44b8&quot;,
+      &quot;producer&quot;: {
+        &quot;case&quot;: &quot;update&quot;,
+        &quot;execution_id&quot;: &quot;8904c1fe-5db2-45d6-b032-1cd171009b96&quot;,
+        &quot;external_function&quot;: {
+          &quot;bytes&quot;: 63244,
+          &quot;commit&quot;: &quot;f171966258b9dd8d6cdfcc150930cdb45d23cf65&quot;,
+          &quot;function&quot;: &quot;simpspm&quot;,
+          &quot;git_blob_sha1&quot;: &quot;21bfcbccb6c85a8ed59cee43c7838498431829c5&quot;,
+          &quot;licence&quot;: &quot;GPL-3&quot;,
+          &quot;path&quot;: &quot;R/spm.r&quot;,
+          &quot;repository&quot;: &quot;https://github.com/haddonm/MQMF&quot;,
+          &quot;sha256&quot;: &quot;bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a&quot;,
+          &quot;unchanged_copy&quot;: true,
+          &quot;url&quot;: &quot;https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/R/spm.r&quot;
+        },
+        &quot;job&quot;: &quot;cpue_a&quot;,
+        &quot;parameter_file&quot;: {
+          &quot;path&quot;: &quot;parameters/active-revised.json&quot;,
+          &quot;sha256&quot;: &quot;c5b11804987a02c35e14402507d84d66c8f7f9819952eab50b1cc5b514c7da6a&quot;
+        },
+        &quot;raw_input&quot;: {
+          &quot;bytes&quot;: 502,
+          &quot;commit&quot;: &quot;f171966258b9dd8d6cdfcc150930cdb45d23cf65&quot;,
+          &quot;git_blob_sha1&quot;: &quot;9fac454a95e9d4c55295b16984b23829f4e87ddb&quot;,
+          &quot;licence&quot;: &quot;GPL-3&quot;,
+          &quot;path&quot;: &quot;data/abdat.RData&quot;,
+          &quot;repository&quot;: &quot;https://github.com/haddonm/MQMF&quot;,
+          &quot;sha256&quot;: &quot;e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d&quot;,
+          &quot;unchanged_copy&quot;: true,
+          &quot;url&quot;: &quot;https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/data/abdat.RData&quot;
+        },
+        &quot;run_directory&quot;: &quot;/evidence/mqmf-study/selective&quot;,
+        &quot;run_id&quot;: &quot;Run 002&quot;,
+        &quot;signature&quot;: &quot;b8e52558cfe9db4c2e9c4229872280a92568946c9a7234a4c065e75ff3537da6&quot;,
+        &quot;wrapper&quot;: {
+          &quot;commit&quot;: null,
+          &quot;kind&quot;: &quot;local study file bytes&quot;,
+          &quot;manifest_sha256&quot;: &quot;37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb&quot;,
+          &quot;path&quot;: &quot;jobs/cpue_a/run.R&quot;,
+          &quot;repository&quot;: null,
+          &quot;sha256&quot;: &quot;545d5f9e26c19caef73614c3032de00068f4535ee42c1d0ef41a4e48e89e0f73&quot;
+        }
+      },
+      &quot;settings&quot;: {
+        &quot;r&quot;: 0.35,
+        &quot;K&quot;: 9400,
+        &quot;Binit&quot;: 3400,
+        &quot;sigma&quot;: 0.05,
+        &quot;schaefer&quot;: true
+      },
+      &quot;file_inputs&quot;: {
+        &quot;external/MQMF/data/abdat.RData&quot;: &quot;e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d&quot;,
+        &quot;parameters/active-revised.json&quot;: &quot;c5b11804987a02c35e14402507d84d66c8f7f9819952eab50b1cc5b514c7da6a&quot;,
+        &quot;mapped/abdat.csv&quot;: &quot;d053be7a81101f0b8a2bae2478be734b8fb67ffe2e34aacfe09d1b553207cdd8&quot;,
+        &quot;mapped/abdat.json&quot;: &quot;efd3ee71d18f9b33771bb28ea9df0a1b72633809266493a0ca5c5160d4dfe211&quot;,
+        &quot;mapped/mapping-manifest.json&quot;: &quot;9408f53865e1f3d862344f0361878c343004338a7f9b06df463b27306661a09b&quot;
+      },
+      &quot;source_closure&quot;: {
+        &quot;workflow/__init__.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/__init__.py&quot;,
+          &quot;sha256&quot;: &quot;bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09&quot;,
+          &quot;bytes&quot;: 82
+        },
+        &quot;workflow/engine.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/engine.py&quot;,
+          &quot;sha256&quot;: &quot;08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb&quot;,
+          &quot;bytes&quot;: 27115
+        },
+        &quot;workflow/spec.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/spec.py&quot;,
+          &quot;sha256&quot;: &quot;22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127&quot;,
+          &quot;bytes&quot;: 3898
+        },
+        &quot;workflow/sources.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/sources.py&quot;,
+          &quot;sha256&quot;: &quot;a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd&quot;,
+          &quot;bytes&quot;: 15075
+        },
+        &quot;workflow/contracts.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/contracts.py&quot;,
+          &quot;sha256&quot;: &quot;8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b&quot;,
+          &quot;bytes&quot;: 4095
+        },
+        &quot;workflow/reports.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/reports.py&quot;,
+          &quot;sha256&quot;: &quot;b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c&quot;,
+          &quot;bytes&quot;: 31344
+        },
+        &quot;workflow/quarto_reports.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/quarto_reports.py&quot;,
+          &quot;sha256&quot;: &quot;ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d&quot;,
+          &quot;bytes&quot;: 2220
+        },
+        &quot;workflow/r_bridge.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/r_bridge.py&quot;,
+          &quot;sha256&quot;: &quot;89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93&quot;,
+          &quot;bytes&quot;: 4576
+        },
+        &quot;workflow/r_driver.R&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/r_driver.R&quot;,
+          &quot;sha256&quot;: &quot;9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039&quot;,
+          &quot;bytes&quot;: 4590
+        },
+        &quot;workflow/Makefile&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/Makefile&quot;,
+          &quot;sha256&quot;: &quot;9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157&quot;,
+          &quot;bytes&quot;: 306
+        },
+        &quot;workflow/r/common.R&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/r/common.R&quot;,
+          &quot;sha256&quot;: &quot;9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191&quot;,
+          &quot;bytes&quot;: 4816
+        },
+        &quot;workflow/jobs.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/jobs.json&quot;,
+          &quot;sha256&quot;: &quot;4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710&quot;,
+          &quot;bytes&quot;: 1327
+        },
+        &quot;workflow/study_adapter.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/study_adapter.py&quot;,
+          &quot;sha256&quot;: &quot;3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2&quot;,
+          &quot;bytes&quot;: 21361
+        },
+        &quot;workflow/r/study.R&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/r/study.R&quot;,
+          &quot;sha256&quot;: &quot;5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a&quot;,
+          &quot;bytes&quot;: 8716
+        },
+        &quot;prepare-inputs.R&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/prepare-inputs.R&quot;,
+          &quot;sha256&quot;: &quot;6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449&quot;,
+          &quot;bytes&quot;: 1475
+        },
+        &quot;run-study.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/run-study.py&quot;,
+          &quot;sha256&quot;: &quot;0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1&quot;,
+          &quot;bytes&quot;: 15256
+        },
+        &quot;study-case.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/study-case.json&quot;,
+          &quot;sha256&quot;: &quot;7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63&quot;,
+          &quot;bytes&quot;: 2934
+        },
+        &quot;workflow/offline.py&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/workflow/offline.py&quot;,
+          &quot;sha256&quot;: &quot;e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788&quot;,
+          &quot;bytes&quot;: 19898
+        },
+        &quot;runtime-preservation.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/runtime-preservation.json&quot;,
+          &quot;sha256&quot;: &quot;e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197&quot;,
+          &quot;bytes&quot;: 1449
+        },
+        &quot;upstream/origins.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/upstream/origins.json&quot;,
+          &quot;sha256&quot;: &quot;6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc&quot;,
+          &quot;bytes&quot;: 9063
+        },
+        &quot;study.sh&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/study.sh&quot;,
+          &quot;sha256&quot;: &quot;940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb&quot;,
+          &quot;bytes&quot;: 2259
+        },
+        &quot;jobs/cpue_a/run.R&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/jobs/cpue_a/run.R&quot;,
+          &quot;sha256&quot;: &quot;545d5f9e26c19caef73614c3032de00068f4535ee42c1d0ef41a4e48e89e0f73&quot;,
+          &quot;bytes&quot;: 156
+        },
+        &quot;external/MQMF/R/spm.r&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/external/MQMF/R/spm.r&quot;,
+          &quot;sha256&quot;: &quot;bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a&quot;,
+          &quot;bytes&quot;: 63244
+        },
+        &quot;source-manifest.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/source-manifest.json&quot;,
+          &quot;sha256&quot;: &quot;37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb&quot;,
+          &quot;bytes&quot;: 19731
+        },
+        &quot;external/MQMF/data/abdat.RData&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/external/MQMF/data/abdat.RData&quot;,
+          &quot;sha256&quot;: &quot;e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d&quot;,
+          &quot;bytes&quot;: 502
+        },
+        &quot;parameters/active-revised.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/parameters/active-revised.json&quot;,
+          &quot;sha256&quot;: &quot;c5b11804987a02c35e14402507d84d66c8f7f9819952eab50b1cc5b514c7da6a&quot;,
+          &quot;bytes&quot;: 83
+        },
+        &quot;mapped/abdat.csv&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/mapped/abdat.csv&quot;,
+          &quot;sha256&quot;: &quot;d053be7a81101f0b8a2bae2478be734b8fb67ffe2e34aacfe09d1b553207cdd8&quot;,
+          &quot;bytes&quot;: 625
+        },
+        &quot;mapped/abdat.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/mapped/abdat.json&quot;,
+          &quot;sha256&quot;: &quot;efd3ee71d18f9b33771bb28ea9df0a1b72633809266493a0ca5c5160d4dfe211&quot;,
+          &quot;bytes&quot;: 967
+        },
+        &quot;mapped/mapping-manifest.json&quot;: {
+          &quot;path&quot;: &quot;closure/Run_002/cpue_a/mapped/mapping-manifest.json&quot;,
+          &quot;sha256&quot;: &quot;9408f53865e1f3d862344f0361878c343004338a7f9b06df463b27306661a09b&quot;,
+          &quot;bytes&quot;: 2806
+        }
+      }
+    }
+  },
+  &quot;execution&quot;: {
+    &quot;actual_route&quot;: &quot;Local Docker&quot;,
+    &quot;actual_client&quot;: &quot;offline study runner&quot;,
+    &quot;execution_id&quot;: &quot;8904c1fe-5db2-45d6-b032-1cd171009b96&quot;,
+    &quot;case&quot;: &quot;update&quot;,
+    &quot;reader&quot;: &quot;registered Local validation&quot;,
+    &quot;runtime_verification&quot;: {
+      &quot;schema_version&quot;: 1,
+      &quot;upstream_registry_digest&quot;: &quot;ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d&quot;,
+      &quot;config_id&quot;: &quot;sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158&quot;,
+      &quot;platform&quot;: &quot;linux/amd64&quot;,
+      &quot;rootfs_diff_ids&quot;: [
+        &quot;sha256:98effb2dfe85d4c431f97d90482075f19e5fc3a57c2dd423d8bdfd4813620043&quot;,
+        &quot;sha256:613659109016edd06de370f7bc2025e102bdcddaeac9de63a7b539d8bf3b1ae1&quot;,
+        &quot;sha256:0b37a25965e9e9119a64e622f3101c8b7ef9f6eacab3a6dd9a4b062e9550f948&quot;,
+        &quot;sha256:b52c4fe3ae39d7f3c34a04f72ac1e8ea873cbb9645bd2ea9bfe58f841059b60b&quot;,
+        &quot;sha256:26cd91d7da066e47b7463ffd3d6e1795f3ba2d036f4a078b73cf3579830bc009&quot;,
+        &quot;sha256:3a4afdc4e1d09235c386e112b3f8c8779ca06dcdeac06099001ba3260d49639d&quot;,
+        &quot;sha256:853a19e9d9bf3fee97141848b791a845454f147bf9a3c61707b124c676288c6c&quot;,
+        &quot;sha256:56accf9e26339a6b30b33f4f17954bb9931861898b4e82f41fc3ddce60c59f54&quot;,
+        &quot;sha256:9d662917e398066bfc676c31a09d46648e38baf92db0ef55a76f1ae800732fca&quot;,
+        &quot;sha256:655fde5934fb72434f5b0212542cb467d110a5d8c9e6fc2c8d5304643245afd3&quot;,
+        &quot;sha256:616cadc63d516bc79ef6ffd13f95736739bdd9f8711ed03f93228276e318f545&quot;,
+        &quot;sha256:60860921f93d2910563d7bb8e2bdcc06b93f70698e6e5c63b96de67f8dbb0700&quot;
+      ],
+      &quot;identity_note&quot;: &quot;Docker save/load may omit registry RepoDigests. Verify and launch the config ID with these ordered rootfs diff IDs; the upstream digest remains a source pin.&quot;,
+      &quot;launch_reference&quot;: &quot;sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158&quot;,
+      &quot;local_repo_digests&quot;: [
+        &quot;ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d&quot;
+      ],
+      &quot;upstream_reference_present_locally&quot;: true,
+      &quot;verification_basis&quot;: &quot;config ID, platform and ordered rootfs diff IDs&quot;,
+      &quot;registry_digest_verified_locally&quot;: true,
+      &quot;pull_policy&quot;: &quot;never&quot;,
+      &quot;network&quot;: &quot;none&quot;
+    },
+    &quot;resources_declared_by_launcher&quot;: {
+      &quot;cpus&quot;: 2,
+      &quot;memory_bytes&quot;: 4294967296,
+      &quot;OMP_NUM_THREADS&quot;: 2,
+      &quot;platform&quot;: &quot;linux/amd64&quot;,
+      &quot;network&quot;: &quot;none&quot;,
+      &quot;pull&quot;: &quot;never&quot;,
+      &quot;source_mount&quot;: &quot;read-only&quot;
+    },
+    &quot;source_manifest_sha256&quot;: &quot;37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb&quot;,
+    &quot;mapping_manifest_sha256&quot;: &quot;9408f53865e1f3d862344f0361878c343004338a7f9b06df463b27306661a09b&quot;
+  },
+  &quot;source&quot;: {
+    &quot;kind&quot;: &quot;local study manifest&quot;,
+    &quot;repository&quot;: null,
+    &quot;commit&quot;: null,
+    &quot;manifest_sha256&quot;: &quot;37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb&quot;
+  },
+  &quot;original_orchestrator&quot;: {
+    &quot;repository&quot;: &quot;https://github.com/kyuhank/fisheries-workflow-demo&quot;,
+    &quot;commit&quot;: &quot;819c67034625b9a30b4196fd5ec17b0c74f60ba7&quot;,
+    &quot;scope&quot;: &quot;unchanged copied core; separate declarations and adapter&quot;
+  },
+  &quot;outputs&quot;: {
+    &quot;output.json&quot;: &quot;4650cb660649c314e4aa45cadf3b69d134cbd7dcdf8312e1191b1e8a52e6b6df&quot;
+  },
+  &quot;log&quot;: [
+    &quot;Validate source-scale natural-log annual predictions and actual producer links before comparison.&quot;
+  ]
+}</pre></details></body></html>

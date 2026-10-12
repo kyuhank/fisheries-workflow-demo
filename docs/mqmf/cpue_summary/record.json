@@ -1,0 +1,648 @@
+{
+  "schema_version": 1,
+  "job": "cpue_summary",
+  "owner": "Study receiving wrapper",
+  "run_id": "Run 002",
+  "signature": "f3d58c6166340fc5679a867fa37fed2cad72454f2923a86bfe3f1f82ff57a8a3",
+  "settings": {
+    "absolute": 1e-12,
+    "relative": 1e-12
+  },
+  "snapshot": 2008,
+  "code": {
+    "workflow/__init__.py": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09",
+    "workflow/engine.py": "08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb",
+    "workflow/spec.py": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127",
+    "workflow/sources.py": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd",
+    "workflow/contracts.py": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b",
+    "workflow/reports.py": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
+    "workflow/quarto_reports.py": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d",
+    "workflow/r_bridge.py": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
+    "workflow/r_driver.R": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039",
+    "workflow/Makefile": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+    "workflow/r/common.R": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
+    "workflow/jobs.json": "4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710",
+    "workflow/study_adapter.py": "3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2",
+    "workflow/r/study.R": "5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a",
+    "prepare-inputs.R": "6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449",
+    "run-study.py": "0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1",
+    "study-case.json": "7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63",
+    "workflow/offline.py": "e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788",
+    "runtime-preservation.json": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197",
+    "upstream/origins.json": "6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc",
+    "study.sh": "940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb",
+    "jobs/cpue_summary/run.R": "e364d4b4d157f44f3a499981d87604d69e43f9e2c215e91fbe6cd114f44afa97"
+  },
+  "software": {
+    "r": "4.6.0",
+    "r_platform": "x86_64-pc-linux-gnu",
+    "quarto": "1.9.37",
+    "jsonlite": "2.0.0",
+    "RTMB": "2.0",
+    "TMB": "1.9.25",
+    "knitr": "1.52",
+    "rmarkdown": "2.32",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "container_url": "https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow",
+    "python": "3.12.3",
+    "platform": "linux",
+    "runtime": "Rscript in protected SPC container",
+    "adapter_runtime": "CPython",
+    "study": "MQMF unchanged simpspm adoption"
+  },
+  "file_inputs": {},
+  "source_closure": {
+    "workflow/__init__.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/__init__.py",
+      "sha256": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09",
+      "bytes": 82
+    },
+    "workflow/engine.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/engine.py",
+      "sha256": "08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb",
+      "bytes": 27115
+    },
+    "workflow/spec.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/spec.py",
+      "sha256": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127",
+      "bytes": 3898
+    },
+    "workflow/sources.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/sources.py",
+      "sha256": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd",
+      "bytes": 15075
+    },
+    "workflow/contracts.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/contracts.py",
+      "sha256": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b",
+      "bytes": 4095
+    },
+    "workflow/reports.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/reports.py",
+      "sha256": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
+      "bytes": 31344
+    },
+    "workflow/quarto_reports.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/quarto_reports.py",
+      "sha256": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d",
+      "bytes": 2220
+    },
+    "workflow/r_bridge.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/r_bridge.py",
+      "sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
+      "bytes": 4576
+    },
+    "workflow/r_driver.R": {
+      "path": "closure/Run_002/cpue_summary/workflow/r_driver.R",
+      "sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039",
+      "bytes": 4590
+    },
+    "workflow/Makefile": {
+      "path": "closure/Run_002/cpue_summary/workflow/Makefile",
+      "sha256": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+      "bytes": 306
+    },
+    "workflow/r/common.R": {
+      "path": "closure/Run_002/cpue_summary/workflow/r/common.R",
+      "sha256": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
+      "bytes": 4816
+    },
+    "workflow/jobs.json": {
+      "path": "closure/Run_002/cpue_summary/workflow/jobs.json",
+      "sha256": "4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710",
+      "bytes": 1327
+    },
+    "workflow/study_adapter.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/study_adapter.py",
+      "sha256": "3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2",
+      "bytes": 21361
+    },
+    "workflow/r/study.R": {
+      "path": "closure/Run_002/cpue_summary/workflow/r/study.R",
+      "sha256": "5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a",
+      "bytes": 8716
+    },
+    "prepare-inputs.R": {
+      "path": "closure/Run_002/cpue_summary/prepare-inputs.R",
+      "sha256": "6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449",
+      "bytes": 1475
+    },
+    "run-study.py": {
+      "path": "closure/Run_002/cpue_summary/run-study.py",
+      "sha256": "0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1",
+      "bytes": 15256
+    },
+    "study-case.json": {
+      "path": "closure/Run_002/cpue_summary/study-case.json",
+      "sha256": "7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63",
+      "bytes": 2934
+    },
+    "workflow/offline.py": {
+      "path": "closure/Run_002/cpue_summary/workflow/offline.py",
+      "sha256": "e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788",
+      "bytes": 19898
+    },
+    "runtime-preservation.json": {
+      "path": "closure/Run_002/cpue_summary/runtime-preservation.json",
+      "sha256": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197",
+      "bytes": 1449
+    },
+    "upstream/origins.json": {
+      "path": "closure/Run_002/cpue_summary/upstream/origins.json",
+      "sha256": "6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc",
+      "bytes": 9063
+    },
+    "study.sh": {
+      "path": "closure/Run_002/cpue_summary/study.sh",
+      "sha256": "940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb",
+      "bytes": 2259
+    },
+    "jobs/cpue_summary/run.R": {
+      "path": "closure/Run_002/cpue_summary/jobs/cpue_summary/run.R",
+      "sha256": "e364d4b4d157f44f3a499981d87604d69e43f9e2c215e91fbe6cd114f44afa97",
+      "bytes": 126
+    },
+    "source-manifest.json": {
+      "path": "closure/Run_002/cpue_summary/source-manifest.json",
+      "sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb",
+      "bytes": 19731
+    }
+  },
+  "inputs": {
+    "cpue_b": {
+      "run_id": "Run 001",
+      "signature": "64e07c2213c0d489fb2c8f3646f8ac0404cb81fc3d118920c55b1d751b47b39d",
+      "record_path": "cpue_b/record.json",
+      "record_checksum": "8f841b2b51ee07f432b7c151848e1cd92e86661fbc80ba09f13c93435bb8f479",
+      "checksum": "52a52fc3b5477404051caa7a7de9bd30e9d964febd7b00efd94bef33b4372a03",
+      "producer": {
+        "case": "baseline",
+        "execution_id": "8904c1fe-5db2-45d6-b032-1cd171009b96",
+        "external_function": {
+          "bytes": 63244,
+          "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+          "function": "simpspm",
+          "git_blob_sha1": "21bfcbccb6c85a8ed59cee43c7838498431829c5",
+          "licence": "GPL-3",
+          "path": "R/spm.r",
+          "repository": "https://github.com/haddonm/MQMF",
+          "sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a",
+          "unchanged_copy": true,
+          "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/R/spm.r"
+        },
+        "job": "cpue_b",
+        "parameter_file": {
+          "path": "parameters/reference.json",
+          "sha256": "c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326"
+        },
+        "raw_input": {
+          "bytes": 502,
+          "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+          "git_blob_sha1": "9fac454a95e9d4c55295b16984b23829f4e87ddb",
+          "licence": "GPL-3",
+          "path": "data/abdat.RData",
+          "repository": "https://github.com/haddonm/MQMF",
+          "sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+          "unchanged_copy": true,
+          "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/data/abdat.RData"
+        },
+        "run_directory": "/evidence/mqmf-study/selective",
+        "run_id": "Run 001",
+        "signature": "64e07c2213c0d489fb2c8f3646f8ac0404cb81fc3d118920c55b1d751b47b39d",
+        "wrapper": {
+          "commit": null,
+          "kind": "local study file bytes",
+          "manifest_sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb",
+          "path": "jobs/cpue_b/run.R",
+          "repository": null,
+          "sha256": "4c9ebf875ed8d3c6730417d8952fca9c03d7b3111d6ed79c16fabce914dcbe8b"
+        }
+      },
+      "settings": {
+        "Binit": 3400,
+        "K": 9400,
+        "r": 0.4,
+        "schaefer": true,
+        "sigma": 0.05
+      },
+      "file_inputs": {
+        "external/MQMF/data/abdat.RData": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+        "parameters/reference.json": "c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326"
+      },
+      "source_closure": {
+        "external/MQMF/R/spm.r": {
+          "bytes": 63244,
+          "path": "closure/Run_001/cpue_b/external/MQMF/R/spm.r",
+          "sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a"
+        },
+        "external/MQMF/data/abdat.RData": {
+          "bytes": 502,
+          "path": "closure/Run_001/cpue_b/external/MQMF/data/abdat.RData",
+          "sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d"
+        },
+        "jobs/cpue_b/run.R": {
+          "bytes": 155,
+          "path": "closure/Run_001/cpue_b/jobs/cpue_b/run.R",
+          "sha256": "4c9ebf875ed8d3c6730417d8952fca9c03d7b3111d6ed79c16fabce914dcbe8b"
+        },
+        "parameters/reference.json": {
+          "bytes": 82,
+          "path": "closure/Run_001/cpue_b/parameters/reference.json",
+          "sha256": "c6895c7a594cb9fab9510a64f4022923955617ba392c065f45de426ccf5ff326"
+        },
+        "prepare-inputs.R": {
+          "bytes": 1475,
+          "path": "closure/Run_001/cpue_b/prepare-inputs.R",
+          "sha256": "6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449"
+        },
+        "run-study.py": {
+          "bytes": 15256,
+          "path": "closure/Run_001/cpue_b/run-study.py",
+          "sha256": "0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1"
+        },
+        "runtime-preservation.json": {
+          "bytes": 1449,
+          "path": "closure/Run_001/cpue_b/runtime-preservation.json",
+          "sha256": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197"
+        },
+        "source-manifest.json": {
+          "bytes": 19731,
+          "path": "closure/Run_001/cpue_b/source-manifest.json",
+          "sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb"
+        },
+        "study-case.json": {
+          "bytes": 2934,
+          "path": "closure/Run_001/cpue_b/study-case.json",
+          "sha256": "7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63"
+        },
+        "study.sh": {
+          "bytes": 2259,
+          "path": "closure/Run_001/cpue_b/study.sh",
+          "sha256": "940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb"
+        },
+        "upstream/origins.json": {
+          "bytes": 9063,
+          "path": "closure/Run_001/cpue_b/upstream/origins.json",
+          "sha256": "6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc"
+        },
+        "workflow/Makefile": {
+          "bytes": 306,
+          "path": "closure/Run_001/cpue_b/workflow/Makefile",
+          "sha256": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157"
+        },
+        "workflow/__init__.py": {
+          "bytes": 82,
+          "path": "closure/Run_001/cpue_b/workflow/__init__.py",
+          "sha256": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09"
+        },
+        "workflow/contracts.py": {
+          "bytes": 4095,
+          "path": "closure/Run_001/cpue_b/workflow/contracts.py",
+          "sha256": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b"
+        },
+        "workflow/engine.py": {
+          "bytes": 27115,
+          "path": "closure/Run_001/cpue_b/workflow/engine.py",
+          "sha256": "08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb"
+        },
+        "workflow/jobs.json": {
+          "bytes": 1327,
+          "path": "closure/Run_001/cpue_b/workflow/jobs.json",
+          "sha256": "4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710"
+        },
+        "workflow/offline.py": {
+          "bytes": 19898,
+          "path": "closure/Run_001/cpue_b/workflow/offline.py",
+          "sha256": "e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788"
+        },
+        "workflow/quarto_reports.py": {
+          "bytes": 2220,
+          "path": "closure/Run_001/cpue_b/workflow/quarto_reports.py",
+          "sha256": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d"
+        },
+        "workflow/r/common.R": {
+          "bytes": 4816,
+          "path": "closure/Run_001/cpue_b/workflow/r/common.R",
+          "sha256": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191"
+        },
+        "workflow/r/study.R": {
+          "bytes": 8716,
+          "path": "closure/Run_001/cpue_b/workflow/r/study.R",
+          "sha256": "5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a"
+        },
+        "workflow/r_bridge.py": {
+          "bytes": 4576,
+          "path": "closure/Run_001/cpue_b/workflow/r_bridge.py",
+          "sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93"
+        },
+        "workflow/r_driver.R": {
+          "bytes": 4590,
+          "path": "closure/Run_001/cpue_b/workflow/r_driver.R",
+          "sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039"
+        },
+        "workflow/reports.py": {
+          "bytes": 31344,
+          "path": "closure/Run_001/cpue_b/workflow/reports.py",
+          "sha256": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c"
+        },
+        "workflow/sources.py": {
+          "bytes": 15075,
+          "path": "closure/Run_001/cpue_b/workflow/sources.py",
+          "sha256": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd"
+        },
+        "workflow/spec.py": {
+          "bytes": 3898,
+          "path": "closure/Run_001/cpue_b/workflow/spec.py",
+          "sha256": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127"
+        },
+        "workflow/study_adapter.py": {
+          "bytes": 21361,
+          "path": "closure/Run_001/cpue_b/workflow/study_adapter.py",
+          "sha256": "3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2"
+        }
+      }
+    },
+    "cpue_a": {
+      "run_id": "Run 002",
+      "signature": "b8e52558cfe9db4c2e9c4229872280a92568946c9a7234a4c065e75ff3537da6",
+      "record_path": "cpue_a/record.json",
+      "record_checksum": "ed1b3d9f1dc56cfc15ce79f521820666cf7e1b357c5135ae10cdb80e9a2e1af6",
+      "checksum": "c75054e1dc17234da0783eb64c746f3afe08ac7c80d535a2a0a8dbbae3ec44b8",
+      "producer": {
+        "case": "update",
+        "execution_id": "8904c1fe-5db2-45d6-b032-1cd171009b96",
+        "external_function": {
+          "bytes": 63244,
+          "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+          "function": "simpspm",
+          "git_blob_sha1": "21bfcbccb6c85a8ed59cee43c7838498431829c5",
+          "licence": "GPL-3",
+          "path": "R/spm.r",
+          "repository": "https://github.com/haddonm/MQMF",
+          "sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a",
+          "unchanged_copy": true,
+          "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/R/spm.r"
+        },
+        "job": "cpue_a",
+        "parameter_file": {
+          "path": "parameters/active-revised.json",
+          "sha256": "c5b11804987a02c35e14402507d84d66c8f7f9819952eab50b1cc5b514c7da6a"
+        },
+        "raw_input": {
+          "bytes": 502,
+          "commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+          "git_blob_sha1": "9fac454a95e9d4c55295b16984b23829f4e87ddb",
+          "licence": "GPL-3",
+          "path": "data/abdat.RData",
+          "repository": "https://github.com/haddonm/MQMF",
+          "sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+          "unchanged_copy": true,
+          "url": "https://raw.githubusercontent.com/haddonm/MQMF/f171966258b9dd8d6cdfcc150930cdb45d23cf65/data/abdat.RData"
+        },
+        "run_directory": "/evidence/mqmf-study/selective",
+        "run_id": "Run 002",
+        "signature": "b8e52558cfe9db4c2e9c4229872280a92568946c9a7234a4c065e75ff3537da6",
+        "wrapper": {
+          "commit": null,
+          "kind": "local study file bytes",
+          "manifest_sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb",
+          "path": "jobs/cpue_a/run.R",
+          "repository": null,
+          "sha256": "545d5f9e26c19caef73614c3032de00068f4535ee42c1d0ef41a4e48e89e0f73"
+        }
+      },
+      "settings": {
+        "r": 0.35,
+        "K": 9400,
+        "Binit": 3400,
+        "sigma": 0.05,
+        "schaefer": true
+      },
+      "file_inputs": {
+        "external/MQMF/data/abdat.RData": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+        "parameters/active-revised.json": "c5b11804987a02c35e14402507d84d66c8f7f9819952eab50b1cc5b514c7da6a",
+        "mapped/abdat.csv": "d053be7a81101f0b8a2bae2478be734b8fb67ffe2e34aacfe09d1b553207cdd8",
+        "mapped/abdat.json": "efd3ee71d18f9b33771bb28ea9df0a1b72633809266493a0ca5c5160d4dfe211",
+        "mapped/mapping-manifest.json": "9408f53865e1f3d862344f0361878c343004338a7f9b06df463b27306661a09b"
+      },
+      "source_closure": {
+        "workflow/__init__.py": {
+          "path": "closure/Run_002/cpue_a/workflow/__init__.py",
+          "sha256": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09",
+          "bytes": 82
+        },
+        "workflow/engine.py": {
+          "path": "closure/Run_002/cpue_a/workflow/engine.py",
+          "sha256": "08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb",
+          "bytes": 27115
+        },
+        "workflow/spec.py": {
+          "path": "closure/Run_002/cpue_a/workflow/spec.py",
+          "sha256": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127",
+          "bytes": 3898
+        },
+        "workflow/sources.py": {
+          "path": "closure/Run_002/cpue_a/workflow/sources.py",
+          "sha256": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd",
+          "bytes": 15075
+        },
+        "workflow/contracts.py": {
+          "path": "closure/Run_002/cpue_a/workflow/contracts.py",
+          "sha256": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b",
+          "bytes": 4095
+        },
+        "workflow/reports.py": {
+          "path": "closure/Run_002/cpue_a/workflow/reports.py",
+          "sha256": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
+          "bytes": 31344
+        },
+        "workflow/quarto_reports.py": {
+          "path": "closure/Run_002/cpue_a/workflow/quarto_reports.py",
+          "sha256": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d",
+          "bytes": 2220
+        },
+        "workflow/r_bridge.py": {
+          "path": "closure/Run_002/cpue_a/workflow/r_bridge.py",
+          "sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
+          "bytes": 4576
+        },
+        "workflow/r_driver.R": {
+          "path": "closure/Run_002/cpue_a/workflow/r_driver.R",
+          "sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039",
+          "bytes": 4590
+        },
+        "workflow/Makefile": {
+          "path": "closure/Run_002/cpue_a/workflow/Makefile",
+          "sha256": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+          "bytes": 306
+        },
+        "workflow/r/common.R": {
+          "path": "closure/Run_002/cpue_a/workflow/r/common.R",
+          "sha256": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
+          "bytes": 4816
+        },
+        "workflow/jobs.json": {
+          "path": "closure/Run_002/cpue_a/workflow/jobs.json",
+          "sha256": "4bbf5b08dcfef8366970d76838fc3126425da08e7485f87abe748d8ac59bc710",
+          "bytes": 1327
+        },
+        "workflow/study_adapter.py": {
+          "path": "closure/Run_002/cpue_a/workflow/study_adapter.py",
+          "sha256": "3f22227dc8071e56157c2d6b50daf2652d063f47c8d3b8b6a5ddd0ee18ea14a2",
+          "bytes": 21361
+        },
+        "workflow/r/study.R": {
+          "path": "closure/Run_002/cpue_a/workflow/r/study.R",
+          "sha256": "5323979f712734d34ae3d7ef13ded2eabd4d472dff5c200ebfb413bd7932062a",
+          "bytes": 8716
+        },
+        "prepare-inputs.R": {
+          "path": "closure/Run_002/cpue_a/prepare-inputs.R",
+          "sha256": "6b08019bf68a807fe1ef0c39f896e84802b7cbf55a839bacb97cb993e72a2449",
+          "bytes": 1475
+        },
+        "run-study.py": {
+          "path": "closure/Run_002/cpue_a/run-study.py",
+          "sha256": "0afa4343e0e942275384e4f2e4676072c01d049da7f9afc12fb828f143d24fc1",
+          "bytes": 15256
+        },
+        "study-case.json": {
+          "path": "closure/Run_002/cpue_a/study-case.json",
+          "sha256": "7ba69411cc3c8f5f42c83e0cd2dd2aeab3b738378f563ee049f4cd14f3e6df63",
+          "bytes": 2934
+        },
+        "workflow/offline.py": {
+          "path": "closure/Run_002/cpue_a/workflow/offline.py",
+          "sha256": "e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788",
+          "bytes": 19898
+        },
+        "runtime-preservation.json": {
+          "path": "closure/Run_002/cpue_a/runtime-preservation.json",
+          "sha256": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197",
+          "bytes": 1449
+        },
+        "upstream/origins.json": {
+          "path": "closure/Run_002/cpue_a/upstream/origins.json",
+          "sha256": "6faf00a3c752c8d352f3a592a122cb149ddca4d7b6340502d7f806c880bbbacc",
+          "bytes": 9063
+        },
+        "study.sh": {
+          "path": "closure/Run_002/cpue_a/study.sh",
+          "sha256": "940bd5b48ba2b1444d6be2b4554f65784347bdcc6a3b8f86af457f1e6577b9bb",
+          "bytes": 2259
+        },
+        "jobs/cpue_a/run.R": {
+          "path": "closure/Run_002/cpue_a/jobs/cpue_a/run.R",
+          "sha256": "545d5f9e26c19caef73614c3032de00068f4535ee42c1d0ef41a4e48e89e0f73",
+          "bytes": 156
+        },
+        "external/MQMF/R/spm.r": {
+          "path": "closure/Run_002/cpue_a/external/MQMF/R/spm.r",
+          "sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a",
+          "bytes": 63244
+        },
+        "source-manifest.json": {
+          "path": "closure/Run_002/cpue_a/source-manifest.json",
+          "sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb",
+          "bytes": 19731
+        },
+        "external/MQMF/data/abdat.RData": {
+          "path": "closure/Run_002/cpue_a/external/MQMF/data/abdat.RData",
+          "sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d",
+          "bytes": 502
+        },
+        "parameters/active-revised.json": {
+          "path": "closure/Run_002/cpue_a/parameters/active-revised.json",
+          "sha256": "c5b11804987a02c35e14402507d84d66c8f7f9819952eab50b1cc5b514c7da6a",
+          "bytes": 83
+        },
+        "mapped/abdat.csv": {
+          "path": "closure/Run_002/cpue_a/mapped/abdat.csv",
+          "sha256": "d053be7a81101f0b8a2bae2478be734b8fb67ffe2e34aacfe09d1b553207cdd8",
+          "bytes": 625
+        },
+        "mapped/abdat.json": {
+          "path": "closure/Run_002/cpue_a/mapped/abdat.json",
+          "sha256": "efd3ee71d18f9b33771bb28ea9df0a1b72633809266493a0ca5c5160d4dfe211",
+          "bytes": 967
+        },
+        "mapped/mapping-manifest.json": {
+          "path": "closure/Run_002/cpue_a/mapped/mapping-manifest.json",
+          "sha256": "9408f53865e1f3d862344f0361878c343004338a7f9b06df463b27306661a09b",
+          "bytes": 2806
+        }
+      }
+    }
+  },
+  "execution": {
+    "actual_route": "Local Docker",
+    "actual_client": "offline study runner",
+    "execution_id": "8904c1fe-5db2-45d6-b032-1cd171009b96",
+    "case": "update",
+    "reader": "registered Local validation",
+    "runtime_verification": {
+      "schema_version": 1,
+      "upstream_registry_digest": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+      "config_id": "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158",
+      "platform": "linux/amd64",
+      "rootfs_diff_ids": [
+        "sha256:98effb2dfe85d4c431f97d90482075f19e5fc3a57c2dd423d8bdfd4813620043",
+        "sha256:613659109016edd06de370f7bc2025e102bdcddaeac9de63a7b539d8bf3b1ae1",
+        "sha256:0b37a25965e9e9119a64e622f3101c8b7ef9f6eacab3a6dd9a4b062e9550f948",
+        "sha256:b52c4fe3ae39d7f3c34a04f72ac1e8ea873cbb9645bd2ea9bfe58f841059b60b",
+        "sha256:26cd91d7da066e47b7463ffd3d6e1795f3ba2d036f4a078b73cf3579830bc009",
+        "sha256:3a4afdc4e1d09235c386e112b3f8c8779ca06dcdeac06099001ba3260d49639d",
+        "sha256:853a19e9d9bf3fee97141848b791a845454f147bf9a3c61707b124c676288c6c",
+        "sha256:56accf9e26339a6b30b33f4f17954bb9931861898b4e82f41fc3ddce60c59f54",
+        "sha256:9d662917e398066bfc676c31a09d46648e38baf92db0ef55a76f1ae800732fca",
+        "sha256:655fde5934fb72434f5b0212542cb467d110a5d8c9e6fc2c8d5304643245afd3",
+        "sha256:616cadc63d516bc79ef6ffd13f95736739bdd9f8711ed03f93228276e318f545",
+        "sha256:60860921f93d2910563d7bb8e2bdcc06b93f70698e6e5c63b96de67f8dbb0700"
+      ],
+      "identity_note": "Docker save/load may omit registry RepoDigests. Verify and launch the config ID with these ordered rootfs diff IDs; the upstream digest remains a source pin.",
+      "launch_reference": "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158",
+      "local_repo_digests": [
+        "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+      ],
+      "upstream_reference_present_locally": true,
+      "verification_basis": "config ID, platform and ordered rootfs diff IDs",
+      "registry_digest_verified_locally": true,
+      "pull_policy": "never",
+      "network": "none"
+    },
+    "resources_declared_by_launcher": {
+      "cpus": 2,
+      "memory_bytes": 4294967296,
+      "OMP_NUM_THREADS": 2,
+      "platform": "linux/amd64",
+      "network": "none",
+      "pull": "never",
+      "source_mount": "read-only"
+    },
+    "source_manifest_sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb",
+    "mapping_manifest_sha256": "9408f53865e1f3d862344f0361878c343004338a7f9b06df463b27306661a09b"
+  },
+  "source": {
+    "kind": "local study manifest",
+    "repository": null,
+    "commit": null,
+    "manifest_sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb"
+  },
+  "original_orchestrator": {
+    "repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+    "scope": "unchanged copied core; separate declarations and adapter"
+  },
+  "outputs": {
+    "output.json": "4650cb660649c314e4aa45cadf3b69d134cbd7dcdf8312e1191b1e8a52e6b6df",
+    "report.html": "bcf85311707cee4deb113e78790e53f03c3548881d7755e22fc5c42ed71694c1"
+  },
+  "log": [
+    "Validate source-scale natural-log annual predictions and actual producer links before comparison."
+  ],
+  "report_rendering": {
+    "engine": "study HTML",
+    "source": "workflow/study_adapter.py",
+    "quarto_executed": false
+  }
+}

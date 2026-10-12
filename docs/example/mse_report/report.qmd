@@ -4,18 +4,35 @@ lang: en-NZ
 format:
   html:
     embed-resources: true
-    toc: true
-    theme: cosmo
+    toc: false
+    theme: none
 execute:
   echo: false
   warning: false
   message: false
 ---
 
-Synthetic fisheries workflow. This report is rendered by Quarto from preserved R outputs.
+<style>
+body { max-width: 880px; margin: 32px auto; padding: 0 20px; font: 16px/1.6 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 28px; line-height: 1.2; }
+h2 { font-size: 20px; margin-top: 28px; }
+a { color: #1779a0; overflow-wrap: anywhere; }
+img, svg { max-width: 100%; height: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid #dde5eb; text-align: left; }
+th { background: #f3f6f8; }
+.cell-output-display { overflow-x: auto; }
+pre { padding: 14px; background: #f3f6f8; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+details { margin: 18px 0; }
+summary { cursor: pointer; font-weight: 600; color: #316985; }
+</style>
+
+Compare catch, biomass and catch stability for three rules under the same simulated future conditions.
+
+**Path:** Four fitted cases → shared trials and catch rules → management comparison.
 
 ```{r}
-# Read preserved results. Report rendering performs no model fitting.
+# Read saved results without fitting or simulating again.
 payload <- jsonlite::fromJSON("report-data.json", simplifyVector = FALSE)
 result <- payload$result
 record <- payload$record
@@ -35,13 +52,61 @@ plot_series <- function(series, field, label) {
   legend("topright", names(series), col = colours[seq_along(series)], lty = 1, bty = "n")
 }
 ```
+
 ## Methods
 
-Four fitted Schaefer cases supply starting biomass, carrying capacity, growth and catchability. Three catch rules face the same saved R growth and observation error streams: constant catch, an index rule and a buffered rule. Each trial observes an index with error, sets catch and updates biomass using surplus production and removals. The index rules see a three-year observed mean rather than true biomass. Realised catch is capped at 0.4 times starting biomass, and realised intrinsic growth is capped at 1 per year. Surplus production uses starting biomass; catch is then removed in the same annual recurrence.
 
-Each rule runs for **`r result$assumptions$years` years**, with **`r result$assumptions$replicates` trials** per case and scenario. One scenario keeps the growth multiplier at one; the other uses 0.7 for six years, then returns to one. The underlying mean-one lognormal growth and observation perturbations have coefficients of variation `r result$assumptions$growth_cv` and `r result$assumptions$observation_cv`, before the growth cap is applied. The preparation result preserves seeds, RNG settings and the actual paired error vectors.
+```{r}
+#| results: asis
+if (!is.null(record$data_source)) {
+  cat("**Input index:** ", record$data_source$cpue_scope,
+      ". **Annual catch:** ", record$data_source$catch_scope, ".\n\n", sep = "")
+  cat("The selected Fiji fleet index is not a validated stock-wide abundance index. ",
+      "Using it with stock-wide catches is a teaching assumption.\n\n", sep = "")
+} else {
+  cat("The supplied index and catches define this teaching example; ",
+      "inspect the producing records for their data scope.\n\n", sep = "")
+}
+```
+
+Four fitted Schaefer cases supply starting biomass, capacity, growth and
+catchability. Constant catch, an index rule and a buffered rule use the same
+saved growth and observation errors for **`r result$assumptions$years` years**,
+with **`r result$assumptions$replicates` trials** per case and scenario.
+Each year, observe an index → set catch → update biomass → observe again.
+The index rules use a three-year observed mean.
+
+**Shared guardrail:** realised catch is capped at
+`r 100 * result$assumptions$maximum_harvest_rate`% of true starting biomass.
+This simulator safeguard uses biomass unavailable to the index rules; every
+rule's biomass and low-biomass statistics are conditional on that guardrail.
+Growth is capped at `r result$assumptions$maximum_growth_rate` per year.
 
 ## Results
+
+```{r}
+# Use the recorded rule order for consistent colours in every plot.
+rule_names <- vapply(result$metrics, function(row) row$name, character(1))
+plot_series(result$series[rule_names], "B_over_K", "Median end-year biomass / carrying capacity")
+```
+
+Compare biomass alongside realised catch and annual catch changes. These
+conditional trials provide neither calibrated risk estimates nor evidence that
+a rule would be safe without the shared harvest guardrail. Fixed case differences
+do not include assessment parameter uncertainty or select a rule for a real fishery.
+
+```{r}
+#| results: asis
+if (length(result$boundary_cases)) {
+  cat("**Review needed:** assessment search boundaries were reached for ",
+      paste(unlist(result$boundary_cases), collapse = ", "), ".\n\n", sep = "")
+}
+if (any(vapply(result$metrics, function(row) row$shortfall_trials > 0, logical(1)))) {
+  cat("Some requested catches exceeded the harvest guardrail. Metrics use realised catches.\n\n")
+}
+```
+
+<details><summary>Catch, biomass and catch stability</summary>
 
 ```{r}
 metrics <- lapply(result$metrics, function(row) {
@@ -51,30 +116,66 @@ metrics <- lapply(result$metrics, function(row) {
        catch_change_percent = row$catch_change_percent)
 })
 knitr::kable(rows_frame(metrics), digits = 3)
+```
+
+Mean catch is in tonnes per year; final B/K is the median across trials. The
+threshold column counts trials below `r result$assumptions$depletion_threshold`
+of carrying capacity at any time. Catch change includes the first change from
+reference catch. Cases and scenarios have equal weight, not estimated probabilities.
+
+</details>
+
+<details><summary>Trajectories by growth scenario</summary>
+
+```{r}
 for (scenario in result$scenarios) {
-  plot_series(scenario$series, "B_over_K", paste(scenario$name, "— median end-year biomass / K"))
-  plot_series(scenario$series, "catch_t", paste(scenario$name, "— median realised catch (tonnes)"))
+  series <- scenario$series[rule_names]
+  plot_series(series, "B_over_K", paste(scenario$name, "— median end-year biomass / K"))
+  plot_series(series, "catch_t", paste(scenario$name, "— median realised catch (tonnes)"))
 }
 ```
 
-Final biomass is a median over trials. The threshold statistic counts trials that crossed 0.2 of carrying capacity, an illustrative comparison level. Catch change includes the first change from the reference catch. Cases and scenarios receive equal comparison weight; they are not estimated probabilities.
+</details>
 
-## Interpretation
+<details><summary>Trial assumptions and limits</summary>
 
-Compare catch, biomass and catch stability together. These trials show how each decision affects the stock and future observations. They do not select a preferred rule for a real fishery. The comparison inherits the fitted starting states and fixed assumptions and does not include assessment parameter uncertainty.
+One scenario keeps the growth multiplier at one. The other uses 0.7 for six
+years, then returns to one. Mean-one lognormal growth and observation errors
+have coefficients of variation `r result$assumptions$growth_cv` and
+`r result$assumptions$observation_cv` before the growth cap is applied. The
+preparation result preserves seeds, RNG settings and actual paired error vectors.
+Surplus production uses starting biomass; realised catch is then removed.
 
 ```{r}
 #| results: asis
 for (limitation in result$limitations) cat("- ", limitation, "\n", sep = "")
-if (length(result$boundary_cases)) {
-  cat("\nBoundary fits used as operating models: ",
-      paste(unlist(result$boundary_cases), collapse = ", "), ".\n", sep = "")
-}
 ```
+
+</details>
 
 ## Analysis record
 
-Produced in **`r record$run_id`**. Each input below keeps its original run and output checksum.
+Produced in **`r record$run_id`**. Retained inputs keep their original producing runs.
+
+```{r}
+#| results: asis
+if (!is.null(record$execution$provider)) {
+  cat("Execution: ", record$execution$provider, ".\n\n", sep = "")
+}
+cat("Calculation image: `", record$software$container, "`\n\n", sep = "")
+if (!is.null(record$software$container_url)) {
+  cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
+}
+for (key in c("source", "analysis_source")) {
+  source <- record[[key]]
+  if (!is.null(source$repository) && !is.null(source$commit)) {
+    cat("[", key, " at ", substr(source$commit, 1, 8), "](",
+        source$repository, "/commit/", source$commit, ")\n\n", sep = "")
+  }
+}
+```
+
+<details><summary>Inputs, settings and software</summary>
 
 ```{r}
 inputs <- lapply(names(record$inputs), function(key) {
@@ -82,29 +183,19 @@ inputs <- lapply(names(record$inputs), function(key) {
        output_sha256 = record$inputs[[key]]$checksum)
 })
 if (length(inputs)) knitr::kable(rows_frame(inputs))
-```
-
-New calculations and this Quarto report run inside the declared container. The downloadable bundle includes the actual R job, shared R sources, this QMD, the preserved result JSON, settings and checksums.
-
-```{r}
 software <- lapply(names(record$software), function(key) {
   list(component = key, value = as.character(record$software[[key]]))
 })
 knitr::kable(rows_frame(software))
 ```
 
+The run bundle preserves the R jobs, libraries, this QMD, result JSON, settings
+and checksums.
+
 ```{r}
 #| results: asis
-image <- record$software$container
-cat("Calculation image and digest: `", image, "`\n\n", sep = "")
-if (!is.null(record$software$container_url)) {
-  cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
-}
-if (!is.null(record$source$repository) && !is.null(record$source$commit)) {
-  commit_url <- paste0(record$source$repository, "/commit/", record$source$commit)
-  cat("[", commit_url, "](", commit_url, ")\n\n", sep = "")
-}
-cat("<details><summary>Full preserved input record</summary>\n\n```json\n",
-    jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),
-    "\n```\n\n</details>\n", sep = "")
+cat("```json\n", jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),
+    "\n```\n", sep = "")
 ```
+
+</details>

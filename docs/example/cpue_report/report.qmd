@@ -4,21 +4,39 @@ lang: en-NZ
 format:
   html:
     embed-resources: true
-    toc: true
-    theme: cosmo
+    toc: false
+    theme: none
 execute:
   echo: false
   warning: false
   message: false
 ---
 
-Synthetic fisheries workflow. This report is rendered by Quarto from preserved R outputs.
+<style>
+body { max-width: 880px; margin: 32px auto; padding: 0 20px; font: 16px/1.6 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 28px; line-height: 1.2; }
+h2 { font-size: 20px; margin-top: 28px; }
+a { color: #1779a0; overflow-wrap: anywhere; }
+img, svg { max-width: 100%; height: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid #dde5eb; text-align: left; }
+th { background: #f3f6f8; }
+.cell-output-display { overflow-x: auto; }
+pre { padding: 14px; background: #f3f6f8; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+details { margin: 18px 0; }
+summary { cursor: pointer; font-weight: 600; color: #316985; }
+</style>
+
+Compare annual CPUE indices from the two saved analyses.
+
+**Path:** Catch and effort rows → adjusted and year-only GLMs → annual index comparison.
 
 ```{r}
 # Read preserved results. Report rendering performs no model fitting.
 payload <- jsonlite::fromJSON("report-data.json", simplifyVector = FALSE)
 result <- payload$result
 record <- payload$record
+public <- identical(result$data_kind, "public-wcpfc")
 rows_frame <- function(rows) {
   do.call(rbind, lapply(rows, function(row) as.data.frame(row, stringsAsFactors = FALSE)))
 }
@@ -37,7 +55,51 @@ plot_series <- function(series, field, label) {
 ```
 ## Methods
 
-Analysis A fits a Poisson GLM in R with year and vessel effects; analysis B uses year effects only. Both include the log of hooks divided by 1000 as an offset. Predictions at fixed effort and reference vessel are scaled to one in the first year. The record filter belongs to analysis A. This report reads the two saved indices.
+```{r}
+#| results: asis
+if (public) {
+  cat("Analysis A fits a quasipoisson GLM with year and cell–quarter effects. ",
+      "Analysis B uses year effects only. Both use a log link and ",
+      "log(hooks / 1000) as an offset. Predictions at 1000 hooks are averaged ",
+      "on the response scale over the same strata with equal weights in every year. ",
+      "Each index is divided by its first-year prediction. ",
+      "The effort filter belongs to analysis A. Released zero counts are retained.\n\n", sep = "")
+} else {
+  cat("Analysis A fits the synthetic Poisson GLM with year and vessel effects; ",
+      "analysis B uses year effects only. Both use log(hooks / 1000) as an offset. ",
+      "Predictions at 1000 hooks and the first synthetic vessel are divided by ",
+      "the first-year prediction. The effort filter belongs to analysis A.\n\n", sep = "")
+}
+```
+
+<details><summary>Model checks and prediction weights</summary>
+
+```{r}
+#| results: asis
+if (length(result$analyses)) {
+  methods <- lapply(names(result$analyses), function(name) {
+    x <- result$analyses[[name]]
+    list(analysis = name, formula = x$formula, included = x$sets_used,
+         excluded = x$sets_excluded, converged = x$converged,
+         score_residual = x$score_residual)
+  })
+  print(knitr::kable(rows_frame(methods), digits = 7))
+}
+if (public) {
+  x <- result$analyses[[1]]
+  cat("\nFixed prediction weights:\n\n")
+  print(knitr::kable(rows_frame(x$weights), digits = 4))
+  cat("\nEstimated dispersion (Pearson sum of squares / residual degrees of freedom):\n\n")
+  dispersion <- lapply(names(result$analyses), function(name) {
+    x <- result$analyses[[name]]
+    list(analysis = name, dispersion = x$dispersion,
+         residual_degrees_of_freedom = x$residual_degrees_of_freedom)
+  })
+  print(knitr::kable(rows_frame(dispersion), digits = 3))
+}
+```
+
+</details>
 
 ## Results
 
@@ -48,17 +110,46 @@ endpoints <- lapply(names(result$series), function(name) {
        final_year = tail(rows, 1)[[1]]$year,
        final_relative_CPUE = tail(rows, 1)[[1]]$index)
 })
-knitr::kable(rows_frame(endpoints), digits = 3)
 plot_series(result$series, "index", "CPUE relative to first year")
 ```
 
+<details><summary>Annual values and fish per 1,000 hooks</summary>
+
+```{r}
+knitr::kable(rows_frame(endpoints), digits = 3)
+if (public) {
+  standardised <- result$series[[1]]
+  nominal <- lapply(standardised, function(row) {
+    list(year = row$year, standardised_cpue = row$nominal_cpue)
+  })
+  plot_series(list("A: fixed strata" = standardised, "Nominal: selected records" = nominal),
+              "standardised_cpue", "Albacore per 1000 hooks")
+}
+```
+
+</details>
+
 ## Interpretation
 
-Differences between the indices reflect vessel adjustment and the selected records. These synthetic observations illustrate the workflow. The comparison does not validate either index for a real fishery.
+```{r}
+#| results: asis
+if (public) {
+  cat("Differences reflect adjustment for cell–quarter composition and any effort filter. ",
+      "The public records aggregate fleet, cell and quarter; vessel identifiers are unavailable. ",
+      "This index describes the selected fleet and released strata. It is a simple ",
+      "workflow example, with no confidence intervals or official stock assessment advice. ",
+      "Absent or suppressed values do not represent zero catch.\n\n", sep = "")
+} else {
+  cat("Differences reflect vessel adjustment and the selected synthetic records. ",
+      "This comparison illustrates the workflow and supplies no fisheries advice.\n\n", sep = "")
+}
+```
 
 ## Analysis record
 
-Produced in **`r record$run_id`**. Each input below keeps its original run and output checksum.
+Produced in **`r record$run_id`**. Each input keeps its original producing run.
+
+<details><summary>Inputs and software versions</summary>
 
 ```{r}
 inputs <- lapply(names(record$inputs), function(key) {
@@ -76,6 +167,8 @@ software <- lapply(names(record$software), function(key) {
 })
 knitr::kable(rows_frame(software))
 ```
+
+</details>
 
 ```{r}
 #| results: asis

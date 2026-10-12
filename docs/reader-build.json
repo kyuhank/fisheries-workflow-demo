@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "scope": "Reader interface assembly; no analyses, simulations or report rendering",
+  "interface_commit": "0dd53a54c5360b71e425f6c1d435968bc5a694fe",
+  "input_reader_sha256": "d6a1aaa9a9ec99cc2386f41c9d784b6aec1119dbe7a9a24b010cae7465a89119",
+  "output_reader_sha256": "5e2a2b5f5268892891976241f7382f35a2b41dc0469de5d0b4a412d96a54ce26",
+  "saved_payload_sha256": "f30c676e2ca2b771151af9468cd142528c7cf990c33ccf8ef8df0b806faa0a5e",
+  "saved_payload_unchanged": true,
+  "source_files": {
+    "app/index.html": "decacc8fb8ef3fff7a36f201ca6ca48361e0498f57e02441fbd8a046a8219492",
+    "app/style.css": "0dc01d597d39f9c086fa923b619257b5cf41bd41b678b10aff8c8a69adc10f93",
+    "app/cloud.js": "f95153f36f24e1167bb1fb913d3a32f57e441c6feb28fd7dd9c4f2574c6f018e",
+    "app/lineage.js": "1af9550accb16c4ce6a442576b09bbad8d783b48263ae75e6d7ef544537e1e30",
+    "app/app.js": "f45cfb602678d02cd92ca1f23dfdf812d30db8223c63725a85047e58a6f74fa1",
+    "app/record.js": "afdf7b018dc4611be5d037589825a2b4df25f4e9392c38d25e158af4974ab901"
+  }
+}
