@@ -217,7 +217,7 @@ GitHub release links alone do not provide an independent deposit. Each software
 component retains its own licence, as described in [THIRD_PARTY.md](THIRD_PARTY.md).
 Preserved copies do not require this website or the original image registry to
 remain online. They still require a Docker-compatible computer.
-</pre></details><details id="source-b335630551682c19" data-name="README.md"><summary>README.md</summary><p class="muted"><br>SHA-256: de80b1cb77440346369090ec63b55bea9c32c3ff92b30be522a29ca54a0e1a58</p><pre># Fisheries workflow demonstration
+</pre></details><details id="source-b335630551682c19" data-name="README.md"><summary>README.md</summary><p class="muted"><br>SHA-256: dc5acdf6f27dbfbeaa576c4e73a574b13e4d8180644c3a948b6b59844498a560</p><pre># Fisheries workflow demonstration
 
 [Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Code by job](jobs/README.md) · [Preserved releases](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
@@ -305,10 +305,10 @@ original CPUE standardisation.
 
 Keep a downloaded run and its recorded execution image together. Follow the
 bundle&#x27;s `REPRODUCE.txt` to repeat its declared scope. The
-[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.10.0.zip)
+[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.2.zip)
 includes local result and code pages, source archives, extraction SQL and all
 22 reference outputs; its
-[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.10.0.zip.sha256)
+[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.2.zip.sha256)
 identifies the download. Open `START-HERE.html`, then follow `OFFLINE.md`.
 The archived
 [v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)
@@ -7442,14 +7442,14 @@ if (sys.nframe() == 0L) {
     cat(workflow_execute_json(input))
   }
 }
-</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: 4bc488e82af04e67adaee1e2522210cbd4804b38d36fce49e2718bfdc12ecab8</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
+</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: 55923b9d6a9a067376331120693fac9a3cea635c11e15948d8aa175991f0a195</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
 import html
 import json
 import math
 
-STYLE = &#x27;&#x27;&#x27;body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}&#x27;&#x27;&#x27;
-STYLE += &#x27;&#x27;&#x27;.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}&#x27;&#x27;&#x27;
-STYLE += &#x27;&#x27;&#x27;.plot-pair{display:grid;grid-template-columns:1fr;gap:18px}.plot-pair h2{font-size:17px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 12px}.result-method{font-size:14px;color:#526477}.result-view h2{margin-top:20px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}&#x27;&#x27;&#x27;
+STYLE = &#x27;&#x27;&#x27;body{font:15px/1.5 system-ui,sans-serif;color:#293039;max-width:920px;margin:22px auto;padding:0 22px}h1{font-size:23px;line-height:1.25;font-weight:600;margin:0 0 12px}h2{font-size:17px;font-weight:600;margin:22px 0 8px}p{max-width:80ch;margin:8px 0}small,.muted{color:#626a73}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:8px 10px;border-bottom:1px solid #d8dce0}th{font-weight:600;background:white}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}.note{border-left:2px solid #a48242;padding:6px 12px;background:white}footer{margin-top:22px;border-top:1px solid #d8dce0;padding-top:10px;color:#626a73;font-size:12px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#245b86}&#x27;&#x27;&#x27;
+STYLE += &#x27;&#x27;&#x27;.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}&#x27;&#x27;&#x27;
+STYLE += &#x27;&#x27;&#x27;.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}&#x27;&#x27;&#x27;
 STYLE += &#x27;&#x27;&#x27;.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}&#x27;&#x27;&#x27;
 MSE_COLOURS = {&#x27;Constant catch&#x27;: &#x27;#1378a3&#x27;, &#x27;Index rule&#x27;: &#x27;#b56435&#x27;, &#x27;Buffered rule&#x27;: &#x27;#7357a8&#x27;}
 
@@ -7861,7 +7861,7 @@ def result_view(job, result):
         body += &#x27;&lt;h2&gt;Sample of submitted rows&lt;/h2&gt;&#x27; + table(rows, observation_columns(rows), 6)
         if public:
             body += &#x27;&lt;p&gt;Each row combines fleet, five-degree cell, quarter and year; vessel IDs are unavailable.&lt;/p&gt;&#x27;
-        return body + &#x27;&lt;p class=&quot;muted&quot;&gt;First six rows shown. Open Data for all submitted rows.&lt;/p&gt;&#x27;
+        return body + &#x27;&lt;p class=&quot;muted&quot;&gt;First six rows shown.&lt;/p&gt;&#x27;
     if key == &#x27;qc&#x27;:
         passed = all(row[&#x27;result&#x27;] == &#x27;Pass&#x27; for row in result[&#x27;checks&#x27;])
         message = (&#x27;The corrected submission passed all checks.&#x27; if result[&#x27;returned&#x27;]
@@ -7887,7 +7887,7 @@ def result_view(job, result):
                 f&#x27;{len(result[&quot;catch&quot;])} annual catch records.&lt;/p&gt;&#x27;
                 &#x27;&lt;p&gt;The query selects positive effort and non-negative catch; any effort filter for analysis A is applied later.&lt;/p&gt;&#x27;)
         body += &#x27;&lt;h2&gt;Records → CPUE&lt;/h2&gt;&#x27; + table(rows, observation_columns(rows), 6)
-        body += (&#x27;&lt;p&gt;First six rows shown; Data preserves all selected rows and the extraction SQL.&lt;/p&gt;&#x27;
+        body += (&#x27;&lt;p&gt;First six rows shown.&lt;/p&gt;&#x27;
                  &#x27;&lt;h2&gt;Annual catch → assessment inputs&lt;/h2&gt;&lt;p&gt;Annual total catches in tonnes &#x27;
                  &#x27;are joined to each index by year; they are not the catch numbers above.&lt;/p&gt;&#x27;)
         return body
@@ -7896,7 +7896,7 @@ def result_view(job, result):
         return (f&#x27;&lt;p&gt;{len(rows)} annual index/catch pairs · {esc(coverage_text(rows))}.&lt;/p&gt;&#x27;
                 &#x27;&lt;p&gt;The saved CPUE index and annual removals are joined by year for the stock model.&lt;/p&gt;&#x27;
                 + table(rows, [(&#x27;year&#x27;, &#x27;Year&#x27;), (&#x27;index&#x27;, &#x27;Relative CPUE&#x27;), (&#x27;catch_t&#x27;, &#x27;Catch (t)&#x27;)], 6)
-                + &#x27;&lt;p class=&quot;muted&quot;&gt;First six years shown. Data contains every model input.&lt;/p&gt;&#x27;)
+                + &#x27;&lt;p class=&quot;muted&quot;&gt;First six years shown.&lt;/p&gt;&#x27;)
     if key in (&#x27;cpue_a&#x27;, &#x27;cpue_b&#x27;):
         rows = result[&#x27;series&#x27;]
         rates = cpue_rates(rows)
@@ -7946,7 +7946,7 @@ def result_view(job, result):
         checks = [{&#x27;check&#x27;: title, &#x27;value&#x27;: result[field]} for field, title in [
             (&#x27;balance_check&#x27;, &#x27;Biomass recurrence&#x27;), (&#x27;feasibility_check&#x27;, &#x27;Positive biomass&#x27;),
             (&#x27;gradient_check&#x27;, &#x27;Projected gradient&#x27;)] if field in result]
-        return body + table(checks, [(&#x27;check&#x27;, &#x27;Recorded check&#x27;), (&#x27;value&#x27;, &#x27;Result&#x27;)]) + &#x27;&lt;p class=&quot;muted&quot;&gt;These checks do not establish model adequacy. Data preserves estimates, residuals and optimizer diagnostics.&lt;/p&gt;&#x27;
+        return body + table(checks, [(&#x27;check&#x27;, &#x27;Recorded check&#x27;), (&#x27;value&#x27;, &#x27;Result&#x27;)]) + &#x27;&lt;p class=&quot;muted&quot;&gt;These checks do not establish model adequacy.&lt;/p&gt;&#x27;
     if key == &#x27;assessment_summary&#x27;:
         body = &#x27;&lt;p&gt;Compare the four fitted biomass trajectories.&lt;/p&gt;&#x27;
         body += plot(result[&#x27;series&#x27;], &#x27;B_over_K&#x27;, &#x27;Biomass / each case’s carrying capacity&#x27;)
@@ -7965,7 +7965,7 @@ def result_view(job, result):
                 (&#x27;reference_catch_t&#x27;, &#x27;Reference catch (t/year)&#x27;)]))
         body += &#x27;&lt;p&gt;Trials start after the last observed catch, using the fitted next-year biomass. Future growth and observation errors are declared assumptions.&lt;/p&gt;&#x27;
         body += &#x27;&lt;p&gt;Every rule faces the same recorded scenarios and random errors. The Buffered rule job supplies the catch buffer actually tested.&lt;/p&gt;&#x27;
-        return body + &#x27;&lt;p class=&quot;muted&quot;&gt;Inputs &amp;amp; versions traces each stock to its assessment run. Data preserves parameters, scenarios and paired random streams.&lt;/p&gt;&#x27;
+        return body
     if key in (&#x27;mse_constant&#x27;, &#x27;mse_index&#x27;, &#x27;mse_buffered&#x27;):
         series = {result[&#x27;name&#x27;]: result[&#x27;series&#x27;]}
         body = &#x27;&lt;p&gt;&#x27; + esc(result[&#x27;description&#x27;]) + &#x27;&lt;/p&gt;&#x27;
@@ -7973,7 +7973,7 @@ def result_view(job, result):
                              &#x27;Realised catch across trials&#x27;, plot(series, &#x27;catch_t&#x27;, &#x27;Median annual catch (tonnes)&#x27;, colour_by_name=MSE_COLOURS))
         body += &#x27;&lt;p&gt;These medians combine the declared stock cases and growth scenarios with equal weight; they are conditional examples.&lt;/p&gt;&#x27;
         body += mse_metrics([{&#x27;name&#x27;: result[&#x27;name&#x27;], **result[&#x27;metrics&#x27;]}])
-        return body + mse_metric_note() + &#x27;&lt;p class=&quot;result-method&quot;&gt;Observe the index → set catch → update stock → repeat. Data preserves each annual decision and one complete example trial.&lt;/p&gt;&#x27;
+        return body + mse_metric_note() + &#x27;&lt;p class=&quot;result-method&quot;&gt;Each year: observe the index, set catch, then update the stock.&lt;/p&gt;&#x27;
     if key == &#x27;mse_summary&#x27;:
         body = &#x27;&lt;p&gt;Compare catch, stock condition and catch stability under the same trials.&lt;/p&gt;&#x27;
         body += paired_plots(&#x27;Catch and final biomass&#x27;, mse_tradeoff(result[&#x27;metrics&#x27;]),
@@ -8022,15 +8022,19 @@ def output_page(job, result, record, lineage):
         warnings.append(&#x27;Some requested catches exceeded the simulated harvest limit; metrics use realised catch.&#x27;)
     if warnings:
         body += &#x27;&lt;p class=&quot;note&quot;&gt;&#x27; + &#x27; &#x27;.join(esc(warning) for warning in warnings) + &#x27;&lt;/p&gt;&#x27;
-    body = body.replace(&#x27;&lt;/p&gt;&#x27;, &#x27;&lt;/p&gt;&lt;p class=&quot;feedback-flow&quot;&gt;&#x27; + esc(job_trace(key)) + &#x27;&lt;/p&gt;&#x27;, 1)
-    body += &#x27;&lt;p class=&quot;muted&quot;&gt;Produced in &lt;strong&gt;&#x27; + esc(record[&#x27;run_id&#x27;]) + &#x27;&lt;/strong&gt;. Retained inputs keep their original runs.&lt;/p&gt;&#x27;
+    if key.endswith(&#x27;_report&#x27;):
+        body = body.replace(&#x27;&lt;/p&gt;&#x27;, &#x27;&lt;/p&gt;&lt;p class=&quot;feedback-flow&quot;&gt;&#x27; + esc(job_trace(key)) + &#x27;&lt;/p&gt;&#x27;, 1)
+        body += &#x27;&lt;p class=&quot;muted&quot;&gt;Produced in &lt;strong&gt;&#x27; + esc(record[&#x27;run_id&#x27;]) + &#x27;&lt;/strong&gt;. Retained inputs keep their original runs.&lt;/p&gt;&#x27;
     if key.endswith(&#x27;_report&#x27;) and lineage:
         preview = [{**row, &#x27;checksum&#x27;: row[&#x27;checksum&#x27;][:12]} for row in lineage]
         body += &#x27;&lt;h2&gt;Retained inputs&lt;/h2&gt;&#x27; + table(preview, [(&#x27;job&#x27;, &#x27;Input job&#x27;), (&#x27;run_id&#x27;, &#x27;Original run&#x27;), (&#x27;checksum&#x27;, &#x27;Checksum prefix&#x27;)])
-    body += &#x27;&lt;p class=&quot;muted&quot;&gt;Open Data for complete values and Inputs &amp;amp; versions for exact source, settings and execution records. The run bundle preserves these files.&lt;/p&gt;&#x27;
+    footer = &#x27;&#x27;
+    if key.endswith(&#x27;_report&#x27;):
+        body += &#x27;&lt;p class=&quot;muted&quot;&gt;Open Data for complete values and Inputs &amp;amp; versions for exact source, settings and execution records. The run bundle preserves these files.&lt;/p&gt;&#x27;
+        footer = &#x27;&lt;footer&gt;Teaching workflow with simplified assessment and management models. The run bundle preserves inputs, code, settings and results.&lt;/footer&gt;&#x27;
     return (&#x27;&lt;!doctype html&gt;&lt;html lang=&quot;en-NZ&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;title&gt;&#x27;
             + esc(job[&#x27;title&#x27;]) + &#x27;&lt;/title&gt;&lt;style&gt;&#x27; + STYLE + &#x27;&lt;/style&gt;&lt;body&gt;&lt;h1&gt;&#x27; + esc(job[&#x27;title&#x27;]) + &#x27;&lt;/h1&gt;&#x27;
-            + body + &#x27;&lt;footer&gt;Teaching workflow with simplified assessment and management models. The run bundle preserves inputs, code, settings and results.&lt;/footer&gt;&lt;/body&gt;&lt;/html&gt;&#x27;)
+            + body + footer + &#x27;&lt;/body&gt;&lt;/html&gt;&#x27;)
 </pre></details><details id="source-662bc565159b1b1e" data-name="workflow/results.qmd"><summary>workflow/results.qmd</summary><p class="muted"><br>SHA-256: 529b14d7b9d6beabc1fc9aa9f6afddff4938fba98a6da99d4245621df54b28b1</p><pre>---
 lang: en-NZ
 format:
