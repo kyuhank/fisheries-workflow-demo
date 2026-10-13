@@ -1556,6 +1556,8 @@ function displayOutput(title, output, kind = "Job output") {
     html,body{max-width:100%;overflow-wrap:anywhere}
     body{box-sizing:border-box}
     table,pre{display:block;max-width:100%;overflow-x:auto}
+    table th,table td{overflow-wrap:normal;word-break:normal}
+    table td{white-space:nowrap}
     code{overflow-wrap:anywhere;word-break:break-word}
     svg,img{max-width:100%;height:auto}
     .page-columns{display:block!important}
