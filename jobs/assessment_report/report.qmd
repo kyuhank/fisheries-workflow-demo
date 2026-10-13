@@ -121,7 +121,7 @@ The analysed series runs from `r result$series[[1]][[1]]$year` to
 per year. Biomass is the start-of-year, pre-catch state. The annual Schaefer model starts it
 at carrying capacity, adds surplus production and subtracts recorded catch in tonnes.
 R/RTMB fits carrying capacity by minimising squared log-index residuals within
-feasible bounds; log catchability is the mean log index minus log biomass. Initial
+feasible bounds; log catchability is the mean difference between log index and log biomass. Initial
 biomass and growth are assumptions, rather than additional fitted parameters.
 
 ## Analysis record
