@@ -33,7 +33,7 @@
     },
     "mse": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
-      "commit": "b1e618d9cebd9fffe1b8715ab4fa58f63e804762",
+      "commit": "001db01d0c2246895c29458c99a5a971cde61e3d",
       "checkout": "components/mse",
       "jobs": [
         "mse_prepare",
