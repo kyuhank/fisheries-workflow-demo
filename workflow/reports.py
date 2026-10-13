@@ -5,7 +5,8 @@ import math
 
 STYLE = '''body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}'''
 STYLE += '''.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}'''
-STYLE += '''.plot-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.plot-pair h2{font-size:17px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 12px}.result-method{font-size:14px;color:#526477}.result-view h2{margin-top:20px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}'''
+STYLE += '''.plot-pair{display:grid;grid-template-columns:1fr;gap:18px}.plot-pair h2{font-size:17px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 12px}.result-method{font-size:14px;color:#526477}.result-view h2{margin-top:20px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}'''
+STYLE += '''.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}'''
 MSE_COLOURS = {'Constant catch': '#1378a3', 'Index rule': '#b56435', 'Buffered rule': '#7357a8'}
 
 
@@ -106,7 +107,7 @@ def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     step = next(size * scale for size in [1, 2, 2.5, 5, 10] if size * scale >= (ymax-ymin) / 4)
     ymin, ymax = math.floor(ymin / step) * step, math.ceil(ymax / step) * step
     span = max(ymax - ymin, step)
-    x = lambda year: 65 + (year - xmin) / max(1, xmax - xmin) * 660
+    x = lambda year: 100 + (year - xmin) / max(1, xmax - xmin) * 625
     y = lambda number: 280 - (number - ymin) / span * 225
     out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" aria-label="' + esc(label) + '">']
     for i in range(round(span / step) + 1):
@@ -114,19 +115,21 @@ def plot(series, value, label, points=(), colour_by_name=None, upper=None):
         if abs(v) < step * 1e-8:
             v = 0.0
         stroke = '#9cafba' if v == 0 and ymin < 0 else '#e1e8ee'
-        out.append(f'<path d="M65 {y(v):.1f}H730" stroke="{stroke}"/><text x="54" y="{y(v)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{v:g}</text>')
+        out.append(f'<path d="M100 {y(v):.1f}H730" stroke="{stroke}"/><text x="90" y="{y(v)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{v:g}</text>')
     for year in sorted({xmin, (xmin+xmax)//2, xmax}):
         out.append(f'<text x="{x(year):.1f}" y="304" text-anchor="middle" fill="#607080" font-size="12">{year}</text>')
+    legend = []
     for i, (name, rows) in enumerate(series.items()):
         coordinates = ' '.join(f'{x(r["year"]):.2f},{y(r[value]):.2f}' for r in rows)
         colour = (colour_by_name or {}).get(name, colours[i % len(colours)])
         if name in points:
             out.extend(f'<circle cx="{x(r["year"]):.2f}" cy="{y(r[value]):.2f}" r="3.5" fill="{colour}"/>' for r in rows)
         else:
-            out.append(f'<polyline points="{coordinates}" fill="none" stroke="{colour}" stroke-width="2.5"/>')
-        out.append(f'<text x="{65+(i%4)*170}" y="{25+(i//4)*20}" fill="{colour}" font-size="14">{esc(name)}</text>')
-    out.append(f'<text x="65" y="332" fill="#607080" font-size="12">{esc(label)}</text></svg>')
-    return ''.join(out)
+            dash = ' stroke-dasharray="8 5"' if name == "Nominal" else ""
+            out.append(f'<polyline points="{coordinates}" fill="none" stroke="{colour}" stroke-width="2.5"{dash}/>')
+        legend.append(f'<span><i class="plot-swatch" style="color:{colour};border-top-style:{"dashed" if name == "Nominal" else "solid"}"></i>{esc(name)}</span>')
+    out.append("</svg>")
+    return '<div class="plot-legend">' + ''.join(legend) + '</div>' + ''.join(out) + '<p class="plot-unit">' + esc(label) + '</p>'
 
 
 def cpue_report(result):
@@ -368,25 +371,26 @@ def mse_tradeoff(metrics):
     colours = MSE_COLOURS
     xmax = max(1, max(row['mean_catch_t'] for row in metrics) * 1.15)
     ymax = max(1, max(row['final_B_over_K'] for row in metrics) * 1.15)
-    x = lambda v: 75 + 610 * v / xmax
+    x = lambda v: 100 + 585 * v / xmax
     y = lambda v: 275 - 220 * v / ymax
     out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" '
            'aria-label="Management trade-off: mean annual catch (tonnes) and median final biomass / carrying capacity">']
     for i in range(5):
         catch, biomass = xmax * i / 4, ymax * i / 4
-        out.append(f'<path d="M75 {y(biomass):.1f}H685" stroke="#e1e8ee"/>'
-                   f'<text x="64" y="{y(biomass)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{biomass:.2g}</text>'
+        out.append(f'<path d="M100 {y(biomass):.1f}H685" stroke="#e1e8ee"/>'
+                   f'<text x="90" y="{y(biomass)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{biomass:.2g}</text>'
                    f'<text x="{x(catch):.1f}" y="299" text-anchor="middle" fill="#607080" font-size="12">{catch:,.0f}</text>')
+    legend = []
     for i, row in enumerate(metrics):
         colour = colours.get(row['name'], '#1378a3')
         out.append(f'<circle cx="{x(row["mean_catch_t"]):.2f}" cy="{y(row["final_B_over_K"]):.2f}" '
                    f'r="6" fill="{colour}"><title>{esc(row["name"])}: {row["mean_catch_t"]:.4g} t/year; '
                    f'final B / K {row["final_B_over_K"]:.4g}</title></circle>'
                    f'<text x="{x(row["mean_catch_t"])+9:.2f}" y="{y(row["final_B_over_K"])-8-i*13:.2f}" '
-                   f'fill="{colour}" font-size="13">{i+1}</text>'
-                   f'<text x="{75+i*205}" y="25" fill="{colour}" font-size="13">{i+1}. {esc(row["name"])}</text>')
-    out.append('<text x="75" y="328" fill="#607080" font-size="12">Mean annual realised catch (tonnes); y: median final B / K</text></svg>')
-    return ''.join(out)
+                   f'fill="{colour}" font-size="13">{i+1}</text>')
+        legend.append(f'<span style="color:{colour}">{i+1}. {esc(row["name"])}</span>')
+    out.append("</svg>")
+    return '<div class="plot-legend">' + ''.join(legend) + '</div>' + ''.join(out) + '<p class="plot-unit">Mean annual realised catch (tonnes); y: median final B / K</p>'
 
 
 def annual_coverage(rows):
