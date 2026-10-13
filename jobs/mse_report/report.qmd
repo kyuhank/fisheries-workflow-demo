@@ -104,8 +104,9 @@ including the first change from the reference catch. Cases and scenarios have eq
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 for (scenario in result$scenarios) {
   series <- scenario$series[rule_names]
-  plot_series(series, "B_over_K", paste(scenario$name, "— median end-year biomass / K"))
-  plot_series(series, "catch_t", paste(scenario$name, "— median realised catch (tonnes)"))
+  label <- sub(" growth$", "", sub(" and recovery$", "", scenario$name))
+  plot_series(series, "B_over_K", paste0(label, ": median B/K"))
+  plot_series(series, "catch_t", paste0(label, ": median catch (t)"))
 }
 ```
 
