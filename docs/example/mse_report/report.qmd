@@ -23,8 +23,6 @@ th, td { padding: 8px 10px; border-bottom: 1px solid #dde5eb; text-align: left; 
 th { background: #f3f6f8; }
 .cell-output-display { overflow-x: auto; }
 pre { padding: 14px; background: #f3f6f8; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
-details { margin: 18px 0; }
-summary { cursor: pointer; font-weight: 600; color: #316985; }
 </style>
 
 Compare catch, biomass and catch stability for three rules under the same simulated future conditions.
@@ -53,36 +51,7 @@ plot_series <- function(series, field, label) {
 }
 ```
 
-## Methods
-
-
-```{r}
-#| results: asis
-if (!is.null(record$data_source)) {
-  cat("**Input index:** ", record$data_source$cpue_scope,
-      ". **Annual catch:** ", record$data_source$catch_scope, ".\n\n", sep = "")
-  cat("The selected Fiji fleet index is not a validated stock-wide abundance index. ",
-      "Using it with stock-wide catches is a teaching assumption.\n\n", sep = "")
-} else {
-  cat("The supplied index and catches define this teaching example; ",
-      "inspect the producing records for their data scope.\n\n", sep = "")
-}
-```
-
-Four fitted Schaefer cases supply starting biomass, capacity, growth and
-catchability. Constant catch, an index rule and a buffered rule use the same
-saved growth and observation errors for **`r result$assumptions$years` years**,
-with **`r result$assumptions$replicates` trials** per case and scenario.
-Each year, observe an index → set catch → update biomass → observe again.
-The index rules use a three-year observed mean.
-
-**Shared guardrail:** realised catch is capped at
-`r 100 * result$assumptions$maximum_harvest_rate`% of true starting biomass.
-This simulator safeguard uses biomass unavailable to the index rules; every
-rule's biomass and low-biomass statistics are conditional on that guardrail.
-Growth is capped at `r result$assumptions$maximum_growth_rate` per year.
-
-## Results
+## Management comparison
 
 ```{r}
 # Use the recorded rule order for consistent colours in every plot.
@@ -106,7 +75,7 @@ if (any(vapply(result$metrics, function(row) row$shortfall_trials > 0, logical(1
 }
 ```
 
-<details><summary>Catch, biomass and catch stability</summary>
+### Catch, biomass and catch stability
 
 ```{r}
 metrics <- lapply(result$metrics, function(row) {
@@ -120,14 +89,15 @@ knitr::kable(rows_frame(metrics), digits = 3)
 
 Mean catch is in tonnes per year; final B/K is the median across trials. The
 threshold column counts trials below `r result$assumptions$depletion_threshold`
-of carrying capacity at any time. Catch change includes the first change from
-reference catch. Cases and scenarios have equal weight, not estimated probabilities.
+of carrying capacity at any time. Catch change averages each trial's `100 × sum(abs(C_t − C_(t−1))) / sum(C_t)` using realised catches,
+including the first change from the reference catch. Cases and scenarios have equal weight, not estimated probabilities.
 
-</details>
 
-<details><summary>Trajectories by growth scenario</summary>
+
+### Trajectories by growth scenario
 
 ```{r}
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 for (scenario in result$scenarios) {
   series <- scenario$series[rule_names]
   plot_series(series, "B_over_K", paste(scenario$name, "— median end-year biomass / K"))
@@ -135,9 +105,9 @@ for (scenario in result$scenarios) {
 }
 ```
 
-</details>
 
-<details><summary>Trial assumptions and limits</summary>
+
+### Trial assumptions and limits
 
 One scenario keeps the growth multiplier at one. The other uses 0.7 for six
 years, then returns to one. Mean-one lognormal growth and observation errors
@@ -151,7 +121,51 @@ Surplus production uses starting biomass; realised catch is then removed.
 for (limitation in result$limitations) cat("- ", limitation, "\n", sep = "")
 ```
 
-</details>
+
+
+
+## Methods
+
+
+```{r}
+#| results: asis
+if (!is.null(record$data_source)) {
+  cat("**Source coverage:** ", record$data_source$cpue_scope,
+      ". **Annual catch:** ", record$data_source$catch_scope, ".\n\n", sep = "")
+  cat("The selected Fiji fleet index is not a validated stock-wide abundance index. ",
+      "Using it with stock-wide catches is a teaching assumption.\n\n", sep = "")
+} else {
+  cat("The supplied index and catches define this teaching example; ",
+      "inspect the producing records for their data scope.\n\n", sep = "")
+}
+```
+
+Four fitted Schaefer cases supply starting biomass, capacity, growth and
+catchability. Constant catch, an index rule and a buffered rule use the same
+saved growth and observation errors for **`r result$assumptions$years` years**,
+with **`r result$assumptions$replicates` trials** per case and scenario.
+Each year, observe an index → set catch → update biomass → observe again.
+The index rules use a three-year observed mean. Reference catch C₀ and index
+I₀ are the last three historical-year means. Rₜ is the mean of the current
+simulated index and previous two indices, divided by I₀.
+
+| Rule | Requested catch |
+|:--|:--|
+| Constant | C₀ |
+| Index | C₀ × min(`r result$assumptions$maximum_catch_multiple`, Rₜ) |
+| Buffered | b × C₀ × m(Rₜ), limited to ±`r 100 * result$assumptions$annual_change_limit`% of the previous request (initially C₀) |
+
+Here b is `r result$rules$buffered$settings$buffer`. The step multiplier m is
+`r paste(unlist(result$assumptions$buffered_steps$multipliers), collapse = ", ")`
+for Rₜ below `r result$assumptions$buffered_steps$thresholds[[1]]`, between
+`r paste(unlist(result$assumptions$buffered_steps$thresholds), collapse = " and ")`,
+or at least `r result$assumptions$buffered_steps$thresholds[[2]]`, respectively.
+
+**Shared guardrail:** realised catch is capped at
+`r 100 * result$assumptions$maximum_harvest_rate`% of true starting biomass.
+This simulator safeguard uses biomass unavailable to the index rules; every
+rule's biomass and low-biomass statistics are conditional on that guardrail.
+Growth is capped at `r result$assumptions$maximum_growth_rate` per year.
 
 ## Analysis record
 
@@ -175,27 +189,4 @@ for (key in c("source", "analysis_source")) {
 }
 ```
 
-<details><summary>Inputs, settings and software</summary>
-
-```{r}
-inputs <- lapply(names(record$inputs), function(key) {
-  list(job = key, run = record$inputs[[key]]$run_id,
-       output_sha256 = record$inputs[[key]]$checksum)
-})
-if (length(inputs)) knitr::kable(rows_frame(inputs))
-software <- lapply(names(record$software), function(key) {
-  list(component = key, value = as.character(record$software[[key]]))
-})
-knitr::kable(rows_frame(software))
-```
-
-The run bundle preserves the R jobs, libraries, this QMD, result JSON, settings
-and checksums.
-
-```{r}
-#| results: asis
-cat("```json\n", jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),
-    "\n```\n", sep = "")
-```
-
-</details>
+Annual values are available in the **Data** tab. Input files, settings, source versions and checksums are available in **Inputs & versions** and the downloaded run. Rendering reads saved results and does not fit models again.

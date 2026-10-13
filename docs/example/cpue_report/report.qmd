@@ -10,6 +10,8 @@ execute:
   echo: false
   warning: false
   message: false
+  fig-width: 8
+  fig-height: 4.2
 ---
 
 <style>
@@ -23,13 +25,10 @@ th, td { padding: 8px 10px; border-bottom: 1px solid #dde5eb; text-align: left; 
 th { background: #f3f6f8; }
 .cell-output-display { overflow-x: auto; }
 pre { padding: 14px; background: #f3f6f8; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
-details { margin: 18px 0; }
-summary { cursor: pointer; font-weight: 600; color: #316985; }
+code { overflow-wrap: anywhere; }
 </style>
 
-Compare annual CPUE indices from the two saved analyses.
-
-**Path:** Catch and effort rows → adjusted and year-only GLMs → annual index comparison.
+See how standardisation changes annual CPUE, then compare the two saved relative indices.
 
 ```{r}
 # Read preserved results. Report rendering performs no model fitting.
@@ -37,151 +36,154 @@ payload <- jsonlite::fromJSON("report-data.json", simplifyVector = FALSE)
 result <- payload$result
 record <- payload$record
 public <- identical(result$data_kind, "public-wcpfc")
+series <- result$series
+analysis_a <- if (length(result$analyses)) result$analyses[[1]] else list()
+rows_a <- series[[1]]
 rows_frame <- function(rows) {
   do.call(rbind, lapply(rows, function(row) as.data.frame(row, stringsAsFactors = FALSE)))
 }
-plot_series <- function(series, field, label) {
+has_field <- function(series, field) {
+  length(series) > 0 && all(vapply(series, function(rows) {
+    length(rows) > 0 && all(vapply(rows, function(row) {
+      value <- row[[field]]
+      is.numeric(value) && length(value) == 1L && is.finite(value)
+    }, logical(1)))
+  }, logical(1)))
+}
+absolute_cpue <- has_field(list(rows_a), "standardised_cpue") &&
+                 has_field(list(rows_a), "nominal_cpue")
+plot_series <- function(series, field, label, line_types = c(1, 2)) {
   years <- unlist(lapply(series, function(rows) vapply(rows, function(x) x$year, numeric(1))))
   values <- unlist(lapply(series, function(rows) vapply(rows, function(x) x[[field]], numeric(1))))
-  colours <- c("#1378a3", "#b56435", "#7357a8", "#328363")
-  plot(range(years), range(c(0, values)), type = "n", xlab = "Year", ylab = label)
+  colours <- rep(c("#1378a3", "#b56435", "#7357a8", "#328363"), length.out = length(series))
+  line_types <- rep(line_types, length.out = length(series))
+  symbols <- rep(c(16, 1, 17, 2), length.out = length(series))
+  par(mar = c(4.2, 4.8, 2.8, 1))
+  plot(range(years), range(c(0, values)), type = "n", xlab = "Year", ylab = label, las = 1)
+  abline(h = axTicks(2), col = "#e4e9ee", lwd = 0.8)
   for (i in seq_along(series)) {
     lines(vapply(series[[i]], function(x) x$year, numeric(1)),
           vapply(series[[i]], function(x) x[[field]], numeric(1)),
-          col = colours[(i - 1) %% length(colours) + 1], lwd = 2)
+          type = "o", col = colours[i], lty = line_types[i], lwd = 2,
+          pch = symbols[i], cex = 0.65)
   }
-  legend("topright", names(series), col = colours[seq_along(series)], lty = 1, bty = "n")
-}
-```
-## Methods
-
-```{r}
-#| results: asis
-if (public) {
-  cat("Analysis A fits a quasipoisson GLM with year and cell–quarter effects. ",
-      "Analysis B uses year effects only. Both use a log link and ",
-      "log(hooks / 1000) as an offset. Predictions at 1000 hooks are averaged ",
-      "on the response scale over the same strata with equal weights in every year. ",
-      "Each index is divided by its first-year prediction. ",
-      "The effort filter belongs to analysis A. Released zero counts are retained.\n\n", sep = "")
-} else {
-  cat("Analysis A fits the synthetic Poisson GLM with year and vessel effects; ",
-      "analysis B uses year effects only. Both use log(hooks / 1000) as an offset. ",
-      "Predictions at 1000 hooks and the first synthetic vessel are divided by ",
-      "the first-year prediction. The effort filter belongs to analysis A.\n\n", sep = "")
+  legend("top", inset = c(0, -0.16), names(series), col = colours,
+         lty = line_types, lwd = 2, pch = symbols, bty = "n", horiz = TRUE, xpd = NA, cex = 0.9)
 }
 ```
 
-<details><summary>Model checks and prediction weights</summary>
+## Standardised and nominal CPUE
 
 ```{r}
-#| results: asis
-if (length(result$analyses)) {
-  methods <- lapply(names(result$analyses), function(name) {
-    x <- result$analyses[[name]]
-    list(analysis = name, formula = x$formula, included = x$sets_used,
-         excluded = x$sets_excluded, converged = x$converged,
-         score_residual = x$score_residual)
-  })
-  print(knitr::kable(rows_frame(methods), digits = 7))
-}
-if (public) {
-  x <- result$analyses[[1]]
-  cat("\nFixed prediction weights:\n\n")
-  print(knitr::kable(rows_frame(x$weights), digits = 4))
-  cat("\nEstimated dispersion (Pearson sum of squares / residual degrees of freedom):\n\n")
-  dispersion <- lapply(names(result$analyses), function(name) {
-    x <- result$analyses[[name]]
-    list(analysis = name, dispersion = x$dispersion,
-         residual_degrees_of_freedom = x$residual_degrees_of_freedom)
-  })
-  print(knitr::kable(rows_frame(dispersion), digits = 3))
-}
-```
-
-</details>
-
-## Results
-
-```{r}
-endpoints <- lapply(names(result$series), function(name) {
-  rows <- result$series[[name]]
-  list(analysis = name, first_year = rows[[1]]$year,
-       final_year = tail(rows, 1)[[1]]$year,
-       final_relative_CPUE = tail(rows, 1)[[1]]$index)
-})
-plot_series(result$series, "index", "CPUE relative to first year")
-```
-
-<details><summary>Annual values and fish per 1,000 hooks</summary>
-
-```{r}
-knitr::kable(rows_frame(endpoints), digits = 3)
-if (public) {
-  standardised <- result$series[[1]]
-  nominal <- lapply(standardised, function(row) {
+if (absolute_cpue) {
+  nominal_a <- lapply(rows_a, function(row) {
     list(year = row$year, standardised_cpue = row$nominal_cpue)
   })
-  plot_series(list("A: fixed strata" = standardised, "Nominal: selected records" = nominal),
-              "standardised_cpue", "Albacore per 1000 hooks")
+  plot_series(list("Standardised A" = rows_a, "Nominal: A records" = nominal_a),
+              "standardised_cpue", "Fish per 1,000 hooks")
 }
 ```
 
-</details>
+```{r}
+#| results: asis
+if (!absolute_cpue) {
+  cat("This saved result contains relative indices only; an absolute standardised–nominal comparison is unavailable.\n\n")
+} else if (public) {
+  cat("Standardised A averages predictions at 1,000 hooks over the same ",
+      length(analysis_a$weights), " cell–quarter strata with equal weights each year. ",
+      "Nominal CPUE is 1,000 × annual total catch / annual total hooks from the same A records. ",
+      "Any A effort filter applies to both curves.\n\n", sep = "")
+} else {
+  cat("Standardised A predicts at 1,000 hooks for the first synthetic vessel. ",
+      "Nominal CPUE is 1,000 × annual total catch / annual total hooks from the same A observations. ",
+      "Any A effort filter applies to both curves.\n\n", sep = "")
+}
+```
 
-## Interpretation
+## Relative indices for analyses A and B
+
+```{r}
+plot_series(series, "index", "CPUE relative to first year")
+```
+
+Each index is divided by its own first-year prediction (first year = 1). A adjusts for composition; B uses year effects only. B may use different records because the optional effort filter applies to A.
+
+## Methods and checks
 
 ```{r}
 #| results: asis
 if (public) {
-  cat("Differences reflect adjustment for cell–quarter composition and any effort filter. ",
-      "The public records aggregate fleet, cell and quarter; vessel identifiers are unavailable. ",
-      "This index describes the selected fleet and released strata. It is a simple ",
-      "workflow example, with no confidence intervals or official stock assessment advice. ",
-      "Absent or suppressed values do not represent zero catch.\n\n", sep = "")
+  cat("The saved models are quasipoisson GLMs with a log link and ",
+      "a `log(hooks / 1000)` offset. A adjusts for cell–quarter composition; ",
+      "B has year effects only. The source rows are fleet–cell–quarter aggregates, ",
+      "not individual fishing sets.\n\n", sep = "")
+} else if (length(result$analyses)) {
+  cat("The saved synthetic models are Poisson GLMs with a log link and ",
+      "a `log(hooks / 1000)` offset. A adjusts for vessel effects; ",
+      "B has year effects only.\n\n", sep = "")
+}
+if (length(result$analyses)) {
+  for (i in seq_along(result$analyses)) {
+    x <- result$analyses[[i]]
+    cat("**", LETTERS[i], ":** `", x$formula, "`\n\n", sep = "")
+  }
+  if (!is.null(analysis_a$min_hooks)) {
+    cat("A effort threshold: **", analysis_a$min_hooks, " hooks per record** ",
+        "(0 retains all eligible records).\n\n", sep = "")
+  }
+  checks <- lapply(seq_along(result$analyses), function(i) {
+    x <- result$analyses[[i]]
+    row <- list(Analysis = LETTERS[i], Rows_used = x$sets_used,
+                Excluded = x$sets_excluded, Converged = x$converged,
+                Score_error = format(x$score_residual, scientific = TRUE, digits = 3))
+    if (public) row$Dispersion <- x$dispersion
+    row
+  })
+  print(knitr::kable(rows_frame(checks), digits = 3,
+                    col.names = gsub("_", " ", names(checks[[1]]))))
+  if (!public) {
+    cat("\nScore error is the maximum relative difference between fitted and observed annual catch totals.\n\n")
+  }
+}
+if (public && length(analysis_a$weights)) {
+  weights <- vapply(analysis_a$weights, function(x) {
+    paste0("`", x$stratum, "` (", format(x$weight, digits = 4), ")")
+  }, character(1))
+  cat("\nA's fixed prediction weights: ", paste(weights, collapse = "; "), ".\n\n",
+      "Score error is the maximum relative difference between fitted and observed annual or stratum catch totals. ",
+      "Dispersion is the Pearson sum of squares divided by residual degrees of freedom.\n\n", sep = "")
+}
+```
+
+## Interpretation and limits
+
+```{r}
+#| results: asis
+if (public) {
+  cat("The first plot shows the effect of holding cell–quarter composition fixed for A's selected records. ",
+      "The index covers the selected fleet and released strata; vessel identifiers are unavailable. ",
+      "Released zero counts are retained, while absent or suppressed values are not zero catch. ",
+      "An effort filter may require model predictions for omitted year–stratum combinations. ",
+      "No confidence intervals are supplied, and this workflow example provides no stock-wide or official assessment advice.\n\n", sep = "")
 } else {
-  cat("Differences reflect vessel adjustment and the selected synthetic records. ",
-      "This comparison illustrates the workflow and supplies no fisheries advice.\n\n", sep = "")
+  cat("The comparison illustrates vessel adjustment for the selected synthetic observations. ",
+      "No confidence intervals or fisheries advice are supplied.\n\n", sep = "")
 }
 ```
 
 ## Analysis record
 
-Produced in **`r record$run_id`**. Each input keeps its original producing run.
-
-<details><summary>Inputs and software versions</summary>
-
-```{r}
-inputs <- lapply(names(record$inputs), function(key) {
-  list(job = key, run = record$inputs[[key]]$run_id,
-       output_sha256 = record$inputs[[key]]$checksum)
-})
-if (length(inputs)) knitr::kable(rows_frame(inputs))
-```
-
-New calculations and this Quarto report run inside the declared container. The downloadable bundle includes the actual R job, shared R sources, this QMD, the preserved result JSON, settings and checksums.
-
-```{r}
-software <- lapply(names(record$software), function(key) {
-  list(component = key, value = as.character(record$software[[key]]))
-})
-knitr::kable(rows_frame(software))
-```
-
-</details>
+Produced in **`r record$run_id`** from preserved results; rendering fits no models. Annual values and the full method record are in **Data**. Producing runs, input checksums, code, settings and software are in **Inputs & versions** and the downloadable bundle.
 
 ```{r}
 #| results: asis
-image <- record$software$container
-cat("Calculation image and digest: `", image, "`\n\n", sep = "")
 if (!is.null(record$software$container_url)) {
-  cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
+  cat("[Calculation container](", record$software$container_url, ")", sep = "")
 }
 if (!is.null(record$source$repository) && !is.null(record$source$commit)) {
   commit_url <- paste0(record$source$repository, "/commit/", record$source$commit)
-  cat("[", commit_url, "](", commit_url, ")\n\n", sep = "")
+  if (!is.null(record$software$container_url)) cat(" · ")
+  cat("[Source ", substr(record$source$commit, 1, 12), "](", commit_url, ")", sep = "")
 }
-cat("<details><summary>Full preserved input record</summary>\n\n```json\n",
-    jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),
-    "\n```\n\n</details>\n", sep = "")
+cat("\n\n")
 ```

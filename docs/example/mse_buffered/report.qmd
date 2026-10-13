@@ -1,0 +1,11 @@
+---
+lang: en-NZ
+format:
+  html:
+    minimal: true
+    embed-resources: true
+    include-before-body: report-body.html
+---
+
+<!-- The coordinator prepares report-body.html from the saved result and record.
+     This shared result view has no executable cells or model fitting. -->
