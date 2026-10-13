@@ -1,0 +1,58 @@
+{
+  "scope": "Actual public-interface execution and publication checks; local numerical and reproduction checks are separate.",
+  "runs": [
+    {
+      "name": "01-full2021-manual",
+      "request_id": "cd9864df-2148-4510-8ced-e93bc988dc16",
+      "github_run": 38346657425,
+      "source_commit": "17852d8fdd00181de0c4683135a5e7a57ba7c4ed",
+      "executed": 22,
+      "retained": 0,
+      "files": {
+        "run-bundle.zip": {
+          "bytes": 6011771,
+          "sha256": "7fbc3ac045e1f319683e05cde241112df6e8e350a7698e67e23c82ce954fd749"
+        },
+        "acceptance.json": {
+          "bytes": 1545,
+          "sha256": "40cc0fd0a7b2668298b137bc94c804b56632b62f991f7ee900e741c2f6c3197e"
+        },
+        "github-independent.json": {
+          "bytes": 13784,
+          "sha256": "8ad601feb45f1491b600fdc05e007b8de25978e560f1b068b495c61a7bcfbad6"
+        }
+      }
+    },
+    {
+      "name": "02-buffer060-auto",
+      "request_id": "a8f1b4f4-f8f2-42e4-9422-f52e2465b96c",
+      "github_run": 38347523139,
+      "source_commit": "17852d8fdd00181de0c4683135a5e7a57ba7c4ed",
+      "executed": 3,
+      "retained": 19,
+      "files": {
+        "run-bundle.zip": {
+          "bytes": 6017762,
+          "sha256": "dcc652b10f08e9399f1caf95cad2556d7419031f2a9e20e458dc28217cc16711"
+        },
+        "acceptance.json": {
+          "bytes": 1537,
+          "sha256": "0a1236fe06c7b78e80c71e914f45c508b2317a00bbc3283e9c1e3d4259d2050c"
+        },
+        "github-independent.json": {
+          "bytes": 13784,
+          "sha256": "5e06d25d87d38077a4c06d0b1b6a33d9942c9dec849081b3eecbbe045e8800fd"
+        }
+      }
+    }
+  ],
+  "prior_failed_publication": {
+    "source_commit": "3fcbe700aba562d3f075c1fe597dfc9e927d9e91",
+    "github_run": 38340681828,
+    "outcome": "Failed atomic publication after three Buffered jobs calculated; previous bundle/checkpoint retained. This is negative evidence, not a successful run.",
+    "custody": {
+      "bytes": 1037,
+      "sha256": "48b236c823f6af7b3f9a6f0a320ef766e05a5ccc210814cf555037937efd7d98"
+    }
+  }
+}

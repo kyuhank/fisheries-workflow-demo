@@ -1,0 +1,41 @@
+{
+  "api_run_status": "failed",
+  "github_run": "38340681828",
+  "bundle_sha256": "7b4e0db5e7303785b2b1a84bff32e1b55032af2d2d62509724cef0090aad48ec",
+  "checkpoint_sha256": "d1181f0f2c3177cd32ccb76cee29338715217beee4ae0de854fed72ba0ab5553",
+  "bundle_equals_prior_growth": true,
+  "bundle_manifest_all_hashes_pass": true,
+  "bundle_manifest_files": 329,
+  "bundle_endpoint_equal_jobs": [
+    "assessment_a2",
+    "cpue_b",
+    "assessment_b2",
+    "cpue_summary",
+    "cpue_report",
+    "assessment_b1",
+    "mse_index",
+    "extract",
+    "assessment_summary",
+    "assessment_a1",
+    "database",
+    "qc",
+    "prepare_a",
+    "mse_prepare",
+    "mse_constant",
+    "assessment_report",
+    "prepare_b",
+    "cpue_a",
+    "submission"
+  ],
+  "bundle_endpoint_different_jobs": [
+    "mse_summary",
+    "mse_report",
+    "mse_buffered"
+  ],
+  "bundle_checkpoint_state_equal": true,
+  "package_current_api_state_equal": false,
+  "endpoint_buffer": 0.6,
+  "bundle_buffer": 0.8,
+  "all22_quarto_metadata": true,
+  "no_folded_core": true
+}
