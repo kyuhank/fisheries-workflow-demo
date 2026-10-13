@@ -35,7 +35,9 @@ function renderRecord() {
   title.append(
     uiElement("p", "eyebrow", "Recorded execution"),
     uiElement("h3", "", `${jobLabel(key)} · ${record.run_id}`),
-    uiElement("p", "", byKey[key].description),
+    uiElement("p", "", key === "cpue_summary"
+      ? "Compare standardised and nominal CPUE, then relative indices A and B."
+      : byKey[key].description),
   );
   heading.append(title);
   panel.append(heading);
@@ -64,8 +66,7 @@ function renderRecord() {
     .toLocaleDateString("en-NZ", { month: "long", year: "numeric", timeZone: "UTC" }) : "";
   if (dataSource) {
     const description = uiElement("div", "record-data-context");
-    description.append(uiElement("p", "", "CPUE input: " + dataSource.cpue_scope.split(",")[0] +
-      "; " + (dataSource.reference_strata?.length || "recorded") + " fixed cell–quarter strata. " +
+    description.append(uiElement("p", "", "CPUE input: " + dataSource.cpue_scope.split(",")[0] + ". " +
       "Catch counts: " + dataSource.units.catch_n + ". Effort: " + dataSource.units.hooks + "."));
     description.append(uiElement("p", "", "Separate assessment catch: " + dataSource.catch_scope +
       ", in " + dataSource.units.catch_t + "."));
