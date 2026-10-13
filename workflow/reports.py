@@ -466,7 +466,7 @@ def result_view(job, result):
             body += plot(rates, 'cpue', 'Fish per 1,000 hooks') + cpue_support(result)
             body += '<p>Nominal CPUE = 1,000 × annual fish numbers / annual hooks.</p>'
             if public:
-                body += ('<p>Standardised A holds cell–quarter composition fixed: predict 1,000 hooks '
+                body += ('<p>Standardised A holds cell–quarter composition fixed: predict catch at 1,000 hooks '
                          'in each of the six strata, then average with equal weights.</p>'
                          if key == 'cpue_a' else
                          '<p>B fits year effects only; its annual fitted rate reproduces nominal CPUE.</p>')
@@ -502,7 +502,7 @@ def result_view(job, result):
             if analysis.get('standardisation'):
                 body += '<p class="result-method">Standardised: ' + esc(analysis['standardisation']) + '. Nominal: 1,000 × annual fish numbers / annual hooks on the A rows.</p>'
             if public:
-                body += '<p>A predicts 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B fits year effects only. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.</p>'
+                body += '<p>A predicts catch at 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B fits year effects only. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.</p>'
         else:
             body += relative + '<p>The saved result has relative indices only; an A-row nominal overlay is unavailable.</p>'
         return body + '<p class="result-method">The A/B comparison includes differences in adjustment and row selection. Each relative index equals one in its own first year.</p>'
