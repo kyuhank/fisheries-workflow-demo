@@ -287,7 +287,16 @@ class CloudRun {
         }
         return acknowledgement;
       }
-      if (type === "download") return (await this.request("/bundle")).bundle;
+      if (type === "download") {
+        const requestId = this.run?.status === "complete" ? this.run.id : null;
+        if (!requestId) throw Error("Download after a successful run.");
+        const publication = await this.request("/bundle");
+        if (publication.request_id !== requestId || this.run?.id !== requestId ||
+            this.run?.status !== "complete" || typeof publication.bundle !== "string" || !publication.bundle) {
+          throw Error("The download does not match the completed run.");
+        }
+        return publication.bundle;
+      }
       if (type === "reset") {
         try {
           await this.request("/reset", {});

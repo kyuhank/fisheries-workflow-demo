@@ -5,6 +5,21 @@ export const OWNER_ID = 51262923;
 export const WORKFLOW = ".github/workflows/live.yml";
 export const PERMISSIONS = { actions: "write", contents: "read" };
 
+/** Persist only a new binding or terminal failure; progress reads need no lock. */
+export function observationUpdate(run: any, remote: any) {
+  const update: any = {};
+  if (!remote) return update;
+  if (String(run.github_run ?? "") !== String(remote.id)) {
+    update.github_run = String(remote.id);
+  }
+  if (remote.status === "completed" && remote.conclusion !== "success") {
+    update.status = "failed";
+    update.error = "The GitHub execution " + remote.conclusion +
+      ". Open its execution record for details.";
+  }
+  return update;
+}
+
 export const base64url = (data: Uint8Array) =>
   btoa(String.fromCharCode(...data))
     .replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");

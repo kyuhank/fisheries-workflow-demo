@@ -20,6 +20,7 @@ const modeStates = {};
 let cloudReady = false, unresolvedLive = false;
 let liveExecutionLink = "";
 let completedRun = null, modeVersion = 0;
+let publishedBundle = null;
 let correctionPending = false;
 let activities = {}, dispatchPending = false;
 let workspaceView = "tasks", jobStatusFilter = "";
@@ -117,6 +118,32 @@ function displayedPlan() {
 function runStates(run, state) {
   return Object.fromEntries(jobs.map((job) =>
     [job.key, run.includes(job.key) ? state : records[job.key] ? "retained" : "waiting"]));
+}
+
+function bundleRecordVersions(values) {
+  return JSON.stringify(Object.keys(values).sort().map((key) => {
+    const record = values[key];
+    return [key, record.run_id, Object.entries(record.outputs || {}).sort(),
+      Object.entries(record.inputs || {}).sort().map(([parent, input]) =>
+        [parent, input.run_id, input.checksum])];
+  }));
+}
+
+function publishedRunBundle() {
+  const run = cloud.run, result = run?.result;
+  if (run?.status !== "complete" || !run.id || !result?.run_id || !result.records ||
+      result.run_id !== latestRun ||
+      bundleRecordVersions(result.records) !== bundleRecordVersions(records)) return null;
+  return { request_id: run.id, run_id: result.run_id, versions: bundleRecordVersions(records) };
+}
+
+function canDownloadBundle() {
+  if (busy || !Object.keys(records).length) return false;
+  if (mode === "saved") return Boolean(payload.saved.bundle);
+  const current = publishedRunBundle();
+  return Boolean(!unresolvedLive && cloud.session && publishedBundle && current &&
+    current.request_id === publishedBundle.request_id && current.run_id === publishedBundle.run_id &&
+    current.versions === publishedBundle.versions);
 }
 
 function status(kind, title, message) {
@@ -1033,7 +1060,9 @@ function render() {
     : start === "submission"
     ? "Run full workflow →"
     : "Run from this job →";
-  $("download").disabled = busy || !Object.keys(records).length;
+  $("download").disabled = !canDownloadBundle();
+  $("download").title = mode === "saved" ? "Download saved results"
+    : $("download").disabled ? "Download after a successful run" : "Download this completed run";
   $("reset").disabled = busy || !ready || mode === "saved";
   $("mode").disabled = busy;
   $("handover").disabled = busy || mode === "saved";
@@ -1153,11 +1182,12 @@ function handleEvent(event) {
   if (event.state === "session_expired") {
     // Only the live session loses its files; settings and job selection survive.
     if (modeStates.cloud) Object.assign(modeStates.cloud, {
-      records: {}, states: {}, latestRun: "", completedRun: null, messages: [],
+      records: {}, states: {}, latestRun: "", completedRun: null, publishedBundle: null, messages: [],
     });
     if (mode !== "cloud") return;
     records = {};
     completedRun = null;
+    publishedBundle = null;
     latestRun = "";
     waitingTransfer = null;
     confirmingTransfer = false;
@@ -1174,6 +1204,7 @@ function handleEvent(event) {
     return;
   }
   if (event.state === "plan") {
+    publishedBundle = null;
     correctionPending = false;
     activities = {};
     waitingTransfer = null;
@@ -1260,6 +1291,7 @@ $("run").onclick = async () => {
   correctionPending = false;
   activities = {};
   completedRun = null;
+  publishedBundle = null;
   states = runStates(plan.run, "waiting");
   messages.length = 0;
   $("execution-log").textContent = "";
@@ -1284,6 +1316,7 @@ $("run").onclick = async () => {
     dispatchPending = false;
     busy = false;
     latestRun = result.run_id;
+    publishedBundle = publishedRunBundle();
     status(
       "complete",
       "Results are ready",
@@ -1359,6 +1392,7 @@ $("connect-workflow").onclick = () => transferFiles(true);
 $("reset").onclick = async () => {
   if (!ready || busy || mode !== "cloud" || unresolvedLive) return;
   ++planVersion;
+  publishedBundle = null;
   busy = true;
   status("running", "Starting afresh", "Clearing the live workspace. No new analysis has started.");
   render();
@@ -1489,13 +1523,20 @@ function download(name, bytes, type) {
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 $("download").onclick = async () => {
+  if (!canDownloadBundle()) return;
+  const downloadMode = mode, version = modeVersion;
+  const publication = publishedBundle;
   try {
     const bytes = Uint8Array.from(
       atob(mode === "saved" ? payload.saved.bundle : await call("download")),
       (char) => char.charCodeAt(0),
     );
+    if (mode !== downloadMode || version !== modeVersion || !canDownloadBundle() ||
+        (mode === "cloud" && publishedBundle?.request_id !== publication?.request_id)) return;
     download("fisheries-workflow-run.zip", bytes, "application/zip");
   } catch (error) {
+    if (mode !== downloadMode || version !== modeVersion || !canDownloadBundle() ||
+        (mode === "cloud" && publishedBundle?.request_id !== publication?.request_id)) return;
     status("failed", "Download unavailable", error.message);
   }
 };
@@ -1635,7 +1676,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     fallbackReason + " The saved example is available. No new analysis has started.";
   modeStates[mode] = {
     records, states, latestRun, selected, executionScope, settingsIntent,
-    completedRun, messages: [...messages], settings: settings(),
+    completedRun, publishedBundle, messages: [...messages], settings: settings(),
     handover: $("handover").value,
   };
   mode = next;
@@ -1659,6 +1700,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   settingsIntent = saved?.settingsIntent || false;
   $("handover").value = saved?.handover || "connected";
   completedRun = saved?.completedRun || null;
+  publishedBundle = saved?.publishedBundle || null;
   messages.splice(0, messages.length, ...(saved?.messages || []));
   $("execution-log").textContent = messages.join("\n") || "No execution yet.";
   const values = mode === "saved" ? payload.saved.settings : saved?.settings;
@@ -1699,8 +1741,9 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
         if (version !== modeVersion) return;
         records = result.records;
         states = {};
-        latestRun = "";
+        latestRun = cloud.run?.status === "complete" ? cloud.run.result?.run_id || "" : "";
         completedRun = null;
+        publishedBundle = publishedRunBundle();
       }
       if (version !== modeVersion) return;
       ready = true;

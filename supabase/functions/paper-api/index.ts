@@ -1,5 +1,6 @@
 import {
   createGitHub,
+  observationUpdate,
   OWNER_ID,
   REPOSITORY as REPO,
   REPOSITORY_ID,
@@ -10,6 +11,7 @@ import { createDatabase, DatabaseError } from "./database.ts";
 import { validateRunnerWrite } from "./runner-write.ts";
 import { runScope, runSettings } from "./request.ts";
 import { confirmTransfer } from "./transfer.ts";
+import { publishedBundle } from "./publication.ts";
 import { checkSession, SessionDenied, SessionExpired, startInSession } from "./session.ts";
 const jobs = [
   "submission",
@@ -194,14 +196,8 @@ async function observeRun(run: any) {
       r.display_title.endsWith(run.id)
     );
   }
-  const update: any = {};
-  if (remote) {
-    update.github_run = String(remote.id);
-    if (remote.status === "completed" && remote.conclusion !== "success") {
-      update.status = "failed";
-      update.error = "The GitHub execution " + remote.conclusion +
-        ". Open its execution record for details.";
-    }
+  const update = observationUpdate(run, remote);
+  if (Object.keys(update).length) {
     // Never overwrite a completion saved by the runner during this network request.
     await db(
       "paper_runs?id=eq." + run.id + "&status=in.(queued,running,handover)",
@@ -328,9 +324,7 @@ export async function handle(request: Request) {
       return reply(rows[0].output);
     }
     if (path === "/bundle") {
-      const [full] = await db("paper_sessions?id=eq." + sid + "&select=bundle");
-      if (!full.bundle) throw Error("The result bundle is not ready.");
-      return reply(full);
+      return reply(await publishedBundle(db, sid));
     }
     if (path === "/checkpoint") {
       const [full] = await db(
