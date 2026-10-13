@@ -160,7 +160,7 @@ grant execute on function public.paper_runner_write to service_role;
 -- Delegate to the same atomic receipt function without changing its payload.
 create or replace function public.paper_runner_finish(
  p_request uuid,p_operation uuid,p_action text,p_body jsonb
-) returns void language plpgsql security invoker set search_path='' set statement_timeout='20s' as $$
+) returns void language plpgsql security invoker set search_path='' set statement_timeout='20s' set work_mem='16MB' as $$
 begin
  if p_action is distinct from 'finish' then
   raise exception 'Invalid completed execution action';
@@ -169,6 +169,12 @@ begin
 end $$;
 revoke all on function public.paper_runner_finish(uuid,uuid,text,jsonb) from public,anon,authenticated;
 grant execute on function public.paper_runner_finish(uuid,uuid,text,jsonb) to service_role;
+
+-- Hoist the finish function's memory setting before PostgREST materialises its
+-- large JSON argument. Other RPCs retain the database's work_mem setting.
+alter role authenticator in database postgres set pgrst.db_hoisted_tx_settings =
+ 'statement_timeout,plan_filter.statement_cost_limit,default_transaction_isolation,work_mem';
+notify pgrst, 'reload config';
 
 create extension if not exists pg_cron;
 do $$ begin
