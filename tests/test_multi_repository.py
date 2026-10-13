@@ -48,6 +48,7 @@ class SourceFixture:
         self.root = self.base / 'coordinator'
         self.root.mkdir()
         (self.root / 'workflow/r').mkdir(parents=True)
+        shutil.copyfile(ROOT / 'workflow/results.qmd', self.root / 'workflow/results.qmd')
         for name in ('common.R', 'models.R', 'mse.R'):
             shutil.copyfile(ROOT / 'workflow/r' / name, self.root / 'workflow/r' / name)
         self.lock = {'schema_version': 1, 'repositories': {}, 'libraries': {}}

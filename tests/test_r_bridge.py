@@ -12,6 +12,8 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from workflow.r_bridge import RBridge, kill_process_group, run_command
 from workflow.quarto_reports import render_report
+from workflow.reports import output_page
+from workflow.spec import SPEC
 
 IMAGE = 'ghcr.io/example/calculation@sha256:' + 'a' * 64
 
@@ -176,3 +178,81 @@ class RBridgeTests(unittest.TestCase):
                 render_report(root, 'cpue_report', {}, {}, Path(directory), 'fallback')
             self.assertFalse((Path(directory) / 'report.html').exists())
             self.assertTrue((Path(directory) / 'report.qmd').exists())
+
+    def test_static_result_requires_Quarto_and_container_without_HTML_fallback(self):
+        root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(RBridge, 'require_container', return_value=IMAGE), \
+             patch('workflow.quarto_reports.shutil.which', return_value=None):
+            folder = Path(directory)
+            with self.assertRaisesRegex(RuntimeError, 'Quarto is required for native result views'):
+                render_report(root, 'cpue_a', {}, {}, folder, 'fallback')
+            self.assertFalse((folder / 'report.html').exists())
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(RBridge, 'require_container', side_effect=RuntimeError('container required')), \
+             patch('workflow.quarto_reports.run_command') as execute:
+            with self.assertRaisesRegex(RuntimeError, 'container required'):
+                render_report(root, 'cpue_a', {}, {}, Path(directory), 'fallback')
+            execute.assert_not_called()
+
+    def test_all_job_keys_take_native_Quarto_route_with_preserved_static_or_formal_sources(self):
+        root = Path(__file__).resolve().parents[1]
+        result = {'sets': [{'set_id': 'sample', 'year': 2000, 'vessel': 'A', 'hooks': 1000, 'catch_n': 2}]}
+        record = {'run_id': 'Fixture', 'settings': {}, 'software': {'quarto': 'fixture'}}
+        page = output_page(SPEC['submission'], result, record, [])
+        for key in SPEC:
+            with self.subTest(job=key), tempfile.TemporaryDirectory() as directory:
+                folder = Path(directory)
+                calls = []
+
+                def execute(command, timeout, environment=None):
+                    calls.append(command[-1])
+                    if command[-1] == 'report':
+                        self.assertEqual(environment['PAPER_REPORT_DIR'], str(folder.resolve()))
+                        self.assertNotIn('MAKEFLAGS', environment)
+                        # Explicit renderer double; no R or Quarto subprocess executes.
+                        (folder / 'report.html').write_text('MOCK QUARTO RENDER')
+                    return Mock(returncode=0, stderr='', stdout='1.8.27\n')
+
+                with patch.object(RBridge, 'require_container', return_value=IMAGE), \
+                     patch('workflow.quarto_reports.shutil.which', return_value='/usr/bin/quarto'), \
+                     patch('workflow.quarto_reports.make_command', side_effect=lambda target: ['make', target]), \
+                     patch('workflow.quarto_reports.run_command', side_effect=execute), \
+                     patch.dict(os.environ, {'MAKEFLAGS': '--jobs=12'}):
+                    metadata = render_report(root, key, result, record, folder, page)
+                formal = key.endswith('_report')
+                source = root / 'jobs' / key / 'report.qmd' if formal else root / 'workflow/results.qmd'
+                self.assertEqual((folder / 'report.qmd').read_bytes(), source.read_bytes())
+                self.assertEqual(json.loads((folder / 'report-data.json').read_text()), {'result': result, 'record': record})
+                self.assertEqual(calls, ['report', 'quarto-version'])
+                self.assertTrue(metadata['quarto_executed'])
+                self.assertEqual(metadata['engine'], 'Quarto')
+                self.assertEqual(metadata['version'], '1.8.27')
+                self.assertEqual(metadata['execution_engine'], 'knitr' if formal else 'static')
+                self.assertEqual(set(metadata['artifacts']), {p.name for p in folder.iterdir()})
+                self.assertEqual(metadata['presentation_source'], source.relative_to(root).as_posix())
+                if not formal:
+                    self.assertIn('<svg', (folder / 'report-body.html').read_text())
+                    self.assertNotIn('<html', (folder / 'report-body.html').read_text())
+                    self.assertNotIn('<body', (folder / 'report-body.html').read_text())
+                    self.assertNotIn('```{', (folder / 'report.qmd').read_text())
+                    self.assertIn('minimal: true', (folder / 'report.qmd').read_text())
+                    self.assertEqual(metadata['plot_generator'], 'Python SVG from saved results')
+
+    def test_static_Quarto_failure_preserves_sources_but_does_not_claim_success(self):
+        root = Path(__file__).resolve().parents[1]
+        result = {'series': [{'year': 2000, 'index': 1}]}
+        record = {'run_id': 'Fixture'}
+        page = output_page(SPEC['cpue_a'], result, record, [])
+        with tempfile.TemporaryDirectory() as directory, \
+             patch.object(RBridge, 'require_container', return_value=IMAGE), \
+             patch('workflow.quarto_reports.shutil.which', return_value='/usr/bin/quarto'), \
+             patch('workflow.quarto_reports.make_command', return_value=['make', 'report']), \
+             patch('workflow.quarto_reports.run_command', return_value=Mock(
+                 returncode=1, stderr='static render failed', stdout='')):
+            folder = Path(directory)
+            with self.assertRaisesRegex(RuntimeError, 'Quarto report failed: static render failed'):
+                render_report(root, 'cpue_a', result, record, folder, page)
+            self.assertFalse((folder / 'report.html').exists())
+            self.assertEqual({path.name for path in folder.iterdir()},
+                             {'report.qmd', 'report-data.json', 'report-body.html'})

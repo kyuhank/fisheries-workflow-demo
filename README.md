@@ -41,8 +41,10 @@ low-biomass results are conditional on that guardrail.
 
 ## Use the demo
 
+Plots are visible immediately. CPUE results overlay standardised and nominal rates on the same selected rows; assessment and MSE results show their main comparisons. All views are rendered by Quarto from saved numerical outputs. The three report jobs give the methods and checks.
+
 1. Choose **View example** to inspect the saved results, or **Live run** to
-   execute the R jobs and Quarto reports on GitHub Actions.
+   execute the R jobs and Quarto result views on GitHub Actions.
 2. Select a job and open **Output**. Use **Inputs & versions** to trace its
    producing records and exact source.
 3. Choose **Run full workflow**. The default snapshot ends in 2021; select 2022

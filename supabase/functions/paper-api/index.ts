@@ -9,6 +9,7 @@ import { setup } from "./setup.ts";
 import { createDatabase, DatabaseError } from "./database.ts";
 import { validateRunnerWrite } from "./runner-write.ts";
 import { runScope, runSettings } from "./request.ts";
+import { confirmTransfer } from "./transfer.ts";
 import { checkSession, SessionDenied, SessionExpired, startInSession } from "./session.ts";
 const jobs = [
   "submission",
@@ -374,21 +375,7 @@ export async function handle(request: Request) {
       return reply({ id, status: "queued" });
     }
     if (path === "/transfer") {
-      const rows = await db(
-        "paper_runs?session_id=eq." + sid + "&status=eq.handover",
-      );
-      if (rows.length !== 1) throw Error("No transfer is pending.");
-      await db(
-        "paper_runs?id=eq." + rows[0].id +
-          "&status=eq.handover&transfer_count=eq." + rows[0].transfer_count,
-        "PATCH",
-        {
-          transfer_count: rows[0].transfer_count + 1,
-          connected: b.connect === true,
-          status: "running",
-        },
-      );
-      return reply({ ok: true });
+      return reply(await confirmTransfer(db, sid, b));
     }
     if (path === "/reset") {
       const active = await db(

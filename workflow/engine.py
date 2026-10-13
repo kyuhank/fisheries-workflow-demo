@@ -65,7 +65,7 @@ def calculation_files():
 def source_payload(sources=None):
     """Canonical exact source closure used by run, page and release downloads."""
     sources = sources or SourceResolver(ROOT)
-    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('data/**/*'),
+    files = [*ROOT.glob('workflow/*.py'), *ROOT.glob('workflow/*.sql'), *ROOT.glob('workflow/*.qmd'), *ROOT.glob('data/**/*'),
              *calculation_files(), *ROOT.glob('tests/*.py'), *ROOT.glob('tests/*.R'),
              *ROOT.glob('cloud/*.py'), *ROOT.glob('cloud/*.sql'), *ROOT.glob('vendor/analysis/*')]
     files += job_files()
@@ -393,7 +393,7 @@ class Workflow:
         record['report_rendering'] = rendered
         record['outputs']['report.html'] = digest((folder / 'report.html').read_bytes())
         if rendered['quarto_executed']:
-            for name in ('report.qmd', 'report-data.json'):
+            for name in rendered.get('artifacts', ('report.qmd', 'report-data.json')):
                 record['outputs'][name] = digest((folder / name).read_bytes())
         (folder / 'record.json').write_text(json.dumps(record, indent=2) + '\n')
         self.persist()

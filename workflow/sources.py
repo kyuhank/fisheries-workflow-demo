@@ -183,7 +183,7 @@ class SourceResolver:
             required = {'run.py', 'verify.py', 'Makefile', 'workflow/engine.py', 'workflow/spec.py',
                         'workflow/r_bridge.py', 'workflow/r_driver.R', 'workflow/Makefile',
                         'workflow/jobs.json', 'workflow/sources.py', 'workflow/contracts.py',
-                        'workflow/reports.py', 'workflow/quarto_reports.py', 'workflow/r/common.R'}
+                        'workflow/reports.py', 'workflow/quarto_reports.py', 'workflow/results.qmd', 'workflow/r/common.R'}
             if not isinstance(origin['files'], dict) or not required <= set(origin['files']):
                 raise ValueError('Frozen coordinator identity is missing executable source pins')
             for name, checksum in origin['files'].items():
@@ -213,6 +213,9 @@ class SourceResolver:
             result[self.archive_name(path)] = path
         if key.endswith('_report'):
             qmd = self.job_path(key, 'report.qmd')
+            result[self.archive_name(qmd)] = qmd
+        else:
+            qmd = self.root / 'workflow/results.qmd'
             result[self.archive_name(qmd)] = qmd
         return result
 

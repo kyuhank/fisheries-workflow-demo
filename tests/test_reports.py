@@ -1,9 +1,12 @@
 """Reports describe their supplied results rather than repeating the summary view."""
 import copy
 from html.parser import HTMLParser
+import json
+from pathlib import Path
 import unittest
+from unittest.mock import patch
 
-from workflow.reports import output_page
+from workflow.reports import cpue_rates, output_page
 from workflow.spec import SPEC
 
 
@@ -158,12 +161,96 @@ class ReportTest(unittest.TestCase):
         self.assertIn('annual total catches in tonnes', text.lower())
         self.assertIn('fish-5', text)
         self.assertNotIn('fish-6', text)
-        self.assertIn(result['sql'], text)
+        self.assertIn('Data preserves all selected rows and the extraction SQL', text)
+        self.assertNotIn(result['sql'], text)
         result['sets'].append({'set_id': 'new', 'year': 2024, 'vessel': 'B',
                                'hooks': 1000, 'catch_n': 3})
         result['catch'].append({'year': 2024, 'catch_t': 350})
         updated = ''.join(ReportReader(self.page('extract', result)).content)
         self.assertIn('13 observations · 2000–2024 · 4 annual catch records', updated)
+
+    def test_cpue_overlay_uses_saved_same_analysis_rates_before_values(self):
+        result = {'series': [{'year': 2000, 'index': 1, 'standardised_cpue': 10, 'nominal_cpue': 12},
+                             {'year': 2001, 'index': .8, 'standardised_cpue': 8, 'nominal_cpue': 11}],
+                  'method': 'Quasipoisson GLM', 'sets_used': 8, 'sets_excluded': 4, 'min_hooks': 1000,
+                  'standardisation': 'Fixed supported strata'}
+        original = copy.deepcopy(result)
+        for key in ('cpue_a', 'cpue_b'):
+            with self.subTest(job=key), patch('workflow.reports.plot', return_value='<svg></svg>') as chart:
+                page = self.page(key, result)
+                chart.assert_called_once_with(cpue_rates(result['series']), 'cpue', 'Fish per 1,000 hooks')
+                self.assertLess(page.index('<svg>'), page.index('<table>'))
+                self.assertIn('same selected rows; 8 used, 4 excluded; effort filter: at least 1000 hooks', page)
+                self.assertNotIn('<details', page)
+        self.assertEqual(result, original)
+
+    def test_summary_overlay_does_not_use_unfiltered_B_as_A_nominal(self):
+        result = {'series': {'CPUE analysis A': [
+                    {'year': 2000, 'index': 1, 'standardised_cpue': 10, 'nominal_cpue': 12},
+                    {'year': 2001, 'index': .8, 'standardised_cpue': 8, 'nominal_cpue': 11}],
+                'CPUE analysis B': [
+                    {'year': 2000, 'index': 1, 'standardised_cpue': 900, 'nominal_cpue': 900},
+                    {'year': 2001, 'index': .9, 'standardised_cpue': 810, 'nominal_cpue': 810}]},
+                  'analyses': {'CPUE analysis A': {'sets_used': 8, 'sets_excluded': 4, 'min_hooks': 1000},
+                               'CPUE analysis B': {'sets_used': 12, 'sets_excluded': 0, 'min_hooks': 0}}}
+        with patch('workflow.reports.plot', return_value='<svg></svg>') as chart:
+            page = self.page('cpue_summary', result)
+        overlay = next(call for call in chart.call_args_list if call.args[1] == 'cpue')
+        self.assertEqual(overlay.args[0], cpue_rates(result['series']['CPUE analysis A']))
+        self.assertLess(page.index('Standardised and nominal'), page.index('Relative indices A and B'))
+        self.assertIn('An A-only effort filter does not apply to B', page)
+        self.assertNotIn('<details', page)
+
+    def test_legacy_relative_cpue_has_explicit_overlay_absence(self):
+        summary = self.page('cpue_summary', self.cpue)
+        self.assertIn('A-row nominal overlay is unavailable', summary)
+        self.assertEqual(ReportReader(summary).tags.count('svg'), 1)
+        page = self.page('cpue_a', {'series': self.cpue['series']['CPUE analysis A']})
+        self.assertIn('nominal and standardised rates were not recorded', page)
+        self.assertEqual(ReportReader(page).tags.count('svg'), 1)
+
+    def test_all_saved_nonreport_views_have_no_folds_or_raw_record_dumps(self):
+        root = Path(__file__).resolve().parents[1]
+        keys = [key for key in SPEC if not key.endswith('_report')]
+        self.assertEqual(len(keys), 19)
+        for key in keys:
+            with self.subTest(job=key):
+                result = json.loads((root / 'docs/example' / key / 'output.json').read_text())
+                original = copy.deepcopy(result)
+                page = self.page(key, result)
+                tags = ReportReader(page).tags
+                self.assertNotIn('details', tags)
+                self.assertNotIn('summary', tags)
+                self.assertNotIn('pre', tags)
+                self.assertLessEqual(tags.count('svg'), 2)
+                self.assertLessEqual(tags.count('table'), 1)
+                self.assertEqual(tags.count('h1'), 1)
+                self.assertIn('Inputs &amp; versions', page)
+                self.assertEqual(result, original)
+                if key.startswith(('cpue_', 'assessment_', 'mse_')) and key != 'mse_prepare':
+                    self.assertGreaterEqual(tags.count('svg'), 1)
+                    if 'table' in tags:
+                        self.assertLess(tags.index('svg'), tags.index('table'))
+
+    def test_assessment_displays_observed_fitted_and_biomass_before_checks(self):
+        root = Path(__file__).resolve().parents[1]
+        result = json.loads((root / 'docs/example/assessment_a1/output.json').read_text())
+        page = self.page('assessment_a1', result)
+        self.assertIn('Observed CPUE', page)
+        self.assertIn('Fitted CPUE', page)
+        self.assertIn('Biomass trajectory', page)
+        self.assertEqual(ReportReader(page).tags.count('svg'), 2)
+        self.assertLess(page.rindex('</svg>'), page.index('<table>'))
+
+    def test_mse_summary_tradeoff_contains_actual_metrics_before_table(self):
+        root = Path(__file__).resolve().parents[1]
+        result = json.loads((root / 'docs/example/mse_summary/output.json').read_text())
+        page = self.page('mse_summary', result)
+        self.assertIn('Management trade-off: mean annual catch', page)
+        self.assertLess(page.rindex('</svg>'), page.index('<table>'))
+        for row in result['metrics']:
+            self.assertIn(f'{row["mean_catch_t"]:.4g} t/year; final B / K {row["final_B_over_K"]:.4g}', page)
+        self.assertIn('does not rank the rules', page)
 
 
 if __name__ == '__main__':

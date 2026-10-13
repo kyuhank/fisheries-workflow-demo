@@ -55,7 +55,7 @@ def data_page(source):
             'observed in every year: 132 records through 2021, or 138 through 2022.</p>'
             '<p><a href="data/fiji-source.csv" download>Source projection (CSV)</a> · '
             '<a href="data/extract.sql" download>Selection query (SQL)</a></p>'
-            '<details><summary>Read the SQL</summary><pre>' + html.escape(query) + '</pre></details>'
+            '<h3>Selection query</h3><pre>' + html.escape(query) + '</pre>'
             '<h2>2. Standardise catch per effort</h2><p>CPUE A uses year and cell–quarter stratum '
             'with a log effort offset. CPUE B uses year alone. Both quasi-Poisson models predict '
             'fish per 1,000 hooks. A averages the same six strata equally in each year; '
@@ -124,8 +124,9 @@ def build():
             'builder_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             'extracted_records': len(runner.output('extract')['sets']),
             'annual_catches': len(runner.output('extract')['catch']),
-            'report_jobs': [key for key, record in runner.records.items()
-                            if record['report_rendering']['quarto_executed']]}
+            'report_jobs': [key for key in runner.records if key.endswith('_report')],
+            'quarto_result_views': [key for key, record in runner.records.items()
+                                    if record['report_rendering']['quarto_executed']]}
         (ROOT / 'docs/build-record.json').write_text(json.dumps(build_record, indent=2) + '\n')
         saved = runner.state()
         saved['outputs'] = {key: {'html': (runner.directory/key/'report.html').read_text(),

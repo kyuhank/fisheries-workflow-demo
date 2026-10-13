@@ -62,7 +62,8 @@ explains adding jobs, declaring connections and changing source pins.
 | File | Purpose |
 | --- | --- |
 | `jobs/*/run.R` | one named calculation |
-| `jobs/*_report/report.qmd` | render saved results without refitting |
+| `jobs/*_report/report.qmd` | complete analysis reports from saved results |
+| `workflow/results.qmd` | concise Quarto result views; plots use saved numerical outputs |
 | `workflow/r/common.R` | row checks, source selection and annual joins |
 | `workflow/r/models.R` | monorepo CPUE and Schaefer functions |
 | `workflow/r/mse.R` | management trials with shared random errors |

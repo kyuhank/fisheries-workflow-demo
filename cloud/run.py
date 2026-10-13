@@ -202,6 +202,9 @@ class HostedWorkflow(HostedCalculationWorkflow):
                 self.pool = None
 
     def publish(self, event):
+        if event.get('state') == 'handover' and getattr(self, 'context', {}).get('id'):
+            event = {**event, 'request_id': self.context['id'],
+                     'transfer_count': self.transfer_count}
         output = None
         if event.get('state') == 'complete':
             key = event['job']

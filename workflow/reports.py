@@ -1,10 +1,12 @@
-"""Readable HTML outputs, with small native SVG plots and recorded inputs."""
+"""Concise result views and formal accounts, prepared from saved results."""
 import html
 import json
 import math
 
 STYLE = '''body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}'''
 STYLE += '''.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}'''
+STYLE += '''.plot-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.plot-pair h2{font-size:17px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 12px}.result-method{font-size:14px;color:#526477}.result-view h2{margin-top:20px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}'''
+MSE_COLOURS = {'Constant catch': '#1378a3', 'Index rule': '#b56435', 'Buffered rule': '#7357a8'}
 
 
 def esc(value):
@@ -93,6 +95,8 @@ def table(rows, columns, limit=None):
 def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     colours = ['#1378a3', '#b56435', '#7357a8', '#328363', '#a7526d', '#93761e', '#277f88', '#66748b']
     all_rows = [r for rows in series.values() for r in rows]
+    if not all_rows:
+        return '<p class="muted">No saved values are available for this plot.</p>'
     xs = [r['year'] for r in all_rows]; ys = [r[value] for r in all_rows]
     xmin, xmax = min(xs), max(xs)
     ymin, ymax = min(0, min(ys) * 1.1), max(0, max(ys) * 1.1)
@@ -111,7 +115,7 @@ def plot(series, value, label, points=(), colour_by_name=None, upper=None):
             v = 0.0
         stroke = '#9cafba' if v == 0 and ymin < 0 else '#e1e8ee'
         out.append(f'<path d="M65 {y(v):.1f}H730" stroke="{stroke}"/><text x="54" y="{y(v)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{v:g}</text>')
-    for year in [xmin, (xmin+xmax)//2, xmax]:
+    for year in sorted({xmin, (xmin+xmax)//2, xmax}):
         out.append(f'<text x="{x(year):.1f}" y="304" text-anchor="middle" fill="#607080" font-size="12">{year}</text>')
     for i, (name, rows) in enumerate(series.items()):
         coordinates = ' '.join(f'{x(r["year"]):.2f},{y(r[value]):.2f}' for r in rows)
@@ -256,7 +260,7 @@ def mse_scenario_plots(result):
         scenarios = [{**s, 'series': {row['name']: s['series'][row['name']] for row in s['metrics']}
                       if isinstance(s['series'], dict)
                       else {result['name']: s['series']}} for s in scenarios]
-    colours = {'Constant catch': '#1378a3', 'Index rule': '#b56435', 'Buffered rule': '#7357a8'}
+    colours = MSE_COLOURS
     axes = [('B_over_K', 'Median end-of-year biomass / carrying capacity'),
             ('catch_t', 'Median annual realised catch (tonnes)')]
     ceilings = {key: max(r[key] for s in scenarios for rows in s['series'].values() for r in rows)
@@ -334,195 +338,221 @@ def mse_report(result):
             '<details><summary>Scope and assumptions</summary>' + mse_limits(result) + '</details>')
 
 
-def output_page(job, result, record, lineage):
-    key = job['key']; body = '<p>' + esc(job['description']) + '</p>'
+
+def cpue_rates(rows):
+    """Use the two rates saved by one producing analysis on its selected rows."""
+    if not rows or not all('standardised_cpue' in row and 'nominal_cpue' in row for row in rows):
+        return None
+    return {label: [{'year': row['year'], 'cpue': row[field]} for row in rows]
+            for field, label in [('standardised_cpue', 'Standardised'), ('nominal_cpue', 'Nominal')]}
+
+
+def cpue_support(analysis):
+    parts = ['Both curves use the same selected rows']
+    if 'sets_used' in analysis:
+        parts.append(f'{analysis["sets_used"]:,} used, {analysis.get("sets_excluded", 0):,} excluded')
+    if 'min_hooks' in analysis:
+        parts.append(f'effort filter: at least {analysis["min_hooks"]:g} hooks')
+    return '<p class="result-method">' + esc('; '.join(parts)) + '.</p>'
+
+
+def paired_plots(left_title, left, right_title, right):
+    return ('<div class="plot-pair"><section><h2>' + esc(left_title) + '</h2>' + left
+            + '</section><section><h2>' + esc(right_title) + '</h2>' + right + '</section></div>')
+
+
+def mse_tradeoff(metrics):
+    """Plot the actual saved catch/biomass metrics, with no rule ranking."""
+    if not metrics:
+        return '<p>No saved management metrics are available.</p>'
+    colours = MSE_COLOURS
+    xmax = max(1, max(row['mean_catch_t'] for row in metrics) * 1.15)
+    ymax = max(1, max(row['final_B_over_K'] for row in metrics) * 1.15)
+    x = lambda v: 75 + 610 * v / xmax
+    y = lambda v: 275 - 220 * v / ymax
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" '
+           'aria-label="Management trade-off: mean annual catch (tonnes) and median final biomass / carrying capacity">']
+    for i in range(5):
+        catch, biomass = xmax * i / 4, ymax * i / 4
+        out.append(f'<path d="M75 {y(biomass):.1f}H685" stroke="#e1e8ee"/>'
+                   f'<text x="64" y="{y(biomass)+4:.1f}" text-anchor="end" fill="#607080" font-size="12">{biomass:.2g}</text>'
+                   f'<text x="{x(catch):.1f}" y="299" text-anchor="middle" fill="#607080" font-size="12">{catch:,.0f}</text>')
+    for i, row in enumerate(metrics):
+        colour = colours.get(row['name'], '#1378a3')
+        out.append(f'<circle cx="{x(row["mean_catch_t"]):.2f}" cy="{y(row["final_B_over_K"]):.2f}" '
+                   f'r="6" fill="{colour}"><title>{esc(row["name"])}: {row["mean_catch_t"]:.4g} t/year; '
+                   f'final B / K {row["final_B_over_K"]:.4g}</title></circle>'
+                   f'<text x="{x(row["mean_catch_t"])+9:.2f}" y="{y(row["final_B_over_K"])-8-i*13:.2f}" '
+                   f'fill="{colour}" font-size="13">{i+1}</text>'
+                   f'<text x="{75+i*205}" y="25" fill="{colour}" font-size="13">{i+1}. {esc(row["name"])}</text>')
+    out.append('<text x="75" y="328" fill="#607080" font-size="12">Mean annual realised catch (tonnes); y: median final B / K</text></svg>')
+    return ''.join(out)
+
+
+def annual_coverage(rows):
+    counts = {}
+    for row in rows:
+        counts[row['year']] = counts.get(row['year'], 0) + 1
+    return [{'year': year, 'records': counts[year]} for year in sorted(counts)]
+
+
+def coverage_text(rows):
+    years = [row['year'] for row in rows]
+    return f'{min(years)}–{max(years)}' if years else 'No observation years'
+
+
+def result_view(job, result):
+    """Keep all nineteen non-report views visible, brief and based on saved values."""
+    key = job['key']
     if key == 'submission':
-        public = bool(result['sets'] and 'stratum' in result['sets'][0])
+        rows = result['sets']
+        public = bool(rows and 'stratum' in rows[0])
         unit = 'public aggregate records' if public else 'synthetic fishing observations'
-        body += '<p>' + str(len(result['sets'])) + ' submitted ' + unit + '.</p>'
-        body += table(result['sets'], observation_columns(result['sets']), 6)
-        body += '<p class="muted">First six rows shown; the Data tab preserves every submitted row.</p>'
+        body = (f'<p>{len(rows):,} submitted {unit} · {esc(coverage_text(rows))}.</p>'
+                + plot({'Submitted records': annual_coverage(rows)}, 'records', 'Records per year'))
+        body += '<h2>Sample of submitted rows</h2>' + table(rows, observation_columns(rows), 6)
         if public:
-            body += '<p>Each row combines a fleet, five-degree cell, quarter and year. '
-            body += '<code>set_id</code> identifies that aggregate row; vessel IDs are unavailable.</p>'
-    elif key == 'qc':
+            body += '<p>Each row combines fleet, five-degree cell, quarter and year; vessel IDs are unavailable.</p>'
+        return body + '<p class="muted">First six rows shown. Open Data for all submitted rows.</p>'
+    if key == 'qc':
         passed = all(row['result'] == 'Pass' for row in result['checks'])
         message = ('The corrected submission passed all checks.' if result['returned']
                    else 'All records passed the checks.') if passed else 'The quality checks need review.'
-        body += '<p class="note">' + message + '</p>'
-        body += table(result['checks'], [('check','Check'),('result','Result')])
+        body = '<p class="note">' + message + '</p>' + table(result['checks'], [('check', 'Check'), ('result', 'Result')])
         if result['returned']:
-            body += '<h2>Correction record</h2><p>Invalid submitted rows were returned and replaced '
-            body += 'from the supplied source. The record preserves the correction.</p>'
-    elif key == 'database':
+            body += '<p>Invalid rows were returned and replaced from the supplied source. The saved correction record preserves the change.</p>'
+        return body
+    if key == 'database':
         public = result.get('grouping_field') == 'stratum'
         groups = result.get('groups', result.get('vessels', []))
         group_name = 'cell–quarter strata' if public else 'vessels'
-        body += f'<p class="note"><strong>{result["rows"]:,}</strong> records · <strong>{len(groups)}</strong> {group_name} · <strong>{result["first_year"]}–{result["last_year"]}</strong></p>'
-        body += '<p>' + esc(result.get('record_unit', 'Synthetic fishing observation')) + '.</p>'
-        body += '<p>Fishing records are saved in <code>sets</code>; annual catch in tonnes '
-        body += 'is saved separately in <code>removals</code>. The annual catch series is '
-        body += 'not a sum of catch numbers in the selected CPUE records.</p>'
-        body += '<h2>Annual catch</h2>' + plot({'Total removals': result['annual']}, 'catch_t', 'Total annual catch (tonnes)')
-        count_field = 'strata' if public else 'vessels'
-        group_series = {group: [{'year': r['year'], 'share': 100*r[count_field][group]/r['observations']}
-                               for r in result['annual']] for group in groups}
-        body += '<details><summary>Record coverage and composition</summary>' + plot(group_series, 'share', 'Share of records (%)')
-        body += '<p>CPUE analysis A adjusts for ' + ('cell–quarter strata' if public else 'vessel effects') + '.</p>'
-        body += '<h2>Annual data</h2>' + table(result['annual'], [('year','Year'),('observations','Records'),('hooks','Hooks'),('catch_n','Fish (number)'),('catch_t','Total catch (t)'),('zero_catch_percent','Zero catch (%)')]) + '</details>'
-        body += '<details><summary>Database fields</summary>' + table(result['fields'], [('name','Field'),('meaning','Meaning'),('type','Type')]) + '</details>'
-    elif key == 'extract':
-        years = [row['year'] for row in result['sets']]
-        coverage = f'{min(years)}–{max(years)}' if years else 'No observation years'
-        body += (f'<p class="note"><strong>{len(result["sets"]):,}</strong> observations · '
-                 f'<strong>{esc(coverage)}</strong> · <strong>{len(result["catch"])}</strong> '
-                 'annual catch records</p>')
-        body += ('<p>The saved query selects shared fields from records with positive effort '
-                 'and non-negative catch; any effort filter for analysis A is applied later.</p>')
-        body += '<h2>Records → CPUE</h2>' + table(result['sets'], observation_columns(result['sets']), 6)
-        body += '<p class="muted">First six rows shown; the Data tab contains all selected records.</p>'
-        body += ('<h2>Annual catch → assessment inputs</h2><p>Annual total catches in tonnes '
-                 'are joined to each CPUE index during input preparation.</p>')
-        body += '<details><summary>Extraction SQL</summary><pre>' + esc(result['sql']) + '</pre>'
-        if result.get('catch_sql'):
-            body += '<pre>' + esc(result['catch_sql']) + '</pre>'
-        body += '</details>'
-    elif key.startswith('prepare_'):
-        body += '<p>One annual CPUE index is joined to annual catch by year. No years or values are missing.</p>' + table(result['rows'], [('year','Year'),('index','Relative CPUE'),('catch_t','Catch (t)')], 6)
-        body += '<p class="muted">First six years shown; the Data tab contains every model input.</p>'
-    elif key in ('cpue_a', 'cpue_b'):
-        body = '<p>Estimate an annual CPUE index from the extracted catch and effort records.</p>'
-        body += f'<p><strong>{esc(result["method"])}</strong> · {result["sets_used"]:,} rows used · {result["sets_excluded"]:,} excluded.</p>'
-        body += '<p>' + esc(result.get('record_unit', 'Synthetic fishing observation')) + '.</p>'
-        body += plot({job['title']: result['series']}, 'index', 'CPUE relative to the first year')
-        body += table([result['series'][0], result['series'][-1]], [('year','Year'),('index','Relative CPUE')])
-        body += '<details><summary>All annual values</summary>' + table(result['series'], [('year','Year'),('index','Relative CPUE')]) + '</details>'
-        if result['series'] and 'standardised_cpue' in result['series'][0]:
-            rates = {label: [{'year': row['year'], 'cpue': row[field]} for row in result['series']]
-                     for field, label in [('standardised_cpue', 'Standardised'), ('nominal_cpue', 'Nominal')]}
-            body += '<details><summary>CPUE in fish per 1,000 hooks</summary>'
-            body += plot(rates, 'cpue', 'Fish per 1,000 hooks')
-            body += table(result['series'], [('year', 'Year'), ('standardised_cpue', 'Standardised'), ('nominal_cpue', 'Nominal')]) + '</details>'
-        body += '<details><summary>Model, prediction support and checks</summary>' + cpue_details(result) + '</details>'
-        if result.get('data_kind') == 'public-wcpfc':
-            body += '<p>The index covers the selected released strata. No confidence intervals '
-            body += 'or stock-management advice are supplied.</p>'
-    elif key.startswith('assessment_') and key[-2:] in ('a1','a2','b1','b2'):
-        body += f'<p>Schaefer surplus-production model · intrinsic growth {result["r"]:.2f} per year · R/RTMB fit. Initial biomass equals carrying capacity.</p>'
-        body += '<h2>Biomass trajectory</h2>' + plot({job['title']:result['series']}, 'B_over_K', 'Biomass / carrying capacity')
-        body += table([result['series'][0],result['series'][-1]], [('year','Year'),('B_over_K','B / K'),('harvest_rate','Harvest rate')])
-        fit_series = {'Observed CPUE':[{'year':r['year'], 'index':r['observed_index']} for r in result['series']],
-                      'Fitted CPUE':[{'year':r['year'], 'index':r['fitted_index']} for r in result['series']]}
+        body = (f'<p>{result["rows"]:,} records · {len(groups)} {group_name} · '
+                f'{result["first_year"]}–{result["last_year"]}.</p>'
+                + plot({'Total removals': result['annual']}, 'catch_t', 'Total annual catch (tonnes)'))
+        body += '<p>Annual removals are saved separately from catch numbers in the CPUE rows.</p>'
+        return body + '<h2>Sample of annual coverage</h2>' + table(result['annual'], [
+            ('year', 'Year'), ('observations', 'Records'), ('hooks', 'Hooks'),
+            ('catch_n', 'Fish (number)'), ('catch_t', 'Total catch (t)')], 6)
+    if key == 'extract':
+        rows = result['sets']
+        body = (f'<p>{len(rows):,} observations · {esc(coverage_text(rows))} · '
+                f'{len(result["catch"])} annual catch records.</p>'
+                '<p>The query selects positive effort and non-negative catch; any effort filter for analysis A is applied later.</p>')
+        body += '<h2>Records → CPUE</h2>' + table(rows, observation_columns(rows), 6)
+        body += ('<p>First six rows shown; Data preserves all selected rows and the extraction SQL.</p>'
+                 '<h2>Annual catch → assessment inputs</h2><p>Annual total catches in tonnes '
+                 'are joined to each index by year; they are not the catch numbers above.</p>')
+        return body
+    if key.startswith('prepare_'):
+        rows = result.get('rows', result.get('series', []))
+        return (f'<p>{len(rows)} annual index/catch pairs · {esc(coverage_text(rows))}.</p>'
+                '<p>The saved CPUE index and annual removals are joined by year for the stock model.</p>'
+                + table(rows, [('year', 'Year'), ('index', 'Relative CPUE'), ('catch_t', 'Catch (t)')], 6)
+                + '<p class="muted">First six years shown. Data contains every model input.</p>')
+    if key in ('cpue_a', 'cpue_b'):
+        rows = result['series']
+        rates = cpue_rates(rows)
+        body = '<p>Annual CPUE from the selected catch and effort records.</p>'
+        if rates:
+            body += plot(rates, 'cpue', 'Fish per 1,000 hooks') + cpue_support(result)
+            body += '<p>The nominal curve is 1,000 times annual fish numbers divided by annual hooks. The standardised curve uses the saved GLM prediction target.</p>'
+        else:
+            body += plot({job['title']: rows}, 'index', 'CPUE relative to the first year')
+            body += '<p>Only the relative index is available in this saved result; nominal and standardised rates were not recorded.</p>'
+        body += '<p class="result-method">' + esc(result.get('method', 'See the saved producing-job methods'))
+        if result.get('standardisation'):
+            body += ' · ' + esc(result['standardisation'])
+        body += '.</p>'
+        columns = [('year', 'Year'), ('standardised_cpue', 'Standardised (fish/1,000 hooks)'),
+                   ('nominal_cpue', 'Nominal (fish/1,000 hooks)')] if rates else [('year', 'Year'), ('index', 'Relative CPUE')]
+        return body + table([rows[0], rows[-1]] if len(rows) > 1 else rows, columns)
+    if key == 'cpue_summary':
+        series = result['series']
+        a_name = 'CPUE analysis A'
+        rates = cpue_rates(series.get(a_name, []))
+        relative = plot(series, 'index', 'Each index relative to its own first year')
+        body = '<p>Compare standardisation on analysis A’s selected rows, then compare the saved A/B indices.</p>'
+        if rates:
+            body += paired_plots('Standardised and nominal — A rows', plot(rates, 'cpue', 'Fish per 1,000 hooks'),
+                                 'Relative indices A and B', relative)
+            body += cpue_support(result.get('analyses', {}).get(a_name, {}))
+            body += '<p>The main overlay uses analysis A’s nominal rate. An A-only effort filter does not apply to B; B is not substituted for A’s nominal curve.</p>'
+            analysis = result.get('analyses', {}).get(a_name, {})
+            if analysis.get('standardisation'):
+                body += '<p class="result-method">Standardised: ' + esc(analysis['standardisation']) + '. Nominal: 1,000 × annual fish numbers / annual hooks on the A rows.</p>'
+        else:
+            body += relative + '<p>The saved result has relative indices only; an A-row nominal overlay is unavailable.</p>'
+        return body + '<p class="result-method">The A/B comparison includes differences in adjustment and row selection. Each relative index equals one in its own first year.</p>'
+    if key.startswith('assessment_') and key[-2:] in ('a1', 'a2', 'b1', 'b2'):
+        rows = result['series']
+        fit = {'Observed CPUE': [{'year': row['year'], 'index': row['observed_index']} for row in rows],
+               'Fitted CPUE': [{'year': row['year'], 'index': row['fitted_index']} for row in rows]}
+        body = '<p>Fit the annual CPUE index and carry catch removals through the stock model.</p>'
+        body += paired_plots('Observed and fitted CPUE', plot(fit, 'index', 'Relative CPUE', points=('Observed CPUE',)),
+                             'Biomass trajectory', plot({'Biomass': rows}, 'B_over_K', 'Biomass / carrying capacity'))
+        body += (f'<p class="result-method">Schaefer model · intrinsic growth {result["r"]:.2f} per year · '
+                 'R/RTMB fit · initial biomass equals carrying capacity.</p>'
+                 '<p>Points are observed indices; the fitted line follows model biomass. Biomass is relative to the fitted capacity.</p>')
         if result['boundary_fit']:
-            body += '<p class="note">The fit reached a search boundary. Inspect the fit before interpreting it.</p>'
-        body += '<details><summary>Fit and diagnostic checks</summary><h2>Fit to the CPUE index</h2>' + plot(fit_series, 'index', 'Relative CPUE', points=('Observed CPUE',))
-        body += '<h2>Fit residuals</h2>' + plot({'Log residual': result['series']}, 'log_residual', 'Log(observed / fitted); persistent patterns merit review', points=('Log residual',))
-        body += '<h2>Recorded checks</h2>' + table([result], [
-            ('feasibility_check', 'Positive biomass'), ('balance_check', 'Biomass recurrence'),
-            ('balance_residual_t', 'Balance residual (t)'), ('gradient_check', 'Projected gradient'),
-            ('projected_gradient_logK', 'Projected gradient at fit'), ('active_bound', 'Active capacity bound')])
-        body += '<p>The checks describe the declared recurrence and optimizer, and do not establish model adequacy.</p>'
-        body += '</details><details><summary>All annual estimates</summary>'
-        body += table(result['series'], [('year','Year'),('B_over_K','B / K'),('harvest_rate','Harvest rate')]) + '</details>'
-    elif key == 'cpue_report':
+            body += '<p class="note">The fit reached a search boundary and needs review.</p>'
+        checks = [{'check': title, 'value': result[field]} for field, title in [
+            ('balance_check', 'Biomass recurrence'), ('feasibility_check', 'Positive biomass'),
+            ('gradient_check', 'Projected gradient')] if field in result]
+        return body + table(checks, [('check', 'Recorded check'), ('value', 'Result')]) + '<p class="muted">These checks do not establish model adequacy. Data preserves estimates, residuals and optimizer diagnostics.</p>'
+    if key == 'assessment_summary':
+        body = '<p>Compare the four fitted biomass trajectories.</p>'
+        body += plot(result['series'], 'B_over_K', 'Biomass / each case’s carrying capacity')
+        body += '<p>The cases combine two CPUE indices and two fixed growth settings. Their differences are sensitivities, not an uncertainty interval.</p>'
+        rows = [{'case': name, 'year': values[-1]['year'], 'value': values[-1]['B_over_K']}
+                for name, values in result['series'].items() if values]
+        return body + table(rows, [('case', 'Case'), ('year', 'Final year'), ('value', 'B / K')])
+    if key == 'mse_prepare':
+        models = result['operating_models']
+        assumptions = result['assumptions']
+        model_rows = [{**model, 'starting_depletion': model['B'] / model['K']} for model in models]
+        body = (f'<p>{len(models)} fitted stock cases · {len(result["rules"])} catch rules · '
+                f'{assumptions["years"]} future years · {assumptions["replicates"]} trials per case and scenario.</p>'
+                '<h2>Starting stocks</h2>' + table(model_rows, [('name', 'Assessment case'),
+                ('first_year', 'First future year'), ('starting_depletion', 'Starting B / K'),
+                ('reference_catch_t', 'Reference catch (t/year)')]))
+        body += '<p>Trials start after the last observed catch, using the fitted next-year biomass. Future growth and observation errors are declared assumptions.</p>'
+        body += '<p>Every rule faces the same recorded scenarios and random errors. The Buffered rule job supplies the catch buffer actually tested.</p>'
+        return body + '<p class="muted">Inputs &amp; versions traces each stock to its assessment run. Data preserves parameters, scenarios and paired random streams.</p>'
+    if key in ('mse_constant', 'mse_index', 'mse_buffered'):
+        series = {result['name']: result['series']}
+        body = '<p>' + esc(result['description']) + '</p>'
+        body += paired_plots('Biomass across trials', plot(series, 'B_over_K', 'Median end-of-year B / K', colour_by_name=MSE_COLOURS),
+                             'Realised catch across trials', plot(series, 'catch_t', 'Median annual catch (tonnes)', colour_by_name=MSE_COLOURS))
+        body += '<p>These medians combine the declared stock cases and growth scenarios with equal weight; they are conditional examples.</p>'
+        body += mse_metrics([{'name': result['name'], **result['metrics']}])
+        return body + mse_metric_note() + '<p class="result-method">Observe the index → set catch → update stock → repeat. Data preserves each annual decision and one complete example trial.</p>'
+    if key == 'mse_summary':
+        body = '<p>Compare catch, stock condition and catch stability under the same trials.</p>'
+        body += paired_plots('Catch and final biomass', mse_tradeoff(result['metrics']),
+                             'Biomass through time', plot(mse_series(result), 'B_over_K', 'Median end-of-year B / K', colour_by_name=MSE_COLOURS))
+        body += '<p>Each point is one rule’s saved mean catch and median final biomass. The comparison shows trade-offs and does not rank the rules.</p>'
+        return body + mse_metrics(result['metrics']) + mse_metric_note()
+    raise ValueError('No result view for job: ' + key)
+
+
+def output_page(job, result, record, lineage):
+    key = job['key']
+    if key == 'cpue_report':
         body = '<article class="narrative-report" data-report="cpue_report">' + cpue_report(result) + '</article>'
-        if result.get('analyses'):
-            body += '<details><summary>Prediction support and model checks</summary>'
-            for name, analysis in result['analyses'].items():
-                body += '<h2>' + esc(name) + '</h2>' + cpue_details(analysis)
-            body += '</details>'
+        for name, analysis in result.get('analyses', {}).items():
+            body += '<h2>' + esc(name) + ': prediction support and checks</h2>' + cpue_details(analysis)
     elif key == 'assessment_report':
         body = '<article class="narrative-report" data-report="assessment_report">' + assessment_report(result) + '</article>'
-    elif key == 'mse_prepare':
-        body += '<p class="note">Four assessment cases → three catch rules → one comparison.</p>'
-        body += ('<h2>From stock assessment to MSE</h2><p>Each fitted assessment supplies a '
-                 'starting biomass and its fitted carrying capacity, growth and catchability. '
-                 'Simulation begins in the year after the last observed catch. '
-                 'The four cases are deliberately included in this example.</p>')
-        body += '<details><summary>How assessment results enter the trials</summary>' + table([
-            {'source': 'Fitted model and catch history', 'use': 'Carry forward the fitted final biomass.'},
-            {'source': 'Intrinsic growth and carrying capacity', 'use': 'Define annual surplus production.'},
-            {'source': 'Catchability and recent CPUE indices', 'use': 'Simulate future indices and define the reference index.'},
-            {'source': 'Recent annual catches', 'use': 'Set the reference catch for the management rules.'},
-        ], [('source', 'Assessment result used'), ('use', 'Role in MSE')]) + '</details>'
-        model_rows = [{**model, 'starting_depletion': model['B'] / model['K']}
-                      for model in result['operating_models']]
-        body += '<h2>Starting stocks</h2>' + table(model_rows, [
-            ('name', 'Assessment case'), ('first_year', 'First future year'),
-            ('starting_depletion', 'Starting B / K'), ('reference_catch_t', 'Reference catch (t/year)')])
-        body += ('<p>Open <strong>Inputs &amp; versions</strong> to follow each case to the exact '
-                 'assessment run used. Full starting states and parameters are in the Data tab.</p>')
-        body += ('<h2>Added for the future trials</h2><p>The example specifies two growth '
-                 'scenarios, observation error and three management rules. These are additional '
-                 'assumptions; they are not estimated by the assessments. Every rule faces the '
-                 'same scenarios and random trials.</p>')
-        body += '<details><summary>Management rules</summary>' + mse_rules(result) + '</details>'
-        body += ('<p>The MSE catch buffer belongs to the Buffered rule job. Changing it reuses '
-                 'these prepared stocks and common trial conditions; the MP output and MSE '
-                 'comparison record the fraction actually tested.</p>')
-        body += ('<h2>What is compared?</h2><p>Catch, biomass and annual catch changes. '
-                 'These are illustrative objectives for demonstrating the connected workflow.</p>')
-        body += '<details><summary>Simulation assumptions</summary>' + mse_methods(result) + mse_limits(result)
-        body += '<pre>' + esc(json.dumps(result['assumptions'], indent=2)) + '</pre></details>'
-    elif key in ('mse_constant', 'mse_index', 'mse_buffered'):
-        body = '<p>Test ' + esc(result['name']) + ' in the common future trials.</p><p class="note">' + esc(result['description']) + '</p>'
-        if key == 'mse_buffered':
-            body += '<details><summary>Catch thresholds</summary>' + mse_steps(result) + '</details>'
-        body += '<p class="feedback-flow">Observe index → Set catch → Update stock → Repeat</p>'
-        example = result['example']
-        body += '<h2>Across all trials</h2>'
-        body += mse_metrics([{'name': result['name'], **result['metrics']}]) + mse_metric_note()
-        body += ('<details><summary>Follow one trial</summary><p>' + esc(example['case']) + ' · '
-                 + esc(example['scenario']) + ' · trial ' + str(example['replicate'])
-                 + '. The same case and random errors are used for each rule.</p>')
-        body += mse_trial_plots(example)
-        body += ('<p class="muted">The index-based MPs use the three-year observed index; '
-                 'constant catch keeps the reference catch. Stock change includes fishing, '
-                 'surplus production and catch removals. B / K is biomass relative '
-                 'to its carrying capacity.</p>')
-        body += mse_trial(example['rows']) + '</details>'
-        body += '<details><summary>Median results across all trials</summary>' + mse_scenario_plots(result) + '</details>'
-        body += '<details><summary>Results by stock case and scenario</summary>' + table(
-            result['cases'], [('case', 'Stock case'), ('scenario', 'Growth'),
-                              ('mean_catch_t', 'Mean catch (t/year)'), ('final_B_over_K', 'Final B / K'),
-                              ('below_threshold_percent', 'Trials below 0.2 (%)')]) + '</details>'
-        body += '<details><summary>Scope and assumptions</summary>' + mse_methods(result) + mse_limits(result) + '</details>'
-    elif key == 'mse_summary':
-        body = '<p>Compare catch, biomass and catch stability for the three management rules.</p>'
-        body += '<h2>Results across all trials</h2>'
-        body += mse_metrics(result['metrics']) + mse_metric_note()
-        body += '<details><summary>Management rules</summary>' + mse_rules(result) + '</details>'
-        body += '<details><summary>Trajectories by growth scenario</summary>' + mse_scenario_plots(result) + '</details>'
-        body += '<details><summary>Results by stock case and scenario</summary>' + table(
-            result['cases'], [('rule', 'Rule'), ('case', 'Stock case'), ('scenario', 'Growth'),
-                              ('mean_catch_t', 'Mean catch (t/year)'),
-                              ('final_B_over_K', 'Final B / K')]) + '</details>'
     elif key == 'mse_report':
         body = '<article class="narrative-report" data-report="mse_report">' + mse_report(result) + '</article>'
     else:
-        cpue = key.startswith('cpue_'); value = 'index' if cpue else 'B_over_K'
-        label = 'CPUE relative to the first year' if cpue else 'Biomass / carrying capacity'
-        body += '<h2>Results</h2>' + plot(result['series'], value, label)
-        rows = [{'case': name, 'year': values[-1]['year'], 'value': values[-1][value]} for name, values in result['series'].items()]
-        body += table(rows, [('case','Analysis'),('year','Final year'),('value','Relative CPUE' if cpue else 'B / K')])
-        if not cpue:
-            body += '<details><summary>Harvest rate and case checks</summary><h2>Harvest rate</h2>' + plot(result['series'], 'harvest_rate', 'Catch / starting biomass')
-            diagnostics = [{**r, 'boundary': 'Review' if r['boundary_fit'] else 'Within bounds'} for r in result['diagnostics']]
-            body += '<h2>Case checks</h2>' + table(diagnostics, [('case','Case'),('r','Intrinsic growth'),('balance_check','Biomass balance'),('feasibility_check','Feasibility'),('gradient_check','Projected gradient'),('boundary','Biomass search')]) + '</details>'
-        if cpue:
-            body += '<details><summary>Methods and prediction support</summary>' + cpue_methods(result)
-            for name, analysis in result.get('analyses', {}).items():
-                body += '<h2>' + esc(name) + '</h2>' + cpue_details(analysis)
-            body += '</details>'
-        body += '<h2>Interpretation</h2><p>' + ('The analyses use different adjustments. Any selected effort filter applies to analysis A. Their saved methods and prediction support explain the comparison.' if cpue else 'The four cases combine two CPUE indices with two growth settings. Their differences illustrate how analytical inputs and assumptions carry through to assessment outputs. These calculations provide no management advice.') + '</p>'
-    if record.get('data_source') and (key.startswith(('assessment_', 'mse_', 'prepare_'))):
-        body += '<p>The selected Fiji fleet index is not a validated stock-wide abundance '
-        body += 'index. Using it with stock-wide catches is a teaching assumption.</p>'
+        body = '<article class="result-view" data-result="' + esc(key) + '">' + result_view(job, result) + '</article>'
+    if record.get('data_source') and key.startswith(('assessment_', 'mse_', 'prepare_')):
+        body += '<p>The selected Fiji fleet index is not a validated stock-wide abundance index. Using it with stock-wide catches is a teaching assumption.</p>'
     if key.startswith('mse_') and result.get('assumptions'):
         cap = 100 * result['assumptions']['maximum_harvest_rate']
-        body += f'<p>The shared simulator guardrail caps realised catch at {cap:g}% of true '
-        body += 'starting biomass. Biomass and low-biomass statistics are conditional on '
-        body += 'that safeguard; they do not show how a rule would perform without it.</p>'
+        body += (f'<p class="result-method">The shared guardrail caps realised catch at {cap:g}% of true starting biomass. '
+                 'Biomass and low-biomass statistics are conditional on that safeguard.</p>')
     warnings = []
     for check in ('balance_check', 'feasibility_check', 'gradient_check'):
         if check in result and result[check] != 'Pass':
@@ -546,22 +576,10 @@ def output_page(job, result, record, lineage):
         body += '<p class="note">' + ' '.join(esc(warning) for warning in warnings) + '</p>'
     body = body.replace('</p>', '</p><p class="feedback-flow">' + esc(job_trace(key)) + '</p>', 1)
     body += '<p class="muted">Produced in <strong>' + esc(record['run_id']) + '</strong>. Retained inputs keep their original runs.</p>'
-    body += '<details><summary>Inputs, source and software</summary>'
-    if lineage:
+    if key.endswith('_report') and lineage:
         preview = [{**row, 'checksum': row['checksum'][:12]} for row in lineage]
-        body += table(preview, [('job','Input job'),('run_id','Original run'),('checksum','Checksum prefix')])
-    if record.get('execution'):
-        execution = record['execution']
-        body += '<p>Execution: ' + esc(execution.get('provider', 'See recorded execution metadata')) + '.</p>'
-        if execution.get('repository') and execution.get('commit'):
-            repo = esc(execution['repository'])
-            commit = esc(execution['commit'])
-            body += '<p>Source: <a href="https://github.com/' + repo + '/commit/' + commit + '">' + commit[:8] + '</a></p>'
-    container = record.get('software', {}).get('container')
-    if container:
-        body += '<p>Calculation container: <code>' + esc(container) + '</code></p>'
-        url = record.get('software', {}).get('container_url')
-        if url:
-            body += '<p><a href="' + esc(url) + '">Container package</a></p>'
-    body += '<details><summary>Full execution record</summary><pre>' + esc(json.dumps(record, indent=2)) + '</pre></details></details>'
-    return '<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(job['title']) + '</title><style>' + STYLE + '</style><body><h1>' + esc(job['title']) + '</h1>' + body + '<footer>Teaching workflow with simplified assessment and management models. The run bundle preserves inputs, code, settings and results.</footer></body></html>'
+        body += '<h2>Retained inputs</h2>' + table(preview, [('job', 'Input job'), ('run_id', 'Original run'), ('checksum', 'Checksum prefix')])
+    body += '<p class="muted">Open Data for complete values and Inputs &amp; versions for exact source, settings and execution records. The run bundle preserves these files.</p>'
+    return ('<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'
+            + esc(job['title']) + '</title><style>' + STYLE + '</style><body><h1>' + esc(job['title']) + '</h1>'
+            + body + '<footer>Teaching workflow with simplified assessment and management models. The run bundle preserves inputs, code, settings and results.</footer></body></html>')

@@ -107,7 +107,7 @@ def verify_manifest(root):
     required = {'run.py', 'verify.py', 'workflow/engine.py', 'workflow/spec.py',
                 'workflow/sources.py', 'workflow/contracts.py', 'workflow/r_bridge.py',
                 'workflow/r_driver.R', 'workflow/Makefile', 'workflow/jobs.json',
-                'workflow/reports.py', 'workflow/quarto_reports.py', 'workflow/r/common.R',
+                'workflow/reports.py', 'workflow/quarto_reports.py', 'workflow/results.qmd', 'workflow/r/common.R',
                 'scripts/offline.sh', 'scripts/offline-runtime.py', 'scripts/preserve-runtime.sh',
                 'workflow/offline.py', 'runtime-preservation.json', 'source-lock.json',
                 'source-origins.json', 'coordinator-origin.json'}

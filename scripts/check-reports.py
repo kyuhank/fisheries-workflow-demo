@@ -6,6 +6,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
+JOB_KEYS = [job['key'] for job in json.loads((ROOT / 'workflow/jobs.json').read_text())['jobs']]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--online', action='store_true', help='Run on the public service without login.')
 args = parser.parse_args()
@@ -45,6 +46,26 @@ def inspect(page, key, report=False):
     assert output['record']['job'] == key
     assert output['record']['data_source']['cpue_scope'].startswith('Fiji fleet;')
     assert 'Synthetic fisheries workflow' not in body
+    rendering = output['record']['report_rendering']
+    assert rendering['engine'] == 'Quarto' and rendering['quarto_executed'] is True, key
+    assert frame.locator('details, summary').count() == 0, key
+    if not report:
+        assert rendering['presentation_source'] == 'workflow/results.qmd', key
+        assert rendering['execution_engine'] == 'static', key
+        assert 'report-body.html' in rendering['artifacts'], key
+        assert frame.locator('svg').count() <= 2, key
+        assert frame.locator('pre').count() == 0, key
+    if key in ('cpue_a', 'cpue_b', 'cpue_summary'):
+        assert 'Standardised' in body and 'Nominal' in body, key
+        assert frame.locator('svg').first.get_attribute('aria-label') == 'Fish per 1,000 hooks', key
+        assert 'same selected rows' in body, key
+    if key == 'cpue_summary':
+        assert 'An A-only effort filter does not apply to B' in body
+    if key.startswith('assessment_') and key[-2:] in ('a1', 'a2', 'b1', 'b2'):
+        assert 'Observed CPUE' in body and 'Fitted CPUE' in body and 'Biomass trajectory' in body, key
+        assert frame.locator('svg').count() == 2, key
+    if key == 'mse_summary':
+        assert frame.locator('svg').first.get_attribute('aria-label').startswith('Management trade-off')
     if key == 'extract':
         assert 'Records → CPUE' in body and 'Annual catch → assessment inputs' in body
         selected = output['output']
@@ -91,8 +112,9 @@ with sync_playwright() as playwright:
         baseline = page.evaluate('records')
     else:
         baseline = run(page)
-    for key in ['extract', 'cpue_summary', 'assessment_summary', 'mse_prepare', 'mse_summary']:
-        inspect(page, key)
+    for key in JOB_KEYS:
+        if not key.endswith('_report'):
+            inspect(page, key)
     cpue_before, _ = inspect(page, 'cpue_report', True)
     assessment_before, _ = inspect(page, 'assessment_report', True)
     mse_before, _ = inspect(page, 'mse_report', True)
@@ -127,7 +149,9 @@ with sync_playwright() as playwright:
     for key in ['cpue_report', 'assessment_report', 'mse_report']:
         inspect(page, key, True)
     assert not errors, errors
-    result = {'mode': mode, 'distinct_reports': True, 'settings_updates': args.online,
+    result = {'mode': mode, 'distinct_reports': True, 'all_native_views_quarto': True,
+              'visible_plot_first_results': True, 'collapsed_controls': False,
+              'settings_updates': args.online,
               'retained_inputs': True, 'mse_assessment_inputs': True,
               'saved_reports': True, 'page_errors': errors,
               'execution': growth_records['assessment_report'].get('execution'),

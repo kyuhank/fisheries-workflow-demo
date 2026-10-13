@@ -273,7 +273,20 @@ class CloudRun {
           "/output?job=" + encodeURIComponent(data.job),
         );
       }
-      if (type === "transfer") return await this.request("/transfer", data);
+      if (type === "transfer") {
+        if (typeof data.connect !== "boolean" ||
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.request_id || "") ||
+            !Number.isInteger(data.transfer_count) || data.transfer_count < 0) {
+          throw Error("This file transfer has no valid boundary identity. Wait for the live status to update.");
+        }
+        const acknowledgement = await this.request("/transfer", data);
+        if (acknowledgement.ok !== true || typeof acknowledgement.connected !== "boolean" ||
+            !Number.isInteger(acknowledgement.transfer_count) ||
+            acknowledgement.transfer_count <= data.transfer_count) {
+          throw Error("The file transfer acknowledgement was incomplete.");
+        }
+        return acknowledgement;
+      }
       if (type === "download") return (await this.request("/bundle")).bundle;
       if (type === "reset") {
         try {

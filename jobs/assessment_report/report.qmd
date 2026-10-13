@@ -23,8 +23,6 @@ th, td { padding: 8px 10px; border-bottom: 1px solid #dde5eb; text-align: left; 
 th { background: #f3f6f8; }
 .cell-output-display { overflow-x: auto; }
 pre { padding: 14px; background: #f3f6f8; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
-details { margin: 18px 0; }
-summary { cursor: pointer; font-weight: 600; color: #316985; }
 </style>
 
 Compare how two CPUE indices and two fixed growth assumptions affect the fitted biomass trajectory.
@@ -53,30 +51,7 @@ plot_series <- function(series, field, label) {
 }
 ```
 
-## Methods
-
-
-```{r}
-#| results: asis
-if (!is.null(record$data_source)) {
-  cat("**Input index:** ", record$data_source$cpue_scope,
-      ". **Annual catch:** ", record$data_source$catch_scope, ".\n\n", sep = "")
-  cat("The selected Fiji fleet index is not a validated stock-wide abundance index. ",
-      "Using it with stock-wide catches is a teaching assumption.\n\n", sep = "")
-} else {
-  cat("The supplied index and catches define this teaching example; ",
-      "inspect the producing records for their data scope.\n\n", sep = "")
-}
-```
-
-Four cases combine indices A and B with fixed intrinsic growth rates of
-`r paste(sort(unique(vapply(result$diagnostics, function(x) x$r, numeric(1)))), collapse = " and ")`
-per year. The annual Schaefer model starts biomass at carrying capacity, adds
-surplus production and subtracts the recorded catch in tonnes. R/RTMB fits
-carrying capacity within feasible bounds and profiles catchability. Initial
-biomass and growth are assumptions, rather than additional fitted parameters.
-
-## Results
+## Biomass comparison
 
 ```{r}
 plot_series(result$series, "B_over_K", "Biomass / carrying capacity")
@@ -99,7 +74,7 @@ if (any(review)) {
 }
 ```
 
-<details><summary>Final annual values and fit checks</summary>
+### Final annual values and fit checks
 
 ```{r}
 endpoints <- lapply(names(result$series), function(name) {
@@ -111,8 +86,7 @@ knitr::kable(rows_frame(endpoints), digits = 3)
 checks <- lapply(result$diagnostics, function(row) {
   list(case = row$case, intrinsic_growth = row$r,
        biomass_balance_check = row$balance_check, feasibility = row$feasibility_check,
-       balance_residual_t = row$balance_residual_t, gradient_check = row$gradient_check,
-       projected_gradient = row$projected_gradient_logK, active_bound = row$active_bound,
+       gradient_check = row$gradient_check,
        boundary_fit = row$boundary_fit, convergence = row$convergence)
 })
 knitr::kable(rows_frame(checks), digits = 7)
@@ -122,7 +96,33 @@ Convergence, biomass balance and positive-biomass feasibility check the fitted
 calculation. They do not establish biological adequacy or validate the CPUE
 as a stock-wide abundance measure.
 
-</details>
+
+
+
+## Methods
+
+
+```{r}
+#| results: asis
+if (!is.null(record$data_source)) {
+  cat("**Source coverage:** ", record$data_source$cpue_scope,
+      ". **Annual catch:** ", record$data_source$catch_scope, ".\n\n", sep = "")
+  cat("The selected Fiji fleet index is not a validated stock-wide abundance index. ",
+      "Using it with stock-wide catches is a teaching assumption.\n\n", sep = "")
+} else {
+  cat("The supplied index and catches define this teaching example; ",
+      "inspect the producing records for their data scope.\n\n", sep = "")
+}
+```
+
+The analysed series runs from `r result$series[[1]][[1]]$year` to
+`r tail(result$series[[1]], 1)[[1]]$year`. Four cases combine indices A and B with fixed intrinsic growth rates of
+`r paste(sort(unique(vapply(result$diagnostics, function(x) x$r, numeric(1)))), collapse = " and ")`
+per year. Biomass is the start-of-year, pre-catch state. The annual Schaefer model starts it
+at carrying capacity, adds surplus production and subtracts recorded catch in tonnes.
+R/RTMB fits carrying capacity by minimising squared log-index residuals within
+feasible bounds; log catchability is the mean log index minus log biomass. Initial
+biomass and growth are assumptions, rather than additional fitted parameters.
 
 ## Analysis record
 
@@ -146,27 +146,4 @@ for (key in c("source", "analysis_source")) {
 }
 ```
 
-<details><summary>Inputs, settings and software</summary>
-
-```{r}
-inputs <- lapply(names(record$inputs), function(key) {
-  list(job = key, run = record$inputs[[key]]$run_id,
-       output_sha256 = record$inputs[[key]]$checksum)
-})
-if (length(inputs)) knitr::kable(rows_frame(inputs))
-software <- lapply(names(record$software), function(key) {
-  list(component = key, value = as.character(record$software[[key]]))
-})
-knitr::kable(rows_frame(software))
-```
-
-The run bundle preserves the R jobs, libraries, this QMD, result JSON, settings
-and checksums.
-
-```{r}
-#| results: asis
-cat("```json\n", jsonlite::toJSON(record, auto_unbox = TRUE, pretty = TRUE),
-    "\n```\n", sep = "")
-```
-
-</details>
+Annual values are available in the **Data** tab. Input files, settings, source versions and checksums are available in **Inputs & versions** and the downloaded run. Rendering reads saved results and does not fit models again.

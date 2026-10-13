@@ -157,6 +157,7 @@ const labels = {
   complete: "Complete",
   retained: "Retained",
   failed: "Failed",
+  unconfirmed: "Status unavailable",
   returned: "Correction",
   handover: "Awaiting file",
   received: "Received",
@@ -167,6 +168,7 @@ const symbols = {
   complete: "check",
   retained: "restore",
   failed: "alert",
+  unconfirmed: "alert",
   returned: "restore",
   handover: "clock",
   received: "check",
@@ -799,6 +801,7 @@ function jobProgress(job) {
     : state === "retained" ? "Earlier result kept unchanged"
     : state === "outdated" ? "Rerun with the updated inputs"
     : state === "failed" ? "Open the execution log"
+    : state === "unconfirmed" ? "Check Execution before starting another run"
     : state === "waiting" && pendingInputs.length
     ? "After " + byKey[pendingInputs[0]].title + (pendingInputs.length > 1 ? ` + ${pendingInputs.length - 1} more` : "")
     : state === "waiting" ? (busy ? "Inputs available · queued" : "Inputs available")
@@ -1114,6 +1117,13 @@ function explainChanges() {
 }
 
 function showError(error) {
+  const unfinished = new Set([...(plan?.run || []), ...(waitingTransfer?.group || [])]);
+  for (const key of unfinished) {
+    if (["waiting", "running", "handover", "received"].includes(states[key])) {
+      states[key] = error.executionUnknown ? "unconfirmed" : "failed";
+      activities[key] = "";
+    }
+  }
   busy = false;
   dispatchPending = false;
   waitingTransfer = null;
@@ -1268,6 +1278,8 @@ $("run").onclick = async () => {
     });
     records = result.records;
     states = runStates(result.run, "complete");
+    waitingTransfer = null;
+    confirmingTransfer = false;
     completedRun = { run: result.run, retained: result.retained };
     dispatchPending = false;
     busy = false;
@@ -1316,13 +1328,23 @@ $("revise-cpue").onclick = () => {
 };
 async function transferFiles(connect = false) {
   if (!waitingTransfer || confirmingTransfer) return;
+  const pending = waitingTransfer, executionMode = mode, version = modeVersion;
+  const current = () => waitingTransfer === pending && mode === executionMode &&
+    modeVersion === version;
+  const confirmation = {
+    connect,
+    request_id: pending.request_id,
+    transfer_count: pending.transfer_count,
+  };
   confirmingTransfer = true;
   render();
   try {
-    await call("transfer", { connect });
-    if (connect) $("handover").value = "connected";
+    const response = await call("transfer", confirmation);
+    if (!current()) return;
+    if (response.connected === true) $("handover").value = "connected";
     render();
   } catch (error) {
+    if (!current()) return;
     confirmingTransfer = false;
     status(
       "failed",
@@ -1484,6 +1506,8 @@ function displayOutput(title, output, kind = "Job output") {
   currentOutput = output;
   renderOutputRun();
   $("output-title").textContent = title;
+  document.querySelector('[data-output="report"]').textContent =
+    (output.record?.job || output.job || "").endsWith("_report") ? "Report" : "Results";
   $("output-kind").textContent = [jobNumber(output.record?.job || output.job), kind]
     .filter(Boolean).join(" · ");
   // Keep saved report bytes intact; narrow screens scroll wide tables locally.
@@ -1619,6 +1643,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   ready = false;
   plan = null;
   waitingTransfer = null;
+  confirmingTransfer = false;
   correctionPending = false;
   activities = {};
   dispatchPending = false;

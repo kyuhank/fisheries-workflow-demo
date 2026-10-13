@@ -241,7 +241,11 @@ def execute(session, start, expected_run, handover='connected', previous=None,
             confirmed.append(pending['boundary'])
             if report:
                 reports_before_transfer.append(pending['boundary'])
-            request('/transfer', {'connect': False}, session)
+            assert pending.get('request_id') == run['id'], 'Transfer belongs to a different request.'
+            count = pending.get('transfer_count')
+            assert isinstance(count, int) and not isinstance(count, bool) and count >= 0, 'Missing frozen transfer count.'
+            request('/transfer', {'connect': False, 'request_id': pending['request_id'],
+                                  'transfer_count': count}, session)
             transferred, pending, status_deadline = True, None, None
         if run['status'] == 'complete':
             if handover == 'manual':

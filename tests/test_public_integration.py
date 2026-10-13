@@ -106,12 +106,12 @@ class PublicNativeIntegrationTest(unittest.TestCase):
                 self.assertIn('code_sources', record)
                 for parent, details in record['inputs'].items():
                     self.assertEqual(details['analysis_source'], runner.records[parent]['analysis_source'])
-        for key in ('cpue_report', 'assessment_report', 'mse_report'):
-            if key not in runner.records:
-                continue
-            record = runner.records[key]
-            self.assertTrue(record['report_rendering']['quarto_executed'])
-            for name in ('report.html', 'report.qmd', 'report-data.json'):
+        for key, record in runner.records.items():
+            rendering = record['report_rendering']
+            self.assertTrue(rendering['quarto_executed'])
+            self.assertEqual(rendering['engine'], 'Quarto')
+            self.assertEqual(rendering['execution_engine'], 'knitr' if key.endswith('_report') else 'static')
+            for name in rendering['artifacts']:
                 path = runner.directory / key / name
                 self.assertEqual(digest(path.read_bytes()), record['outputs'][name])
             payload = json.loads((runner.directory / key / 'report-data.json').read_text())

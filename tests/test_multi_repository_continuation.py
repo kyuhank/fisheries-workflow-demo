@@ -31,7 +31,7 @@ PROOF = {'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md',
 CORE = {'run.py', 'verify.py', 'Makefile', 'workflow/engine.py', 'workflow/spec.py',
         'workflow/r_bridge.py', 'workflow/r_driver.R', 'workflow/Makefile',
         'workflow/jobs.json', 'workflow/sources.py', 'workflow/contracts.py',
-        'workflow/reports.py', 'workflow/quarto_reports.py', 'workflow/r/common.R'}
+        'workflow/reports.py', 'workflow/quarto_reports.py', 'workflow/results.qmd', 'workflow/r/common.R'}
 
 
 def checksum(data):

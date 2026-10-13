@@ -73,7 +73,8 @@ class JobSourceTests(unittest.TestCase):
                                    ('workflow/r/models.R', {'cpue_a', 'cpue_b'}),
                                    ('Makefile', {'cpue_a', 'cpue_b'}),
                                    ('workflow/Makefile', {'cpue_a', 'cpue_b'}),
-                                   ('workflow/jobs.json', {'cpue_a', 'cpue_b'})]:
+                                   ('workflow/jobs.json', {'cpue_a', 'cpue_b'}),
+                                   ('workflow/results.qmd', {'cpue_a', 'cpue_b'})]:
                 target = ROOT / name
                 def changed(path):
                     return original(path) + b'\n# changed source\n' if path == target else original(path)

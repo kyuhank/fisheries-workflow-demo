@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import tempfile
 import runpy
+from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
 
@@ -12,8 +13,17 @@ ARTIFACTS.mkdir(exist_ok=True)
 
 
 def preview():
-    # Build first: the graph, saved examples and executable code must match.
-    return (ROOT / 'docs/offline.html').read_text()
+    # Use current UI sources with saved results while the native build is pending.
+    return runpy.run_path(str(ROOT / 'scripts/check-handover.py'))['preview']()[0]
+
+
+def open_live(page, mock):
+    page.route('https://**/*', lambda route: route.abort())
+    page.route('**/functions/v1/paper-api/**', mock.route)
+    page.route('https://ui.example.test/demo', lambda route: route.fulfill(
+        content_type='text/html', body=preview()))
+    page.goto('https://ui.example.test/demo')
+    page.wait_for_function("mode === 'cloud' && ready")
 
 
 def run_selection(page):
@@ -164,7 +174,18 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     # Saved executes nothing; Live controls use the HTTP client with fixture states.
     ui = runpy.run_path(str(ROOT / 'scripts/check-browser.py'))
     mock = ui['MockCloud']()
-    ui['open_live'](page, mock)
+    original_route, transfer_requests = mock.route, []
+    def route_with_transfers(route):
+        if urlsplit(route.request.url).path.rsplit('/', 1)[-1] == 'transfer':
+            body = route.request.post_data_json
+            transfer_requests.append(body)
+            route.fulfill(content_type='application/json', body=json.dumps({
+                'ok': True, 'connected': body['connect'],
+                'transfer_count': body['transfer_count'] + 1, 'replay': False}))
+        else:
+            original_route(route)
+    mock.route = route_with_transfers
+    open_live(page, mock)
     page.locator('[data-tab="jobs"]').click()
     page.evaluate("""() => {
       window.orchestrationRuns = [];
@@ -187,16 +208,19 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
 
     # Check all three handover views and the busy state; no transfer is executed.
     page.locator('#handover').select_option('manual')
-    for boundary, key, title, size in [
+    for transfer_count, (boundary, key, title, size) in enumerate([
         ('data', 'cpue_a', 'Data manager → CPUE analyst', 2),
         ('cpue', 'prepare_a', 'CPUE analyst → Assessment analyst', 2),
         ('assessment', 'mse_prepare', 'Assessment analyst → MSE analyst', 1),
-    ]:
+    ]):
         group = ['cpue_a', 'cpue_b'] if boundary == 'data' else ['prepare_a', 'prepare_b'] if boundary == 'cpue' else ['mse_prepare']
+        event = {'job': key, 'boundary': boundary, 'group': group,
+                 'request_id': '12345678-1234-4234-9234-123456789abc',
+                 'transfer_count': transfer_count}
         page.evaluate("""event => {
           busy = true;
           handleEvent({...event, state: 'handover', message: 'Mocked transfer boundary'});
-        }""", {'job': key, 'boundary': boundary, 'group': group})
+        }""", event)
         assert page.locator('#handover-title').inner_text() == title
         assert page.locator('#handover-panel').is_visible()
         assert page.locator('.handover-marker.active').count() == size
@@ -207,8 +231,11 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
         page.evaluate("""event => {
           handleEvent({...event, state: 'received', message: 'Mocked receipt'});
           busy = false; render();
-        }""", {'job': key, 'group': group})
+        }""", event)
         assert page.locator('#handover-panel').is_hidden()
+    assert transfer_requests == [{'connect': False,
+        'request_id': '12345678-1234-4234-9234-123456789abc', 'transfer_count': count}
+        for count in range(3)]
     page.locator('#handover').select_option('connected')
     page.evaluate("states = {}; render()")
 

@@ -29,7 +29,7 @@ class OnlinePollTest(unittest.TestCase):
 
     def handover(self):
         return {'job': 'cpue_a', 'state': 'handover', 'boundary': 'data',
-                'group': ['cpue_a', 'cpue_b']}
+                'group': ['cpue_a', 'cpue_b'], 'request_id': 'test-request', 'transfer_count': 0}
 
     def plan(self):
         return {'state': 'plan', 'start': 'submission', 'scope': 'workflow',
@@ -57,6 +57,8 @@ class OnlinePollTest(unittest.TestCase):
             if path == '/run':
                 return {'id': 'test-request'}
             if path == '/transfer':
+                self.assertEqual(body, {'connect': False, 'request_id': 'test-request',
+                                        'transfer_count': 0})
                 self.transfers += 1
                 return {'ok': True}
             self.assertTrue(path.startswith('/state?after='))
