@@ -1634,7 +1634,7 @@ calculate &lt;- function(context) {
   if (is.null(result$sets[[1]]$stratum)) result$sets[[1]]$hooks &lt;- 0
   result
 }
-</pre></details><details id="source-07c72af50ce4463b" data-name="components/mse/R/mse.R"><summary>components/mse/R/mse.R</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956</p><pre># Small closed-loop trials around the fitted Schaefer cases.
+</pre></details><details id="source-07c72af50ce4463b" data-name="components/mse/R/mse.R"><summary>components/mse/R/mse.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956</p><pre># Small closed-loop trials around the fitted Schaefer cases.
 # Common recorded growth/observation errors let the three rules face the same trials.
 
 MSE_CASES &lt;- c(&quot;assessment_a1&quot;, &quot;assessment_a2&quot;, &quot;assessment_b1&quot;, &quot;assessment_b2&quot;)
@@ -1886,7 +1886,7 @@ mse_summarise &lt;- function(results) {
        limitations = first$limitations, boundary_cases = first$boundary_cases, scope = first$scope,
        scenarios = scenarios, examples = setNames(lapply(by_rule, function(result) result$example), rule_names))
 }
-</pre></details><details id="source-4dbf30b5fc6c49a1" data-name="components/mse/README.md"><summary>components/mse/README.md</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 3b3715613cc285bfe68119c7bf9dffcd8d65836798eb14f085b2ed6a0090e14c</p><pre># Fisheries workflow MSE example
+</pre></details><details id="source-4dbf30b5fc6c49a1" data-name="components/mse/README.md"><summary>components/mse/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 3b3715613cc285bfe68119c7bf9dffcd8d65836798eb14f085b2ed6a0090e14c</p><pre># Fisheries workflow MSE example
 
 These six jobs prepare common future trials, test constant catch, an index rule
 and a buffered rule, then compare their catch, biomass and catch stability.
@@ -1916,7 +1916,7 @@ rerunning trials and keeps detailed metrics, assumptions and source records.
 [SOURCE.json](SOURCE.json) records the calculation library&#x27;s baseline origin and
 SHA-256. The R library and calculation entry points retain those source bytes;
 the report and reader guides have been revised for the public-data example.
-</pre></details><details id="source-50bbf43f1460cb4f" data-name="components/mse/jobs/mse_buffered/README.md"><summary>components/mse/jobs/mse_buffered/README.md</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 46c88f7e32e0936bc23e41425d0522b5ff6b98f13a1dec8c6860a1faa259fcbc</p><pre># Buffered rule (`mse_buffered`)
+</pre></details><details id="source-50bbf43f1460cb4f" data-name="components/mse/jobs/mse_buffered/README.md"><summary>components/mse/jobs/mse_buffered/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 46c88f7e32e0936bc23e41425d0522b5ff6b98f13a1dec8c6860a1faa259fcbc</p><pre># Buffered rule (`mse_buffered`)
 
 Test index-based catch steps with the selected buffer and a 15% annual advice-change limit in the common seeded Schaefer management trials.
 
@@ -1949,12 +1949,12 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/record.json)
-</pre></details><details id="source-dcd7c940c7f1485d" data-name="components/mse/jobs/mse_buffered/run.R"><summary>components/mse/jobs/mse_buffered/run.R</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: db2b1a36dbbe4a60dffbe52fbb407e958f8d6c0282ae30fb5e5f62f10614919d</p><pre># Apply index steps, the selected buffer and a 15% annual advice-change limit.
+</pre></details><details id="source-dcd7c940c7f1485d" data-name="components/mse/jobs/mse_buffered/run.R"><summary>components/mse/jobs/mse_buffered/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: db2b1a36dbbe4a60dffbe52fbb407e958f8d6c0282ae30fb5e5f62f10614919d</p><pre># Apply index steps, the selected buffer and a 15% annual advice-change limit.
 calculate &lt;- function(context) {
   mse_simulate(context$parents$mse_prepare, rule = &quot;buffered&quot;,
                buffer = context$settings$mse_buffer)
 }
-</pre></details><details id="source-a67dcce55038e73a" data-name="components/mse/jobs/mse_constant/README.md"><summary>components/mse/jobs/mse_constant/README.md</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 432d29561f7c1fd07172f7c26384ad3bc4b06ccf6a8dd3cffc9cf8c4a2458ec5</p><pre># Constant catch (`mse_constant`)
+</pre></details><details id="source-a67dcce55038e73a" data-name="components/mse/jobs/mse_constant/README.md"><summary>components/mse/jobs/mse_constant/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 432d29561f7c1fd07172f7c26384ad3bc4b06ccf6a8dd3cffc9cf8c4a2458ec5</p><pre># Constant catch (`mse_constant`)
 
 Test fixed advice equal to recent mean catch in the common seeded Schaefer management trials.
 
@@ -1987,11 +1987,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_constant/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_constant/record.json)
-</pre></details><details id="source-1a63cd8d1b64a79f" data-name="components/mse/jobs/mse_constant/run.R"><summary>components/mse/jobs/mse_constant/run.R</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 46cfef42dfdde27d8373c99aedea76133ae3529dc7284e24ed6c94536b616ee7</p><pre># Hold annual advice at recent mean catch in the common management trials.
+</pre></details><details id="source-1a63cd8d1b64a79f" data-name="components/mse/jobs/mse_constant/run.R"><summary>components/mse/jobs/mse_constant/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 46cfef42dfdde27d8373c99aedea76133ae3529dc7284e24ed6c94536b616ee7</p><pre># Hold annual advice at recent mean catch in the common management trials.
 calculate &lt;- function(context) {
   mse_simulate(context$parents$mse_prepare, rule = &quot;constant&quot;)
 }
-</pre></details><details id="source-63d62edac076ce63" data-name="components/mse/jobs/mse_index/README.md"><summary>components/mse/jobs/mse_index/README.md</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 362fc92f3328d622a3cc09fd78ecca2e536539f219d3b584da262a14f2c26a91</p><pre># Index rule (`mse_index`)
+</pre></details><details id="source-63d62edac076ce63" data-name="components/mse/jobs/mse_index/README.md"><summary>components/mse/jobs/mse_index/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 362fc92f3328d622a3cc09fd78ecca2e536539f219d3b584da262a14f2c26a91</p><pre># Index rule (`mse_index`)
 
 Test advice proportional to the three-year mean observed abundance index in the common seeded Schaefer management trials.
 
@@ -2024,11 +2024,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/record.json)
-</pre></details><details id="source-4242f5e7f7023503" data-name="components/mse/jobs/mse_index/run.R"><summary>components/mse/jobs/mse_index/run.R</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: d741a44bc969af921f6ab385bd5ed0a1569d80336770634b9f3d90ef99f938d5</p><pre># Update advice from the three-year mean observed index in the common trials.
+</pre></details><details id="source-4242f5e7f7023503" data-name="components/mse/jobs/mse_index/run.R"><summary>components/mse/jobs/mse_index/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: d741a44bc969af921f6ab385bd5ed0a1569d80336770634b9f3d90ef99f938d5</p><pre># Update advice from the three-year mean observed index in the common trials.
 calculate &lt;- function(context) {
   mse_simulate(context$parents$mse_prepare, rule = &quot;index&quot;)
 }
-</pre></details><details id="source-28bd801835dbf411" data-name="components/mse/jobs/mse_prepare/README.md"><summary>components/mse/jobs/mse_prepare/README.md</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 2f09f955114c1eb07332e5f598e8c85050dd87f8304ece945e44b07137dd4788</p><pre># Prepare MSE (`mse_prepare`)
+</pre></details><details id="source-28bd801835dbf411" data-name="components/mse/jobs/mse_prepare/README.md"><summary>components/mse/jobs/mse_prepare/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 2f09f955114c1eb07332e5f598e8c85050dd87f8304ece945e44b07137dd4788</p><pre># Prepare MSE (`mse_prepare`)
 
 Reconstruct next-year Schaefer stocks after the terminal assessment catch, then prepare common seeded growth and observation errors once for all three management rules.
 
@@ -2061,9 +2061,9 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Constant catch (`mse_constant`)](../mse_constant/README.md), [Index rule (`mse_index`)](../mse_index/README.md), [Buffered rule (`mse_buffered`)](../mse_buffered/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_prepare/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_prepare/record.json)
-</pre></details><details id="source-f8ead33ecd395c4b" data-name="components/mse/jobs/mse_prepare/run.R"><summary>components/mse/jobs/mse_prepare/run.R</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: dae23c4c405f5ac70aa64947d5a8c503e2c3e765d176d4c7fe7fe68d64a18cae</p><pre># Reconstruct next-year stocks and prepare paired seeded R error vectors once.
+</pre></details><details id="source-f8ead33ecd395c4b" data-name="components/mse/jobs/mse_prepare/run.R"><summary>components/mse/jobs/mse_prepare/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: dae23c4c405f5ac70aa64947d5a8c503e2c3e765d176d4c7fe7fe68d64a18cae</p><pre># Reconstruct next-year stocks and prepare paired seeded R error vectors once.
 calculate &lt;- function(context) mse_prepare(context$parents[MSE_CASES])
-</pre></details><details id="source-28d1d9c7c37531be" data-name="components/mse/jobs/mse_report/README.md"><summary>components/mse/jobs/mse_report/README.md</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 33bd44d0e91d2f48c5bd366e7f24bac8040bc51202857f9a071b385e34bc0f5a</p><pre># MSE report (`mse_report`)
+</pre></details><details id="source-28d1d9c7c37531be" data-name="components/mse/jobs/mse_report/README.md"><summary>components/mse/jobs/mse_report/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 33bd44d0e91d2f48c5bd366e7f24bac8040bc51202857f9a071b385e34bc0f5a</p><pre># MSE report (`mse_report`)
 
 Render the saved management-trial comparison as a Quarto report. Trial fractions describe this conditional illustration; they are not validated risk estimates.
 
@@ -2096,7 +2096,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/record.json)
-</pre></details><details id="source-fe6cc12cd2ef0a8a" data-name="components/mse/jobs/mse_report/report.qmd"><summary>components/mse/jobs/mse_report/report.qmd</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 8eb594f8b296467e731ffd916e618e3e43ce996a7fa976c0fce0a7c4ad1805e7</p><pre>---
+</pre></details><details id="source-fe6cc12cd2ef0a8a" data-name="components/mse/jobs/mse_report/report.qmd"><summary>components/mse/jobs/mse_report/report.qmd</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: a88509df77e13ebea300c1301a5bc8f5fd58d8be37b6eca2e64c323d01f82aa5</p><pre>---
 title: &quot;Management strategy comparison report&quot;
 lang: en-NZ
 format:
@@ -2139,13 +2139,17 @@ plot_series &lt;- function(series, field, label) {
   years &lt;- unlist(lapply(series, function(rows) vapply(rows, function(x) x$year, numeric(1))))
   values &lt;- unlist(lapply(series, function(rows) vapply(rows, function(x) x[[field]], numeric(1))))
   colours &lt;- c(&quot;#1378a3&quot;, &quot;#b56435&quot;, &quot;#7357a8&quot;, &quot;#328363&quot;)
+  old_mar &lt;- par(&quot;mar&quot;)
+  on.exit(par(mar = old_mar))
+  par(mar = c(4, 4, 5, 1))
   plot(range(years), range(c(0, values)), type = &quot;n&quot;, xlab = &quot;Year&quot;, ylab = label)
   for (i in seq_along(series)) {
     lines(vapply(series[[i]], function(x) x$year, numeric(1)),
           vapply(series[[i]], function(x) x[[field]], numeric(1)),
           col = colours[(i - 1) %% length(colours) + 1], lwd = 2)
   }
-  legend(&quot;topright&quot;, names(series), col = colours[seq_along(series)], lty = 1, bty = &quot;n&quot;)
+  legend(&quot;top&quot;, names(series), inset = c(0, -0.34), xpd = NA,
+         col = colours[seq_along(series)], lty = 1, lwd = 2, cex = 0.8, bty = &quot;n&quot;)
 }
 ```
 
@@ -2198,8 +2202,9 @@ including the first change from the reference catch. Cases and scenarios have eq
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 for (scenario in result$scenarios) {
   series &lt;- scenario$series[rule_names]
-  plot_series(series, &quot;B_over_K&quot;, paste(scenario$name, &quot;— median end-year biomass / K&quot;))
-  plot_series(series, &quot;catch_t&quot;, paste(scenario$name, &quot;— median realised catch (tonnes)&quot;))
+  label &lt;- sub(&quot; growth$&quot;, &quot;&quot;, sub(&quot; and recovery$&quot;, &quot;&quot;, scenario$name))
+  plot_series(series, &quot;B_over_K&quot;, paste0(label, &quot;: median B/K&quot;))
+  plot_series(series, &quot;catch_t&quot;, paste0(label, &quot;: median catch (t)&quot;))
 }
 ```
 
@@ -2288,9 +2293,9 @@ for (key in c(&quot;source&quot;, &quot;analysis_source&quot;)) {
 ```
 
 Annual values are available in the **Data** tab. Input files, settings, source versions and checksums are available in **Inputs &amp; versions** and the downloaded run. Rendering reads saved results and does not fit models again.
-</pre></details><details id="source-9111b28c2fc8be38" data-name="components/mse/jobs/mse_report/run.R"><summary>components/mse/jobs/mse_report/run.R</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 0e4bc6fe0a570a0316bbea5bb6a1bcd375dc6c150f5b5e4c7b702cb24e4ad174</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
+</pre></details><details id="source-9111b28c2fc8be38" data-name="components/mse/jobs/mse_report/run.R"><summary>components/mse/jobs/mse_report/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 0e4bc6fe0a570a0316bbea5bb6a1bcd375dc6c150f5b5e4c7b702cb24e4ad174</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
 calculate &lt;- function(context) context$parents$mse_summary
-</pre></details><details id="source-92e90be2d84c73e6" data-name="components/mse/jobs/mse_summary/README.md"><summary>components/mse/jobs/mse_summary/README.md</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 18c116bed5b5644b1260715da4a8db190f4aad44eb80559c5dcb4a2a3b9f3200</p><pre># MSE results summary (`mse_summary`)
+</pre></details><details id="source-92e90be2d84c73e6" data-name="components/mse/jobs/mse_summary/README.md"><summary>components/mse/jobs/mse_summary/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 18c116bed5b5644b1260715da4a8db190f4aad44eb80559c5dcb4a2a3b9f3200</p><pre># MSE results summary (`mse_summary`)
 
 Compare the three rules only when fitted stocks, scenarios and the actual saved error vectors match. Summarise catches, biomass and catch stability.
 
@@ -2323,7 +2328,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE report (`mse_report`)](../mse_report/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_summary/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_summary/record.json)
-</pre></details><details id="source-2a281783e8105cdb" data-name="components/mse/jobs/mse_summary/run.R"><summary>components/mse/jobs/mse_summary/run.R</summary><p class="muted">Recorded component revision: b1e618d9cebd9fffe1b8715ab4fa58f63e804762<br>SHA-256: 09719a18af53a22a4fce05e5f6d833e6adeedaa1dd2d4461b76e8cd7861627bc</p><pre># Compare rules only when their stocks, scenarios and actual error vectors match.
+</pre></details><details id="source-2a281783e8105cdb" data-name="components/mse/jobs/mse_summary/run.R"><summary>components/mse/jobs/mse_summary/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 09719a18af53a22a4fce05e5f6d833e6adeedaa1dd2d4461b76e8cd7861627bc</p><pre># Compare rules only when their stocks, scenarios and actual error vectors match.
 calculate &lt;- function(context) {
   mse_summarise(context$parents[c(&quot;mse_constant&quot;, &quot;mse_index&quot;, &quot;mse_buffered&quot;)])
 }
@@ -3427,7 +3432,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/record.json)
-</pre></details><details id="source-6c03622b4e8d9138" data-name="jobs/mse_report/report.qmd"><summary>jobs/mse_report/report.qmd</summary><p class="muted"><br>SHA-256: 8eb594f8b296467e731ffd916e618e3e43ce996a7fa976c0fce0a7c4ad1805e7</p><pre>---
+</pre></details><details id="source-6c03622b4e8d9138" data-name="jobs/mse_report/report.qmd"><summary>jobs/mse_report/report.qmd</summary><p class="muted"><br>SHA-256: a88509df77e13ebea300c1301a5bc8f5fd58d8be37b6eca2e64c323d01f82aa5</p><pre>---
 title: &quot;Management strategy comparison report&quot;
 lang: en-NZ
 format:
@@ -3470,13 +3475,17 @@ plot_series &lt;- function(series, field, label) {
   years &lt;- unlist(lapply(series, function(rows) vapply(rows, function(x) x$year, numeric(1))))
   values &lt;- unlist(lapply(series, function(rows) vapply(rows, function(x) x[[field]], numeric(1))))
   colours &lt;- c(&quot;#1378a3&quot;, &quot;#b56435&quot;, &quot;#7357a8&quot;, &quot;#328363&quot;)
+  old_mar &lt;- par(&quot;mar&quot;)
+  on.exit(par(mar = old_mar))
+  par(mar = c(4, 4, 5, 1))
   plot(range(years), range(c(0, values)), type = &quot;n&quot;, xlab = &quot;Year&quot;, ylab = label)
   for (i in seq_along(series)) {
     lines(vapply(series[[i]], function(x) x$year, numeric(1)),
           vapply(series[[i]], function(x) x[[field]], numeric(1)),
           col = colours[(i - 1) %% length(colours) + 1], lwd = 2)
   }
-  legend(&quot;topright&quot;, names(series), col = colours[seq_along(series)], lty = 1, bty = &quot;n&quot;)
+  legend(&quot;top&quot;, names(series), inset = c(0, -0.34), xpd = NA,
+         col = colours[seq_along(series)], lty = 1, lwd = 2, cex = 0.8, bty = &quot;n&quot;)
 }
 ```
 
@@ -3529,8 +3538,9 @@ including the first change from the reference catch. Cases and scenarios have eq
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 for (scenario in result$scenarios) {
   series &lt;- scenario$series[rule_names]
-  plot_series(series, &quot;B_over_K&quot;, paste(scenario$name, &quot;— median end-year biomass / K&quot;))
-  plot_series(series, &quot;catch_t&quot;, paste(scenario$name, &quot;— median realised catch (tonnes)&quot;))
+  label &lt;- sub(&quot; growth$&quot;, &quot;&quot;, sub(&quot; and recovery$&quot;, &quot;&quot;, scenario$name))
+  plot_series(series, &quot;B_over_K&quot;, paste0(label, &quot;: median B/K&quot;))
+  plot_series(series, &quot;catch_t&quot;, paste0(label, &quot;: median catch (t)&quot;))
 }
 ```
 
@@ -7432,14 +7442,15 @@ if (sys.nframe() == 0L) {
     cat(workflow_execute_json(input))
   }
 }
-</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: effce30743320b30f59c2c157dc367d9dc0d9d29728ac4386a7238e61049f865</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
+</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: 4bc488e82af04e67adaee1e2522210cbd4804b38d36fce49e2718bfdc12ecab8</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
 import html
 import json
 import math
 
 STYLE = &#x27;&#x27;&#x27;body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}&#x27;&#x27;&#x27;
 STYLE += &#x27;&#x27;&#x27;.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}&#x27;&#x27;&#x27;
-STYLE += &#x27;&#x27;&#x27;.plot-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.plot-pair h2{font-size:17px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 12px}.result-method{font-size:14px;color:#526477}.result-view h2{margin-top:20px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}&#x27;&#x27;&#x27;
+STYLE += &#x27;&#x27;&#x27;.plot-pair{display:grid;grid-template-columns:1fr;gap:18px}.plot-pair h2{font-size:17px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 12px}.result-method{font-size:14px;color:#526477}.result-view h2{margin-top:20px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}&#x27;&#x27;&#x27;
+STYLE += &#x27;&#x27;&#x27;.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}&#x27;&#x27;&#x27;
 MSE_COLOURS = {&#x27;Constant catch&#x27;: &#x27;#1378a3&#x27;, &#x27;Index rule&#x27;: &#x27;#b56435&#x27;, &#x27;Buffered rule&#x27;: &#x27;#7357a8&#x27;}
 
 
@@ -7540,7 +7551,7 @@ def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     step = next(size * scale for size in [1, 2, 2.5, 5, 10] if size * scale &gt;= (ymax-ymin) / 4)
     ymin, ymax = math.floor(ymin / step) * step, math.ceil(ymax / step) * step
     span = max(ymax - ymin, step)
-    x = lambda year: 65 + (year - xmin) / max(1, xmax - xmin) * 660
+    x = lambda year: 100 + (year - xmin) / max(1, xmax - xmin) * 625
     y = lambda number: 280 - (number - ymin) / span * 225
     out = [&#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 780 340&quot; role=&quot;img&quot; aria-label=&quot;&#x27; + esc(label) + &#x27;&quot;&gt;&#x27;]
     for i in range(round(span / step) + 1):
@@ -7548,19 +7559,21 @@ def plot(series, value, label, points=(), colour_by_name=None, upper=None):
         if abs(v) &lt; step * 1e-8:
             v = 0.0
         stroke = &#x27;#9cafba&#x27; if v == 0 and ymin &lt; 0 else &#x27;#e1e8ee&#x27;
-        out.append(f&#x27;&lt;path d=&quot;M65 {y(v):.1f}H730&quot; stroke=&quot;{stroke}&quot;/&gt;&lt;text x=&quot;54&quot; y=&quot;{y(v)+4:.1f}&quot; text-anchor=&quot;end&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;{v:g}&lt;/text&gt;&#x27;)
+        out.append(f&#x27;&lt;path d=&quot;M100 {y(v):.1f}H730&quot; stroke=&quot;{stroke}&quot;/&gt;&lt;text x=&quot;90&quot; y=&quot;{y(v)+4:.1f}&quot; text-anchor=&quot;end&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;{v:g}&lt;/text&gt;&#x27;)
     for year in sorted({xmin, (xmin+xmax)//2, xmax}):
         out.append(f&#x27;&lt;text x=&quot;{x(year):.1f}&quot; y=&quot;304&quot; text-anchor=&quot;middle&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;{year}&lt;/text&gt;&#x27;)
+    legend = []
     for i, (name, rows) in enumerate(series.items()):
         coordinates = &#x27; &#x27;.join(f&#x27;{x(r[&quot;year&quot;]):.2f},{y(r[value]):.2f}&#x27; for r in rows)
         colour = (colour_by_name or {}).get(name, colours[i % len(colours)])
         if name in points:
             out.extend(f&#x27;&lt;circle cx=&quot;{x(r[&quot;year&quot;]):.2f}&quot; cy=&quot;{y(r[value]):.2f}&quot; r=&quot;3.5&quot; fill=&quot;{colour}&quot;/&gt;&#x27; for r in rows)
         else:
-            out.append(f&#x27;&lt;polyline points=&quot;{coordinates}&quot; fill=&quot;none&quot; stroke=&quot;{colour}&quot; stroke-width=&quot;2.5&quot;/&gt;&#x27;)
-        out.append(f&#x27;&lt;text x=&quot;{65+(i%4)*170}&quot; y=&quot;{25+(i//4)*20}&quot; fill=&quot;{colour}&quot; font-size=&quot;14&quot;&gt;{esc(name)}&lt;/text&gt;&#x27;)
-    out.append(f&#x27;&lt;text x=&quot;65&quot; y=&quot;332&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;{esc(label)}&lt;/text&gt;&lt;/svg&gt;&#x27;)
-    return &#x27;&#x27;.join(out)
+            dash = &#x27; stroke-dasharray=&quot;8 5&quot;&#x27; if name == &quot;Nominal&quot; else &quot;&quot;
+            out.append(f&#x27;&lt;polyline points=&quot;{coordinates}&quot; fill=&quot;none&quot; stroke=&quot;{colour}&quot; stroke-width=&quot;2.5&quot;{dash}/&gt;&#x27;)
+        legend.append(f&#x27;&lt;span&gt;&lt;i class=&quot;plot-swatch&quot; style=&quot;color:{colour};border-top-style:{&quot;dashed&quot; if name == &quot;Nominal&quot; else &quot;solid&quot;}&quot;&gt;&lt;/i&gt;{esc(name)}&lt;/span&gt;&#x27;)
+    out.append(&quot;&lt;/svg&gt;&quot;)
+    return &#x27;&lt;div class=&quot;plot-legend&quot;&gt;&#x27; + &#x27;&#x27;.join(legend) + &#x27;&lt;/div&gt;&#x27; + &#x27;&#x27;.join(out) + &#x27;&lt;p class=&quot;plot-unit&quot;&gt;&#x27; + esc(label) + &#x27;&lt;/p&gt;&#x27;
 
 
 def cpue_report(result):
@@ -7802,25 +7815,26 @@ def mse_tradeoff(metrics):
     colours = MSE_COLOURS
     xmax = max(1, max(row[&#x27;mean_catch_t&#x27;] for row in metrics) * 1.15)
     ymax = max(1, max(row[&#x27;final_B_over_K&#x27;] for row in metrics) * 1.15)
-    x = lambda v: 75 + 610 * v / xmax
+    x = lambda v: 100 + 585 * v / xmax
     y = lambda v: 275 - 220 * v / ymax
     out = [&#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 780 340&quot; role=&quot;img&quot; &#x27;
            &#x27;aria-label=&quot;Management trade-off: mean annual catch (tonnes) and median final biomass / carrying capacity&quot;&gt;&#x27;]
     for i in range(5):
         catch, biomass = xmax * i / 4, ymax * i / 4
-        out.append(f&#x27;&lt;path d=&quot;M75 {y(biomass):.1f}H685&quot; stroke=&quot;#e1e8ee&quot;/&gt;&#x27;
-                   f&#x27;&lt;text x=&quot;64&quot; y=&quot;{y(biomass)+4:.1f}&quot; text-anchor=&quot;end&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;{biomass:.2g}&lt;/text&gt;&#x27;
+        out.append(f&#x27;&lt;path d=&quot;M100 {y(biomass):.1f}H685&quot; stroke=&quot;#e1e8ee&quot;/&gt;&#x27;
+                   f&#x27;&lt;text x=&quot;90&quot; y=&quot;{y(biomass)+4:.1f}&quot; text-anchor=&quot;end&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;{biomass:.2g}&lt;/text&gt;&#x27;
                    f&#x27;&lt;text x=&quot;{x(catch):.1f}&quot; y=&quot;299&quot; text-anchor=&quot;middle&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;{catch:,.0f}&lt;/text&gt;&#x27;)
+    legend = []
     for i, row in enumerate(metrics):
         colour = colours.get(row[&#x27;name&#x27;], &#x27;#1378a3&#x27;)
         out.append(f&#x27;&lt;circle cx=&quot;{x(row[&quot;mean_catch_t&quot;]):.2f}&quot; cy=&quot;{y(row[&quot;final_B_over_K&quot;]):.2f}&quot; &#x27;
                    f&#x27;r=&quot;6&quot; fill=&quot;{colour}&quot;&gt;&lt;title&gt;{esc(row[&quot;name&quot;])}: {row[&quot;mean_catch_t&quot;]:.4g} t/year; &#x27;
                    f&#x27;final B / K {row[&quot;final_B_over_K&quot;]:.4g}&lt;/title&gt;&lt;/circle&gt;&#x27;
                    f&#x27;&lt;text x=&quot;{x(row[&quot;mean_catch_t&quot;])+9:.2f}&quot; y=&quot;{y(row[&quot;final_B_over_K&quot;])-8-i*13:.2f}&quot; &#x27;
-                   f&#x27;fill=&quot;{colour}&quot; font-size=&quot;13&quot;&gt;{i+1}&lt;/text&gt;&#x27;
-                   f&#x27;&lt;text x=&quot;{75+i*205}&quot; y=&quot;25&quot; fill=&quot;{colour}&quot; font-size=&quot;13&quot;&gt;{i+1}. {esc(row[&quot;name&quot;])}&lt;/text&gt;&#x27;)
-    out.append(&#x27;&lt;text x=&quot;75&quot; y=&quot;328&quot; fill=&quot;#607080&quot; font-size=&quot;12&quot;&gt;Mean annual realised catch (tonnes); y: median final B / K&lt;/text&gt;&lt;/svg&gt;&#x27;)
-    return &#x27;&#x27;.join(out)
+                   f&#x27;fill=&quot;{colour}&quot; font-size=&quot;13&quot;&gt;{i+1}&lt;/text&gt;&#x27;)
+        legend.append(f&#x27;&lt;span style=&quot;color:{colour}&quot;&gt;{i+1}. {esc(row[&quot;name&quot;])}&lt;/span&gt;&#x27;)
+    out.append(&quot;&lt;/svg&gt;&quot;)
+    return &#x27;&lt;div class=&quot;plot-legend&quot;&gt;&#x27; + &#x27;&#x27;.join(legend) + &#x27;&lt;/div&gt;&#x27; + &#x27;&#x27;.join(out) + &#x27;&lt;p class=&quot;plot-unit&quot;&gt;Mean annual realised catch (tonnes); y: median final B / K&lt;/p&gt;&#x27;
 
 
 def annual_coverage(rows):

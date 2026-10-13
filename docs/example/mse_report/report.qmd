@@ -41,13 +41,17 @@ plot_series <- function(series, field, label) {
   years <- unlist(lapply(series, function(rows) vapply(rows, function(x) x$year, numeric(1))))
   values <- unlist(lapply(series, function(rows) vapply(rows, function(x) x[[field]], numeric(1))))
   colours <- c("#1378a3", "#b56435", "#7357a8", "#328363")
+  old_mar <- par("mar")
+  on.exit(par(mar = old_mar))
+  par(mar = c(4, 4, 5, 1))
   plot(range(years), range(c(0, values)), type = "n", xlab = "Year", ylab = label)
   for (i in seq_along(series)) {
     lines(vapply(series[[i]], function(x) x$year, numeric(1)),
           vapply(series[[i]], function(x) x[[field]], numeric(1)),
           col = colours[(i - 1) %% length(colours) + 1], lwd = 2)
   }
-  legend("topright", names(series), col = colours[seq_along(series)], lty = 1, bty = "n")
+  legend("top", names(series), inset = c(0, -0.34), xpd = NA,
+         col = colours[seq_along(series)], lty = 1, lwd = 2, cex = 0.8, bty = "n")
 }
 ```
 
@@ -100,8 +104,9 @@ including the first change from the reference catch. Cases and scenarios have eq
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 for (scenario in result$scenarios) {
   series <- scenario$series[rule_names]
-  plot_series(series, "B_over_K", paste(scenario$name, "— median end-year biomass / K"))
-  plot_series(series, "catch_t", paste(scenario$name, "— median realised catch (tonnes)"))
+  label <- sub(" growth$", "", sub(" and recovery$", "", scenario$name))
+  plot_series(series, "B_over_K", paste0(label, ": median B/K"))
+  plot_series(series, "catch_t", paste0(label, ": median catch (t)"))
 }
 ```
 
