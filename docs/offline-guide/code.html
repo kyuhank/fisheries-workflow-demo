@@ -217,7 +217,7 @@ GitHub release links alone do not provide an independent deposit. Each software
 component retains its own licence, as described in [THIRD_PARTY.md](THIRD_PARTY.md).
 Preserved copies do not require this website or the original image registry to
 remain online. They still require a Docker-compatible computer.
-</pre></details><details id="source-b335630551682c19" data-name="README.md"><summary>README.md</summary><p class="muted"><br>SHA-256: dc5acdf6f27dbfbeaa576c4e73a574b13e4d8180644c3a948b6b59844498a560</p><pre># Fisheries workflow demonstration
+</pre></details><details id="source-b335630551682c19" data-name="README.md"><summary>README.md</summary><p class="muted"><br>SHA-256: 8149424bb591fdd3a19c89039ff2986945c03833002dbd89241f415f6e5c9cc4</p><pre># Fisheries workflow demonstration
 
 [Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Code by job](jobs/README.md) · [Preserved releases](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
@@ -305,10 +305,10 @@ original CPUE standardisation.
 
 Keep a downloaded run and its recorded execution image together. Follow the
 bundle&#x27;s `REPRODUCE.txt` to repeat its declared scope. The
-[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.2.zip)
+[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.3.zip)
 includes local result and code pages, source archives, extraction SQL and all
 22 reference outputs; its
-[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.2.zip.sha256)
+[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.3.zip.sha256)
 identifies the download. Open `START-HERE.html`, then follow `OFFLINE.md`.
 The archived
 [v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)
@@ -7442,7 +7442,7 @@ if (sys.nframe() == 0L) {
     cat(workflow_execute_json(input))
   }
 }
-</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: 55923b9d6a9a067376331120693fac9a3cea635c11e15948d8aa175991f0a195</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
+</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: 5eef0437ff2beed3d5f2b772cfabebe7382957a60e2188b0b73fc7a2e6945a19</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
 import html
 import json
 import math
@@ -7798,8 +7798,10 @@ def cpue_support(analysis):
     parts = [&#x27;Both curves use the same selected rows&#x27;]
     if &#x27;sets_used&#x27; in analysis:
         parts.append(f&#x27;{analysis[&quot;sets_used&quot;]:,} used, {analysis.get(&quot;sets_excluded&quot;, 0):,} excluded&#x27;)
-    if &#x27;min_hooks&#x27; in analysis:
+    if analysis.get(&#x27;min_hooks&#x27;, 0) &gt; 0:
         parts.append(f&#x27;effort filter: at least {analysis[&quot;min_hooks&quot;]:g} hooks&#x27;)
+    elif &#x27;min_hooks&#x27; in analysis:
+        parts.append(&#x27;no additional effort filter&#x27;)
     return &#x27;&lt;p class=&quot;result-method&quot;&gt;&#x27; + esc(&#x27;; &#x27;.join(parts)) + &#x27;.&lt;/p&gt;&#x27;
 
 
@@ -7900,10 +7902,18 @@ def result_view(job, result):
     if key in (&#x27;cpue_a&#x27;, &#x27;cpue_b&#x27;):
         rows = result[&#x27;series&#x27;]
         rates = cpue_rates(rows)
-        body = &#x27;&lt;p&gt;Annual CPUE from the selected catch and effort records.&lt;/p&gt;&#x27;
+        public = result.get(&#x27;data_kind&#x27;) == &#x27;public-wcpfc&#x27;
+        body = (f&#x27;&lt;p&gt;Fiji longline albacore · {esc(coverage_text(rows))} · &#x27;
+                f&#x27;{result[&quot;sets_used&quot;]:,} released fleet–cell–quarter records.&lt;/p&gt;&#x27;
+                if public else &#x27;&lt;p&gt;Annual CPUE from the selected synthetic observations.&lt;/p&gt;&#x27;)
         if rates:
             body += plot(rates, &#x27;cpue&#x27;, &#x27;Fish per 1,000 hooks&#x27;) + cpue_support(result)
-            body += &#x27;&lt;p&gt;The nominal curve is 1,000 times annual fish numbers divided by annual hooks. The standardised curve uses the saved GLM prediction target.&lt;/p&gt;&#x27;
+            body += &#x27;&lt;p&gt;Nominal CPUE = 1,000 × annual fish numbers / annual hooks.&lt;/p&gt;&#x27;
+            if public:
+                body += (&#x27;&lt;p&gt;Standardised A holds cell–quarter composition fixed: predict catch at 1,000 hooks &#x27;
+                         &#x27;in each of the six strata, then average with equal weights.&lt;/p&gt;&#x27;
+                         if key == &#x27;cpue_a&#x27; else
+                         &#x27;&lt;p&gt;B fits year effects only; its annual fitted rate reproduces nominal CPUE.&lt;/p&gt;&#x27;)
         else:
             body += plot({job[&#x27;title&#x27;]: rows}, &#x27;index&#x27;, &#x27;CPUE relative to the first year&#x27;)
             body += &#x27;&lt;p&gt;Only the relative index is available in this saved result; nominal and standardised rates were not recorded.&lt;/p&gt;&#x27;
@@ -7911,6 +7921,8 @@ def result_view(job, result):
         if result.get(&#x27;standardisation&#x27;):
             body += &#x27; · &#x27; + esc(result[&#x27;standardisation&#x27;])
         body += &#x27;.&lt;/p&gt;&#x27;
+        if public:
+            body += &#x27;&lt;p&gt;These released strata cover the selected fleet. No confidence intervals or stock-wide abundance validation are supplied.&lt;/p&gt;&#x27;
         columns = [(&#x27;year&#x27;, &#x27;Year&#x27;), (&#x27;standardised_cpue&#x27;, &#x27;Standardised (fish/1,000 hooks)&#x27;),
                    (&#x27;nominal_cpue&#x27;, &#x27;Nominal (fish/1,000 hooks)&#x27;)] if rates else [(&#x27;year&#x27;, &#x27;Year&#x27;), (&#x27;index&#x27;, &#x27;Relative CPUE&#x27;)]
         return body + table([rows[0], rows[-1]] if len(rows) &gt; 1 else rows, columns)
@@ -7919,15 +7931,22 @@ def result_view(job, result):
         a_name = &#x27;CPUE analysis A&#x27;
         rates = cpue_rates(series.get(a_name, []))
         relative = plot(series, &#x27;index&#x27;, &#x27;Each index relative to its own first year&#x27;)
-        body = &#x27;&lt;p&gt;Compare standardisation on analysis A’s selected rows, then compare the saved A/B indices.&lt;/p&gt;&#x27;
+        analysis = result.get(&#x27;analyses&#x27;, {}).get(a_name, {})
+        public = result.get(&#x27;data_kind&#x27;) == &#x27;public-wcpfc&#x27;
+        a_rows = series.get(a_name, [])
+        body = (f&#x27;&lt;p&gt;Fiji longline albacore · {esc(coverage_text(a_rows))} · &#x27;
+                f&#x27;{analysis[&quot;sets_used&quot;]:,} released records used by A.&lt;/p&gt;&#x27; if public
+                else &#x27;&lt;p&gt;CPUE from the selected synthetic observations.&lt;/p&gt;&#x27;)
         if rates:
-            body += paired_plots(&#x27;Standardised and nominal — A rows&#x27;, plot(rates, &#x27;cpue&#x27;, &#x27;Fish per 1,000 hooks&#x27;),
+            body += paired_plots(&#x27;Standardised and nominal CPUE&#x27;, plot(rates, &#x27;cpue&#x27;, &#x27;Fish per 1,000 hooks&#x27;),
                                  &#x27;Relative indices A and B&#x27;, relative)
             body += cpue_support(result.get(&#x27;analyses&#x27;, {}).get(a_name, {}))
-            body += &#x27;&lt;p&gt;The main overlay uses analysis A’s nominal rate. An A-only effort filter does not apply to B; B is not substituted for A’s nominal curve.&lt;/p&gt;&#x27;
+            body += &#x27;&lt;p&gt;The first plot uses the same A records for both curves. Any A effort filter applies to both; B uses its own eligible records.&lt;/p&gt;&#x27;
             analysis = result.get(&#x27;analyses&#x27;, {}).get(a_name, {})
             if analysis.get(&#x27;standardisation&#x27;):
                 body += &#x27;&lt;p class=&quot;result-method&quot;&gt;Standardised: &#x27; + esc(analysis[&#x27;standardisation&#x27;]) + &#x27;. Nominal: 1,000 × annual fish numbers / annual hooks on the A rows.&lt;/p&gt;&#x27;
+            if public:
+                body += &#x27;&lt;p&gt;A predicts catch at 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B fits year effects only. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.&lt;/p&gt;&#x27;
         else:
             body += relative + &#x27;&lt;p&gt;The saved result has relative indices only; an A-row nominal overlay is unavailable.&lt;/p&gt;&#x27;
         return body + &#x27;&lt;p class=&quot;result-method&quot;&gt;The A/B comparison includes differences in adjustment and row selection. Each relative index equals one in its own first year.&lt;/p&gt;&#x27;
