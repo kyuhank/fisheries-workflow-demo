@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "all_four_completed_successfully": true,
+  "standard_public_runners": [
+    {
+      "name": "baseline",
+      "id": 38326908624,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "success"
+    },
+    {
+      "name": "update2022",
+      "id": 38327224611,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "success"
+    },
+    {
+      "name": "growth035",
+      "id": 38327486257,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "success"
+    },
+    {
+      "name": "buffer060",
+      "id": 38327738192,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "success"
+    }
+  ],
+  "commit": "90e59f98d3f20006127aa44c686b0ae6d3e0258d"
+}

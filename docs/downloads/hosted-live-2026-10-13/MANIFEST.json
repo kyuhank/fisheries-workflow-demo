@@ -1,0 +1,107 @@
+{
+  "cases": [
+    {
+      "bundle_bytes": 5798876,
+      "bundle_sha256": "b16fb07fdc70ac45ff3dc204b7532e4f21a30bfb53b713c4afefb14e2a9fb91d",
+      "case": "01-full2021",
+      "commit": "90e59f98d3f20006127aa44c686b0ae6d3e0258d",
+      "executed_jobs": 22,
+      "github_run_id": "38326908624",
+      "github_run_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/38326908624",
+      "original_manifest_entries": 271,
+      "original_unmanifested_members": [
+        "REPRODUCE.txt",
+        "SHA256SUMS.json"
+      ],
+      "request_id": "cc7398b5-3aff-40ac-bb78-8d04a98835ad",
+      "retained_jobs": 0,
+      "run_bundle": "01-full2021/run-bundle.zip"
+    },
+    {
+      "bundle_bytes": 5790676,
+      "bundle_sha256": "f143e91d31e09f47ac864fbf4fd2d27f5effc03b0f89fa28431adee7eab8a78b",
+      "case": "02-update2022",
+      "commit": "90e59f98d3f20006127aa44c686b0ae6d3e0258d",
+      "executed_jobs": 22,
+      "github_run_id": "38327224611",
+      "github_run_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/38327224611",
+      "original_manifest_entries": 271,
+      "original_unmanifested_members": [
+        "REPRODUCE.txt",
+        "SHA256SUMS.json"
+      ],
+      "request_id": "40ab2205-825c-42bf-8167-b8e8a82b5aa5",
+      "retained_jobs": 0,
+      "run_bundle": "02-update2022/run-bundle.zip"
+    },
+    {
+      "bundle_bytes": 5796233,
+      "bundle_sha256": "a8ad0afee731c48400f66539191749c03c9b77ad81c719715e73b0a70538db4e",
+      "case": "03-growth035",
+      "commit": "90e59f98d3f20006127aa44c686b0ae6d3e0258d",
+      "executed_jobs": 10,
+      "github_run_id": "38327486257",
+      "github_run_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/38327486257",
+      "original_manifest_entries": 271,
+      "original_unmanifested_members": [
+        "REPRODUCE.txt",
+        "SHA256SUMS.json"
+      ],
+      "request_id": "e4af4ec5-d163-4df8-8483-57defa7c703f",
+      "retained_jobs": 12,
+      "run_bundle": "03-growth035/run-bundle.zip"
+    },
+    {
+      "bundle_bytes": 5782468,
+      "bundle_sha256": "10d6051efcc6d147de34803b0c06df6cd6f9115b5e50ab36acbf3db3c02daf2e",
+      "case": "04-buffer060",
+      "commit": "90e59f98d3f20006127aa44c686b0ae6d3e0258d",
+      "executed_jobs": 3,
+      "github_run_id": "38327738192",
+      "github_run_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/38327738192",
+      "original_manifest_entries": 271,
+      "original_unmanifested_members": [
+        "REPRODUCE.txt",
+        "SHA256SUMS.json"
+      ],
+      "request_id": "d6af0567-0328-49c3-b21a-1b52cdac7ac4",
+      "retained_jobs": 19,
+      "run_bundle": "04-buffer060/run-bundle.zip"
+    }
+  ],
+  "copies": {
+    "01-full2021/run-bundle.zip": {
+      "bytes": 5798876,
+      "sha256": "b16fb07fdc70ac45ff3dc204b7532e4f21a30bfb53b713c4afefb14e2a9fb91d"
+    },
+    "02-update2022/run-bundle.zip": {
+      "bytes": 5790676,
+      "sha256": "f143e91d31e09f47ac864fbf4fd2d27f5effc03b0f89fa28431adee7eab8a78b"
+    },
+    "03-growth035/run-bundle.zip": {
+      "bytes": 5796233,
+      "sha256": "a8ad0afee731c48400f66539191749c03c9b77ad81c719715e73b0a70538db4e"
+    },
+    "04-buffer060/run-bundle.zip": {
+      "bytes": 5782468,
+      "sha256": "10d6051efcc6d147de34803b0c06df6cd6f9115b5e50ab36acbf3db3c02daf2e"
+    },
+    "acceptance.json": {
+      "bytes": 6911,
+      "sha256": "0d3abac46d944b6689b94c66763e06787b4251d93561b89e10056169fca5cd23"
+    },
+    "github-independent-verification.json": {
+      "bytes": 742,
+      "sha256": "772dc61de3357b22f5ac40908684a4d9b923402c0553e68a073e85d78bb023e5"
+    }
+  },
+  "evidence_date": "2026-10-13",
+  "executed_source_commit": "90e59f98d3f20006127aa44c686b0ae6d3e0258d",
+  "fresh_full_equivalence_retested": false,
+  "native_bundle_reproduction_retested": false,
+  "original_local_evidence_is_separate": true,
+  "preservation": "Exact original bytes and hashes; repository delivery is not a durable-archive guarantee.",
+  "repository": "kyuhank/fisheries-workflow-demo",
+  "schema_version": 1,
+  "scope": "Hosted execution, lineage and artifact integrity; no scientific-validity claim."
+}

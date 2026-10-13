@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hosted fisheries workflow evidence — 13 October 2026</title>
+  <style>
+    body { font: 17px/1.6 system-ui, sans-serif; max-width: 850px; margin: 40px auto; padding: 0 24px; color: #202b33; }
+    h1 { font-size: 1.8rem; line-height: 1.25; }
+    h2 { font-size: 1.2rem; margin-top: 1.6rem; }
+    a { color: #125a8b; }
+    li { margin: .6rem 0; }
+    code { overflow-wrap: anywhere; font-size: .85em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Hosted fisheries workflow evidence</h1>
+    <p>Four public-data runs checked on 13 October 2026. Each ZIP is an unchanged copy of the original run bundle, including its recorded inputs, code, settings, results and reports. The recorded source commit is <code>90e59f98d3f20006127aa44c686b0ae6d3e0258d</code>.</p>
+    <h2>Download run bundles</h2>
+    <ul>
+      <li><a href="01-full2021/run-bundle.zip" download>Baseline through 2021</a> — 22 jobs executed; 0 retained.</li>
+      <li><a href="02-update2022/run-bundle.zip" download>Data extended through 2022</a> — 22 jobs executed; 0 retained.</li>
+      <li><a href="03-growth035/run-bundle.zip" download>Growth changed to 0.35</a> — 10 jobs executed; 12 retained.</li>
+      <li><a href="04-buffer060/run-bundle.zip" download>Buffered rule changed to 0.60</a> — 3 jobs executed; 19 retained.</li>
+    </ul>
+    <h2>Check the evidence</h2>
+    <p><a href="acceptance.json">Hosted acceptance checks</a> · <a href="github-independent-verification.json">GitHub execution verification</a> · <a href="MANIFEST.json">Run identities and original bundle hashes</a> · <a href="SHA256SUMS.json">Delivery checksums</a> · <a href="README.md">Detailed source and scope notes</a>.</p>
+    <p>These records check hosted execution, producing-run identity, selective retention and artifact integrity. They do not repeat native bundle reproduction or compare the hosted updates with new full executions. Earlier local equivalence checks are separate evidence. These teaching models are not a validated stock assessment.</p>
+    <h2>Sources and conditions</h2>
+    <p>The example uses WCPFC/SPC public longline catch and effort and South Pacific annual catch estimates. Effort is converted from hundreds of hooks to hooks; albacore catch numbers feed the CPUE models, while the separate annual catch series is in metric tonnes. The relative CPUE index is dimensionless. Confidentiality-masked zeros are excluded.</p>
+    <p>Retain WCPFC/SPC attribution and source notices. The code's MIT licence does not relicense the statistical data. See the <a href="https://github.com/kyuhank/fisheries-workflow-demo/blob/90e59f98d3f20006127aa44c686b0ae6d3e0258d/data/public/README.md">pinned public-data guide</a> and the notices preserved inside each bundle.</p>
+    <p>Download and keep these files if needed. The hashes identify these exact copies; continued GitHub Pages availability is not a durable repository guarantee.</p>
+  </main>
+</body>
+</html>
