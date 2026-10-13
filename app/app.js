@@ -738,7 +738,7 @@ function renderTasks() {
       uiElement("span", "", completed || reused
         ? [completed && `${completed} complete`, reused && `${reused} reused`].filter(Boolean).join(" · ")
         : `${available}/${members.length} outputs available`),
-      uiElement("span", "task-open", `${members.length} jobs ›`),
+      uiElement("span", "task-open", `${members.length} jobs`),
     );
     const activity = uiElement(
       "span",
@@ -800,12 +800,12 @@ function renderTasks() {
     : "Tasks / Jobs";
   $("workspace-title").textContent = workspaceView === "tasks"
     ? "Tasks"
-    : workspaceView === "dependencies" ? "Follow a job’s connections"
+    : workspaceView === "dependencies" ? "Job dependencies"
     : $("task-title").textContent;
   $("workspace-description").textContent = workspaceView === "tasks"
-    ? "Select a task to see its analyses and results."
-    : workspaceView === "dependencies" ? "See the earlier results a job needs and the later analyses that use it."
-    : "Open Output for a result or Record for the inputs and versions it used.";
+    ? "Select a task."
+    : workspaceView === "dependencies" ? "Required inputs and downstream jobs."
+    : "Output: results. Record: inputs and versions.";
   $("task-filter").value = selectedTask || "";
   $("job-status-filter").value = jobStatusFilter;
   $("show-tasks").classList.toggle("active", workspaceView === "tasks");
@@ -1058,8 +1058,8 @@ function render() {
     : executionScope === "job"
     ? "Run this job"
     : start === "submission"
-    ? "Run full workflow →"
-    : "Run from this job →";
+    ? "Run full workflow"
+    : "Run from this job";
   $("download").disabled = !canDownloadBundle();
   $("download").title = mode === "saved" ? "Download saved results"
     : $("download").disabled ? "Download after a successful run" : "Download this completed run";
@@ -1069,15 +1069,15 @@ function render() {
   $("handover-note").hidden = Boolean(waitingTransfer) || mode === "saved" ||
     $("handover").value !== "manual";
   $("handover-help").textContent = $("handover").value === "manual"
-    ? "Confirm each file transfer to continue."
-    : "Pass recorded inputs automatically.";
+    ? "Confirm each transfer."
+    : "Automatic input transfer.";
   $("revise-cpue").hidden = publicExample || busy || !records.cpue_a;
   $("handover-panel").hidden = !waitingTransfer;
   $("transfer-files").disabled = confirmingTransfer;
   $("connect-workflow").disabled = confirmingTransfer;
   $("transfer-files").textContent = confirmingTransfer
     ? "Confirming transfer…"
-    : "Confirm file transfer →";
+    : "Confirm file transfer";
   const manual = $("handover").value === "manual" && mode !== "saved";
   document.querySelector('[data-tab="jobs"]').textContent = "Orchestration tool";
   document.querySelector('.workspace-brand .eyebrow').textContent = manual ? "Manual handover" : "Orchestration";
@@ -1085,16 +1085,16 @@ function render() {
   document.querySelector('.workspace-nav').setAttribute('aria-label', manual
     ? "Job outputs navigation" : "Orchestration navigation");
   if (manual) $("workspace-description").textContent = workspaceView === "dependencies"
-    ? "These connections show the files passed between analysts. Manual handovers require confirmation."
-    : "Inspect results and records; confirm a file transfer when an analysis is waiting.";
+    ? "Manual handovers require confirmation."
+    : "Confirm the transfer when a receiving analysis is waiting.";
   renderViewGuide();
   for (const id of ["snapshot", "filter", "growth-rate", "mse-buffer"]) {
     $(id).disabled = busy || mode === "saved";
   }
   $("selection-label").textContent = mode === "saved" || executionScope === "job" ? "Selected job" : "Start from";
   $("hint").textContent = mode === "saved"
-    ? "Open a job’s output, then use Inputs & versions to trace its inputs."
-    : "Job Run prepares required inputs and stops at that job. Run workflow also updates dependent analyses.";
+    ? "Inputs & versions lists each result’s source."
+    : "Run: selected job and required inputs. Run workflow: dependent analyses too.";
   if (mode === "saved") {
     $("completion").textContent = `${Object.keys(records).length} saved outputs`;
     $("reuse-message").textContent = "";
@@ -1108,11 +1108,11 @@ function render() {
     $("reuse-message").textContent = parentNames.length
       ? "Uses saved inputs: " + parentNames.join(" · ")
       : plan.retained.length
-      ? "Other results keep their original run and files."
+      ? "Other results retained."
       : "";
     if (plan.changed.length && start !== "submission") {
       $("reuse-message").textContent +=
-        " Missing or changed inputs are rebuilt first.";
+        " Missing or changed inputs rerun first.";
     }
   }
 }
@@ -1229,7 +1229,7 @@ function handleEvent(event) {
         ? "Data manager → CPUE analyst"
         : event.boundary === "assessment" ? "Assessment analyst → MSE analyst"
         : "CPUE analyst → Assessment analyst";
-      $("handover-message").textContent = "This simulates a file handover between analysts. Confirm it to continue receiving jobs; no upload is needed.";
+      $("handover-message").textContent = "Confirm to continue the receiving jobs. No upload is needed.";
     } else if (event.state === "received") {
       waitingTransfer = null;
       confirmingTransfer = false;
@@ -1430,24 +1430,24 @@ function renderViewGuide() {
   const orchestration = $("workflow-view").hidden;
   const manual = $("handover").value === "manual" && mode !== "saved";
   $("view-guide-title").textContent = orchestration
-    ? manual ? "Follow a manual handover"
-    : mode === "saved" ? "Inspect results and their inputs"
-    : "Run analyses and follow an update"
-    : "Follow results into later analyses";
+    ? manual ? "Manual handover"
+    : mode === "saved" ? "Saved analyses"
+    : "Execution"
+    : "Workflow";
   $("view-guide-description").textContent = orchestration
     ? manual
-      ? "Receiving analyses wait for Confirm file transfer; other ready jobs can continue. Open Output or Record to inspect a result."
+      ? "Confirm file transfer releases receiving analyses; other ready jobs continue."
       : mode === "saved"
-      ? "Explore saved results by task. Open Output to read a result or Record to follow its inputs, code and software."
-      : "Run the workflow, change a setting, then choose Update workflow. Affected jobs rerun; unchanged results keep their original records."
+      ? "Inspect saved results. Output: analyses. Record: inputs and versions."
+      : "Update workflow reruns affected jobs and retains unchanged results."
     : manual
-      ? "Arrows show the results passed between analysts. Confirm each file transfer to continue the receiving analyses."
+      ? "Arrows show input transfers. Confirm each handover to continue."
       : mode === "saved"
-      ? "Explore saved results: CPUE indices feed assessments, whose results inform MSE. Open a result, then use Inputs & versions to trace the earlier results it used."
-      : "Arrows show which results become inputs. Change a setting and choose Update workflow to follow its effect.";
+      ? "Inspect saved results: data → CPUE → assessment → MSE."
+      : "Arrows link each analysis to its inputs.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
-  $("view-guide-link").textContent = orchestration ? "See workflow diagram →"
-    : manual ? "Inspect job outputs →" : "Open Orchestration tool →";
+  $("view-guide-link").textContent = orchestration ? "Workflow diagram"
+    : "Orchestration tool";
 }
 function showTab(tab) {
   const orchestration = tab === "jobs";
@@ -1661,8 +1661,8 @@ $("save-output").onclick = () =>
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"
-    ? "Run analyses on GitHub with recorded software."
-    : "Browse saved results; does not run code.";
+    ? "GitHub execution."
+    : "Saved outputs; no execution.";
 }
 
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
@@ -1717,8 +1717,8 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     messages.length = 0;
     payload.saved.events.forEach(log);
     status("", "Saved results", location.protocol === "file:"
-      ? `${Object.keys(records).length} completed jobs. Browse their reports and records offline.`
-      : `${Object.keys(records).length} completed jobs. Choose Live run to repeat or update the analyses.`);
+      ? `${Object.keys(records).length} completed jobs. Available offline.`
+      : `${Object.keys(records).length} completed jobs. Live run repeats or updates them.`);
   } else if (unresolvedLive) {
     showError(Object.assign(Error("The previous live run has an unresolved outcome."), {
       executionUnknown: true,
@@ -1748,8 +1748,8 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
       if (version !== modeVersion) return;
       ready = true;
       explainMode();
-      status("", Object.keys(records).length ? "Your results are still here" : "Ready to run",
-        "No login needed. Each run uses the recorded container. Change a setting to compare updated and reused results.");
+      status("", Object.keys(records).length ? "Results available" : "Ready to run",
+        "Each run uses the recorded container.");
       await refreshPlan();
     } catch (error) {
       if (version !== modeVersion) return;

@@ -24,8 +24,8 @@ with sync_playwright() as playwright:
       const bounds = el => { const r = el.getBoundingClientRect();
         return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height}; };
       return {tasks:[...document.querySelectorAll('#tasks .task')].map(el => ({
-        class:el.className,name:el.querySelector('.task-card-heading').innerText,
-        bounds:bounds(el),heading:bounds(el.querySelector('.task-card-heading')),
+        class:el.className,name:el.querySelector('.task-name').innerText,
+        bounds:bounds(el),heading:bounds(el.querySelector('.task-name')),
         responsibility:bounds(el.querySelector('.task-responsibility'))}))};
     }""")
     page.screenshot(path=str(destination / 'tasks.png'), full_page=True)

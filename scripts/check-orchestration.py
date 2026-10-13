@@ -132,6 +132,21 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.locator('#show-tasks').inner_text().startswith('Tasks')
     assert page.locator('#workspace-title').inner_text() == 'Tasks'
     assert page.locator('.task-responsibility').count() == page.evaluate('taskGroups.length')
+    # Task names, analyst roles and states must remain readable on small screens.
+    for width in [390, 320]:
+        page.set_viewport_size({'width': width, 'height': 1000})
+        assert page.evaluate("""() => [...document.querySelectorAll('#tasks .task')].every(task => {
+          const row = task.getBoundingClientRect();
+          const cells = ['.task-name', '.task-responsibility', '.task-open', '.task-status']
+            .map(selector => task.querySelector(selector).getBoundingClientRect());
+          return cells.every(a => a.width > 0 && a.height > 0 &&
+            a.left >= row.left - 1 && a.right <= row.right + 1 &&
+            a.top >= row.top - 1 && a.bottom <= row.bottom + 1) &&
+            cells.every((a, i) => cells.every((b, j) => i === j ||
+              a.right <= b.left + 1 || b.right <= a.left + 1 ||
+              a.bottom <= b.top + 1 || b.bottom <= a.top + 1));
+        })"""), f'Overlapping or clipped task fields at {width}px'
+    page.set_viewport_size({'width': 1440, 'height': 1000})
     page.locator('#tasks .cpue').click()
     assert page.locator('#job-table-body tr').count() == 4
     assert page.locator('tr[data-job="cpue_a"] .job-number').inner_text() == 'Job 05'

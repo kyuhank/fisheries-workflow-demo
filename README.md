@@ -86,10 +86,10 @@ original CPUE standardisation.
 
 Keep a downloaded run and its recorded execution image together. Follow the
 bundle's `REPRODUCE.txt` to repeat its declared scope. The
-[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.10.0.zip)
+[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.2.zip)
 includes local result and code pages, source archives, extraction SQL and all
 22 reference outputs; its
-[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.10.0.zip.sha256)
+[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.2.zip.sha256)
 identifies the download. Open `START-HERE.html`, then follow `OFFLINE.md`.
 The archived
 [v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)

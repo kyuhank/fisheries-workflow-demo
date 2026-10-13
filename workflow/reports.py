@@ -3,9 +3,9 @@ import html
 import json
 import math
 
-STYLE = '''body{font:16px/1.6 system-ui,sans-serif;color:#243649;max-width:920px;margin:36px auto;padding:0 24px}h1{font-size:28px;line-height:1.2}h2{font-size:19px;margin-top:30px}p{max-width:75ch}small,.muted{color:#617181}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:9px 12px;border-bottom:1px solid #dde5eb}th{background:#f3f6f8}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f6f8;padding:16px;border-radius:8px}.note{border-left:3px solid #7195b2;padding:8px 16px;background:#f3f7fa}footer{margin-top:36px;border-top:1px solid #dde5eb;padding-top:12px;color:#617181;font-size:13px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#316985}'''
-STYLE += '''.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 24px}.mp-rule{border:1px solid #dde5eb;border-top:3px solid #1378a3;border-radius:8px;padding:14px}.mp-rule:nth-child(2){border-top-color:#b56435}.mp-rule:nth-child(3){border-top-color:#7357a8}.mp-rule h3{font-size:16px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{padding:10px 14px;background:#edf5f8;border-radius:8px;color:#316985;font-weight:600}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:20px auto;padding:0 16px}}'''
-STYLE += '''.plot-pair{display:grid;grid-template-columns:1fr;gap:18px}.plot-pair h2{font-size:17px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 12px}.result-method{font-size:14px;color:#526477}.result-view h2{margin-top:20px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}'''
+STYLE = '''body{font:15px/1.5 system-ui,sans-serif;color:#293039;max-width:920px;margin:22px auto;padding:0 22px}h1{font-size:23px;line-height:1.25;font-weight:600;margin:0 0 12px}h2{font-size:17px;font-weight:600;margin:22px 0 8px}p{max-width:80ch;margin:8px 0}small,.muted{color:#626a73}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:8px 10px;border-bottom:1px solid #d8dce0}th{font-weight:600;background:white}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}.note{border-left:2px solid #a48242;padding:6px 12px;background:white}footer{margin-top:22px;border-top:1px solid #d8dce0;padding-top:10px;color:#626a73;font-size:12px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#245b86}'''
+STYLE += '''.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}'''
+STYLE += '''.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}'''
 STYLE += '''.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}'''
 MSE_COLOURS = {'Constant catch': '#1378a3', 'Index rule': '#b56435', 'Buffered rule': '#7357a8'}
 
@@ -417,7 +417,7 @@ def result_view(job, result):
         body += '<h2>Sample of submitted rows</h2>' + table(rows, observation_columns(rows), 6)
         if public:
             body += '<p>Each row combines fleet, five-degree cell, quarter and year; vessel IDs are unavailable.</p>'
-        return body + '<p class="muted">First six rows shown. Open Data for all submitted rows.</p>'
+        return body + '<p class="muted">First six rows shown.</p>'
     if key == 'qc':
         passed = all(row['result'] == 'Pass' for row in result['checks'])
         message = ('The corrected submission passed all checks.' if result['returned']
@@ -443,7 +443,7 @@ def result_view(job, result):
                 f'{len(result["catch"])} annual catch records.</p>'
                 '<p>The query selects positive effort and non-negative catch; any effort filter for analysis A is applied later.</p>')
         body += '<h2>Records → CPUE</h2>' + table(rows, observation_columns(rows), 6)
-        body += ('<p>First six rows shown; Data preserves all selected rows and the extraction SQL.</p>'
+        body += ('<p>First six rows shown.</p>'
                  '<h2>Annual catch → assessment inputs</h2><p>Annual total catches in tonnes '
                  'are joined to each index by year; they are not the catch numbers above.</p>')
         return body
@@ -452,7 +452,7 @@ def result_view(job, result):
         return (f'<p>{len(rows)} annual index/catch pairs · {esc(coverage_text(rows))}.</p>'
                 '<p>The saved CPUE index and annual removals are joined by year for the stock model.</p>'
                 + table(rows, [('year', 'Year'), ('index', 'Relative CPUE'), ('catch_t', 'Catch (t)')], 6)
-                + '<p class="muted">First six years shown. Data contains every model input.</p>')
+                + '<p class="muted">First six years shown.</p>')
     if key in ('cpue_a', 'cpue_b'):
         rows = result['series']
         rates = cpue_rates(rows)
@@ -502,7 +502,7 @@ def result_view(job, result):
         checks = [{'check': title, 'value': result[field]} for field, title in [
             ('balance_check', 'Biomass recurrence'), ('feasibility_check', 'Positive biomass'),
             ('gradient_check', 'Projected gradient')] if field in result]
-        return body + table(checks, [('check', 'Recorded check'), ('value', 'Result')]) + '<p class="muted">These checks do not establish model adequacy. Data preserves estimates, residuals and optimizer diagnostics.</p>'
+        return body + table(checks, [('check', 'Recorded check'), ('value', 'Result')]) + '<p class="muted">These checks do not establish model adequacy.</p>'
     if key == 'assessment_summary':
         body = '<p>Compare the four fitted biomass trajectories.</p>'
         body += plot(result['series'], 'B_over_K', 'Biomass / each case’s carrying capacity')
@@ -521,7 +521,7 @@ def result_view(job, result):
                 ('reference_catch_t', 'Reference catch (t/year)')]))
         body += '<p>Trials start after the last observed catch, using the fitted next-year biomass. Future growth and observation errors are declared assumptions.</p>'
         body += '<p>Every rule faces the same recorded scenarios and random errors. The Buffered rule job supplies the catch buffer actually tested.</p>'
-        return body + '<p class="muted">Inputs &amp; versions traces each stock to its assessment run. Data preserves parameters, scenarios and paired random streams.</p>'
+        return body
     if key in ('mse_constant', 'mse_index', 'mse_buffered'):
         series = {result['name']: result['series']}
         body = '<p>' + esc(result['description']) + '</p>'
@@ -529,7 +529,7 @@ def result_view(job, result):
                              'Realised catch across trials', plot(series, 'catch_t', 'Median annual catch (tonnes)', colour_by_name=MSE_COLOURS))
         body += '<p>These medians combine the declared stock cases and growth scenarios with equal weight; they are conditional examples.</p>'
         body += mse_metrics([{'name': result['name'], **result['metrics']}])
-        return body + mse_metric_note() + '<p class="result-method">Observe the index → set catch → update stock → repeat. Data preserves each annual decision and one complete example trial.</p>'
+        return body + mse_metric_note() + '<p class="result-method">Each year: observe the index, set catch, then update the stock.</p>'
     if key == 'mse_summary':
         body = '<p>Compare catch, stock condition and catch stability under the same trials.</p>'
         body += paired_plots('Catch and final biomass', mse_tradeoff(result['metrics']),
@@ -578,12 +578,16 @@ def output_page(job, result, record, lineage):
         warnings.append('Some requested catches exceeded the simulated harvest limit; metrics use realised catch.')
     if warnings:
         body += '<p class="note">' + ' '.join(esc(warning) for warning in warnings) + '</p>'
-    body = body.replace('</p>', '</p><p class="feedback-flow">' + esc(job_trace(key)) + '</p>', 1)
-    body += '<p class="muted">Produced in <strong>' + esc(record['run_id']) + '</strong>. Retained inputs keep their original runs.</p>'
+    if key.endswith('_report'):
+        body = body.replace('</p>', '</p><p class="feedback-flow">' + esc(job_trace(key)) + '</p>', 1)
+        body += '<p class="muted">Produced in <strong>' + esc(record['run_id']) + '</strong>. Retained inputs keep their original runs.</p>'
     if key.endswith('_report') and lineage:
         preview = [{**row, 'checksum': row['checksum'][:12]} for row in lineage]
         body += '<h2>Retained inputs</h2>' + table(preview, [('job', 'Input job'), ('run_id', 'Original run'), ('checksum', 'Checksum prefix')])
-    body += '<p class="muted">Open Data for complete values and Inputs &amp; versions for exact source, settings and execution records. The run bundle preserves these files.</p>'
+    footer = ''
+    if key.endswith('_report'):
+        body += '<p class="muted">Open Data for complete values and Inputs &amp; versions for exact source, settings and execution records. The run bundle preserves these files.</p>'
+        footer = '<footer>Teaching workflow with simplified assessment and management models. The run bundle preserves inputs, code, settings and results.</footer>'
     return ('<!doctype html><html lang="en-NZ"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'
             + esc(job['title']) + '</title><style>' + STYLE + '</style><body><h1>' + esc(job['title']) + '</h1>'
-            + body + '<footer>Teaching workflow with simplified assessment and management models. The run bundle preserves inputs, code, settings and results.</footer></body></html>')
+            + body + footer + '</body></html>')

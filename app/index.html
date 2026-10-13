@@ -12,21 +12,21 @@
     <main>
       <header class="masthead">
         <div>
-          <h1>Fisheries workflow demonstration</h1>
+          <h1>Fisheries workflow</h1>
           <p
-            class="intro">Follow catch and effort data through CPUE standardisation, stock assessment and management strategy evaluation (MSE). Open a result to see its inputs, method and output.</p>
+            class="intro">Catch and effort → CPUE → stock assessment → management strategy evaluation (MSE).</p>
         </div>
         <div
-          class="header-links"><button id="example" class="quiet">Example report</button><a href="data.html">Data &amp; SQL</a><a id="offline-download" href="offline.html" download="fisheries-workflow-example.html">Download saved example</a><a href="https://github.com/kyuhank/fisheries-workflow-demo" target="_blank" rel="noopener">Code &amp; download ↗</a></div>
+          class="header-links"><button id="example" class="quiet">Assessment report</button><a href="data.html">Data &amp; SQL</a><a id="offline-download" href="offline.html" download="fisheries-workflow-example.html">Saved example</a><a href="https://github.com/kyuhank/fisheries-workflow-demo" target="_blank" rel="noopener">Source code</a></div>
       </header>
       <section class="controls"
         aria-label="Analysis settings">
-        <label>Run mode<select id="mode" aria-describedby="mode-help"><option value="cloud" selected>Live run</option><option value="saved">View example</option></select><small id="mode-help">Run analyses on GitHub with recorded software.</small></label>
-        <label>Input transfer<select id="handover" aria-describedby="handover-help"><option value="connected">Automatic file transfer</option><option value="manual">Manual handover</option></select><small id="handover-help">Pass recorded inputs automatically.</small></label>
-        <label>Data snapshot<select id="snapshot" aria-describedby="snapshot-help"><option selected>2021</option><option>2022</option></select><small id="snapshot-help">Records through this year.</small></label>
+        <label>Run mode<select id="mode" aria-describedby="mode-help"><option value="cloud" selected>Live run</option><option value="saved">View example</option></select><small id="mode-help">GitHub execution.</small></label>
+        <label>Input transfer<select id="handover" aria-describedby="handover-help"><option value="connected">Automatic transfer</option><option value="manual">Manual handover</option></select><small id="handover-help">Automatic input transfer.</small></label>
+        <label>Last data year<select id="snapshot" aria-describedby="snapshot-help"><option selected>2021</option><option>2022</option></select><small id="snapshot-help">Includes this year.</small></label>
         <label hidden>CPUE A records<select id="filter" aria-describedby="filter-help"><option value="0">All valid effort</option><option value="1200">At least 1,200 hooks</option></select><small id="filter-help">Effort filter for the synthetic example.</small></label>
-        <label>Growth rate setting 2<select id="growth-rate" aria-describedby="growth-rate-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="growth-rate-help">Fixed growth assumption in assessments A2 and B2.</small></label>
-        <label>MSE catch buffer<select id="mse-buffer" aria-describedby="mse-buffer-help"><option value="0.6">60% of stepped target</option><option value="0.8" selected>80% of stepped target</option><option value="1">100% of stepped target</option></select><small id="mse-buffer-help">Catch target fraction; annual changes capped at ±15%.</small></label>
+        <label>Growth (A2/B2)<select id="growth-rate" aria-describedby="growth-rate-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="growth-rate-help">Fixed intrinsic growth.</small></label>
+        <label>MSE catch buffer<select id="mse-buffer" aria-describedby="mse-buffer-help"><option value="0.6">60% of target</option><option value="0.8" selected>80% of target</option><option value="1">100% of target</option></select><small id="mse-buffer-help">Stepped target; change capped at ±15%.</small></label>
         <button id="reset" class="quiet" disabled>Start afresh</button></section>
       <aside id="mode-notice" class="mode-notice" role="status" hidden><div><strong>Showing the saved example</strong><p id="mode-notice-message"></p></div><button id="dismiss-mode-notice" class="quiet" aria-label="Dismiss mode notice">Dismiss ×</button></aside>
       <section class="status" id="status"
@@ -34,15 +34,15 @@
       <nav class="tabs"
         aria-label="View"><button class="active" data-tab="workflow" aria-selected="true">Workflow diagram</button><button data-tab="jobs" aria-selected="false">Orchestration tool</button><span id="completion"></span></nav>
       <section class="view-guide" aria-labelledby="view-guide-title">
-        <div><h2 id="view-guide-title">Follow results into later analyses</h2><p id="view-guide-description">Arrows show which results become inputs. Open a result, then use Inputs &amp; versions to trace the earlier analyses it used.</p></div>
+        <div><h2 id="view-guide-title">Workflow</h2><p id="view-guide-description">Arrows link each analysis to its inputs.</p></div>
         <a id="view-guide-link" href="#orchestration">Open Orchestration tool <span aria-hidden="true">→</span></a>
       </section>
       <section id="handover-note" class="handover-note"
-        hidden><div><strong>Manual file handover</strong><span>This mode simulates a handover between analysts. Receiving jobs wait for your confirmation; other ready jobs can continue.</span></div><button id="revise-cpue" class="quiet" hidden>Revise CPUE A</button></section>
+        hidden><div><strong>Manual file handover</strong><span>Simulated transfer: receiving jobs wait for confirmation; other ready jobs continue.</span></div><button id="revise-cpue" class="quiet" hidden>Revise CPUE A</button></section>
       <section id="handover-panel" class="handover-panel" hidden
         aria-live="polite"><div><strong id="handover-title">Waiting for a file transfer</strong><p id="handover-message">Click Confirm file transfer to continue.</p></div><button id="transfer-files">Confirm file transfer →</button><button id="connect-workflow" class="quiet">Connect automatically</button></section>
       <section
-        class="selection" id="run-controls"><div><span class="eyebrow" id="selection-label">Start from</span><h2 id="selection-title">Data submission</h2><p id="selection-description">Submit catch and effort records, then run CPUE analysis, assessment and MSE.</p><p id="reuse-message" class="reuse"></p></div><div class="run-actions"><button id="run" class="primary" disabled>Run full workflow <span aria-hidden="true">→</span></button><button id="run-workflow" class="quiet" hidden>Run workflow</button></div></section>
+        class="selection" id="run-controls"><div><span class="eyebrow" id="selection-label">Start from</span><h2 id="selection-title">Data submission</h2><p id="selection-description">Submit catch and effort records.</p><p id="reuse-message" class="reuse"></p></div><div class="run-actions"><button id="run" class="primary" disabled>Run full workflow</button><button id="run-workflow" class="quiet" hidden>Run workflow</button></div></section>
       <section id="workflow-view" class="modules"
         aria-label="Connected workflow"></section>
       <section id="jobs-view" hidden>
@@ -65,10 +65,10 @@
               class="workspace-heading"><div><p class="eyebrow" id="workspace-breadcrumb">Tasks</p><h2 id="workspace-title">Tasks</h2><p id="workspace-description">Select a task to see its analyses and results.</p></div><span class="workspace-activity" id="workspace-activity">Waiting</span></div>
             <div id="tasks" class="task-list"></div>
             <section id="dependencies-view" aria-label="Direct job dependencies" hidden>
-              <div class="dependency-toolbar"><label for="dependency-job">Inspect a job<select id="dependency-job" aria-describedby="dependency-help"></select></label><p id="dependency-help">Browse the jobs that provide inputs and use the result. Your run selection stays the same.</p></div>
+              <div class="dependency-toolbar"><label for="dependency-job">Inspect a job<select id="dependency-job" aria-describedby="dependency-help"></select></label><p id="dependency-help">Required inputs and downstream jobs.</p></div>
               <div id="dependency-flow" class="dependency-flow"></div>
               <p id="dependency-rule" class="dependency-rule"></p>
-              <p class="dependency-record-note"><span data-workspace-icon="file"></span><span>Cards show each job’s current state and latest available output. Open a job’s <strong>Record</strong> for the exact input versions it used.</span></p>
+              <p class="dependency-record-note"><span data-workspace-icon="file"></span><span><strong>Record</strong> lists the exact input versions used by each job.</span></p>
             </section>
             <section id="task-jobs" hidden>
               <div
@@ -79,7 +79,7 @@
                     <tr>
                       <th scope="col">Job / required inputs</th>
                       <th scope="col">Responsible</th>
-                      <th scope="col">Progress</th>
+                      <th scope="col">State</th>
                       <th scope="col">Output from</th>
                       <th scope="col">Actions</th>
                     </tr>
@@ -92,7 +92,7 @@
         </div>
       </section>
       <section
-        class="bottom-bar"><p id="hint">Job Run prepares required inputs and stops at that job. Run workflow also updates dependent analyses.</p><button id="download" class="quiet" disabled>Download this run</button><button id="record-toggle" class="quiet" aria-expanded="false">Show record</button></section>
+        class="bottom-bar"><p id="hint">Run: selected job and required inputs. Run workflow: dependent analyses too.</p><button id="download" class="quiet" disabled>Download this run</button><button id="record-toggle" class="quiet" aria-expanded="false">Show record</button></section>
       <section id="record-panel" hidden>
         <div><strong>Execution record</strong><button id="record-close" class="quiet">Hide record</button></div>
         <pre id="execution-log">No execution yet.</pre>
