@@ -354,8 +354,10 @@ def cpue_support(analysis):
     parts = ['Both curves use the same selected rows']
     if 'sets_used' in analysis:
         parts.append(f'{analysis["sets_used"]:,} used, {analysis.get("sets_excluded", 0):,} excluded')
-    if 'min_hooks' in analysis:
+    if analysis.get('min_hooks', 0) > 0:
         parts.append(f'effort filter: at least {analysis["min_hooks"]:g} hooks')
+    elif 'min_hooks' in analysis:
+        parts.append('no additional effort filter')
     return '<p class="result-method">' + esc('; '.join(parts)) + '.</p>'
 
 
@@ -456,10 +458,18 @@ def result_view(job, result):
     if key in ('cpue_a', 'cpue_b'):
         rows = result['series']
         rates = cpue_rates(rows)
-        body = '<p>Annual CPUE from the selected catch and effort records.</p>'
+        public = result.get('data_kind') == 'public-wcpfc'
+        body = (f'<p>Fiji longline albacore · {esc(coverage_text(rows))} · '
+                f'{result["sets_used"]:,} released fleet–cell–quarter records.</p>'
+                if public else '<p>Annual CPUE from the selected synthetic observations.</p>')
         if rates:
             body += plot(rates, 'cpue', 'Fish per 1,000 hooks') + cpue_support(result)
-            body += '<p>The nominal curve is 1,000 times annual fish numbers divided by annual hooks. The standardised curve uses the saved GLM prediction target.</p>'
+            body += '<p>Nominal CPUE = 1,000 × annual fish numbers / annual hooks.</p>'
+            if public:
+                body += ('<p>Standardised A holds cell–quarter composition fixed: predict 1,000 hooks '
+                         'in each of the six strata, then average with equal weights.</p>'
+                         if key == 'cpue_a' else
+                         '<p>B fits year effects only; its annual fitted rate reproduces nominal CPUE.</p>')
         else:
             body += plot({job['title']: rows}, 'index', 'CPUE relative to the first year')
             body += '<p>Only the relative index is available in this saved result; nominal and standardised rates were not recorded.</p>'
@@ -467,6 +477,8 @@ def result_view(job, result):
         if result.get('standardisation'):
             body += ' · ' + esc(result['standardisation'])
         body += '.</p>'
+        if public:
+            body += '<p>These released strata cover the selected fleet. No confidence intervals or stock-wide abundance validation are supplied.</p>'
         columns = [('year', 'Year'), ('standardised_cpue', 'Standardised (fish/1,000 hooks)'),
                    ('nominal_cpue', 'Nominal (fish/1,000 hooks)')] if rates else [('year', 'Year'), ('index', 'Relative CPUE')]
         return body + table([rows[0], rows[-1]] if len(rows) > 1 else rows, columns)
@@ -475,15 +487,22 @@ def result_view(job, result):
         a_name = 'CPUE analysis A'
         rates = cpue_rates(series.get(a_name, []))
         relative = plot(series, 'index', 'Each index relative to its own first year')
-        body = '<p>Compare standardisation on analysis A’s selected rows, then compare the saved A/B indices.</p>'
+        analysis = result.get('analyses', {}).get(a_name, {})
+        public = result.get('data_kind') == 'public-wcpfc'
+        a_rows = series.get(a_name, [])
+        body = (f'<p>Fiji longline albacore · {esc(coverage_text(a_rows))} · '
+                f'{analysis["sets_used"]:,} released records used by A.</p>' if public
+                else '<p>CPUE from the selected synthetic observations.</p>')
         if rates:
-            body += paired_plots('Standardised and nominal — A rows', plot(rates, 'cpue', 'Fish per 1,000 hooks'),
+            body += paired_plots('Standardised and nominal CPUE', plot(rates, 'cpue', 'Fish per 1,000 hooks'),
                                  'Relative indices A and B', relative)
             body += cpue_support(result.get('analyses', {}).get(a_name, {}))
-            body += '<p>The main overlay uses analysis A’s nominal rate. An A-only effort filter does not apply to B; B is not substituted for A’s nominal curve.</p>'
+            body += '<p>The first plot uses the same A records for both curves. Any A effort filter applies to both; B uses its own eligible records.</p>'
             analysis = result.get('analyses', {}).get(a_name, {})
             if analysis.get('standardisation'):
                 body += '<p class="result-method">Standardised: ' + esc(analysis['standardisation']) + '. Nominal: 1,000 × annual fish numbers / annual hooks on the A rows.</p>'
+            if public:
+                body += '<p>A predicts 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B fits year effects only. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.</p>'
         else:
             body += relative + '<p>The saved result has relative indices only; an A-row nominal overlay is unavailable.</p>'
         return body + '<p class="result-method">The A/B comparison includes differences in adjustment and row selection. Each relative index equals one in its own first year.</p>'

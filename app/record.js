@@ -56,12 +56,28 @@ function renderRecord() {
   const source = record.analysis_source || record.source || {};
   const software = record.software || {};
   const image = record.execution?.container || software.container;
+  const dataSource = record.data_source;
+  const observationSource = dataSource?.sources?.find((item) =>
+    item.member?.includes("PUBLIC"));
+  const release = observationSource?.url?.match(/\/(\d{4})-(\d{2})\//);
+  const releaseLabel = release ? new Date(Date.UTC(Number(release[1]), Number(release[2]) - 1))
+    .toLocaleDateString("en-NZ", { month: "long", year: "numeric", timeZone: "UTC" }) : "";
+  if (dataSource) {
+    const description = uiElement("div", "record-data-context");
+    description.append(uiElement("p", "", "CPUE input: " + dataSource.cpue_scope.split(",")[0] +
+      "; " + (dataSource.reference_strata?.length || "recorded") + " fixed cell–quarter strata. " +
+      "Catch counts: " + dataSource.units.catch_n + ". Effort: " + dataSource.units.hooks + "."));
+    description.append(uiElement("p", "", "Separate assessment catch: " + dataSource.catch_scope +
+      ", in " + dataSource.units.catch_t + "."));
+    panel.append(description);
+  }
   for (
     const [label, value, detail] of [
       [
         "Data",
-        `Snapshot ${record.snapshot}`,
-        record.data_source?.observation_unit || "Synthetic catch and effort records",
+        `Data through ${record.snapshot}`,
+        dataSource ? dataSource.observation_unit + (releaseLabel ? " · " + releaseLabel + " release" : "")
+          : "Synthetic catch and effort records",
       ],
       [
         "Code",

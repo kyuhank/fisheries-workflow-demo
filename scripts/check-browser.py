@@ -127,12 +127,12 @@ def main():
         assert page.locator('#filter').is_hidden()
         assert page.locator('#snapshot').input_value() == '2021'
         assert page.locator('#snapshot option').all_text_contents() == ['2021', '2022']
-        assert 'does not run code' in page.locator('#mode-help').inner_text()
+        assert 'no execution' in page.locator('#mode-help').inner_text()
         assert page.evaluate('typeof Worker === "function" && !document.querySelector("#worker-source")')
         keys = page.evaluate('jobs.map(job => job.key)')
         for key in keys:
             page.evaluate('(key) => openOutput(key)', key)
-            page.frame_locator('#output-frame').locator('h1').wait_for()
+            page.frame_locator('#output-frame').locator('body').wait_for()
             assert page.evaluate('currentOutput.record.job') == key
             record = page.evaluate('currentOutput.record')
             assert record['data_source']['observation_unit'] == 'Released fleet–quarter–5-degree-cell aggregate', key

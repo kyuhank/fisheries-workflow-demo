@@ -2,6 +2,10 @@ const payload = JSON.parse(document.getElementById("demo-payload").textContent);
 const $ = (id) => document.getElementById(id);
 const publicExample = !!payload.saved?.outputs?.extract?.output?.sets?.[0]?.stratum;
 $("filter").closest("label").hidden = publicExample;
+if (publicExample) {
+  document.querySelector(".intro").textContent =
+    "Fiji longline albacore · WCPFC/SPC public aggregates · CPUE → illustrative assessment → MSE.";
+}
 let planVersion = 0,
   jobs = payload.jobs,
   records = {},
@@ -1044,6 +1048,7 @@ function render() {
   renderTasks();
   renderJobTable();
   renderDependencies();
+  $("run-controls").hidden = mode === "saved";
   $("selection-title").textContent = byKey[start].title;
   $("selection-description").textContent = byKey[start].description;
   $("run").disabled = !ready || busy || !plan || mode === "saved";
@@ -1552,7 +1557,7 @@ function displayOutput(title, output, kind = "Job output") {
   $("output-kind").textContent = [jobNumber(output.record?.job || output.job), kind]
     .filter(Boolean).join(" · ");
   // Keep saved report bytes intact; narrow screens scroll wide tables locally.
-  const reportStyle = `<style>@media(max-width:640px){
+  const reportStyle = `<style>h1:has(+ article.result-view){display:none}@media(max-width:640px){
     html,body{max-width:100%;overflow-wrap:anywhere}
     body{box-sizing:border-box}
     table,pre{display:block;max-width:100%;overflow-x:auto}
@@ -1609,6 +1614,9 @@ function renderOutputRun() {
   $("output-run").title = "Run only this job. Prepare missing or changed inputs first.";
 }
 $("output-run").onclick = () => runFromJob(currentOutput?.record?.job || currentOutput?.job);
+$("cpue-results").onclick = () => records.cpue_summary
+  ? openOutput("cpue_summary")
+  : displayOutput("Compare CPUE results", { html: payload.saved.outputs.cpue_summary.html }, "Saved example output");
 $("example").onclick = () =>
   displayOutput(
     "Assessment report",

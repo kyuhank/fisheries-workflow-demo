@@ -122,7 +122,7 @@ def expect_plan(page, start, run):
     assert page.locator('.workflow-node.selected').get_attribute('data-job') == start
     assert page.locator('#job-table-body tr.selected-job').get_attribute('data-job') == start
     assert page.locator('#run').inner_text() == (
-        'Run full workflow →' if start == 'submission' else 'Run from this job →')
+        'Run full workflow' if start == 'submission' else 'Run from this job')
     if snapshot['parents']:
         expected_inputs = 'Uses saved inputs: ' + ' · '.join(snapshot['parents'])
         assert page.locator('#reuse-message').inner_text().startswith(expected_inputs)
