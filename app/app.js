@@ -1659,6 +1659,11 @@ async function openOutput(key) {
         ? payload.saved.outputs[key]
         : await call("view", { job: key });
     if (!isCurrent()) return;
+    const returned = output.record;
+    if (returned?.job !== key || returned.signature !== openedSignature ||
+        returned.run_id !== openedRun || returned.outputs?.["report.pdf"] !== openedPdfHash) {
+      throw Error("This output belongs to a different run. Reopen the current result.");
+    }
     await verifyOutputPdf(output);
     if (!isCurrent()) return;
     displayOutput(
