@@ -72,14 +72,23 @@ cpue_public <- function(sets, stratum_effect = TRUE, min_hooks = 0) {
                     "The effort filter removed a year or stratum from the fixed prediction support.")
   data <- data.frame(year = rows_values(rows, "year"),
                      stratum = rows_values(rows, "stratum"),
+                     quarter = rows_values(rows, "quarter"),
                      hooks = rows_values(rows, "hooks"), catch_n = rows_values(rows, "catch_n"))
   annual_catch <- tapply(data$catch_n, data$year, sum)
   stratum_catch <- tapply(data$catch_n, data$stratum, sum)
   require_condition(length(years) > 1L && all(annual_catch > 0) && all(stratum_catch > 0),
                     "The aggregate GLM requires at least two years and positive annual and stratum totals.")
   adjusted <- stratum_effect && length(strata) > 1L
+  seasonal <- !stratum_effect
+  quarter_catch <- tapply(data$catch_n, data$quarter, sum)
+  if (seasonal) {
+    require_condition(length(quarter_catch) > 1L && all(quarter_catch > 0),
+                      "Quarter adjustment requires at least two quarters with positive catch totals.")
+  }
   formula <- if (adjusted) {
     catch_n ~ factor(year) + factor(stratum) + offset(log(hooks / 1000))
+  } else if (seasonal) {
+    catch_n ~ factor(year) + factor(quarter) + offset(log(hooks / 1000))
   } else {
     catch_n ~ factor(year) + offset(log(hooks / 1000))
   }
@@ -93,6 +102,10 @@ cpue_public <- function(sets, stratum_effect = TRUE, min_hooks = 0) {
                     "The aggregate CPUE GLM did not converge to finite coefficients.")
   # The same strata and equal weights are used in every year's response-scale mean.
   grid <- expand.grid(year = years, stratum = strata, stringsAsFactors = FALSE)
+  if (seasonal) {
+    support <- unique(data[c("stratum", "quarter")])
+    grid$quarter <- support$quarter[match(grid$stratum, support$stratum)]
+  }
   grid$hooks <- 1000
   grid$weight <- 1 / length(strata)
   grid$predicted_cpue <- as.numeric(stats::predict(fit, newdata = grid, type = "response"))
@@ -109,12 +122,15 @@ cpue_public <- function(sets, stratum_effect = TRUE, min_hooks = 0) {
   stratum_score <- if (adjusted) {
     max(abs(tapply(stats::fitted(fit), data$stratum, sum) / stratum_catch - 1))
   } else 0
-  residual <- max(year_score, stratum_score)
+  quarter_score <- if (seasonal) {
+    max(abs(tapply(stats::fitted(fit), data$quarter, sum) / quarter_catch - 1))
+  } else 0
+  residual <- max(year_score, stratum_score, quarter_score)
   dispersion <- sum(stats::residuals(fit, type = "pearson")^2) / fit$df.residual
   require_condition(all(is.finite(index) & index > 0) && residual < 1e-7 &&
                       is.finite(dispersion) && dispersion >= 0,
                     "The aggregate CPUE prediction, score or dispersion check failed.")
-  list(series = lapply(seq_along(years), function(i) {
+  result <- list(series = lapply(seq_along(years), function(i) {
          list(year = years[i], index = index[i], standardised_cpue = predicted[i],
               nominal_cpue = nominal[i])
        }),
@@ -123,7 +139,7 @@ cpue_public <- function(sets, stratum_effect = TRUE, min_hooks = 0) {
        released_zero_rows = sum(data$catch_n == 0), min_hooks = min_hooks,
        data_kind = "public-wcpfc", record_unit = "Public fleet–cell–quarter aggregate record",
        method = if (adjusted) "Quasipoisson GLM: year + cell–quarter stratum" else
-         "Quasipoisson GLM: year only",
+         if (seasonal) "Quasipoisson GLM: year + quarter" else "Quasipoisson GLM: year only",
        formula = paste(deparse(formula, width.cutoff = 500), collapse = " "),
        iterations = fit$iter, converged = fit$converged, deviance = fit$deviance,
        dispersion = dispersion, dispersion_method = "Pearson sum of squares / residual degrees of freedom",
@@ -141,6 +157,17 @@ cpue_public <- function(sets, stratum_effect = TRUE, min_hooks = 0) {
          "Released zero counts are retained; absent or suppressed source values are not zero catch.",
          "An effort filter can require additive-model predictions for omitted year–stratum cells.",
          "This demonstration supplies no confidence intervals or official assessment advice.")))
+  if (seasonal) {
+    result$quarter_score_residual <- quarter_score
+    first_grid <- grid[grid$year == years[1], ]
+    quarter_weights <- tapply(first_grid$weight, first_grid$quarter, sum)
+    result$quarter_weights <- lapply(names(quarter_weights), function(quarter) {
+      list(quarter = as.integer(quarter), weight = unname(quarter_weights[quarter]))
+    })
+    result$limitations <- c(result$limitations, list(
+      "B adjusts for quarter only; quarter effects partly confound spatial differences on this support."))
+  }
+  result
 }
 
 cpue <- function(sets, vessel_effect = TRUE, min_hooks = 0, stratum_effect = TRUE) {

@@ -5,16 +5,16 @@ container: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad
 repositories:
   cpue:
     repository: https://github.com/kyuhank/fisheries-workflow-cpue-demo
-    commit: d2b313016f138a3eac8e8841390f035c53c0167d
+    commit: e5a124ec3adf9b18de44a71192e9f9d3516a64d0
     jobs: [submission, qc, database, extract, cpue_a, cpue_b, cpue_summary, cpue_report]
     library: R/cpue.R
   assessment:
     repository: https://github.com/kyuhank/fisheries-workflow-assessment-demo
-    commit: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f
+    commit: 9b30d4f6d2afbaddc68ab31d83911b308037cb02
     jobs: [prepare_a, prepare_b, assessment_a1, assessment_a2, assessment_b1, assessment_b2, assessment_summary, assessment_report]
     library: R/assessment.R
   mse:
     repository: https://github.com/kyuhank/fisheries-workflow-mse-demo
-    commit: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735
+    commit: af0aac308321d7111b5c49b84e00a00188a5e769
     jobs: [mse_prepare, mse_constant, mse_index, mse_buffered, mse_summary, mse_report]
     library: R/mse.R

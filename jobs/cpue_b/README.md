@@ -1,8 +1,8 @@
 # CPUE analysis B (`cpue_b`)
 
-Estimate the alternative annual CPUE index with a year-only quasipoisson GLM.
+Estimate the alternative annual CPUE index with a year-and-quarter quasipoisson GLM.
 
-**Path:** Catch and effort rows → year-only GLM → annual CPUE index B.
+**Path:** Catch and effort rows → year-and-quarter GLM → annual CPUE index B.
 
 **Inputs:** The aggregate `sets` rows in `runs/extract/output.json`.
 
@@ -10,7 +10,7 @@ Estimate the alternative annual CPUE index with a year-only quasipoisson GLM.
 
 **Settings:** No job-specific settings (`{}`).
 
-Use the same log(hooks / 1000) offset, prediction support and first-year normalisation as A, without a stratum effect. Saved output includes nominal and standardised fish per 1,000 hooks. Synthetic fixtures retain the year-only Poisson example.
+Use the same log(hooks / 1000) offset, prediction support and first-year normalisation as A, with quarter effects instead of cell–quarter effects. Quarter effects partly confound spatial differences on this support. Saved output includes nominal and standardised fish per 1,000 hooks. Synthetic fixtures retain the year-only Poisson example.
 
 From the repository root, run this job and prepare any required inputs:
 

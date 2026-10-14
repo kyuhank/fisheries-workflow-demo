@@ -20,6 +20,8 @@ let selected = "submission",
   latestRun = "",
   selectedTask = "data";
 let mode = "cloud";
+let outputPdfUrl = null;
+let outputPdfBytes = null;
 const modeStates = {};
 let cloudReady = false, unresolvedLive = false;
 let liveExecutionLink = "";
@@ -1545,7 +1547,24 @@ $("download").onclick = async () => {
     status("failed", "Download unavailable", error.message);
   }
 };
+function clearOutputPdf() {
+  if (outputPdfUrl) {
+    const previous = outputPdfUrl;
+    setTimeout(() => URL.revokeObjectURL(previous), 10000);
+  }
+  outputPdfUrl = null;
+  outputPdfBytes = null;
+  $("open-output-pdf").hidden = true;
+  $("open-output-pdf").removeAttribute("href");
+}
 function displayOutput(title, output, kind = "Job output") {
+  const pdf = output.pdf_base64
+    ? Uint8Array.from(atob(output.pdf_base64), (char) => char.charCodeAt(0))
+    : null;
+  if (pdf && String.fromCharCode(...pdf.slice(0, 5)) !== "%PDF-") {
+    throw Error("The recorded PDF is invalid.");
+  }
+  clearOutputPdf();
   if (output.record && !output.comparison) {
     output.comparison = reproductionChecks.get(checkKey(output.record));
   }
@@ -1568,7 +1587,21 @@ function displayOutput(title, output, kind = "Job output") {
     .page-columns{display:block!important}
     main.content{min-width:0;max-width:100%;width:auto!important}
   }</style>`;
-  $("output-frame").srcdoc = output.html.replace(/<body\b/i, reportStyle + "<body");
+  if (pdf) {
+    outputPdfBytes = pdf;
+    outputPdfUrl = URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
+    $("output-frame").removeAttribute("srcdoc");
+    $("output-frame").removeAttribute("sandbox");
+    $("output-frame").src = outputPdfUrl;
+    $("open-output-pdf").href = outputPdfUrl;
+    $("open-output-pdf").hidden = false;
+    $("save-output").textContent = "Save PDF";
+  } else {
+    $("output-frame").removeAttribute("src");
+    $("output-frame").setAttribute("sandbox", "allow-same-origin");
+    $("output-frame").srcdoc = output.html.replace(/<body\b/i, reportStyle + "<body");
+    $("save-output").textContent = "Save HTML";
+  }
   $("output-frame").hidden = false;
   $("output-json").hidden = true;
   $("output-record").hidden = true;
@@ -1594,12 +1627,24 @@ async function openOutput(key) {
     displayOutput(job.title, { job: key, html: "<!doctype html>" + page.documentElement.outerHTML }, "Job details");
     return;
   }
+  const openedMode = mode, openedVersion = modeVersion;
+  const openedSignature = records[key].signature;
   try {
-    displayOutput(
-      byKey[key].title,
-      mode === "saved"
+    const output = mode === "saved"
         ? payload.saved.outputs[key]
-        : await call("view", { job: key }),
+        : await call("view", { job: key });
+    if (output.pdf_base64 && output.record?.outputs?.["report.pdf"]) {
+      const bytes = Uint8Array.from(atob(output.pdf_base64), (char) => char.charCodeAt(0));
+      const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))]
+        .map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      if (hash !== output.record.outputs["report.pdf"]) {
+        throw Error("The PDF differs from its recorded checksum.");
+      }
+    }
+    if (mode !== openedMode || modeVersion !== openedVersion ||
+        records[key]?.signature !== openedSignature) return;
+    displayOutput(
+      byKey[key].title, output,
       mode === "saved" ? "Saved example output" : "Job output",
     );
   } catch (error) {
@@ -1616,11 +1661,14 @@ function renderOutputRun() {
 $("output-run").onclick = () => runFromJob(currentOutput?.record?.job || currentOutput?.job);
 $("cpue-results").onclick = () => records.cpue_summary
   ? openOutput("cpue_summary")
-  : displayOutput("Compare CPUE results", { html: payload.saved.outputs.cpue_summary.html }, "Saved example output");
+  : displayOutput("Compare CPUE results", {
+      html: payload.saved.outputs.cpue_summary.html,
+      pdf_base64: payload.saved.outputs.cpue_summary.pdf_base64,
+    }, "Saved example output");
 $("example").onclick = () =>
   displayOutput(
     "Assessment report",
-    { html: payload.example },
+    { html: payload.example, pdf_base64: payload.example_pdf_base64 },
     "Preserved example",
   );
 $("licences").onclick = () => {
@@ -1633,6 +1681,12 @@ $("licences").onclick = () => {
   }, "Preserved software");
 };
 $("output-close").onclick = () => $("output-dialog").close();
+$("output-dialog").addEventListener("close", () => {
+  if (outputPdfUrl) {
+    $("output-frame").src = "about:blank";
+    clearOutputPdf();
+  }
+});
 $("output-dialog").onclick = (event) => {
   if (event.target === $("output-dialog")) {
     const box = event.target.getBoundingClientRect();
@@ -1666,8 +1720,14 @@ for (const button of document.querySelectorAll("[data-output]")) {
     }
   };
 }
-$("save-output").onclick = () =>
-  download("analysis-output.html", currentOutput.html, "text/html");
+$("save-output").onclick = () => {
+  if (outputPdfBytes) {
+    const job = currentOutput.record?.job || currentOutput.job || "analysis";
+    download(job + "-results.pdf", outputPdfBytes, "application/pdf");
+  } else {
+    download("analysis-output.html", currentOutput.html, "text/html");
+  }
+};
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"

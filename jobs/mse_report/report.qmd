@@ -1,11 +1,21 @@
 ---
 title: "Management strategy comparison report"
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -88,7 +98,9 @@ metrics <- lapply(result$metrics, function(row) {
        below_threshold_percent = row$below_threshold_percent,
        catch_change_percent = row$catch_change_percent)
 })
-knitr::kable(rows_frame(metrics), digits = 3)
+knitr::kable(rows_frame(metrics), digits = 3,
+             col.names = c("Rule", "Mean catch (t/year)", "Final B/K",
+                           "Trials below 0.2 (%)", "Catch change (%)"))
 ```
 
 Mean catch is in tonnes per year; final B/K is the median across trials. The
@@ -181,7 +193,12 @@ Produced in **`r record$run_id`**. Retained inputs keep their original producing
 if (!is.null(record$execution$provider)) {
   cat("Execution: ", record$execution$provider, ".\n\n", sep = "")
 }
-cat("Calculation image: `", record$software$container, "`\n\n", sep = "")
+if (knitr::is_html_output()) {
+  cat("Calculation image: `", record$software$container, "`\n\n", sep = "")
+} else {
+  digest <- sub(".*@sha256:", "", record$software$container)
+  cat("Calculation image: `sha256:", substr(digest, 1, 12), "…` (full digest in the run bundle).\n\n", sep = "")
+}
 if (!is.null(record$software$container_url)) {
   cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
 }

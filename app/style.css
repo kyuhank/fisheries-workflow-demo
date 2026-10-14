@@ -551,12 +551,30 @@ dialog h2 {
 }
 dialog nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 5px;
   padding: 9px 18px;
   border-bottom: 1px solid var(--line);
 }
 #save-output {
   margin-left: auto;
+}
+#open-output-pdf {
+  align-self: center;
+  padding: 7px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+#output-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+#output-dialog > header, #output-dialog > nav {
+  flex-shrink: 0;
+}
+#output-dialog > iframe, #output-dialog > pre, #output-dialog > section {
+  flex: 1;
+  min-height: 0;
 }
 dialog iframe {
   border: 0;

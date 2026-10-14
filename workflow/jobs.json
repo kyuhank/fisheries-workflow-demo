@@ -28,13 +28,13 @@
       "key": "cpue_a", "title": "CPUE analysis A",
       "module": "cpue", "owner": "CPUE analyst",
       "parents": ["extract"], "run": "jobs/cpue_a/run.R",
-      "description": "Fit a CPUE index with year and vessel effects."
+      "description": "Fit a CPUE index with year and cell–quarter effects."
     },
     {
       "key": "cpue_b", "title": "CPUE analysis B",
       "module": "cpue", "owner": "CPUE analyst",
       "parents": ["extract"], "run": "jobs/cpue_b/run.R",
-      "description": "Fit an alternative index with year effects only."
+      "description": "Fit an alternative index with year and quarter effects."
     },
     {
       "key": "cpue_summary", "title": "Compare CPUE results",

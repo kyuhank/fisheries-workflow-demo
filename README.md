@@ -24,9 +24,10 @@ a sum of the selected fleet's catch numbers.
 
 CPUE A fits a quasipoisson GLM with year and cell–quarter effects and a
 `log(hooks / 1000)` offset. It predicts fish per 1,000 hooks in each stratum and
-averages those predictions with equal fixed weights. CPUE B uses year effects
-only. Both indices are divided by their first-year value. The outputs preserve
+averages those predictions with equal fixed weights. CPUE B uses year and quarter
+effects. Both indices are divided by their first-year value. The outputs preserve
 nominal and standardised CPUE, prediction support, weights and model checks.
+Quarter effects partly confound spatial differences on this support.
 These selected released strata do not represent the whole stock; the example
 supplies no confidence intervals. The selected Fiji fleet index is not a validated
 stock-wide abundance measure. Synthetic vessel records remain available as
@@ -41,7 +42,7 @@ low-biomass results are conditional on that guardrail.
 
 ## Use the demo
 
-Plots are visible immediately. CPUE results overlay standardised and nominal rates on the same selected rows; assessment and MSE results show their main comparisons. All views are rendered by Quarto from saved numerical outputs. The three report jobs give the methods and checks.
+Plots are visible immediately. CPUE results overlay standardised and nominal rates on the same selected rows; assessment and MSE results show their main comparisons. View opens the compiled Quarto PDF, with Open PDF and Save PDF controls. Rendering reads saved numerical outputs. The three report jobs give the methods and checks.
 
 1. Choose **View example** to inspect the saved results, or **Live run** to
    execute the R jobs and Quarto result views on GitHub Actions.
@@ -86,10 +87,10 @@ original CPUE standardisation.
 
 Keep a downloaded run and its recorded execution image together. Follow the
 bundle's `REPRODUCE.txt` to repeat its declared scope. The
-[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.4.zip)
+[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.5.zip)
 includes local result and code pages, source archives, extraction SQL and all
 22 reference outputs; its
-[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.4.zip.sha256)
+[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.5.zip.sha256)
 identifies the download. Open `START-HERE.html`, then follow `OFFLINE.md`.
 The archived
 [v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)

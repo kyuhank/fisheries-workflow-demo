@@ -204,6 +204,10 @@ class Workflow:
         record = self.records.get(key)
         if not record or record['signature'] != self.signature(key):
             return False
+        rendering = record.get('report_rendering')
+        if rendering is None or (rendering.get('quarto_executed')
+                                 and 'report.pdf' not in record['outputs']):
+            return False
         if self.sources.multi_repository:
             expected = self.sources.origin(key)
             actual = record.get('analysis_source', {})
@@ -393,6 +397,8 @@ class Workflow:
         record['report_rendering'] = rendered
         record['outputs']['report.html'] = digest((folder / 'report.html').read_bytes())
         if rendered['quarto_executed']:
+            if not (folder / 'report.pdf').read_bytes().startswith(b'%PDF-'):
+                raise RuntimeError('Quarto did not produce a valid PDF result.')
             for name in rendered.get('artifacts', ('report.qmd', 'report-data.json')):
                 record['outputs'][name] = digest((folder / name).read_bytes())
         (folder / 'record.json').write_text(json.dumps(record, indent=2) + '\n')

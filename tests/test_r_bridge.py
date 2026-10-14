@@ -207,11 +207,17 @@ class RBridgeTests(unittest.TestCase):
 
                 def execute(command, timeout, environment=None):
                     calls.append(command[-1])
+                    if command[-1] == 'report-markdown':
+                        (folder / 'report-body.md').write_text('![](report-plot-01.svg)')
                     if command[-1] == 'report':
                         self.assertEqual(environment['PAPER_REPORT_DIR'], str(folder.resolve()))
                         self.assertNotIn('MAKEFLAGS', environment)
                         # Explicit renderer double; no R or Quarto subprocess executes.
                         (folder / 'report.html').write_text('MOCK QUARTO RENDER')
+                        (folder / 'report.pdf').write_bytes(b'%PDF-1.7\nMOCK QUARTO PDF')
+                        (folder / 'report.typ').write_text('// MOCK TYPST SOURCE')
+                    if command[-1] == 'typst-version':
+                        return Mock(returncode=0, stderr='typst 0.14.2 (fixture)\n', stdout='')
                     return Mock(returncode=0, stderr='', stdout='1.8.27\n')
 
                 with patch.object(RBridge, 'require_container', return_value=IMAGE), \
@@ -224,10 +230,13 @@ class RBridgeTests(unittest.TestCase):
                 source = root / 'jobs' / key / 'report.qmd' if formal else root / 'workflow/results.qmd'
                 self.assertEqual((folder / 'report.qmd').read_bytes(), source.read_bytes())
                 self.assertEqual(json.loads((folder / 'report-data.json').read_text()), {'result': result, 'record': record})
-                self.assertEqual(calls, ['report', 'quarto-version'])
+                self.assertEqual(calls, ([] if formal else ['report-markdown']) +
+                                 ['report', 'quarto-version', 'typst-version'])
                 self.assertTrue(metadata['quarto_executed'])
                 self.assertEqual(metadata['engine'], 'Quarto')
                 self.assertEqual(metadata['version'], '1.8.27')
+                self.assertEqual(metadata['view'], 'report.pdf')
+                self.assertEqual(metadata['pdf_engine_version'], 'typst 0.14.2 (fixture)')
                 self.assertEqual(metadata['execution_engine'], 'knitr' if formal else 'static')
                 self.assertEqual(set(metadata['artifacts']), {p.name for p in folder.iterdir()})
                 self.assertEqual(metadata['presentation_source'], source.relative_to(root).as_posix())
@@ -238,21 +247,51 @@ class RBridgeTests(unittest.TestCase):
                     self.assertNotIn('```{', (folder / 'report.qmd').read_text())
                     self.assertIn('minimal: true', (folder / 'report.qmd').read_text())
                     self.assertEqual(metadata['plot_generator'], 'Python SVG from saved results')
+                    self.assertIn('pdf-legend', (folder / 'report-plot-01.svg').read_text())
+
+    def test_HTML_only_or_invalid_PDF_cannot_be_claimed_as_Quarto_success(self):
+        root = Path(__file__).resolve().parents[1]
+        for pdf in (None, b'HTML is not a PDF'):
+            with self.subTest(pdf=pdf), tempfile.TemporaryDirectory() as directory:
+                folder = Path(directory)
+
+                def execute(command, timeout, environment=None):
+                    if command[-1] == 'report':
+                        (folder / 'report.html').write_text('MOCK HTML')
+                        (folder / 'report.typ').write_text('// MOCK')
+                        if pdf is not None:
+                            (folder / 'report.pdf').write_bytes(pdf)
+                    return Mock(returncode=0, stderr='', stdout='1.9.37')
+
+                with patch.object(RBridge, 'require_container', return_value=IMAGE), \
+                     patch('workflow.quarto_reports.shutil.which', return_value='/usr/bin/quarto'), \
+                     patch('workflow.quarto_reports.make_command', side_effect=lambda target: ['make', target]), \
+                     patch('workflow.quarto_reports.run_command', side_effect=execute):
+                    with self.assertRaisesRegex(RuntimeError, 'Quarto report failed|did not produce a PDF'):
+                        render_report(root, 'cpue_report', {}, {}, folder, 'unused')
 
     def test_static_Quarto_failure_preserves_sources_but_does_not_claim_success(self):
         root = Path(__file__).resolve().parents[1]
         result = {'series': [{'year': 2000, 'index': 1}]}
         record = {'run_id': 'Fixture'}
         page = output_page(SPEC['cpue_a'], result, record, [])
-        with tempfile.TemporaryDirectory() as directory, \
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+
+            def execute(command, timeout, environment=None):
+                if command[-1] == 'report-markdown':
+                    (folder / 'report-body.md').write_text('Saved result')
+                    return Mock(returncode=0, stderr='', stdout='')
+                return Mock(returncode=1, stderr='static render failed', stdout='')
+
+            with \
              patch.object(RBridge, 'require_container', return_value=IMAGE), \
              patch('workflow.quarto_reports.shutil.which', return_value='/usr/bin/quarto'), \
-             patch('workflow.quarto_reports.make_command', return_value=['make', 'report']), \
-             patch('workflow.quarto_reports.run_command', return_value=Mock(
-                 returncode=1, stderr='static render failed', stdout='')):
-            folder = Path(directory)
-            with self.assertRaisesRegex(RuntimeError, 'Quarto report failed: static render failed'):
-                render_report(root, 'cpue_a', result, record, folder, page)
+             patch('workflow.quarto_reports.make_command', side_effect=lambda target: ['make', target]), \
+             patch('workflow.quarto_reports.run_command', side_effect=execute):
+                with self.assertRaisesRegex(RuntimeError, 'Quarto report failed: static render failed'):
+                    render_report(root, 'cpue_a', result, record, folder, page)
             self.assertFalse((folder / 'report.html').exists())
             self.assertEqual({path.name for path in folder.iterdir()},
-                             {'report.qmd', 'report-data.json', 'report-body.html'})
+                             {'report.qmd', 'report-data.json', 'report-body.html',
+                              'report-pdf-body.html', 'report-body.md', 'report-plot-01.svg'})

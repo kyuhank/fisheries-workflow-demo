@@ -86,7 +86,7 @@ the recorded container. `OUTPUT=DIR` selects the result directory;
 | File | Contents |
 | --- | --- |
 | `runs/cpue_a/output.json` | numerical result and method metadata |
-| `runs/cpue_a/report.html` | readable result page |
+| `runs/cpue_a/report.pdf` | compiled Quarto result PDF |
 | `runs/cpue_a/record.json` | input producers, settings, exact code and software |
 | `runs/database/snapshot.sqlite` | accepted data snapshot |
 | `runs/state.json` | execution state and events |

@@ -68,8 +68,13 @@ public_b <- cpue(aggregates, stratum_effect = FALSE)
 close(rows_values(public_a$series, "index"), c(1, 1.5, 2))
 close(rows_values(public_a$series, "standardised_cpue"), c(15, 22.5, 30))
 close(rows_values(public_a$series, "nominal_cpue"), c(12.5, 22.5, 35))
-close(rows_values(public_b$series, "standardised_cpue"),
-      rows_values(public_b$series, "nominal_cpue"))
+close(rows_values(public_b$series, "standardised_cpue"), c(15, 22.5, 30))
+close(rows_values(public_b$series, "index"), c(1, 1.5, 2))
+stopifnot(public_b$method == "Quasipoisson GLM: year + quarter",
+          public_b$quarter_score_residual < 1e-7,
+          public_b$score_residual == max(public_b$year_score_residual,
+                                         public_b$quarter_score_residual),
+          all(rows_values(public_b$prediction_grid, "quarter") %in% 1:2))
 stopifnot(public_a$sets_used == 12, public_a$released_zero_rows == 6,
           public_a$data_kind == "public-wcpfc", public_a$converged,
           public_a$rank == public_a$model_columns,
@@ -100,6 +105,57 @@ zero_year <- lapply(aggregates, function(row) {
   row
 })
 rejects(cpue(zero_year))
+
+# Known seasonal effects on six strata: fixed stratum weights imply quarter
+# weights 1/6, 1/6, 1/3, 1/3, rather than four equal quarter weights.
+seasonal_rows <- list()
+support <- data.frame(cell = c(rep("20S_175E", 4), rep("25S_175E", 2)),
+                      quarter = c(1:4, 3:4))
+for (year in 1:3) {
+  for (i in seq_len(nrow(support))) {
+    quarter <- support$quarter[i]
+    hooks <- 1000 * if (year == 1) 5 - quarter else if (year == 2) 1 else quarter
+    rate <- 10 * c(1, 1.5, 2)[year] * quarter
+    for (observation in 1:2) {
+      seasonal_rows[[length(seasonal_rows) + 1L]] <- list(
+        set_id = paste(year, i, observation), year = 2000 + year,
+        fleet = "TEST", cell = support$cell[i], quarter = quarter,
+        stratum = paste0(support$cell[i], "_Q", quarter), hooks = hooks,
+        catch_n = if (observation == 1) 0 else 2 * rate * hooks / 1000)
+    }
+  }
+}
+seasonal_b <- cpue(seasonal_rows, stratum_effect = FALSE)
+close(rows_values(seasonal_b$series, "standardised_cpue"), (85 / 3) * c(1, 1.5, 2))
+close(rows_values(seasonal_b$series, "index"), c(1, 1.5, 2))
+close(rows_values(seasonal_b$quarter_weights, "weight"), c(1/6, 1/6, 1/3, 1/3))
+stopifnot(seasonal_b$rank == 6, seasonal_b$residual_degrees_of_freedom == 30,
+          seasonal_b$released_zero_rows == 18, length(seasonal_b$prediction_grid) == 18,
+          seasonal_b$score_residual == max(seasonal_b$year_score_residual,
+                                           seasonal_b$quarter_score_residual))
+for (point in seasonal_b$series) {
+  selected <- Filter(function(row) row$year == point$year, seasonal_rows)
+  close(point$nominal_cpue, 1000 * sum(rows_values(selected, "catch_n")) /
+          sum(rows_values(selected, "hooks")))
+}
+for (point in seasonal_b$prediction_grid) {
+  close(point$predicted_cpue, 10 * c(1, 1.5, 2)[point$year - 2000] * point$quarter)
+  stopifnot(point$quarter == support$quarter[match(
+    point$stratum, paste0(support$cell, "_Q", support$quarter))])
+}
+for (quarter in list(NULL, NA_real_, 0, 5, 1.5, "1")) {
+  invalid_quarter <- seasonal_rows
+  invalid_quarter[[1]]$quarter <- quarter
+  rejects(cpue(invalid_quarter, stratum_effect = FALSE))
+}
+rejects(cpue(Filter(function(row) row$quarter == 1, seasonal_rows),
+             stratum_effect = FALSE))
+rejects(cpue(disconnected, stratum_effect = FALSE))
+zero_quarter <- lapply(seasonal_rows, function(row) {
+  if (row$quarter == 1) row$catch_n <- 0
+  row
+})
+rejects(cpue(zero_quarter, stratum_effect = FALSE))
 aggregate_catches <- lapply(2001:2003, function(year) list(year = year, catch_t = 10))
 description <- describe_data(aggregates, aggregate_catches)
 stopifnot(description$grouping_field == "stratum", length(description$strata) == 2,

@@ -101,7 +101,7 @@
     </main>
     <dialog id="output-dialog">
       <header><div><span class="eyebrow" id="output-kind">Job output</span><h2 id="output-title"></h2></div><div class="output-actions"><button id="output-run" class="primary" hidden>Run this job</button><button id="output-close" class="quiet" aria-label="Close output">Close ×</button></div></header>
-      <nav><button class="active" data-output="report">Results</button><button data-output="data">Data</button><button data-output="log">Log</button><button data-output="record">Inputs &amp; versions</button><button id="save-output" class="quiet">Save HTML</button></nav>
+      <nav><button class="active" data-output="report">Results</button><button data-output="data">Data</button><button data-output="log">Log</button><button data-output="record">Inputs &amp; versions</button><a id="open-output-pdf" class="quiet" target="_blank" rel="noopener" hidden>Open PDF ↗</a><button id="save-output" class="quiet">Save PDF</button></nav>
       <section id="output-record" hidden aria-label="Recorded inputs and versions"></section>
       <iframe id="output-frame" sandbox="allow-same-origin"
         title="Analysis results"></iframe>

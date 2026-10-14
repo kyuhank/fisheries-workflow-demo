@@ -209,6 +209,7 @@ class HostedWorkflow(HostedCalculationWorkflow):
         if event.get('state') == 'complete':
             key = event['job']
             output = {'html': (self.directory / key / 'report.html').read_text(),
+                      'pdf_base64': base64.b64encode((self.directory / key / 'report.pdf').read_bytes()).decode(),
                       'record': self.records[key], 'output': self.output(key)}
         self.delivery.publish({'event': event, 'state': self.state(), 'output': output})
         print(event.get('job', 'workflow'), event['state'], event.get('message', ''), flush=True)

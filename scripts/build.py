@@ -57,8 +57,8 @@ def data_page(source):
             '<a href="data/extract.sql" download>Selection query (SQL)</a></p>'
             '<h3>Selection query</h3><pre>' + html.escape(query) + '</pre>'
             '<h2>2. Standardise catch per effort</h2><p>CPUE A uses year and cell–quarter stratum '
-            'with a log effort offset. CPUE B uses year alone. Both quasi-Poisson models predict '
-            'fish per 1,000 hooks. A averages the same six strata equally in each year; '
+            'with a log effort offset. CPUE B uses year and quarter. Both quasi-Poisson models predict '
+            'fish per 1,000 hooks and average the same six strata equally in each year; '
             'the relative index starts at one in 2000.</p>'
             '<h2>3. Keep annual stock catch separate</h2><p>The yearbook series sums South Pacific '
             'albacore across all gears and fleets, in metric tonnes. It is not the catch in the '
@@ -130,6 +130,7 @@ def build():
         (ROOT / 'docs/build-record.json').write_text(json.dumps(build_record, indent=2) + '\n')
         saved = runner.state()
         saved['outputs'] = {key: {'html': (runner.directory/key/'report.html').read_text(),
+                                 'pdf_base64': base64_file(runner.directory/key/'report.pdf'),
                                  'record': runner.records[key], 'output': runner.output(key)}
                             for key in SPEC}
         saved['bundle'] = base64.b64encode(runner.bundle()).decode()
@@ -137,9 +138,9 @@ def build():
         example_dir = ROOT / 'docs/example'
         shutil.rmtree(example_dir, ignore_errors=True)
         shutil.copytree(runner.directory, example_dir)
-        (example_dir/'index.html').write_text('<!doctype html><html lang="en-NZ"><meta charset="utf-8"><title>Saved workflow example</title><style>body{font:17px/1.6 system-ui;max-width:850px;margin:50px auto;padding:0 24px}a{color:#1779a0}li{margin:12px 0}</style><h1>Saved workflow example</h1><p>These outputs were calculated when this version was built. Open them without running code or connecting to the internet.</p><ol>' + ''.join(f'<li><a href="{key}/report.html">{job["title"]}</a> — {job["description"]}</li>' for key, job in SPEC.items()) + '</ol><p><a href="../index.html">Open the interactive demo</a></p></html>')
+        (example_dir/'index.html').write_text('<!doctype html><html lang="en-NZ"><meta charset="utf-8"><title>Saved workflow example</title><style>body{font:17px/1.6 system-ui;max-width:850px;margin:50px auto;padding:0 24px}a{color:#1779a0}li{margin:12px 0}</style><h1>Saved workflow example</h1><p>These outputs were calculated when this version was built. Open their compiled Quarto PDFs without running code or connecting to the internet.</p><ol>' + ''.join(f'<li><a href="{key}/report.pdf">{job["title"]}</a> — {job["description"]}</li>' for key, job in SPEC.items()) + '</ol><p><a href="../index.html">Open the interactive demo</a></p></html>')
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE'])
-    payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'notices': notices,
+    payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'example_pdf_base64': saved['outputs']['assessment_report'].get('pdf_base64'), 'notices': notices,
                'calculationBackend': 'container', 'offlineMode': 'saved'}
     if runner.source_context().get('data_kind') == 'public-wcpfc-albacore':
         data_page(runner.source_context())

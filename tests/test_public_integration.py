@@ -148,6 +148,17 @@ class PublicNativeIntegrationTest(unittest.TestCase):
                                    delta=len(strata) * 1e-15)
             self.assertEqual(len(result['prediction_grid']), 6 * len(years))
             self.assertLess(result['year_score_residual'], 1e-7)
+            if suffix == 'b':
+                self.assertEqual(result['method'], 'Quasipoisson GLM: year + quarter')
+                self.assertIn('factor(quarter)', result['formula'])
+                quarters = {row['stratum']: row['quarter'] for row in rows}
+                self.assertEqual(result['rank'], len(years) + len(set(quarters.values())) - 1)
+                self.assertLess(result['quarter_score_residual'], 1e-7)
+                self.assertEqual(result['score_residual'],
+                                 max(result['year_score_residual'], result['quarter_score_residual']))
+                for weight in result['quarter_weights']:
+                    expected = sum(value == weight['quarter'] for value in quarters.values()) / len(strata)
+                    self.assertAlmostEqual(weight['weight'], expected, delta=1e-15)
             minimum = runner.settings['min_hooks_a'] if suffix == 'a' else 0
             accepted = [row for row in rows if row['hooks'] >= minimum]
             self.assertEqual(result['rows_excluded'], len(rows) - len(accepted))
@@ -163,7 +174,12 @@ class PublicNativeIntegrationTest(unittest.TestCase):
                 self.assertAlmostEqual(point['standardised_cpue'], weighted, places=8)
                 self.assertAlmostEqual(point['index'], weighted / result['normalisation']['divisor'], places=8)
                 if suffix == 'b':
-                    self.assertAlmostEqual(point['standardised_cpue'], nominal, places=7)
+                    for prediction in grid:
+                        self.assertEqual(prediction['quarter'], quarters[prediction['stratum']])
+                    for quarter in set(quarters.values()):
+                        rates = [prediction['predicted_cpue'] for prediction in grid
+                                 if prediction['quarter'] == quarter]
+                        self.assertTrue(all(abs(rate - rates[0]) < 1e-10 for rate in rates))
             prepared = runner.output('prepare_' + suffix)['rows']
             self.assertEqual([row['year'] for row in prepared], years)
             for row in prepared:

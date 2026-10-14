@@ -7,6 +7,7 @@ STYLE = '''body{font:15px/1.5 system-ui,sans-serif;color:#293039;max-width:920px
 STYLE += '''.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}'''
 STYLE += '''.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}'''
 STYLE += '''.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}'''
+STYLE += '''.pdf-legend{display:none}'''
 MSE_COLOURS = {'Constant catch': '#1378a3', 'Index rule': '#b56435', 'Buffered rule': '#7357a8'}
 
 
@@ -66,7 +67,7 @@ def job_trace(key):
         'database': 'Accepted rows → save SQLite snapshot → fixed data inputs',
         'extract': 'SQLite snapshot → recorded SQL → CPUE rows and annual catches',
         'cpue_a': 'Catch and effort rows → adjusted GLM → annual CPUE index A',
-        'cpue_b': 'Catch and effort rows → year-only GLM → annual CPUE index B',
+        'cpue_b': 'Catch and effort rows → quarter-adjusted GLM → annual CPUE index B',
         'cpue_summary': 'Indices A and B → align years → index comparison',
         'cpue_report': 'Saved index comparison → describe methods and values → CPUE report',
         'prepare_a': 'Index A and annual catches → join by year → assessment inputs A',
@@ -93,6 +94,21 @@ def table(rows, columns, limit=None):
     return ''.join(parts) + '</tbody></table>'
 
 
+def svg_legend(items):
+    """Keep vector figures self-contained when compiled into a PDF."""
+    parts = ['<g class="pdf-legend" font-family="sans-serif" font-size="13" fill="#293039">']
+    x, y = 100, 23
+    for name, colour, dashed in items:
+        width = 44 + 7 * len(name)
+        if x + width > 745 and x > 100:
+            x, y = 100, y + 21
+        dash = ' stroke-dasharray="8 5"' if dashed else ''
+        parts.append(f'<path d="M{x} {y-4}h24" fill="none" stroke="{colour}" '
+                     f'stroke-width="2.5"{dash}/><text x="{x+31}" y="{y}">{esc(name)}</text>')
+        x += width
+    return ''.join(parts) + '</g>'
+
+
 def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     colours = ['#1378a3', '#b56435', '#7357a8', '#328363', '#a7526d', '#93761e', '#277f88', '#66748b']
     all_rows = [r for rows in series.values() for r in rows]
@@ -110,6 +126,8 @@ def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     x = lambda year: 100 + (year - xmin) / max(1, xmax - xmin) * 625
     y = lambda number: 280 - (number - ymin) / span * 225
     out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" aria-label="' + esc(label) + '">']
+    out.append(svg_legend([(name, (colour_by_name or {}).get(name, colours[i % len(colours)]),
+                           name == 'Nominal') for i, name in enumerate(series)]))
     for i in range(round(span / step) + 1):
         v = ymin + step * i
         if abs(v) < step * 1e-8:
@@ -377,6 +395,8 @@ def mse_tradeoff(metrics):
     y = lambda v: 275 - 220 * v / ymax
     out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 340" role="img" '
            'aria-label="Management trade-off: mean annual catch (tonnes) and median final biomass / carrying capacity">']
+    out.append(svg_legend([(f'{i+1}. {row["name"]}', colours.get(row['name'], '#1378a3'), False)
+                           for i, row in enumerate(metrics)]))
     for i in range(5):
         catch, biomass = xmax * i / 4, ymax * i / 4
         out.append(f'<path d="M100 {y(biomass):.1f}H685" stroke="#e1e8ee"/>'
@@ -469,7 +489,8 @@ def result_view(job, result):
                 body += ('<p>Standardised A holds cell–quarter composition fixed: predict catch at 1,000 hooks '
                          'in each of the six strata, then average with equal weights.</p>'
                          if key == 'cpue_a' else
-                         '<p>B fits year effects only; its annual fitted rate reproduces nominal CPUE.</p>')
+                         '<p>B adjusts quarter only and averages predictions over the same six fixed strata. '
+                         'Quarter effects partly confound spatial differences on this support.</p>')
         else:
             body += plot({job['title']: rows}, 'index', 'CPUE relative to the first year')
             body += '<p>Only the relative index is available in this saved result; nominal and standardised rates were not recorded.</p>'
@@ -502,7 +523,7 @@ def result_view(job, result):
             if analysis.get('standardisation'):
                 body += '<p class="result-method">Standardised: ' + esc(analysis['standardisation']) + '. Nominal: 1,000 × annual fish numbers / annual hooks on the A rows.</p>'
             if public:
-                body += '<p>A predicts catch at 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B fits year effects only. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.</p>'
+                body += '<p>A predicts catch at 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B adjusts quarter only on that support. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.</p>'
         else:
             body += relative + '<p>The saved result has relative indices only; an A-row nominal overlay is unavailable.</p>'
         return body + '<p class="result-method">The A/B comparison includes differences in adjustment and row selection. Each relative index equals one in its own first year.</p>'

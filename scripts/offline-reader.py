@@ -59,7 +59,7 @@ def reader_pages(files, tool_version):
                            for p in job['parents']) or ('WCPFC public records' if record.get('data_source') else 'Supplied synthetic records')
         rows.append(f'<tr><td><strong>{html.escape(job["title"])}</strong><br>'
                     f'<span class="muted">{html.escape(key)}</span></td><td>{inputs}</td>'
-                    f'<td><a href="reference/{key}/report.html">Result</a> · '
+                    f'<td><a href="reference/{key}/report.pdf">Result PDF</a> · '
                     f'<a href="reference/{key}/record.json">Record</a></td><td>{links}</td></tr>')
     start = '<h1>Fisheries workflow: read, repeat, preserve</h1>'
     start += ('<p>Follow the saved CPUE indices through stock assessment and management trials. '

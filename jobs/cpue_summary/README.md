@@ -10,7 +10,7 @@ Compare the two saved CPUE indices without fitting another model.
 
 **Settings:** No job-specific settings (`{}`).
 
-The result preserves both producing methods, prediction support, weights, units and checks. A uses a cell–quarter adjustment; B uses year only.
+The result preserves both producing methods, prediction support, weights, units and checks. A uses a cell–quarter adjustment; B adjusts for quarter only.
 
 From the repository root, run this job and prepare any required inputs:
 
