@@ -1,11 +1,21 @@
 ---
 title: "CPUE analysis report"
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -106,7 +116,7 @@ if (!absolute_cpue) {
 plot_series(series, "index", "CPUE relative to first year")
 ```
 
-Each index is divided by its own first-year prediction (first year = 1). A adjusts for composition; B uses year effects only. B may use different records because the optional effort filter applies to A.
+Each index is divided by its own first-year prediction (first year = 1). `r if (public) "A adjusts cell–quarter composition; B adjusts quarter only on the same fixed prediction support." else "A adjusts vessel effects; B uses year effects only."` B may use different records because the optional effort filter applies to A.
 
 ## Methods and checks
 
@@ -115,7 +125,7 @@ Each index is divided by its own first-year prediction (first year = 1). A adjus
 if (public) {
   cat("The saved models are quasipoisson GLMs with a log link and ",
       "a `log(hooks / 1000)` offset. A adjusts for cell–quarter composition; ",
-      "B has year effects only. The source rows are fleet–cell–quarter aggregates, ",
+      "B adjusts quarter only; quarter effects partly confound spatial differences on this support. The source rows are fleet–cell–quarter aggregates, ",
       "not individual fishing sets.\n\n", sep = "")
 } else if (length(result$analyses)) {
   cat("The saved synthetic models are Poisson GLMs with a log link and ",
@@ -150,7 +160,7 @@ if (public && length(analysis_a$weights)) {
     paste0("`", x$stratum, "` (", format(x$weight, digits = 4), ")")
   }, character(1))
   cat("\nA's fixed prediction weights: ", paste(weights, collapse = "; "), ".\n\n",
-      "Score error is the maximum relative difference between fitted and observed annual or stratum catch totals. ",
+      "Score error is the maximum relative difference between fitted and observed annual, stratum or quarter catch totals. ",
       "Dispersion is the Pearson sum of squares divided by residual degrees of freedom.\n\n", sep = "")
 }
 ```

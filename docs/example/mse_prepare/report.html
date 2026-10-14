@@ -30,7 +30,7 @@ margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 
 <body>
 
-<style>body{font:15px/1.5 system-ui,sans-serif;color:#293039;max-width:920px;margin:22px auto;padding:0 22px}h1{font-size:23px;line-height:1.25;font-weight:600;margin:0 0 12px}h2{font-size:17px;font-weight:600;margin:22px 0 8px}p{max-width:80ch;margin:8px 0}small,.muted{color:#626a73}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:8px 10px;border-bottom:1px solid #d8dce0}th{font-weight:600;background:white}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}.note{border-left:2px solid #a48242;padding:6px 12px;background:white}footer{margin-top:22px;border-top:1px solid #d8dce0;padding-top:10px;color:#626a73;font-size:12px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#245b86}.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}</style>
+<style>body{font:15px/1.5 system-ui,sans-serif;color:#293039;max-width:920px;margin:22px auto;padding:0 22px}h1{font-size:23px;line-height:1.25;font-weight:600;margin:0 0 12px}h2{font-size:17px;font-weight:600;margin:22px 0 8px}p{max-width:80ch;margin:8px 0}small,.muted{color:#626a73}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:8px 10px;border-bottom:1px solid #d8dce0}th{font-weight:600;background:white}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}.note{border-left:2px solid #a48242;padding:6px 12px;background:white}footer{margin-top:22px;border-top:1px solid #d8dce0;padding-top:10px;color:#626a73;font-size:12px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#245b86}.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}.pdf-legend{display:none}</style>
 <h1>Prepare MSE</h1><article class="result-view" data-result="mse_prepare"><p>4 fitted stock cases · 3 catch rules · 15 future years · 20 trials per case and scenario.</p><h2>Starting stocks</h2>
 <table class="caption-top">
 <thead>
@@ -57,13 +57,13 @@ margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 <tr class="odd">
 <td>Assessment B1</td>
 <td>2022</td>
-<td>0.4565</td>
+<td>0.4774</td>
 <td>7.359e+04</td>
 </tr>
 <tr class="even">
 <td>Assessment B2</td>
 <td>2022</td>
-<td>0.4527</td>
+<td>0.474</td>
 <td>7.359e+04</td>
 </tr>
 </tbody>
@@ -73,8 +73,7 @@ margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 
 
 
-<!-- The coordinator prepares report-body.html from the saved result and record.
-     This shared result view has no executable cells or model fitting. -->
+<!-- Both bodies use the same saved result. No executable cells or model fitting. -->
 
 
 

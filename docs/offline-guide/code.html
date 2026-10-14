@@ -117,7 +117,7 @@ near-zero assessment gradient diagnostics have magnitude and difference caps of
 1e-7, conditional on matching successful fit diagnostics. These are comparison policies, not model-accuracy
 guarantees. Summary and report copies must match their own source assessments
 before the exceptions apply. Other values retain the general tolerances.
-</pre></details><details id="source-655fcb4320174e71" data-name="OFFLINE.md"><summary>OFFLINE.md</summary><p class="muted"><br>SHA-256: 5ceefe6de9a3f4d589ddf2a58d172cd7d311de049d87e9e243385dd9a388a6ce</p><pre># Repeat and preserve the analyses
+</pre></details><details id="source-655fcb4320174e71" data-name="OFFLINE.md"><summary>OFFLINE.md</summary><p class="muted"><br>SHA-256: 44dcb7f7c43d6e6ef69b329238d3bfbf376a0c2f410d72f78cd75bf5d3e846ab</p><pre># Repeat and preserve the analyses
 
 Keep the offline ZIP and the execution-image archive together. The ZIP contains
 the saved run&#x27;s exact inputs, settings, source snapshots, outputs and
@@ -130,7 +130,7 @@ tool release does not replace the code used to produce the saved results.
 Unpack the versioned offline ZIP and open `START-HERE.html`. Follow
 the links from a result to its input records, job script and calculation library.
 `code.html` displays the preserved sources. These pages use local files and need
-no login or internet connection. The interactive HTML displays saved results;
+no login or internet connection. The interactive page opens saved Quarto result PDFs;
 new calculations use the commands below.
 
 ## Restore the software
@@ -217,7 +217,7 @@ GitHub release links alone do not provide an independent deposit. Each software
 component retains its own licence, as described in [THIRD_PARTY.md](THIRD_PARTY.md).
 Preserved copies do not require this website or the original image registry to
 remain online. They still require a Docker-compatible computer.
-</pre></details><details id="source-b335630551682c19" data-name="README.md"><summary>README.md</summary><p class="muted"><br>SHA-256: a0c838e9297bee1e6a69a7da27a9644272125555e49730a6ee924b0f15059396</p><pre># Fisheries workflow demonstration
+</pre></details><details id="source-b335630551682c19" data-name="README.md"><summary>README.md</summary><p class="muted"><br>SHA-256: 10f0470ec466742a1ddd437ea7f2dc37d00b65f5c8cf3a24f992b7140160f48f</p><pre># Fisheries workflow demonstration
 
 [Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Code by job](jobs/README.md) · [Preserved releases](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
@@ -243,9 +243,10 @@ a sum of the selected fleet&#x27;s catch numbers.
 
 CPUE A fits a quasipoisson GLM with year and cell–quarter effects and a
 `log(hooks / 1000)` offset. It predicts fish per 1,000 hooks in each stratum and
-averages those predictions with equal fixed weights. CPUE B uses year effects
-only. Both indices are divided by their first-year value. The outputs preserve
+averages those predictions with equal fixed weights. CPUE B uses year and quarter
+effects. Both indices are divided by their first-year value. The outputs preserve
 nominal and standardised CPUE, prediction support, weights and model checks.
+Quarter effects partly confound spatial differences on this support.
 These selected released strata do not represent the whole stock; the example
 supplies no confidence intervals. The selected Fiji fleet index is not a validated
 stock-wide abundance measure. Synthetic vessel records remain available as
@@ -260,7 +261,7 @@ low-biomass results are conditional on that guardrail.
 
 ## Use the demo
 
-Plots are visible immediately. CPUE results overlay standardised and nominal rates on the same selected rows; assessment and MSE results show their main comparisons. All views are rendered by Quarto from saved numerical outputs. The three report jobs give the methods and checks.
+Plots are visible immediately. CPUE results overlay standardised and nominal rates on the same selected rows; assessment and MSE results show their main comparisons. View opens the compiled Quarto PDF, with Open PDF and Save PDF controls. Rendering reads saved numerical outputs. The three report jobs give the methods and checks.
 
 1. Choose **View example** to inspect the saved results, or **Live run** to
    execute the R jobs and Quarto result views on GitHub Actions.
@@ -305,10 +306,10 @@ original CPUE standardisation.
 
 Keep a downloaded run and its recorded execution image together. Follow the
 bundle&#x27;s `REPRODUCE.txt` to repeat its declared scope. The
-[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.4.zip)
+[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.5.zip)
 includes local result and code pages, source archives, extraction SQL and all
 22 reference outputs; its
-[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.4.zip.sha256)
+[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.5.zip.sha256)
 identifies the download. Open `START-HERE.html`, then follow `OFFLINE.md`.
 The archived
 [v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)
@@ -317,7 +318,7 @@ preserves the earlier synthetic example and its separate image archive.
 source changes do not alter that preserved release.
 
 Software attribution and licences are in [THIRD_PARTY.md](THIRD_PARTY.md).
-</pre></details><details id="source-69d74216fb99fa32" data-name="components/assessment/R/assessment.R"><summary>components/assessment/R/assessment.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: c807989ab5de3da1d4ac44cd7e11d84b2eee5d112c2ea74b481f896457abdf06</p><pre># B[t] is biomass before that year&#x27;s catch; the final element is next year&#x27;s state.
+</pre></details><details id="source-69d74216fb99fa32" data-name="components/assessment/R/assessment.R"><summary>components/assessment/R/assessment.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: c807989ab5de3da1d4ac44cd7e11d84b2eee5d112c2ea74b481f896457abdf06</p><pre># B[t] is biomass before that year&#x27;s catch; the final element is next year&#x27;s state.
 surplus_path &lt;- function(K, r, catches) {
   B &lt;- rep(K, length(catches) + 1L)
   for (t in seq_along(catches)) {
@@ -425,7 +426,7 @@ assessment &lt;- function(inputs, r) {
                              &quot;Balance checks test the declared recurrence, not an independent fit to catches.&quot;,
                              &quot;No confidence intervals or real-stock validation are supplied.&quot;)))
 }
-</pre></details><details id="source-b8997fcc0fff0a1a" data-name="components/assessment/README.md"><summary>components/assessment/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: d486fd1b76d10f8c6ebb9682e998678d9f9471ce30559e55f66ea7833e9c02e4</p><pre># Fisheries workflow assessment example
+</pre></details><details id="source-b8997fcc0fff0a1a" data-name="components/assessment/README.md"><summary>components/assessment/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: d486fd1b76d10f8c6ebb9682e998678d9f9471ce30559e55f66ea7833e9c02e4</p><pre># Fisheries workflow assessment example
 
 These eight jobs join annual CPUE indices to catches, fit four fixed-growth
 Schaefer cases, then compare and report their biomass trajectories. The
@@ -451,7 +452,7 @@ refitting, shows the biomass comparison, and retains fit checks and source recor
 [SOURCE.json](SOURCE.json) records the calculation library&#x27;s baseline origin and
 SHA-256. The R library and calculation entry points retain those source bytes;
 the report and reader guides have been revised for the public-data example.
-</pre></details><details id="source-d7783ff5d488a1b6" data-name="components/assessment/jobs/assessment_a1/README.md"><summary>components/assessment/jobs/assessment_a1/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: c1d5e63b75e9f165c921d5593c6766aaa0ec151891220ba0292f52fa19eac048</p><pre># Assessment A1 (`assessment_a1`)
+</pre></details><details id="source-d7783ff5d488a1b6" data-name="components/assessment/jobs/assessment_a1/README.md"><summary>components/assessment/jobs/assessment_a1/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: c1d5e63b75e9f165c921d5593c6766aaa0ec151891220ba0292f52fa19eac048</p><pre># Assessment A1 (`assessment_a1`)
 
 Fit the toy Schaefer model to index A with fixed intrinsic growth r = 0.25 and initial biomass equal to K. RTMB estimates one log(K) parameter; catchability q is profiled.
 
@@ -484,11 +485,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_a1/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_a1/record.json)
-</pre></details><details id="source-8af44f9e8e34c1e0" data-name="components/assessment/jobs/assessment_a1/run.R"><summary>components/assessment/jobs/assessment_a1/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 8076d304436a57dc2dd2374618d36a040df9659918289c7de69465223ef7e08a</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
+</pre></details><details id="source-8af44f9e8e34c1e0" data-name="components/assessment/jobs/assessment_a1/run.R"><summary>components/assessment/jobs/assessment_a1/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 8076d304436a57dc2dd2374618d36a040df9659918289c7de69465223ef7e08a</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
 calculate &lt;- function(context) {
   assessment(context$parents$prepare_a$rows, r = 0.25)
 }
-</pre></details><details id="source-b35b0765964398ac" data-name="components/assessment/jobs/assessment_a2/README.md"><summary>components/assessment/jobs/assessment_a2/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: b27d0f1edeeb7397bc3dc944d5cab2cb5182279f85134e339957836401f52d72</p><pre># Assessment A2 (`assessment_a2`)
+</pre></details><details id="source-b35b0765964398ac" data-name="components/assessment/jobs/assessment_a2/README.md"><summary>components/assessment/jobs/assessment_a2/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: b27d0f1edeeb7397bc3dc944d5cab2cb5182279f85134e339957836401f52d72</p><pre># Assessment A2 (`assessment_a2`)
 
 Fit the toy Schaefer model to index A with the selected fixed intrinsic growth and initial biomass equal to K. RTMB estimates one log(K) parameter; catchability q is profiled.
 
@@ -521,11 +522,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_a2/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_a2/record.json)
-</pre></details><details id="source-bb46461dbe95aae5" data-name="components/assessment/jobs/assessment_a2/run.R"><summary>components/assessment/jobs/assessment_a2/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 7892d48f728611645826db33fbde3511ada04d518c06a1977dd60d5fe370df47</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
+</pre></details><details id="source-bb46461dbe95aae5" data-name="components/assessment/jobs/assessment_a2/run.R"><summary>components/assessment/jobs/assessment_a2/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 7892d48f728611645826db33fbde3511ada04d518c06a1977dd60d5fe370df47</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
 calculate &lt;- function(context) {
   assessment(context$parents$prepare_a$rows, r = context$settings$growth_rate_2)
 }
-</pre></details><details id="source-4bf24507f1c805d4" data-name="components/assessment/jobs/assessment_b1/README.md"><summary>components/assessment/jobs/assessment_b1/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 457f33f739cfff7ae1c1e64994c898f156411cc3993652139b97221874b07717</p><pre># Assessment B1 (`assessment_b1`)
+</pre></details><details id="source-4bf24507f1c805d4" data-name="components/assessment/jobs/assessment_b1/README.md"><summary>components/assessment/jobs/assessment_b1/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 457f33f739cfff7ae1c1e64994c898f156411cc3993652139b97221874b07717</p><pre># Assessment B1 (`assessment_b1`)
 
 Fit the toy Schaefer model to index B with fixed intrinsic growth r = 0.25 and initial biomass equal to K. RTMB estimates one log(K) parameter; catchability q is profiled.
 
@@ -558,11 +559,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b1/record.json)
-</pre></details><details id="source-2109ece20b2b7886" data-name="components/assessment/jobs/assessment_b1/run.R"><summary>components/assessment/jobs/assessment_b1/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: e8f10d732e5e233dfa1707a6f0d7379d2cb01a9d2bd7f476b0dec68c01fec4ff</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
+</pre></details><details id="source-2109ece20b2b7886" data-name="components/assessment/jobs/assessment_b1/run.R"><summary>components/assessment/jobs/assessment_b1/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: e8f10d732e5e233dfa1707a6f0d7379d2cb01a9d2bd7f476b0dec68c01fec4ff</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
 calculate &lt;- function(context) {
   assessment(context$parents$prepare_b$rows, r = 0.25)
 }
-</pre></details><details id="source-22aac2d0151f441c" data-name="components/assessment/jobs/assessment_b2/README.md"><summary>components/assessment/jobs/assessment_b2/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 2860c374f2e11d02d18b6122e7c189ad5e436c9ee2b325804fef2d5b3332751a</p><pre># Assessment B2 (`assessment_b2`)
+</pre></details><details id="source-22aac2d0151f441c" data-name="components/assessment/jobs/assessment_b2/README.md"><summary>components/assessment/jobs/assessment_b2/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 2860c374f2e11d02d18b6122e7c189ad5e436c9ee2b325804fef2d5b3332751a</p><pre># Assessment B2 (`assessment_b2`)
 
 Fit the toy Schaefer model to index B with the selected fixed intrinsic growth and initial biomass equal to K. RTMB estimates one log(K) parameter; catchability q is profiled.
 
@@ -595,11 +596,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b2/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_b2/record.json)
-</pre></details><details id="source-dffa5c85b0689b15" data-name="components/assessment/jobs/assessment_b2/run.R"><summary>components/assessment/jobs/assessment_b2/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: bdc313361eeee533d77eea41f7dd297205c51151c7c857ba6f2f711eedcd1f24</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
+</pre></details><details id="source-dffa5c85b0689b15" data-name="components/assessment/jobs/assessment_b2/run.R"><summary>components/assessment/jobs/assessment_b2/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: bdc313361eeee533d77eea41f7dd297205c51151c7c857ba6f2f711eedcd1f24</p><pre># Fit one log(K) with RTMB; growth and initial B/K are fixed for this case.
 calculate &lt;- function(context) {
   assessment(context$parents$prepare_b$rows, r = context$settings$growth_rate_2)
 }
-</pre></details><details id="source-99ff8b3c84c663de" data-name="components/assessment/jobs/assessment_report/README.md"><summary>components/assessment/jobs/assessment_report/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: ecd99bc6b11d2839bba6c1ee3e0da2cb78a36a04424e725cb5b3c27476f23b1e</p><pre># Assessment report (`assessment_report`)
+</pre></details><details id="source-99ff8b3c84c663de" data-name="components/assessment/jobs/assessment_report/README.md"><summary>components/assessment/jobs/assessment_report/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: ecd99bc6b11d2839bba6c1ee3e0da2cb78a36a04424e725cb5b3c27476f23b1e</p><pre># Assessment report (`assessment_report`)
 
 Render the saved assessment comparison as a Quarto report. The report describes the fixed assumptions, convergence and bounds without refitting or claiming confidence intervals.
 
@@ -632,14 +633,24 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/record.json)
-</pre></details><details id="source-a00b8738bee21131" data-name="components/assessment/jobs/assessment_report/report.qmd"><summary>components/assessment/jobs/assessment_report/report.qmd</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 1f25d208a637a99b8ff90a12ae149da0ca802df64078ef6e802068df80514fce</p><pre>---
+</pre></details><details id="source-a00b8738bee21131" data-name="components/assessment/jobs/assessment_report/report.qmd"><summary>components/assessment/jobs/assessment_report/report.qmd</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: e99f6f4944e3cc812714443bed976cecce25628dec31fccec57e67fc493103e5</p><pre>---
 title: &quot;Surplus-production assessment report&quot;
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -716,14 +727,17 @@ endpoints &lt;- lapply(names(result$series), function(name) {
   list(case = name, year = row$year, B_over_K = row$B_over_K,
        harvest_rate = row$harvest_rate)
 })
-knitr::kable(rows_frame(endpoints), digits = 3)
+knitr::kable(rows_frame(endpoints), digits = 3,
+             col.names = c(&quot;Case&quot;, &quot;Year&quot;, &quot;B/K&quot;, &quot;Harvest rate&quot;))
 checks &lt;- lapply(result$diagnostics, function(row) {
   list(case = row$case, intrinsic_growth = row$r,
        biomass_balance_check = row$balance_check, feasibility = row$feasibility_check,
        gradient_check = row$gradient_check,
        boundary_fit = row$boundary_fit, convergence = row$convergence)
 })
-knitr::kable(rows_frame(checks), digits = 7)
+knitr::kable(rows_frame(checks), digits = 7,
+             col.names = c(&quot;Case&quot;, &quot;Growth (r)&quot;, &quot;Balance&quot;, &quot;Feasible&quot;,
+                           &quot;Gradient&quot;, &quot;Boundary&quot;, &quot;Convergence&quot;))
 ```
 
 Convergence, biomass balance and positive-biomass feasibility check the fitted
@@ -767,7 +781,12 @@ Produced in **`r record$run_id`**. Retained inputs keep their original producing
 if (!is.null(record$execution$provider)) {
   cat(&quot;Execution: &quot;, record$execution$provider, &quot;.\n\n&quot;, sep = &quot;&quot;)
 }
-cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+if (knitr::is_html_output()) {
+  cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+} else {
+  digest &lt;- sub(&quot;.*@sha256:&quot;, &quot;&quot;, record$software$container)
+  cat(&quot;Calculation image: `sha256:&quot;, substr(digest, 1, 12), &quot;…` (full digest in the run bundle).\n\n&quot;, sep = &quot;&quot;)
+}
 if (!is.null(record$software$container_url)) {
   cat(&quot;[Container package](&quot;, record$software$container_url, &quot;)\n\n&quot;, sep = &quot;&quot;)
 }
@@ -781,9 +800,9 @@ for (key in c(&quot;source&quot;, &quot;analysis_source&quot;)) {
 ```
 
 Annual values are available in the **Data** tab. Input files, settings, source versions and checksums are available in **Inputs &amp; versions** and the downloaded run. Rendering reads saved results and does not fit models again.
-</pre></details><details id="source-884f6e7449df6ef5" data-name="components/assessment/jobs/assessment_report/run.R"><summary>components/assessment/jobs/assessment_report/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 2d7054dfee0b4b029c4db2f2d847e1ce5c4a6e97c7d4b7f77189f119b9448baa</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
+</pre></details><details id="source-884f6e7449df6ef5" data-name="components/assessment/jobs/assessment_report/run.R"><summary>components/assessment/jobs/assessment_report/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 2d7054dfee0b4b029c4db2f2d847e1ce5c4a6e97c7d4b7f77189f119b9448baa</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
 calculate &lt;- function(context) context$parents$assessment_summary
-</pre></details><details id="source-09874b1edeafbc4d" data-name="components/assessment/jobs/assessment_summary/README.md"><summary>components/assessment/jobs/assessment_summary/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 0e7fdb79f1282b84e7c1519c0dfdc606e05ef592f1a68d135856df08485b3bb5</p><pre># Compare assessments (`assessment_summary`)
+</pre></details><details id="source-09874b1edeafbc4d" data-name="components/assessment/jobs/assessment_summary/README.md"><summary>components/assessment/jobs/assessment_summary/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 0e7fdb79f1282b84e7c1519c0dfdc606e05ef592f1a68d135856df08485b3bb5</p><pre># Compare assessments (`assessment_summary`)
 
 Compare the four fixed-growth Schaefer sensitivity cases, their biomass trajectories and fit diagnostics.
 
@@ -816,14 +835,14 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Assessment report (`assessment_report`)](../assessment_report/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_summary/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_summary/record.json)
-</pre></details><details id="source-17a62f95b5062b26" data-name="components/assessment/jobs/assessment_summary/run.R"><summary>components/assessment/jobs/assessment_summary/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 53197ec03051c810073b4fd23ec11bb2f5093efa1020250615ef8e0cb73d97ae</p><pre># Compare fixed-growth sensitivity cases without refitting them.
+</pre></details><details id="source-17a62f95b5062b26" data-name="components/assessment/jobs/assessment_summary/run.R"><summary>components/assessment/jobs/assessment_summary/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 53197ec03051c810073b4fd23ec11bb2f5093efa1020250615ef8e0cb73d97ae</p><pre># Compare fixed-growth sensitivity cases without refitting them.
 calculate &lt;- function(context) {
   keys &lt;- c(&quot;assessment_a1&quot;, &quot;assessment_a2&quot;, &quot;assessment_b1&quot;, &quot;assessment_b2&quot;)
   compare_series(context$parents[keys],
                  c(&quot;Assessment A1&quot;, &quot;Assessment A2&quot;, &quot;Assessment B1&quot;, &quot;Assessment B2&quot;),
                  assessment = TRUE)
 }
-</pre></details><details id="source-732be65178c4c484" data-name="components/assessment/jobs/prepare_a/README.md"><summary>components/assessment/jobs/prepare_a/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 740fe562f2f02eaae298d7f1f3454f36424d93cbd2d9d61ca10444b2602f8cf3</p><pre># Prepare inputs A (`prepare_a`)
+</pre></details><details id="source-732be65178c4c484" data-name="components/assessment/jobs/prepare_a/README.md"><summary>components/assessment/jobs/prepare_a/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 740fe562f2f02eaae298d7f1f3454f36424d93cbd2d9d61ca10444b2602f8cf3</p><pre># Prepare inputs A (`prepare_a`)
 
 Join CPUE index A to annual catches by year and reject an index year without a matching catch.
 
@@ -854,11 +873,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Assessment A1 (`assessment_a1`)](../assessment_a1/README.md), [Assessment A2 (`assessment_a2`)](../assessment_a2/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_a/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_a/record.json)
-</pre></details><details id="source-bb8a219338e80911" data-name="components/assessment/jobs/prepare_a/run.R"><summary>components/assessment/jobs/prepare_a/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9</p><pre># Join index A to annual removals by year before fitting the stock model.
+</pre></details><details id="source-bb8a219338e80911" data-name="components/assessment/jobs/prepare_a/run.R"><summary>components/assessment/jobs/prepare_a/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9</p><pre># Join index A to annual removals by year before fitting the stock model.
 calculate &lt;- function(context) {
   prepare_inputs(context$parents$cpue_a$series, context$parents$extract$catch)
 }
-</pre></details><details id="source-14d6190785a1733b" data-name="components/assessment/jobs/prepare_b/README.md"><summary>components/assessment/jobs/prepare_b/README.md</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: 9f17bbe76005a1e95534e228ae77635cf511dfaf97f7110c78af147400de966f</p><pre># Prepare inputs B (`prepare_b`)
+</pre></details><details id="source-14d6190785a1733b" data-name="components/assessment/jobs/prepare_b/README.md"><summary>components/assessment/jobs/prepare_b/README.md</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: 9f17bbe76005a1e95534e228ae77635cf511dfaf97f7110c78af147400de966f</p><pre># Prepare inputs B (`prepare_b`)
 
 Join CPUE index B to annual catches by year and reject an index year without a matching catch.
 
@@ -889,11 +908,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Assessment B1 (`assessment_b1`)](../assessment_b1/README.md), [Assessment B2 (`assessment_b2`)](../assessment_b2/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/record.json)
-</pre></details><details id="source-5013a1be8e97a1f9" data-name="components/assessment/jobs/prepare_b/run.R"><summary>components/assessment/jobs/prepare_b/run.R</summary><p class="muted">Recorded component revision: 5e71b8942a1f00d05c9acdd62ce095eb89b28e8f<br>SHA-256: f014a6e0133069991570cd0b5f3458b287652a915b198a50c7a3f247cf1243c4</p><pre># Join index B to annual removals by year before fitting the stock model.
+</pre></details><details id="source-5013a1be8e97a1f9" data-name="components/assessment/jobs/prepare_b/run.R"><summary>components/assessment/jobs/prepare_b/run.R</summary><p class="muted">Recorded component revision: 9b30d4f6d2afbaddc68ab31d83911b308037cb02<br>SHA-256: f014a6e0133069991570cd0b5f3458b287652a915b198a50c7a3f247cf1243c4</p><pre># Join index B to annual removals by year before fitting the stock model.
 calculate &lt;- function(context) {
   prepare_inputs(context$parents$cpue_b$series, context$parents$extract$catch)
 }
-</pre></details><details id="source-7c85bfb5530ad5fa" data-name="components/cpue/R/cpue.R"><summary>components/cpue/R/cpue.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: ce2bd70395062618a641bb94047993da7d8c34055260ac14010f909dae701a1e</p><pre># CPUE from public aggregate records, with the original synthetic example retained.
+</pre></details><details id="source-7c85bfb5530ad5fa" data-name="components/cpue/R/cpue.R"><summary>components/cpue/R/cpue.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: e1072e9ffde45764666ff932fe160b9daf505908f96aa18b8abff73d8e151f3f</p><pre># CPUE from public aggregate records, with the original synthetic example retained.
 
 describe_data &lt;- function(sets, catches) {
   check_sets(sets)
@@ -967,14 +986,23 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
                     &quot;The effort filter removed a year or stratum from the fixed prediction support.&quot;)
   data &lt;- data.frame(year = rows_values(rows, &quot;year&quot;),
                      stratum = rows_values(rows, &quot;stratum&quot;),
+                     quarter = rows_values(rows, &quot;quarter&quot;),
                      hooks = rows_values(rows, &quot;hooks&quot;), catch_n = rows_values(rows, &quot;catch_n&quot;))
   annual_catch &lt;- tapply(data$catch_n, data$year, sum)
   stratum_catch &lt;- tapply(data$catch_n, data$stratum, sum)
   require_condition(length(years) &gt; 1L &amp;&amp; all(annual_catch &gt; 0) &amp;&amp; all(stratum_catch &gt; 0),
                     &quot;The aggregate GLM requires at least two years and positive annual and stratum totals.&quot;)
   adjusted &lt;- stratum_effect &amp;&amp; length(strata) &gt; 1L
+  seasonal &lt;- !stratum_effect
+  quarter_catch &lt;- tapply(data$catch_n, data$quarter, sum)
+  if (seasonal) {
+    require_condition(length(quarter_catch) &gt; 1L &amp;&amp; all(quarter_catch &gt; 0),
+                      &quot;Quarter adjustment requires at least two quarters with positive catch totals.&quot;)
+  }
   formula &lt;- if (adjusted) {
     catch_n ~ factor(year) + factor(stratum) + offset(log(hooks / 1000))
+  } else if (seasonal) {
+    catch_n ~ factor(year) + factor(quarter) + offset(log(hooks / 1000))
   } else {
     catch_n ~ factor(year) + offset(log(hooks / 1000))
   }
@@ -988,6 +1016,10 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
                     &quot;The aggregate CPUE GLM did not converge to finite coefficients.&quot;)
   # The same strata and equal weights are used in every year&#x27;s response-scale mean.
   grid &lt;- expand.grid(year = years, stratum = strata, stringsAsFactors = FALSE)
+  if (seasonal) {
+    support &lt;- unique(data[c(&quot;stratum&quot;, &quot;quarter&quot;)])
+    grid$quarter &lt;- support$quarter[match(grid$stratum, support$stratum)]
+  }
   grid$hooks &lt;- 1000
   grid$weight &lt;- 1 / length(strata)
   grid$predicted_cpue &lt;- as.numeric(stats::predict(fit, newdata = grid, type = &quot;response&quot;))
@@ -1004,12 +1036,15 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
   stratum_score &lt;- if (adjusted) {
     max(abs(tapply(stats::fitted(fit), data$stratum, sum) / stratum_catch - 1))
   } else 0
-  residual &lt;- max(year_score, stratum_score)
+  quarter_score &lt;- if (seasonal) {
+    max(abs(tapply(stats::fitted(fit), data$quarter, sum) / quarter_catch - 1))
+  } else 0
+  residual &lt;- max(year_score, stratum_score, quarter_score)
   dispersion &lt;- sum(stats::residuals(fit, type = &quot;pearson&quot;)^2) / fit$df.residual
   require_condition(all(is.finite(index) &amp; index &gt; 0) &amp;&amp; residual &lt; 1e-7 &amp;&amp;
                       is.finite(dispersion) &amp;&amp; dispersion &gt;= 0,
                     &quot;The aggregate CPUE prediction, score or dispersion check failed.&quot;)
-  list(series = lapply(seq_along(years), function(i) {
+  result &lt;- list(series = lapply(seq_along(years), function(i) {
          list(year = years[i], index = index[i], standardised_cpue = predicted[i],
               nominal_cpue = nominal[i])
        }),
@@ -1018,7 +1053,7 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
        released_zero_rows = sum(data$catch_n == 0), min_hooks = min_hooks,
        data_kind = &quot;public-wcpfc&quot;, record_unit = &quot;Public fleet–cell–quarter aggregate record&quot;,
        method = if (adjusted) &quot;Quasipoisson GLM: year + cell–quarter stratum&quot; else
-         &quot;Quasipoisson GLM: year only&quot;,
+         if (seasonal) &quot;Quasipoisson GLM: year + quarter&quot; else &quot;Quasipoisson GLM: year only&quot;,
        formula = paste(deparse(formula, width.cutoff = 500), collapse = &quot; &quot;),
        iterations = fit$iter, converged = fit$converged, deviance = fit$deviance,
        dispersion = dispersion, dispersion_method = &quot;Pearson sum of squares / residual degrees of freedom&quot;,
@@ -1036,6 +1071,17 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
          &quot;Released zero counts are retained; absent or suppressed source values are not zero catch.&quot;,
          &quot;An effort filter can require additive-model predictions for omitted year–stratum cells.&quot;,
          &quot;This demonstration supplies no confidence intervals or official assessment advice.&quot;)))
+  if (seasonal) {
+    result$quarter_score_residual &lt;- quarter_score
+    first_grid &lt;- grid[grid$year == years[1], ]
+    quarter_weights &lt;- tapply(first_grid$weight, first_grid$quarter, sum)
+    result$quarter_weights &lt;- lapply(names(quarter_weights), function(quarter) {
+      list(quarter = as.integer(quarter), weight = unname(quarter_weights[quarter]))
+    })
+    result$limitations &lt;- c(result$limitations, list(
+      &quot;B adjusts for quarter only; quarter effects partly confound spatial differences on this support.&quot;))
+  }
+  result
 }
 
 cpue &lt;- function(sets, vessel_effect = TRUE, min_hooks = 0, stratum_effect = TRUE) {
@@ -1086,7 +1132,7 @@ cpue &lt;- function(sets, vessel_effect = TRUE, min_hooks = 0, stratum_effect = 
        reference_vessel = vessels[1], effort_unit = &quot;1000 hooks&quot;)
 }
 
-</pre></details><details id="source-3a605b1ca218e1cb" data-name="components/cpue/README.md"><summary>components/cpue/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 1889e9cb09ae381043fac26722c1a2cd7dafb3d1c7286b0ae2e284628053a80c</p><pre># Fisheries workflow: CPUE
+</pre></details><details id="source-3a605b1ca218e1cb" data-name="components/cpue/README.md"><summary>components/cpue/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 7027d6c20eaf9173a0dadb2cbb49ba70427d5e338058425118ee482867738c7d</p><pre># Fisheries workflow: CPUE
 
 This repository owns 8 of the 22 demonstration jobs: submission, quality check,
 database preparation, extraction, two CPUE analyses, comparison and reporting.
@@ -1099,11 +1145,12 @@ source row. The prepared profile covers six strata in 2000–2022: the initial
 snapshot ends in 2021, and the update adds 2022.
 
 [R/cpue.R](R/cpue.R) contains the calculations. Analysis A fits a quasipoisson
-GLM with year and cell–quarter effects; B fits year effects only. Both use a log
+GLM with year and cell–quarter effects; B fits year and quarter effects. Both use a log
 link and `log(hooks / 1000)` as an effort offset. Predictions at 1000 hooks are
 averaged over the same strata with equal weights in every year, then divided by
 the first-year prediction. Outputs preserve nominal CPUE, standardised CPUE,
-the prediction grid, weights and model checks. Released zeros are retained when
+the prediction grid, weights and model checks. Quarter effects partly confound
+spatial differences on this support. Released zeros are retained when
 supplied. An effort filter fails if it removes an entire year or stratum.
 
 Run [CPUE A](jobs/cpue_a/run.R) and [CPUE B](jobs/cpue_b/run.R) through the
@@ -1115,7 +1162,7 @@ The code originated in `kyuhank/fisheries-workflow-demo` commit
 `b6dc067d5346d3809edf0ad66a0f6c7e7d07ce93`; this version adds the public-data
 method and retains the synthetic year/vessel Poisson example.
 [SOURCE.json](SOURCE.json) records that origin and the current library checksum.
-</pre></details><details id="source-f4db6d330d6bd3d5" data-name="components/cpue/jobs/cpue_a/README.md"><summary>components/cpue/jobs/cpue_a/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 04c54f5067092a8ce62076fab146ba80f65465906800767c47a6dfa2465628de</p><pre># CPUE analysis A (`cpue_a`)
+</pre></details><details id="source-f4db6d330d6bd3d5" data-name="components/cpue/jobs/cpue_a/README.md"><summary>components/cpue/jobs/cpue_a/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 04c54f5067092a8ce62076fab146ba80f65465906800767c47a6dfa2465628de</p><pre># CPUE analysis A (`cpue_a`)
 
 Estimate annual CPUE with a quasipoisson GLM adjusting for year and cell–quarter stratum.
 
@@ -1148,17 +1195,17 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_a/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_a/record.json)
-</pre></details><details id="source-880a4fb68e72c8bf" data-name="components/cpue/jobs/cpue_a/run.R"><summary>components/cpue/jobs/cpue_a/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: b3077be9fa282c54d4769dc8142659cf6b1ae28c53155641651b4ed97af6d51e</p><pre># Public aggregate data: year and cell–quarter effects with an effort offset.
+</pre></details><details id="source-880a4fb68e72c8bf" data-name="components/cpue/jobs/cpue_a/run.R"><summary>components/cpue/jobs/cpue_a/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: b3077be9fa282c54d4769dc8142659cf6b1ae28c53155641651b4ed97af6d51e</p><pre># Public aggregate data: year and cell–quarter effects with an effort offset.
 # Synthetic inputs retain the original year/vessel Poisson example.
 calculate &lt;- function(context) {
   cpue(context$parents$extract$sets, vessel_effect = TRUE, stratum_effect = TRUE,
        min_hooks = context$settings$min_hooks_a)
 }
-</pre></details><details id="source-208c99374552d56a" data-name="components/cpue/jobs/cpue_b/README.md"><summary>components/cpue/jobs/cpue_b/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 45ece636622d1ac8554db53b550d9a4bc0d0538315bad6da04bf3b5e2c73f5f1</p><pre># CPUE analysis B (`cpue_b`)
+</pre></details><details id="source-208c99374552d56a" data-name="components/cpue/jobs/cpue_b/README.md"><summary>components/cpue/jobs/cpue_b/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 868aef369c303e6fd10d080796ea536cccbaea1bf7aff48b04e3f73235887627</p><pre># CPUE analysis B (`cpue_b`)
 
-Estimate the alternative annual CPUE index with a year-only quasipoisson GLM.
+Estimate the alternative annual CPUE index with a year-and-quarter quasipoisson GLM.
 
-**Path:** Catch and effort rows → year-only GLM → annual CPUE index B.
+**Path:** Catch and effort rows → year-and-quarter GLM → annual CPUE index B.
 
 **Inputs:** The aggregate `sets` rows in `runs/extract/output.json`.
 
@@ -1166,7 +1213,7 @@ Estimate the alternative annual CPUE index with a year-only quasipoisson GLM.
 
 **Settings:** No job-specific settings (`{}`).
 
-Use the same log(hooks / 1000) offset, prediction support and first-year normalisation as A, without a stratum effect. Saved output includes nominal and standardised fish per 1,000 hooks. Synthetic fixtures retain the year-only Poisson example.
+Use the same log(hooks / 1000) offset, prediction support and first-year normalisation as A, with quarter effects instead of cell–quarter effects. Quarter effects partly confound spatial differences on this support. Saved output includes nominal and standardised fish per 1,000 hooks. Synthetic fixtures retain the year-only Poisson example.
 
 From the repository root, run this job and prepare any required inputs:
 
@@ -1187,11 +1234,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/record.json)
-</pre></details><details id="source-84d82843d98d2bb3" data-name="components/cpue/jobs/cpue_b/run.R"><summary>components/cpue/jobs/cpue_b/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: ad9fdfbe8b375ff613e386792302523fae029a31e9f2ae6a26f2a2ad71edbd3d</p><pre># Year-only comparison with the same effort offset and first-year normalisation.
+</pre></details><details id="source-84d82843d98d2bb3" data-name="components/cpue/jobs/cpue_b/run.R"><summary>components/cpue/jobs/cpue_b/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 1f8c9f2bbfd112bfb3065ae50b33f1d27849f699507c3839fb92fdf8ec21fb92</p><pre># Quarter-adjusted comparison on public rows; synthetic fixtures retain year only.
 calculate &lt;- function(context) {
   cpue(context$parents$extract$sets, vessel_effect = FALSE, stratum_effect = FALSE)
 }
-</pre></details><details id="source-33750bd38f7d19a6" data-name="components/cpue/jobs/cpue_report/README.md"><summary>components/cpue/jobs/cpue_report/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 03f8534c6368e150ecf343a03b4ee9f0669e044a924917d156cd5c9cdc63a854</p><pre># CPUE report (`cpue_report`)
+</pre></details><details id="source-33750bd38f7d19a6" data-name="components/cpue/jobs/cpue_report/README.md"><summary>components/cpue/jobs/cpue_report/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 03f8534c6368e150ecf343a03b4ee9f0669e044a924917d156cd5c9cdc63a854</p><pre># CPUE report (`cpue_report`)
 
 Render the saved CPUE comparison as a Quarto report. The report reads the result and run record without refitting the GLMs.
 
@@ -1222,14 +1269,24 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/record.json)
-</pre></details><details id="source-4fc81cd41150c8d2" data-name="components/cpue/jobs/cpue_report/report.qmd"><summary>components/cpue/jobs/cpue_report/report.qmd</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 6abadaefa713856e016d1fbc5e54218dad76d770ad1f685bc3ea47783eaff6f0</p><pre>---
+</pre></details><details id="source-4fc81cd41150c8d2" data-name="components/cpue/jobs/cpue_report/report.qmd"><summary>components/cpue/jobs/cpue_report/report.qmd</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: bb24432e87f92dea53e7d26af42a3c47099584fc92fdbf185a51fd060e689c99</p><pre>---
 title: &quot;CPUE analysis report&quot;
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -1330,7 +1387,7 @@ if (!absolute_cpue) {
 plot_series(series, &quot;index&quot;, &quot;CPUE relative to first year&quot;)
 ```
 
-Each index is divided by its own first-year prediction (first year = 1). A adjusts for composition; B uses year effects only. B may use different records because the optional effort filter applies to A.
+Each index is divided by its own first-year prediction (first year = 1). `r if (public) &quot;A adjusts cell–quarter composition; B adjusts quarter only on the same fixed prediction support.&quot; else &quot;A adjusts vessel effects; B uses year effects only.&quot;` B may use different records because the optional effort filter applies to A.
 
 ## Methods and checks
 
@@ -1339,7 +1396,7 @@ Each index is divided by its own first-year prediction (first year = 1). A adjus
 if (public) {
   cat(&quot;The saved models are quasipoisson GLMs with a log link and &quot;,
       &quot;a `log(hooks / 1000)` offset. A adjusts for cell–quarter composition; &quot;,
-      &quot;B has year effects only. The source rows are fleet–cell–quarter aggregates, &quot;,
+      &quot;B adjusts quarter only; quarter effects partly confound spatial differences on this support. The source rows are fleet–cell–quarter aggregates, &quot;,
       &quot;not individual fishing sets.\n\n&quot;, sep = &quot;&quot;)
 } else if (length(result$analyses)) {
   cat(&quot;The saved synthetic models are Poisson GLMs with a log link and &quot;,
@@ -1374,7 +1431,7 @@ if (public &amp;&amp; length(analysis_a$weights)) {
     paste0(&quot;`&quot;, x$stratum, &quot;` (&quot;, format(x$weight, digits = 4), &quot;)&quot;)
   }, character(1))
   cat(&quot;\nA&#x27;s fixed prediction weights: &quot;, paste(weights, collapse = &quot;; &quot;), &quot;.\n\n&quot;,
-      &quot;Score error is the maximum relative difference between fitted and observed annual or stratum catch totals. &quot;,
+      &quot;Score error is the maximum relative difference between fitted and observed annual, stratum or quarter catch totals. &quot;,
       &quot;Dispersion is the Pearson sum of squares divided by residual degrees of freedom.\n\n&quot;, sep = &quot;&quot;)
 }
 ```
@@ -1411,9 +1468,9 @@ if (!is.null(record$source$repository) &amp;&amp; !is.null(record$source$commit)
 }
 cat(&quot;\n\n&quot;)
 ```
-</pre></details><details id="source-aa7035334f104e80" data-name="components/cpue/jobs/cpue_report/run.R"><summary>components/cpue/jobs/cpue_report/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 71deefbab947d096f044d675691d1640e6a2b16276ce100017ee4d91a32d3694</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
+</pre></details><details id="source-aa7035334f104e80" data-name="components/cpue/jobs/cpue_report/run.R"><summary>components/cpue/jobs/cpue_report/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 71deefbab947d096f044d675691d1640e6a2b16276ce100017ee4d91a32d3694</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
 calculate &lt;- function(context) context$parents$cpue_summary
-</pre></details><details id="source-97efe04723f6af95" data-name="components/cpue/jobs/cpue_summary/README.md"><summary>components/cpue/jobs/cpue_summary/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: d67c2ef35bca4cad27f4ffcb7ab23c0dd24447e5b72a0ab73a31958eeaced82b</p><pre># Compare CPUE results (`cpue_summary`)
+</pre></details><details id="source-97efe04723f6af95" data-name="components/cpue/jobs/cpue_summary/README.md"><summary>components/cpue/jobs/cpue_summary/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 5c86b68010c6272aa176de5922803a7a5c06dd33ab30cfbf92d8374d06b1beee</p><pre># Compare CPUE results (`cpue_summary`)
 
 Compare the two saved CPUE indices without fitting another model.
 
@@ -1425,7 +1482,7 @@ Compare the two saved CPUE indices without fitting another model.
 
 **Settings:** No job-specific settings (`{}`).
 
-The result preserves both producing methods, prediction support, weights, units and checks. A uses a cell–quarter adjustment; B uses year only.
+The result preserves both producing methods, prediction support, weights, units and checks. A uses a cell–quarter adjustment; B adjusts for quarter only.
 
 From the repository root, run this job and prepare any required inputs:
 
@@ -1446,7 +1503,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [CPUE report (`cpue_report`)](../cpue_report/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_summary/record.json)
-</pre></details><details id="source-050eba4c8e4e3243" data-name="components/cpue/jobs/cpue_summary/run.R"><summary>components/cpue/jobs/cpue_summary/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: c5034f2d8c16433cea975939eae287a39e348b5373776df8057268f696815aed</p><pre># Preserve both index series and the actual method and prediction support.
+</pre></details><details id="source-050eba4c8e4e3243" data-name="components/cpue/jobs/cpue_summary/run.R"><summary>components/cpue/jobs/cpue_summary/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: c5034f2d8c16433cea975939eae287a39e348b5373776df8057268f696815aed</p><pre># Preserve both index series and the actual method and prediction support.
 calculate &lt;- function(context) {
   analyses &lt;- context$parents[c(&quot;cpue_a&quot;, &quot;cpue_b&quot;)]
   titles &lt;- c(&quot;CPUE analysis A&quot;, &quot;CPUE analysis B&quot;)
@@ -1457,7 +1514,7 @@ calculate &lt;- function(context) {
   result$data_kind &lt;- analyses[[1]]$data_kind
   result
 }
-</pre></details><details id="source-3e0f78331c276b02" data-name="components/cpue/jobs/database/README.md"><summary>components/cpue/jobs/database/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: bf4d7f23f359e1d0f4add7dad45530c5ddf5c4747d161b2bfa90f22a14346127</p><pre># Prepare and load (`database`)
+</pre></details><details id="source-3e0f78331c276b02" data-name="components/cpue/jobs/database/README.md"><summary>components/cpue/jobs/database/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: bf4d7f23f359e1d0f4add7dad45530c5ddf5c4747d161b2bfa90f22a14346127</p><pre># Prepare and load (`database`)
 
 Check the accepted records and calculate snapshot coverage in R. The coordinator stores these same records in the SQLite snapshot.
 
@@ -1489,7 +1546,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Extract data (`extract`)](../extract/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/database/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/database/record.json)
-</pre></details><details id="source-db294f72e7da2254" data-name="components/cpue/jobs/database/run.R"><summary>components/cpue/jobs/database/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 915ca2f3d3252bfd6a73b6569734ff709648afcb557b15a6f5dab6bbb6a688be</p><pre># QC is the scheduling gate; accepted submission rows are the calculation input.
+</pre></details><details id="source-db294f72e7da2254" data-name="components/cpue/jobs/database/run.R"><summary>components/cpue/jobs/database/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 915ca2f3d3252bfd6a73b6569734ff709648afcb557b15a6f5dab6bbb6a688be</p><pre># QC is the scheduling gate; accepted submission rows are the calculation input.
 # The coordinator writes these same rows to the SQLite snapshot.
 calculate &lt;- function(context) {
   accepted &lt;- context$parents$submission
@@ -1497,7 +1554,7 @@ calculate &lt;- function(context) {
   summary &lt;- describe_data(accepted$sets, accepted$catch)
   c(list(rows = length(years), first_year = min(years), last_year = max(years)), summary)
 }
-</pre></details><details id="source-0ea1f542ed655cbe" data-name="components/cpue/jobs/extract/README.md"><summary>components/cpue/jobs/extract/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 74b6f2f8be9fe16fb627db6939ad0087d2c9eaf977248e69b39379ae4ab60460</p><pre># Extract data (`extract`)
+</pre></details><details id="source-0ea1f542ed655cbe" data-name="components/cpue/jobs/extract/README.md"><summary>components/cpue/jobs/extract/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 74b6f2f8be9fe16fb627db6939ad0087d2c9eaf977248e69b39379ae4ab60460</p><pre># Extract data (`extract`)
 
 Use recorded SQLite queries to select the fixed CPUE support and annual catches.
 
@@ -1530,7 +1587,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [CPUE analysis A (`cpue_a`)](../cpue_a/README.md), [CPUE analysis B (`cpue_b`)](../cpue_b/README.md), [Prepare inputs A (`prepare_a`)](../prepare_a/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/extract/record.json)
-</pre></details><details id="source-136b7fa8501357d9" data-name="components/cpue/jobs/extract/run.R"><summary>components/cpue/jobs/extract/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 8c94e3379ec3360fb77c6fa216fa4ab67f0392040ddb842fc96e90a3a69759ce</p><pre># These rows must come from the coordinator&#x27;s real snapshot SQLite queries.
+</pre></details><details id="source-136b7fa8501357d9" data-name="components/cpue/jobs/extract/run.R"><summary>components/cpue/jobs/extract/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 8c94e3379ec3360fb77c6fa216fa4ab67f0392040ddb842fc96e90a3a69759ce</p><pre># These rows must come from the coordinator&#x27;s real snapshot SQLite queries.
 calculate &lt;- function(context) {
   extracted &lt;- context$extracted
   require_condition(!is.null(extracted) &amp;&amp; is.character(extracted$sql),
@@ -1542,7 +1599,7 @@ calculate &lt;- function(context) {
   if (!is.null(extracted$metadata)) result$metadata &lt;- extracted$metadata
   result
 }
-</pre></details><details id="source-b88076d35f807756" data-name="components/cpue/jobs/qc/README.md"><summary>components/cpue/jobs/qc/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: f2b8f741379b1185c589007cb395daef37ce83a19c3b03041a7e4cf2679fd41a</p><pre># Quality check (`qc`)
+</pre></details><details id="source-b88076d35f807756" data-name="components/cpue/jobs/qc/README.md"><summary>components/cpue/jobs/qc/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: f2b8f741379b1185c589007cb395daef37ce83a19c3b03041a7e4cf2679fd41a</p><pre># Quality check (`qc`)
 
 Check positive effort, non-negative released catch and unique source-row IDs.
 
@@ -1575,7 +1632,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Prepare and load (`database`)](../database/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/qc/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/qc/record.json)
-</pre></details><details id="source-eae4fb227a2ba384" data-name="components/cpue/jobs/qc/run.R"><summary>components/cpue/jobs/qc/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 9737e611cdc352101b32c8b7e829e9fedb6842a5a2365da48735ba021a2c71bc</p><pre># Correct invalid synthetic effort from the raw supplied rows, if required.
+</pre></details><details id="source-eae4fb227a2ba384" data-name="components/cpue/jobs/qc/run.R"><summary>components/cpue/jobs/qc/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 9737e611cdc352101b32c8b7e829e9fedb6842a5a2365da48735ba021a2c71bc</p><pre># Correct invalid synthetic effort from the raw supplied rows, if required.
 calculate &lt;- function(context) {
   submission &lt;- context$parents$submission
   invalid &lt;- Filter(function(row) row$hooks &lt;= 0 || row$catch_n &lt; 0, submission$sets)
@@ -1594,7 +1651,7 @@ calculate &lt;- function(context) {
   }
   result
 }
-</pre></details><details id="source-965fba0529ae9461" data-name="components/cpue/jobs/submission/README.md"><summary>components/cpue/jobs/submission/README.md</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: b025ba89f1d2b89126a3f3f95b5241cee04ceb6b728084f82eb2fbf0c33f760b</p><pre># Data submission (`submission`)
+</pre></details><details id="source-965fba0529ae9461" data-name="components/cpue/jobs/submission/README.md"><summary>components/cpue/jobs/submission/README.md</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: b025ba89f1d2b89126a3f3f95b5241cee04ceb6b728084f82eb2fbf0c33f760b</p><pre># Data submission (`submission`)
 
 Select the requested years from the supplied public catch and effort records.
 
@@ -1627,14 +1684,14 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Quality check (`qc`)](../qc/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/record.json)
-</pre></details><details id="source-78dc29451883991c" data-name="components/cpue/jobs/submission/run.R"><summary>components/cpue/jobs/submission/run.R</summary><p class="muted">Recorded component revision: d2b313016f138a3eac8e8841390f035c53c0167d<br>SHA-256: 265e9b83beb85e729b168f3939365bdd28e7b514e2eb90438a09c705491a2472</p><pre># Assemble supplied records; the invalid-effort correction is a synthetic example.
+</pre></details><details id="source-78dc29451883991c" data-name="components/cpue/jobs/submission/run.R"><summary>components/cpue/jobs/submission/run.R</summary><p class="muted">Recorded component revision: 6ae03144434e26a8e70a403f4384bf8251b4eb8f<br>SHA-256: 265e9b83beb85e729b168f3939365bdd28e7b514e2eb90438a09c705491a2472</p><pre># Assemble supplied records; the invalid-effort correction is a synthetic example.
 calculate &lt;- function(context) {
   result &lt;- source_rows(context$source, context$settings$last_year)
   require_condition(length(result$sets) &gt; 0, &quot;No submission records supplied.&quot;)
   if (is.null(result$sets[[1]]$stratum)) result$sets[[1]]$hooks &lt;- 0
   result
 }
-</pre></details><details id="source-07c72af50ce4463b" data-name="components/mse/R/mse.R"><summary>components/mse/R/mse.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956</p><pre># Small closed-loop trials around the fitted Schaefer cases.
+</pre></details><details id="source-07c72af50ce4463b" data-name="components/mse/R/mse.R"><summary>components/mse/R/mse.R</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956</p><pre># Small closed-loop trials around the fitted Schaefer cases.
 # Common recorded growth/observation errors let the three rules face the same trials.
 
 MSE_CASES &lt;- c(&quot;assessment_a1&quot;, &quot;assessment_a2&quot;, &quot;assessment_b1&quot;, &quot;assessment_b2&quot;)
@@ -1886,7 +1943,7 @@ mse_summarise &lt;- function(results) {
        limitations = first$limitations, boundary_cases = first$boundary_cases, scope = first$scope,
        scenarios = scenarios, examples = setNames(lapply(by_rule, function(result) result$example), rule_names))
 }
-</pre></details><details id="source-4dbf30b5fc6c49a1" data-name="components/mse/README.md"><summary>components/mse/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 3b3715613cc285bfe68119c7bf9dffcd8d65836798eb14f085b2ed6a0090e14c</p><pre># Fisheries workflow MSE example
+</pre></details><details id="source-4dbf30b5fc6c49a1" data-name="components/mse/README.md"><summary>components/mse/README.md</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 3b3715613cc285bfe68119c7bf9dffcd8d65836798eb14f085b2ed6a0090e14c</p><pre># Fisheries workflow MSE example
 
 These six jobs prepare common future trials, test constant catch, an index rule
 and a buffered rule, then compare their catch, biomass and catch stability.
@@ -1916,7 +1973,7 @@ rerunning trials and keeps detailed metrics, assumptions and source records.
 [SOURCE.json](SOURCE.json) records the calculation library&#x27;s baseline origin and
 SHA-256. The R library and calculation entry points retain those source bytes;
 the report and reader guides have been revised for the public-data example.
-</pre></details><details id="source-50bbf43f1460cb4f" data-name="components/mse/jobs/mse_buffered/README.md"><summary>components/mse/jobs/mse_buffered/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 46c88f7e32e0936bc23e41425d0522b5ff6b98f13a1dec8c6860a1faa259fcbc</p><pre># Buffered rule (`mse_buffered`)
+</pre></details><details id="source-50bbf43f1460cb4f" data-name="components/mse/jobs/mse_buffered/README.md"><summary>components/mse/jobs/mse_buffered/README.md</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 46c88f7e32e0936bc23e41425d0522b5ff6b98f13a1dec8c6860a1faa259fcbc</p><pre># Buffered rule (`mse_buffered`)
 
 Test index-based catch steps with the selected buffer and a 15% annual advice-change limit in the common seeded Schaefer management trials.
 
@@ -1949,12 +2006,12 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_buffered/record.json)
-</pre></details><details id="source-dcd7c940c7f1485d" data-name="components/mse/jobs/mse_buffered/run.R"><summary>components/mse/jobs/mse_buffered/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: db2b1a36dbbe4a60dffbe52fbb407e958f8d6c0282ae30fb5e5f62f10614919d</p><pre># Apply index steps, the selected buffer and a 15% annual advice-change limit.
+</pre></details><details id="source-dcd7c940c7f1485d" data-name="components/mse/jobs/mse_buffered/run.R"><summary>components/mse/jobs/mse_buffered/run.R</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: db2b1a36dbbe4a60dffbe52fbb407e958f8d6c0282ae30fb5e5f62f10614919d</p><pre># Apply index steps, the selected buffer and a 15% annual advice-change limit.
 calculate &lt;- function(context) {
   mse_simulate(context$parents$mse_prepare, rule = &quot;buffered&quot;,
                buffer = context$settings$mse_buffer)
 }
-</pre></details><details id="source-a67dcce55038e73a" data-name="components/mse/jobs/mse_constant/README.md"><summary>components/mse/jobs/mse_constant/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 432d29561f7c1fd07172f7c26384ad3bc4b06ccf6a8dd3cffc9cf8c4a2458ec5</p><pre># Constant catch (`mse_constant`)
+</pre></details><details id="source-a67dcce55038e73a" data-name="components/mse/jobs/mse_constant/README.md"><summary>components/mse/jobs/mse_constant/README.md</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 432d29561f7c1fd07172f7c26384ad3bc4b06ccf6a8dd3cffc9cf8c4a2458ec5</p><pre># Constant catch (`mse_constant`)
 
 Test fixed advice equal to recent mean catch in the common seeded Schaefer management trials.
 
@@ -1987,11 +2044,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_constant/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_constant/record.json)
-</pre></details><details id="source-1a63cd8d1b64a79f" data-name="components/mse/jobs/mse_constant/run.R"><summary>components/mse/jobs/mse_constant/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 46cfef42dfdde27d8373c99aedea76133ae3529dc7284e24ed6c94536b616ee7</p><pre># Hold annual advice at recent mean catch in the common management trials.
+</pre></details><details id="source-1a63cd8d1b64a79f" data-name="components/mse/jobs/mse_constant/run.R"><summary>components/mse/jobs/mse_constant/run.R</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 46cfef42dfdde27d8373c99aedea76133ae3529dc7284e24ed6c94536b616ee7</p><pre># Hold annual advice at recent mean catch in the common management trials.
 calculate &lt;- function(context) {
   mse_simulate(context$parents$mse_prepare, rule = &quot;constant&quot;)
 }
-</pre></details><details id="source-63d62edac076ce63" data-name="components/mse/jobs/mse_index/README.md"><summary>components/mse/jobs/mse_index/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 362fc92f3328d622a3cc09fd78ecca2e536539f219d3b584da262a14f2c26a91</p><pre># Index rule (`mse_index`)
+</pre></details><details id="source-63d62edac076ce63" data-name="components/mse/jobs/mse_index/README.md"><summary>components/mse/jobs/mse_index/README.md</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 362fc92f3328d622a3cc09fd78ecca2e536539f219d3b584da262a14f2c26a91</p><pre># Index rule (`mse_index`)
 
 Test advice proportional to the three-year mean observed abundance index in the common seeded Schaefer management trials.
 
@@ -2024,11 +2081,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/record.json)
-</pre></details><details id="source-4242f5e7f7023503" data-name="components/mse/jobs/mse_index/run.R"><summary>components/mse/jobs/mse_index/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: d741a44bc969af921f6ab385bd5ed0a1569d80336770634b9f3d90ef99f938d5</p><pre># Update advice from the three-year mean observed index in the common trials.
+</pre></details><details id="source-4242f5e7f7023503" data-name="components/mse/jobs/mse_index/run.R"><summary>components/mse/jobs/mse_index/run.R</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: d741a44bc969af921f6ab385bd5ed0a1569d80336770634b9f3d90ef99f938d5</p><pre># Update advice from the three-year mean observed index in the common trials.
 calculate &lt;- function(context) {
   mse_simulate(context$parents$mse_prepare, rule = &quot;index&quot;)
 }
-</pre></details><details id="source-28bd801835dbf411" data-name="components/mse/jobs/mse_prepare/README.md"><summary>components/mse/jobs/mse_prepare/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 2f09f955114c1eb07332e5f598e8c85050dd87f8304ece945e44b07137dd4788</p><pre># Prepare MSE (`mse_prepare`)
+</pre></details><details id="source-28bd801835dbf411" data-name="components/mse/jobs/mse_prepare/README.md"><summary>components/mse/jobs/mse_prepare/README.md</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 2f09f955114c1eb07332e5f598e8c85050dd87f8304ece945e44b07137dd4788</p><pre># Prepare MSE (`mse_prepare`)
 
 Reconstruct next-year Schaefer stocks after the terminal assessment catch, then prepare common seeded growth and observation errors once for all three management rules.
 
@@ -2061,9 +2118,9 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Constant catch (`mse_constant`)](../mse_constant/README.md), [Index rule (`mse_index`)](../mse_index/README.md), [Buffered rule (`mse_buffered`)](../mse_buffered/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_prepare/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_prepare/record.json)
-</pre></details><details id="source-f8ead33ecd395c4b" data-name="components/mse/jobs/mse_prepare/run.R"><summary>components/mse/jobs/mse_prepare/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: dae23c4c405f5ac70aa64947d5a8c503e2c3e765d176d4c7fe7fe68d64a18cae</p><pre># Reconstruct next-year stocks and prepare paired seeded R error vectors once.
+</pre></details><details id="source-f8ead33ecd395c4b" data-name="components/mse/jobs/mse_prepare/run.R"><summary>components/mse/jobs/mse_prepare/run.R</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: dae23c4c405f5ac70aa64947d5a8c503e2c3e765d176d4c7fe7fe68d64a18cae</p><pre># Reconstruct next-year stocks and prepare paired seeded R error vectors once.
 calculate &lt;- function(context) mse_prepare(context$parents[MSE_CASES])
-</pre></details><details id="source-28d1d9c7c37531be" data-name="components/mse/jobs/mse_report/README.md"><summary>components/mse/jobs/mse_report/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 33bd44d0e91d2f48c5bd366e7f24bac8040bc51202857f9a071b385e34bc0f5a</p><pre># MSE report (`mse_report`)
+</pre></details><details id="source-28d1d9c7c37531be" data-name="components/mse/jobs/mse_report/README.md"><summary>components/mse/jobs/mse_report/README.md</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 33bd44d0e91d2f48c5bd366e7f24bac8040bc51202857f9a071b385e34bc0f5a</p><pre># MSE report (`mse_report`)
 
 Render the saved management-trial comparison as a Quarto report. Trial fractions describe this conditional illustration; they are not validated risk estimates.
 
@@ -2096,14 +2153,24 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/record.json)
-</pre></details><details id="source-fe6cc12cd2ef0a8a" data-name="components/mse/jobs/mse_report/report.qmd"><summary>components/mse/jobs/mse_report/report.qmd</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: a88509df77e13ebea300c1301a5bc8f5fd58d8be37b6eca2e64c323d01f82aa5</p><pre>---
+</pre></details><details id="source-fe6cc12cd2ef0a8a" data-name="components/mse/jobs/mse_report/report.qmd"><summary>components/mse/jobs/mse_report/report.qmd</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: cc33933f02ed22b76f1e373f2af315d2f88d169c8774d263cb9dff17ab67eafb</p><pre>---
 title: &quot;Management strategy comparison report&quot;
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -2186,7 +2253,9 @@ metrics &lt;- lapply(result$metrics, function(row) {
        below_threshold_percent = row$below_threshold_percent,
        catch_change_percent = row$catch_change_percent)
 })
-knitr::kable(rows_frame(metrics), digits = 3)
+knitr::kable(rows_frame(metrics), digits = 3,
+             col.names = c(&quot;Rule&quot;, &quot;Mean catch (t/year)&quot;, &quot;Final B/K&quot;,
+                           &quot;Trials below 0.2 (%)&quot;, &quot;Catch change (%)&quot;))
 ```
 
 Mean catch is in tonnes per year; final B/K is the median across trials. The
@@ -2279,7 +2348,12 @@ Produced in **`r record$run_id`**. Retained inputs keep their original producing
 if (!is.null(record$execution$provider)) {
   cat(&quot;Execution: &quot;, record$execution$provider, &quot;.\n\n&quot;, sep = &quot;&quot;)
 }
-cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+if (knitr::is_html_output()) {
+  cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+} else {
+  digest &lt;- sub(&quot;.*@sha256:&quot;, &quot;&quot;, record$software$container)
+  cat(&quot;Calculation image: `sha256:&quot;, substr(digest, 1, 12), &quot;…` (full digest in the run bundle).\n\n&quot;, sep = &quot;&quot;)
+}
 if (!is.null(record$software$container_url)) {
   cat(&quot;[Container package](&quot;, record$software$container_url, &quot;)\n\n&quot;, sep = &quot;&quot;)
 }
@@ -2293,9 +2367,9 @@ for (key in c(&quot;source&quot;, &quot;analysis_source&quot;)) {
 ```
 
 Annual values are available in the **Data** tab. Input files, settings, source versions and checksums are available in **Inputs &amp; versions** and the downloaded run. Rendering reads saved results and does not fit models again.
-</pre></details><details id="source-9111b28c2fc8be38" data-name="components/mse/jobs/mse_report/run.R"><summary>components/mse/jobs/mse_report/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 0e4bc6fe0a570a0316bbea5bb6a1bcd375dc6c150f5b5e4c7b702cb24e4ad174</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
+</pre></details><details id="source-9111b28c2fc8be38" data-name="components/mse/jobs/mse_report/run.R"><summary>components/mse/jobs/mse_report/run.R</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 0e4bc6fe0a570a0316bbea5bb6a1bcd375dc6c150f5b5e4c7b702cb24e4ad174</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
 calculate &lt;- function(context) context$parents$mse_summary
-</pre></details><details id="source-92e90be2d84c73e6" data-name="components/mse/jobs/mse_summary/README.md"><summary>components/mse/jobs/mse_summary/README.md</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 18c116bed5b5644b1260715da4a8db190f4aad44eb80559c5dcb4a2a3b9f3200</p><pre># MSE results summary (`mse_summary`)
+</pre></details><details id="source-92e90be2d84c73e6" data-name="components/mse/jobs/mse_summary/README.md"><summary>components/mse/jobs/mse_summary/README.md</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 18c116bed5b5644b1260715da4a8db190f4aad44eb80559c5dcb4a2a3b9f3200</p><pre># MSE results summary (`mse_summary`)
 
 Compare the three rules only when fitted stocks, scenarios and the actual saved error vectors match. Summarise catches, biomass and catch stability.
 
@@ -2328,11 +2402,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [MSE report (`mse_report`)](../mse_report/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_summary/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_summary/record.json)
-</pre></details><details id="source-2a281783e8105cdb" data-name="components/mse/jobs/mse_summary/run.R"><summary>components/mse/jobs/mse_summary/run.R</summary><p class="muted">Recorded component revision: cb0bbbc3d2bfde0593599bcaba8b3f2ba4d54735<br>SHA-256: 09719a18af53a22a4fce05e5f6d833e6adeedaa1dd2d4461b76e8cd7861627bc</p><pre># Compare rules only when their stocks, scenarios and actual error vectors match.
+</pre></details><details id="source-2a281783e8105cdb" data-name="components/mse/jobs/mse_summary/run.R"><summary>components/mse/jobs/mse_summary/run.R</summary><p class="muted">Recorded component revision: af0aac308321d7111b5c49b84e00a00188a5e769<br>SHA-256: 09719a18af53a22a4fce05e5f6d833e6adeedaa1dd2d4461b76e8cd7861627bc</p><pre># Compare rules only when their stocks, scenarios and actual error vectors match.
 calculate &lt;- function(context) {
   mse_summarise(context$parents[c(&quot;mse_constant&quot;, &quot;mse_index&quot;, &quot;mse_buffered&quot;)])
 }
-</pre></details><details id="source-2b100e75b5a85c94" data-name="jobs/README.md"><summary>jobs/README.md</summary><p class="muted"><br>SHA-256: 396369405c43c1eb2a35c5bfa0c70e7270d46decce86d7ae131c5d94510c2f7b</p><pre># Jobs and their connections
+</pre></details><details id="source-2b100e75b5a85c94" data-name="jobs/README.md"><summary>jobs/README.md</summary><p class="muted"><br>SHA-256: ea5a7a4175c7ac2471a1716ffc83ad77f82bc8bbe607739345e3ee2785f4864b</p><pre># Jobs and their connections
 
 The 22 jobs pass public catch and effort data through CPUE, assessment and MSE.
 Each guide states its input → method → output path. The calculations use
@@ -2420,7 +2494,7 @@ the recorded container. `OUTPUT=DIR` selects the result directory;
 | File | Contents |
 | --- | --- |
 | `runs/cpue_a/output.json` | numerical result and method metadata |
-| `runs/cpue_a/report.html` | readable result page |
+| `runs/cpue_a/report.pdf` | compiled Quarto result PDF |
 | `runs/cpue_a/record.json` | input producers, settings, exact code and software |
 | `runs/database/snapshot.sqlite` | accepted data snapshot |
 | `runs/state.json` | execution state and events |
@@ -2634,14 +2708,24 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/record.json)
-</pre></details><details id="source-509c8d2ac638a4e6" data-name="jobs/assessment_report/report.qmd"><summary>jobs/assessment_report/report.qmd</summary><p class="muted"><br>SHA-256: 1f25d208a637a99b8ff90a12ae149da0ca802df64078ef6e802068df80514fce</p><pre>---
+</pre></details><details id="source-509c8d2ac638a4e6" data-name="jobs/assessment_report/report.qmd"><summary>jobs/assessment_report/report.qmd</summary><p class="muted"><br>SHA-256: e99f6f4944e3cc812714443bed976cecce25628dec31fccec57e67fc493103e5</p><pre>---
 title: &quot;Surplus-production assessment report&quot;
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -2718,14 +2802,17 @@ endpoints &lt;- lapply(names(result$series), function(name) {
   list(case = name, year = row$year, B_over_K = row$B_over_K,
        harvest_rate = row$harvest_rate)
 })
-knitr::kable(rows_frame(endpoints), digits = 3)
+knitr::kable(rows_frame(endpoints), digits = 3,
+             col.names = c(&quot;Case&quot;, &quot;Year&quot;, &quot;B/K&quot;, &quot;Harvest rate&quot;))
 checks &lt;- lapply(result$diagnostics, function(row) {
   list(case = row$case, intrinsic_growth = row$r,
        biomass_balance_check = row$balance_check, feasibility = row$feasibility_check,
        gradient_check = row$gradient_check,
        boundary_fit = row$boundary_fit, convergence = row$convergence)
 })
-knitr::kable(rows_frame(checks), digits = 7)
+knitr::kable(rows_frame(checks), digits = 7,
+             col.names = c(&quot;Case&quot;, &quot;Growth (r)&quot;, &quot;Balance&quot;, &quot;Feasible&quot;,
+                           &quot;Gradient&quot;, &quot;Boundary&quot;, &quot;Convergence&quot;))
 ```
 
 Convergence, biomass balance and positive-biomass feasibility check the fitted
@@ -2769,7 +2856,12 @@ Produced in **`r record$run_id`**. Retained inputs keep their original producing
 if (!is.null(record$execution$provider)) {
   cat(&quot;Execution: &quot;, record$execution$provider, &quot;.\n\n&quot;, sep = &quot;&quot;)
 }
-cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+if (knitr::is_html_output()) {
+  cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+} else {
+  digest &lt;- sub(&quot;.*@sha256:&quot;, &quot;&quot;, record$software$container)
+  cat(&quot;Calculation image: `sha256:&quot;, substr(digest, 1, 12), &quot;…` (full digest in the run bundle).\n\n&quot;, sep = &quot;&quot;)
+}
 if (!is.null(record$software$container_url)) {
   cat(&quot;[Container package](&quot;, record$software$container_url, &quot;)\n\n&quot;, sep = &quot;&quot;)
 }
@@ -2864,11 +2956,11 @@ calculate &lt;- function(context) {
   cpue(context$parents$extract$sets, vessel_effect = TRUE, stratum_effect = TRUE,
        min_hooks = context$settings$min_hooks_a)
 }
-</pre></details><details id="source-47d05843bc2cd7f8" data-name="jobs/cpue_b/README.md"><summary>jobs/cpue_b/README.md</summary><p class="muted"><br>SHA-256: 45ece636622d1ac8554db53b550d9a4bc0d0538315bad6da04bf3b5e2c73f5f1</p><pre># CPUE analysis B (`cpue_b`)
+</pre></details><details id="source-47d05843bc2cd7f8" data-name="jobs/cpue_b/README.md"><summary>jobs/cpue_b/README.md</summary><p class="muted"><br>SHA-256: 868aef369c303e6fd10d080796ea536cccbaea1bf7aff48b04e3f73235887627</p><pre># CPUE analysis B (`cpue_b`)
 
-Estimate the alternative annual CPUE index with a year-only quasipoisson GLM.
+Estimate the alternative annual CPUE index with a year-and-quarter quasipoisson GLM.
 
-**Path:** Catch and effort rows → year-only GLM → annual CPUE index B.
+**Path:** Catch and effort rows → year-and-quarter GLM → annual CPUE index B.
 
 **Inputs:** The aggregate `sets` rows in `runs/extract/output.json`.
 
@@ -2876,7 +2968,7 @@ Estimate the alternative annual CPUE index with a year-only quasipoisson GLM.
 
 **Settings:** No job-specific settings (`{}`).
 
-Use the same log(hooks / 1000) offset, prediction support and first-year normalisation as A, without a stratum effect. Saved output includes nominal and standardised fish per 1,000 hooks. Synthetic fixtures retain the year-only Poisson example.
+Use the same log(hooks / 1000) offset, prediction support and first-year normalisation as A, with quarter effects instead of cell–quarter effects. Quarter effects partly confound spatial differences on this support. Saved output includes nominal and standardised fish per 1,000 hooks. Synthetic fixtures retain the year-only Poisson example.
 
 From the repository root, run this job and prepare any required inputs:
 
@@ -2897,7 +2989,7 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md).
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/record.json)
-</pre></details><details id="source-e447f62836a95583" data-name="jobs/cpue_b/run.R"><summary>jobs/cpue_b/run.R</summary><p class="muted"><br>SHA-256: ad9fdfbe8b375ff613e386792302523fae029a31e9f2ae6a26f2a2ad71edbd3d</p><pre># Year-only comparison with the same effort offset and first-year normalisation.
+</pre></details><details id="source-e447f62836a95583" data-name="jobs/cpue_b/run.R"><summary>jobs/cpue_b/run.R</summary><p class="muted"><br>SHA-256: 1f8c9f2bbfd112bfb3065ae50b33f1d27849f699507c3839fb92fdf8ec21fb92</p><pre># Quarter-adjusted comparison on public rows; synthetic fixtures retain year only.
 calculate &lt;- function(context) {
   cpue(context$parents$extract$sets, vessel_effect = FALSE, stratum_effect = FALSE)
 }
@@ -2932,14 +3024,24 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/record.json)
-</pre></details><details id="source-d7e70940e0a652c1" data-name="jobs/cpue_report/report.qmd"><summary>jobs/cpue_report/report.qmd</summary><p class="muted"><br>SHA-256: 6abadaefa713856e016d1fbc5e54218dad76d770ad1f685bc3ea47783eaff6f0</p><pre>---
+</pre></details><details id="source-d7e70940e0a652c1" data-name="jobs/cpue_report/report.qmd"><summary>jobs/cpue_report/report.qmd</summary><p class="muted"><br>SHA-256: bb24432e87f92dea53e7d26af42a3c47099584fc92fdbf185a51fd060e689c99</p><pre>---
 title: &quot;CPUE analysis report&quot;
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -3040,7 +3142,7 @@ if (!absolute_cpue) {
 plot_series(series, &quot;index&quot;, &quot;CPUE relative to first year&quot;)
 ```
 
-Each index is divided by its own first-year prediction (first year = 1). A adjusts for composition; B uses year effects only. B may use different records because the optional effort filter applies to A.
+Each index is divided by its own first-year prediction (first year = 1). `r if (public) &quot;A adjusts cell–quarter composition; B adjusts quarter only on the same fixed prediction support.&quot; else &quot;A adjusts vessel effects; B uses year effects only.&quot;` B may use different records because the optional effort filter applies to A.
 
 ## Methods and checks
 
@@ -3049,7 +3151,7 @@ Each index is divided by its own first-year prediction (first year = 1). A adjus
 if (public) {
   cat(&quot;The saved models are quasipoisson GLMs with a log link and &quot;,
       &quot;a `log(hooks / 1000)` offset. A adjusts for cell–quarter composition; &quot;,
-      &quot;B has year effects only. The source rows are fleet–cell–quarter aggregates, &quot;,
+      &quot;B adjusts quarter only; quarter effects partly confound spatial differences on this support. The source rows are fleet–cell–quarter aggregates, &quot;,
       &quot;not individual fishing sets.\n\n&quot;, sep = &quot;&quot;)
 } else if (length(result$analyses)) {
   cat(&quot;The saved synthetic models are Poisson GLMs with a log link and &quot;,
@@ -3084,7 +3186,7 @@ if (public &amp;&amp; length(analysis_a$weights)) {
     paste0(&quot;`&quot;, x$stratum, &quot;` (&quot;, format(x$weight, digits = 4), &quot;)&quot;)
   }, character(1))
   cat(&quot;\nA&#x27;s fixed prediction weights: &quot;, paste(weights, collapse = &quot;; &quot;), &quot;.\n\n&quot;,
-      &quot;Score error is the maximum relative difference between fitted and observed annual or stratum catch totals. &quot;,
+      &quot;Score error is the maximum relative difference between fitted and observed annual, stratum or quarter catch totals. &quot;,
       &quot;Dispersion is the Pearson sum of squares divided by residual degrees of freedom.\n\n&quot;, sep = &quot;&quot;)
 }
 ```
@@ -3123,7 +3225,7 @@ cat(&quot;\n\n&quot;)
 ```
 </pre></details><details id="source-b2f682089a7a0420" data-name="jobs/cpue_report/run.R"><summary>jobs/cpue_report/run.R</summary><p class="muted"><br>SHA-256: 71deefbab947d096f044d675691d1640e6a2b16276ce100017ee4d91a32d3694</p><pre># Native Quarto renders report.qmd from this saved result and its run record.
 calculate &lt;- function(context) context$parents$cpue_summary
-</pre></details><details id="source-cb72df1634b2a7b6" data-name="jobs/cpue_summary/README.md"><summary>jobs/cpue_summary/README.md</summary><p class="muted"><br>SHA-256: d67c2ef35bca4cad27f4ffcb7ab23c0dd24447e5b72a0ab73a31958eeaced82b</p><pre># Compare CPUE results (`cpue_summary`)
+</pre></details><details id="source-cb72df1634b2a7b6" data-name="jobs/cpue_summary/README.md"><summary>jobs/cpue_summary/README.md</summary><p class="muted"><br>SHA-256: 5c86b68010c6272aa176de5922803a7a5c06dd33ab30cfbf92d8374d06b1beee</p><pre># Compare CPUE results (`cpue_summary`)
 
 Compare the two saved CPUE indices without fitting another model.
 
@@ -3135,7 +3237,7 @@ Compare the two saved CPUE indices without fitting another model.
 
 **Settings:** No job-specific settings (`{}`).
 
-The result preserves both producing methods, prediction support, weights, units and checks. A uses a cell–quarter adjustment; B uses year only.
+The result preserves both producing methods, prediction support, weights, units and checks. A uses a cell–quarter adjustment; B adjusts for quarter only.
 
 From the repository root, run this job and prepare any required inputs:
 
@@ -3432,14 +3534,24 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 **Used by:** None.
 
 [Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/record.json)
-</pre></details><details id="source-6c03622b4e8d9138" data-name="jobs/mse_report/report.qmd"><summary>jobs/mse_report/report.qmd</summary><p class="muted"><br>SHA-256: a88509df77e13ebea300c1301a5bc8f5fd58d8be37b6eca2e64c323d01f82aa5</p><pre>---
+</pre></details><details id="source-6c03622b4e8d9138" data-name="jobs/mse_report/report.qmd"><summary>jobs/mse_report/report.qmd</summary><p class="muted"><br>SHA-256: cc33933f02ed22b76f1e373f2af315d2f88d169c8774d263cb9dff17ab67eafb</p><pre>---
 title: &quot;Management strategy comparison report&quot;
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -3522,7 +3634,9 @@ metrics &lt;- lapply(result$metrics, function(row) {
        below_threshold_percent = row$below_threshold_percent,
        catch_change_percent = row$catch_change_percent)
 })
-knitr::kable(rows_frame(metrics), digits = 3)
+knitr::kable(rows_frame(metrics), digits = 3,
+             col.names = c(&quot;Rule&quot;, &quot;Mean catch (t/year)&quot;, &quot;Final B/K&quot;,
+                           &quot;Trials below 0.2 (%)&quot;, &quot;Catch change (%)&quot;))
 ```
 
 Mean catch is in tonnes per year; final B/K is the median across trials. The
@@ -3615,7 +3729,12 @@ Produced in **`r record$run_id`**. Retained inputs keep their original producing
 if (!is.null(record$execution$provider)) {
   cat(&quot;Execution: &quot;, record$execution$provider, &quot;.\n\n&quot;, sep = &quot;&quot;)
 }
-cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+if (knitr::is_html_output()) {
+  cat(&quot;Calculation image: `&quot;, record$software$container, &quot;`\n\n&quot;, sep = &quot;&quot;)
+} else {
+  digest &lt;- sub(&quot;.*@sha256:&quot;, &quot;&quot;, record$software$container)
+  cat(&quot;Calculation image: `sha256:&quot;, substr(digest, 1, 12), &quot;…` (full digest in the run bundle).\n\n&quot;, sep = &quot;&quot;)
+}
 if (!is.null(record$software$container_url)) {
   cat(&quot;[Container package](&quot;, record$software$container_url, &quot;)\n\n&quot;, sep = &quot;&quot;)
 }
@@ -5522,7 +5641,7 @@ def validate_transfer(key, parents, records, settings):
     return {&#x27;boundary&#x27;: boundary, &#x27;schema_version&#x27;: 1,
             &#x27;units&#x27;: {&#x27;catch_t&#x27;: &#x27;tonnes&#x27;, &#x27;index&#x27;: &#x27;relative CPUE&#x27;, &#x27;biomass_t&#x27;: &#x27;tonnes&#x27;},
             &#x27;producers&#x27;: {parent: {&#x27;run_id&#x27;: records[parent][&#x27;run_id&#x27;], &#x27;signature&#x27;: records[parent][&#x27;signature&#x27;], &#x27;checksum&#x27;: records[parent][&#x27;outputs&#x27;][&#x27;output.json&#x27;], &#x27;analysis_source&#x27;: records[parent].get(&#x27;analysis_source&#x27;)} for parent in parents}}
-</pre></details><details id="source-63985f5139022215" data-name="workflow/engine.py"><summary>workflow/engine.py</summary><p class="muted"><br>SHA-256: 4470346a96212a70d58435b57bbac4fb379f0fe3313cd0361a5cfbabe4500e9a</p><pre>&quot;&quot;&quot;Execute selected jobs, verify saved inputs and preserve their original records.&quot;&quot;&quot;
+</pre></details><details id="source-63985f5139022215" data-name="workflow/engine.py"><summary>workflow/engine.py</summary><p class="muted"><br>SHA-256: 2d9a589d3797ddd8f0ac40725dbcbe63361fddcfe16b7f592664483d7eee4513</p><pre>&quot;&quot;&quot;Execute selected jobs, verify saved inputs and preserve their original records.&quot;&quot;&quot;
 import asyncio
 import hashlib
 import io
@@ -5728,6 +5847,10 @@ class Workflow:
         record = self.records.get(key)
         if not record or record[&#x27;signature&#x27;] != self.signature(key):
             return False
+        rendering = record.get(&#x27;report_rendering&#x27;)
+        if rendering is None or (rendering.get(&#x27;quarto_executed&#x27;)
+                                 and &#x27;report.pdf&#x27; not in record[&#x27;outputs&#x27;]):
+            return False
         if self.sources.multi_repository:
             expected = self.sources.origin(key)
             actual = record.get(&#x27;analysis_source&#x27;, {})
@@ -5917,6 +6040,8 @@ class Workflow:
         record[&#x27;report_rendering&#x27;] = rendered
         record[&#x27;outputs&#x27;][&#x27;report.html&#x27;] = digest((folder / &#x27;report.html&#x27;).read_bytes())
         if rendered[&#x27;quarto_executed&#x27;]:
+            if not (folder / &#x27;report.pdf&#x27;).read_bytes().startswith(b&#x27;%PDF-&#x27;):
+                raise RuntimeError(&#x27;Quarto did not produce a valid PDF result.&#x27;)
             for name in rendered.get(&#x27;artifacts&#x27;, (&#x27;report.qmd&#x27;, &#x27;report-data.json&#x27;)):
                 record[&#x27;outputs&#x27;][name] = digest((folder / name).read_bytes())
         (folder / &#x27;record.json&#x27;).write_text(json.dumps(record, indent=2) + &#x27;\n&#x27;)
@@ -6504,7 +6629,7 @@ def main():
 
 if __name__ == &#x27;__main__&#x27;:
     main()
-</pre></details><details id="source-f428103cd67716ad" data-name="workflow/quarto_reports.py"><summary>workflow/quarto_reports.py</summary><p class="muted"><br>SHA-256: e882cc218fc66f072a747e8cc6e26125be252962427c4945b20fff3969be83d2</p><pre>&quot;&quot;&quot;Render saved result views and formal reports with Quarto in the container.&quot;&quot;&quot;
+</pre></details><details id="source-f428103cd67716ad" data-name="workflow/quarto_reports.py"><summary>workflow/quarto_reports.py</summary><p class="muted"><br>SHA-256: 9b26ac62ffd9c3fb751d9e1f77d38dd5ab115c471b9b3ad54a5089a841b21ca3</p><pre>&quot;&quot;&quot;Render saved result views and formal reports with Quarto in the container.&quot;&quot;&quot;
 import json
 from pathlib import Path
 import re
@@ -6523,8 +6648,28 @@ def result_body(page):
     return match[1] + &#x27;\n&#x27; + match[2] + &#x27;\n&#x27;
 
 
+def pdf_body(body, folder):
+    &quot;&quot;&quot;Export the existing vector plots before Pandoc converts the saved HTML.&quot;&quot;&quot;
+    body = re.sub(r&#x27;&lt;style&gt;.*?&lt;/style&gt;&#x27;, &#x27;&#x27;, body, flags=re.S)
+    # Legends are embedded in each exported SVG; the HTML view has its own legend.
+    body = re.sub(r&#x27;&lt;div class=&quot;plot-legend&quot;&gt;.*?&lt;/div&gt;&#x27;, &#x27;&#x27;, body, flags=re.S)
+    plots = []
+
+    def export(match):
+        svg = match[0]
+        name = f&#x27;report-plot-{len(plots) + 1:02d}.svg&#x27;
+        (folder / name).write_text(svg)
+        plots.append(name)
+        label = re.search(r&#x27;aria-label=&quot;([^&quot;]*)&quot;&#x27;, svg)
+        alt = label[1] if label else &#x27;Saved analysis plot&#x27;
+        return f&#x27;&lt;p&gt;&lt;img src=&quot;{name}&quot; alt=&quot;{alt}&quot;&gt;&lt;/p&gt;&#x27;
+
+    return re.sub(r&#x27;&lt;svg\b.*?&lt;/svg&gt;&#x27;, export, body, flags=re.S), plots
+
+
 def render_report(root, key, result, record, folder, result_html, source_path=None):
     destination = folder / &#x27;report.html&#x27;
+    pdf = folder / &#x27;report.pdf&#x27;
     RBridge.require_container()
     executable = shutil.which(&#x27;quarto&#x27;)
     if executable is None:
@@ -6533,10 +6678,13 @@ def render_report(root, key, result, record, folder, result_html, source_path=No
     formal = key in REPORT_JOBS
     source = source_path or (root / &#x27;jobs&#x27; / key / &#x27;report.qmd&#x27; if formal
                              else root / &#x27;workflow/results.qmd&#x27;)
-    artifacts = [&#x27;report.html&#x27;, &#x27;report.qmd&#x27;, &#x27;report-data.json&#x27;]
+    artifacts = [&#x27;report.html&#x27;, &#x27;report.pdf&#x27;, &#x27;report.qmd&#x27;, &#x27;report-data.json&#x27;, &#x27;report.typ&#x27;]
     if not formal:
-        (folder / &#x27;report-body.html&#x27;).write_text(result_body(result_html))
-        artifacts.append(&#x27;report-body.html&#x27;)
+        body = result_body(result_html)
+        (folder / &#x27;report-body.html&#x27;).write_text(body)
+        converted, plots = pdf_body(body, folder)
+        (folder / &#x27;report-pdf-body.html&#x27;).write_text(converted)
+        artifacts.extend([&#x27;report-body.html&#x27;, &#x27;report-pdf-body.html&#x27;, &#x27;report-body.md&#x27;, *plots])
     (folder / &#x27;report.qmd&#x27;).write_bytes(source.read_bytes())
     (folder / &#x27;report-data.json&#x27;).write_text(json.dumps({&#x27;result&#x27;: result, &#x27;record&#x27;: record}, allow_nan=False))
     # Give Quarto writable XDG directories when Docker uses a non-root UID.
@@ -6546,19 +6694,58 @@ def render_report(root, key, result, record, folder, result_html, source_path=No
         for name, suffix in [(&#x27;XDG_CACHE_HOME&#x27;, &#x27;cache&#x27;), (&#x27;XDG_DATA_HOME&#x27;, &#x27;data&#x27;),
                              (&#x27;XDG_CONFIG_HOME&#x27;, &#x27;config&#x27;)]:
             environment[name] = str(Path(temporary) / suffix)
+        if not formal:
+            conversion = run_command(make_command(&#x27;report-markdown&#x27;), timeout=30, environment=environment)
+            if conversion.returncode or not (folder / &#x27;report-body.md&#x27;).is_file():
+                raise RuntimeError(&#x27;Quarto Markdown conversion failed: &#x27; +
+                                   (conversion.stderr or conversion.stdout).strip()[-2000:])
+            markdown = folder / &#x27;report-body.md&#x27;
+            # The units already follow each plot; retain alt text without duplicate captions.
+            text = re.sub(r&#x27;!\[([^\]]*)\]\((report-plot-\d+\.svg)\)&#x27;,
+                          lambda match: &#x27;![](&#x27; + match[2] + &#x27;){fig-alt=&#x27; +
+                          json.dumps(match[1]) + &#x27;}&#x27;, markdown.read_text())
+            markdown.write_text(text)
         process = run_command(make_command(&#x27;report&#x27;), timeout=120, environment=environment)
-    if process.returncode or not destination.is_file():
-        raise RuntimeError(&#x27;Quarto report failed: &#x27; + (process.stderr or process.stdout).strip()[-2000:])
-    version_check = run_command(make_command(&#x27;quarto-version&#x27;), timeout=10)
+        if process.returncode or not destination.is_file() or not pdf.is_file():
+            raise RuntimeError(&#x27;Quarto report failed: &#x27; + (process.stderr or process.stdout).strip()[-2000:])
+        version_check = run_command(make_command(&#x27;quarto-version&#x27;), timeout=10, environment=environment)
+        typst_check = run_command(make_command(&#x27;typst-version&#x27;), timeout=10, environment=environment)
+    if not pdf.read_bytes().startswith(b&#x27;%PDF-&#x27;):
+        raise RuntimeError(&#x27;Quarto did not produce a PDF document.&#x27;)
+    # Preserve generated knitr figure assets for reproduction of the kept Typst source.
+    assets = folder / &#x27;report_files&#x27;
+    if assets.is_dir():
+        artifacts.extend(path.relative_to(folder).as_posix() for path in sorted(assets.rglob(&#x27;*&#x27;))
+                         if path.is_file())
+    artifacts.extend(path.name for path in sorted(folder.glob(&#x27;report*.md&#x27;))
+                     if path.name not in artifacts)
+    for name in artifacts:
+        if not (folder / name).is_file():
+            raise RuntimeError(&#x27;Quarto did not preserve render artifact: &#x27; + name)
+    for name in re.findall(r&#x27;image\(&quot;([^&quot;]+)&quot;&#x27;, (folder / &#x27;report.typ&#x27;).read_text()):
+        if not (folder / name).is_file():
+            raise RuntimeError(&#x27;Quarto did not preserve figure asset: &#x27; + name)
     if version_check.returncode:
         raise RuntimeError(&#x27;Quarto version check failed: &#x27; + version_check.stderr.strip()[-2000:])
     version = version_check.stdout.strip()
+    if typst_check.returncode:
+        raise RuntimeError(&#x27;Typst version check failed: &#x27; + typst_check.stderr.strip()[-2000:])
+    typst_version = (typst_check.stdout or typst_check.stderr).strip()
+    if not re.match(r&#x27;typst \d+\.\d+\.\d+&#x27;, typst_version, re.I):
+        raise RuntimeError(&#x27;Typst version was not verified.&#x27;)
+    # Quarto&#x27;s package cache is scratch; the kept Typst source and figure assets
+    # above are the rendering inputs. Do not carry caches into run downloads.
+    cache = folder / &#x27;.quarto&#x27;
+    if cache.exists():
+        shutil.rmtree(cache)
     return {&#x27;engine&#x27;: &#x27;Quarto&#x27;, &#x27;version&#x27;: version, &#x27;calculation&#x27;: &#x27;R&#x27;,
             &#x27;quarto_executed&#x27;: True,
             &#x27;source&#x27;: f&#x27;jobs/{key}/report.qmd&#x27; if formal else &#x27;workflow/results.qmd&#x27;,
             &#x27;presentation_source&#x27;: f&#x27;jobs/{key}/report.qmd&#x27; if formal else &#x27;workflow/results.qmd&#x27;,
             &#x27;execution_engine&#x27;: &#x27;knitr&#x27; if formal else &#x27;static&#x27;,
             &#x27;plot_generator&#x27;: &#x27;R from saved results&#x27; if formal else &#x27;Python SVG from saved results&#x27;,
+            &#x27;formats&#x27;: [&#x27;html&#x27;, &#x27;typst&#x27;], &#x27;view&#x27;: &#x27;report.pdf&#x27;,
+            &#x27;pdf_engine&#x27;: &#x27;Typst&#x27;, &#x27;pdf_engine_version&#x27;: typst_version,
             &#x27;artifacts&#x27;: artifacts}
 </pre></details><details id="source-aad8298a846eca12" data-name="workflow/r/common.R"><summary>workflow/r/common.R</summary><p class="muted"><br>SHA-256: 4befb1217f341840864249e30182819e3452c685dd30267c0f6bb7f3870b912d</p><pre># Small helpers for JSON row lists. The container driver owns files and SQLite.
 
@@ -6679,7 +6866,7 @@ compare_series &lt;- function(results, titles, assessment = FALSE) {
   }
   output
 }
-</pre></details><details id="source-c6ba277d681f12d5" data-name="workflow/r/models.R"><summary>workflow/r/models.R</summary><p class="muted"><br>SHA-256: 32bf6fe8457f92431885d0e7314a6789e10baa4dbb3b2d8c7d5dbdf3f29b1214</p><pre># CPUE from public aggregate records, with the original synthetic example retained.
+</pre></details><details id="source-c6ba277d681f12d5" data-name="workflow/r/models.R"><summary>workflow/r/models.R</summary><p class="muted"><br>SHA-256: 557d715010d3d03b273e9a1d64eda7ccde3a77cfe192e603f7fc2a7058a10bed</p><pre># CPUE from public aggregate records, with the original synthetic example retained.
 
 describe_data &lt;- function(sets, catches) {
   check_sets(sets)
@@ -6753,14 +6940,23 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
                     &quot;The effort filter removed a year or stratum from the fixed prediction support.&quot;)
   data &lt;- data.frame(year = rows_values(rows, &quot;year&quot;),
                      stratum = rows_values(rows, &quot;stratum&quot;),
+                     quarter = rows_values(rows, &quot;quarter&quot;),
                      hooks = rows_values(rows, &quot;hooks&quot;), catch_n = rows_values(rows, &quot;catch_n&quot;))
   annual_catch &lt;- tapply(data$catch_n, data$year, sum)
   stratum_catch &lt;- tapply(data$catch_n, data$stratum, sum)
   require_condition(length(years) &gt; 1L &amp;&amp; all(annual_catch &gt; 0) &amp;&amp; all(stratum_catch &gt; 0),
                     &quot;The aggregate GLM requires at least two years and positive annual and stratum totals.&quot;)
   adjusted &lt;- stratum_effect &amp;&amp; length(strata) &gt; 1L
+  seasonal &lt;- !stratum_effect
+  quarter_catch &lt;- tapply(data$catch_n, data$quarter, sum)
+  if (seasonal) {
+    require_condition(length(quarter_catch) &gt; 1L &amp;&amp; all(quarter_catch &gt; 0),
+                      &quot;Quarter adjustment requires at least two quarters with positive catch totals.&quot;)
+  }
   formula &lt;- if (adjusted) {
     catch_n ~ factor(year) + factor(stratum) + offset(log(hooks / 1000))
+  } else if (seasonal) {
+    catch_n ~ factor(year) + factor(quarter) + offset(log(hooks / 1000))
   } else {
     catch_n ~ factor(year) + offset(log(hooks / 1000))
   }
@@ -6774,6 +6970,10 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
                     &quot;The aggregate CPUE GLM did not converge to finite coefficients.&quot;)
   # The same strata and equal weights are used in every year&#x27;s response-scale mean.
   grid &lt;- expand.grid(year = years, stratum = strata, stringsAsFactors = FALSE)
+  if (seasonal) {
+    support &lt;- unique(data[c(&quot;stratum&quot;, &quot;quarter&quot;)])
+    grid$quarter &lt;- support$quarter[match(grid$stratum, support$stratum)]
+  }
   grid$hooks &lt;- 1000
   grid$weight &lt;- 1 / length(strata)
   grid$predicted_cpue &lt;- as.numeric(stats::predict(fit, newdata = grid, type = &quot;response&quot;))
@@ -6790,12 +6990,15 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
   stratum_score &lt;- if (adjusted) {
     max(abs(tapply(stats::fitted(fit), data$stratum, sum) / stratum_catch - 1))
   } else 0
-  residual &lt;- max(year_score, stratum_score)
+  quarter_score &lt;- if (seasonal) {
+    max(abs(tapply(stats::fitted(fit), data$quarter, sum) / quarter_catch - 1))
+  } else 0
+  residual &lt;- max(year_score, stratum_score, quarter_score)
   dispersion &lt;- sum(stats::residuals(fit, type = &quot;pearson&quot;)^2) / fit$df.residual
   require_condition(all(is.finite(index) &amp; index &gt; 0) &amp;&amp; residual &lt; 1e-7 &amp;&amp;
                       is.finite(dispersion) &amp;&amp; dispersion &gt;= 0,
                     &quot;The aggregate CPUE prediction, score or dispersion check failed.&quot;)
-  list(series = lapply(seq_along(years), function(i) {
+  result &lt;- list(series = lapply(seq_along(years), function(i) {
          list(year = years[i], index = index[i], standardised_cpue = predicted[i],
               nominal_cpue = nominal[i])
        }),
@@ -6804,7 +7007,7 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
        released_zero_rows = sum(data$catch_n == 0), min_hooks = min_hooks,
        data_kind = &quot;public-wcpfc&quot;, record_unit = &quot;Public fleet–cell–quarter aggregate record&quot;,
        method = if (adjusted) &quot;Quasipoisson GLM: year + cell–quarter stratum&quot; else
-         &quot;Quasipoisson GLM: year only&quot;,
+         if (seasonal) &quot;Quasipoisson GLM: year + quarter&quot; else &quot;Quasipoisson GLM: year only&quot;,
        formula = paste(deparse(formula, width.cutoff = 500), collapse = &quot; &quot;),
        iterations = fit$iter, converged = fit$converged, deviance = fit$deviance,
        dispersion = dispersion, dispersion_method = &quot;Pearson sum of squares / residual degrees of freedom&quot;,
@@ -6822,6 +7025,17 @@ cpue_public &lt;- function(sets, stratum_effect = TRUE, min_hooks = 0) {
          &quot;Released zero counts are retained; absent or suppressed source values are not zero catch.&quot;,
          &quot;An effort filter can require additive-model predictions for omitted year–stratum cells.&quot;,
          &quot;This demonstration supplies no confidence intervals or official assessment advice.&quot;)))
+  if (seasonal) {
+    result$quarter_score_residual &lt;- quarter_score
+    first_grid &lt;- grid[grid$year == years[1], ]
+    quarter_weights &lt;- tapply(first_grid$weight, first_grid$quarter, sum)
+    result$quarter_weights &lt;- lapply(names(quarter_weights), function(quarter) {
+      list(quarter = as.integer(quarter), weight = unname(quarter_weights[quarter]))
+    })
+    result$limitations &lt;- c(result$limitations, list(
+      &quot;B adjusts for quarter only; quarter effects partly confound spatial differences on this support.&quot;))
+  }
+  result
 }
 
 cpue &lt;- function(sets, vessel_effect = TRUE, min_hooks = 0, stratum_effect = TRUE) {
@@ -7442,7 +7656,7 @@ if (sys.nframe() == 0L) {
     cat(workflow_execute_json(input))
   }
 }
-</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: 5eef0437ff2beed3d5f2b772cfabebe7382957a60e2188b0b73fc7a2e6945a19</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
+</pre></details><details id="source-95e1df30e520818f" data-name="workflow/reports.py"><summary>workflow/reports.py</summary><p class="muted"><br>SHA-256: 1d827748c451d80f2d4a14c4f7533647a4a0044e18f0329e8e3dcca2acc90ede</p><pre>&quot;&quot;&quot;Concise result views and formal accounts, prepared from saved results.&quot;&quot;&quot;
 import html
 import json
 import math
@@ -7451,6 +7665,7 @@ STYLE = &#x27;&#x27;&#x27;body{font:15px/1.5 system-ui,sans-serif;color:#293039;
 STYLE += &#x27;&#x27;&#x27;.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}&#x27;&#x27;&#x27;
 STYLE += &#x27;&#x27;&#x27;.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}&#x27;&#x27;&#x27;
 STYLE += &#x27;&#x27;&#x27;.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}&#x27;&#x27;&#x27;
+STYLE += &#x27;&#x27;&#x27;.pdf-legend{display:none}&#x27;&#x27;&#x27;
 MSE_COLOURS = {&#x27;Constant catch&#x27;: &#x27;#1378a3&#x27;, &#x27;Index rule&#x27;: &#x27;#b56435&#x27;, &#x27;Buffered rule&#x27;: &#x27;#7357a8&#x27;}
 
 
@@ -7510,7 +7725,7 @@ def job_trace(key):
         &#x27;database&#x27;: &#x27;Accepted rows → save SQLite snapshot → fixed data inputs&#x27;,
         &#x27;extract&#x27;: &#x27;SQLite snapshot → recorded SQL → CPUE rows and annual catches&#x27;,
         &#x27;cpue_a&#x27;: &#x27;Catch and effort rows → adjusted GLM → annual CPUE index A&#x27;,
-        &#x27;cpue_b&#x27;: &#x27;Catch and effort rows → year-only GLM → annual CPUE index B&#x27;,
+        &#x27;cpue_b&#x27;: &#x27;Catch and effort rows → quarter-adjusted GLM → annual CPUE index B&#x27;,
         &#x27;cpue_summary&#x27;: &#x27;Indices A and B → align years → index comparison&#x27;,
         &#x27;cpue_report&#x27;: &#x27;Saved index comparison → describe methods and values → CPUE report&#x27;,
         &#x27;prepare_a&#x27;: &#x27;Index A and annual catches → join by year → assessment inputs A&#x27;,
@@ -7537,6 +7752,21 @@ def table(rows, columns, limit=None):
     return &#x27;&#x27;.join(parts) + &#x27;&lt;/tbody&gt;&lt;/table&gt;&#x27;
 
 
+def svg_legend(items):
+    &quot;&quot;&quot;Keep vector figures self-contained when compiled into a PDF.&quot;&quot;&quot;
+    parts = [&#x27;&lt;g class=&quot;pdf-legend&quot; font-family=&quot;sans-serif&quot; font-size=&quot;13&quot; fill=&quot;#293039&quot;&gt;&#x27;]
+    x, y = 100, 23
+    for name, colour, dashed in items:
+        width = 44 + 7 * len(name)
+        if x + width &gt; 745 and x &gt; 100:
+            x, y = 100, y + 21
+        dash = &#x27; stroke-dasharray=&quot;8 5&quot;&#x27; if dashed else &#x27;&#x27;
+        parts.append(f&#x27;&lt;path d=&quot;M{x} {y-4}h24&quot; fill=&quot;none&quot; stroke=&quot;{colour}&quot; &#x27;
+                     f&#x27;stroke-width=&quot;2.5&quot;{dash}/&gt;&lt;text x=&quot;{x+31}&quot; y=&quot;{y}&quot;&gt;{esc(name)}&lt;/text&gt;&#x27;)
+        x += width
+    return &#x27;&#x27;.join(parts) + &#x27;&lt;/g&gt;&#x27;
+
+
 def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     colours = [&#x27;#1378a3&#x27;, &#x27;#b56435&#x27;, &#x27;#7357a8&#x27;, &#x27;#328363&#x27;, &#x27;#a7526d&#x27;, &#x27;#93761e&#x27;, &#x27;#277f88&#x27;, &#x27;#66748b&#x27;]
     all_rows = [r for rows in series.values() for r in rows]
@@ -7554,6 +7784,8 @@ def plot(series, value, label, points=(), colour_by_name=None, upper=None):
     x = lambda year: 100 + (year - xmin) / max(1, xmax - xmin) * 625
     y = lambda number: 280 - (number - ymin) / span * 225
     out = [&#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 780 340&quot; role=&quot;img&quot; aria-label=&quot;&#x27; + esc(label) + &#x27;&quot;&gt;&#x27;]
+    out.append(svg_legend([(name, (colour_by_name or {}).get(name, colours[i % len(colours)]),
+                           name == &#x27;Nominal&#x27;) for i, name in enumerate(series)]))
     for i in range(round(span / step) + 1):
         v = ymin + step * i
         if abs(v) &lt; step * 1e-8:
@@ -7821,6 +8053,8 @@ def mse_tradeoff(metrics):
     y = lambda v: 275 - 220 * v / ymax
     out = [&#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 780 340&quot; role=&quot;img&quot; &#x27;
            &#x27;aria-label=&quot;Management trade-off: mean annual catch (tonnes) and median final biomass / carrying capacity&quot;&gt;&#x27;]
+    out.append(svg_legend([(f&#x27;{i+1}. {row[&quot;name&quot;]}&#x27;, colours.get(row[&#x27;name&#x27;], &#x27;#1378a3&#x27;), False)
+                           for i, row in enumerate(metrics)]))
     for i in range(5):
         catch, biomass = xmax * i / 4, ymax * i / 4
         out.append(f&#x27;&lt;path d=&quot;M100 {y(biomass):.1f}H685&quot; stroke=&quot;#e1e8ee&quot;/&gt;&#x27;
@@ -7913,7 +8147,8 @@ def result_view(job, result):
                 body += (&#x27;&lt;p&gt;Standardised A holds cell–quarter composition fixed: predict catch at 1,000 hooks &#x27;
                          &#x27;in each of the six strata, then average with equal weights.&lt;/p&gt;&#x27;
                          if key == &#x27;cpue_a&#x27; else
-                         &#x27;&lt;p&gt;B fits year effects only; its annual fitted rate reproduces nominal CPUE.&lt;/p&gt;&#x27;)
+                         &#x27;&lt;p&gt;B adjusts quarter only and averages predictions over the same six fixed strata. &#x27;
+                         &#x27;Quarter effects partly confound spatial differences on this support.&lt;/p&gt;&#x27;)
         else:
             body += plot({job[&#x27;title&#x27;]: rows}, &#x27;index&#x27;, &#x27;CPUE relative to the first year&#x27;)
             body += &#x27;&lt;p&gt;Only the relative index is available in this saved result; nominal and standardised rates were not recorded.&lt;/p&gt;&#x27;
@@ -7946,7 +8181,7 @@ def result_view(job, result):
             if analysis.get(&#x27;standardisation&#x27;):
                 body += &#x27;&lt;p class=&quot;result-method&quot;&gt;Standardised: &#x27; + esc(analysis[&#x27;standardisation&#x27;]) + &#x27;. Nominal: 1,000 × annual fish numbers / annual hooks on the A rows.&lt;/p&gt;&#x27;
             if public:
-                body += &#x27;&lt;p&gt;A predicts catch at 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B fits year effects only. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.&lt;/p&gt;&#x27;
+                body += &#x27;&lt;p&gt;A predicts catch at 1,000 hooks in each of six fixed cell–quarter strata and averages with equal weights. B adjusts quarter only on that support. The local fleet index has no supplied confidence intervals and has not been validated for stock-wide abundance.&lt;/p&gt;&#x27;
         else:
             body += relative + &#x27;&lt;p&gt;The saved result has relative indices only; an A-row nominal overlay is unavailable.&lt;/p&gt;&#x27;
         return body + &#x27;&lt;p class=&quot;result-method&quot;&gt;The A/B comparison includes differences in adjustment and row selection. Each relative index equals one in its own first year.&lt;/p&gt;&#x27;
@@ -8054,17 +8289,28 @@ def output_page(job, result, record, lineage):
     return (&#x27;&lt;!doctype html&gt;&lt;html lang=&quot;en-NZ&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;title&gt;&#x27;
             + esc(job[&#x27;title&#x27;]) + &#x27;&lt;/title&gt;&lt;style&gt;&#x27; + STYLE + &#x27;&lt;/style&gt;&lt;body&gt;&lt;h1&gt;&#x27; + esc(job[&#x27;title&#x27;]) + &#x27;&lt;/h1&gt;&#x27;
             + body + footer + &#x27;&lt;/body&gt;&lt;/html&gt;&#x27;)
-</pre></details><details id="source-662bc565159b1b1e" data-name="workflow/results.qmd"><summary>workflow/results.qmd</summary><p class="muted"><br>SHA-256: 529b14d7b9d6beabc1fc9aa9f6afddff4938fba98a6da99d4245621df54b28b1</p><pre>---
+</pre></details><details id="source-662bc565159b1b1e" data-name="workflow/results.qmd"><summary>workflow/results.qmd</summary><p class="muted"><br>SHA-256: a917e5ca055291a01dbf591ccd7f7f1bc37be35e93314f73bfaecfccc4d6097b</p><pre>---
 lang: en-NZ
 format:
   html:
     minimal: true
     embed-resources: true
     include-before-body: report-body.html
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    keep-typ: true
+    toc: false
 ---
 
-&lt;!-- The coordinator prepares report-body.html from the saved result and record.
-     This shared result view has no executable cells or model fitting. --&gt;
+::: {.content-visible when-format=&quot;typst&quot;}
+{{&lt; include report-body.md &gt;}}
+:::
+
+&lt;!-- Both bodies use the same saved result. No executable cells or model fitting. --&gt;
 </pre></details><details id="source-34e76a7816a8dfdd" data-name="workflow/sources.py"><summary>workflow/sources.py</summary><p class="muted"><br>SHA-256: cef3cfe54a69bb00f60cef07cbebd2ea95b6653644e0bbeae5808f25fd2d8651</p><pre>&quot;&quot;&quot;Resolve registered, immutable analysis sources and portable offline snapshots.&quot;&quot;&quot;
 import hashlib
 import json

@@ -5,7 +5,18 @@ format:
     minimal: true
     embed-resources: true
     include-before-body: report-body.html
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    keep-typ: true
+    toc: false
 ---
 
-<!-- The coordinator prepares report-body.html from the saved result and record.
-     This shared result view has no executable cells or model fitting. -->
+::: {.content-visible when-format="typst"}
+{{< include report-body.md >}}
+:::
+
+<!-- Both bodies use the same saved result. No executable cells or model fitting. -->

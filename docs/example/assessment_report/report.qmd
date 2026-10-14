@@ -1,11 +1,21 @@
 ---
 title: "Surplus-production assessment report"
 lang: en-NZ
+keep-md: true
 format:
   html:
     embed-resources: true
     toc: false
     theme: none
+  typst:
+    papersize: a4
+    margin:
+      x: 15mm
+      y: 15mm
+    fontsize: 10pt
+    fig-format: svg
+    keep-typ: true
+    toc: false
 execute:
   echo: false
   warning: false
@@ -82,14 +92,17 @@ endpoints <- lapply(names(result$series), function(name) {
   list(case = name, year = row$year, B_over_K = row$B_over_K,
        harvest_rate = row$harvest_rate)
 })
-knitr::kable(rows_frame(endpoints), digits = 3)
+knitr::kable(rows_frame(endpoints), digits = 3,
+             col.names = c("Case", "Year", "B/K", "Harvest rate"))
 checks <- lapply(result$diagnostics, function(row) {
   list(case = row$case, intrinsic_growth = row$r,
        biomass_balance_check = row$balance_check, feasibility = row$feasibility_check,
        gradient_check = row$gradient_check,
        boundary_fit = row$boundary_fit, convergence = row$convergence)
 })
-knitr::kable(rows_frame(checks), digits = 7)
+knitr::kable(rows_frame(checks), digits = 7,
+             col.names = c("Case", "Growth (r)", "Balance", "Feasible",
+                           "Gradient", "Boundary", "Convergence"))
 ```
 
 Convergence, biomass balance and positive-biomass feasibility check the fitted
@@ -133,7 +146,12 @@ Produced in **`r record$run_id`**. Retained inputs keep their original producing
 if (!is.null(record$execution$provider)) {
   cat("Execution: ", record$execution$provider, ".\n\n", sep = "")
 }
-cat("Calculation image: `", record$software$container, "`\n\n", sep = "")
+if (knitr::is_html_output()) {
+  cat("Calculation image: `", record$software$container, "`\n\n", sep = "")
+} else {
+  digest <- sub(".*@sha256:", "", record$software$container)
+  cat("Calculation image: `sha256:", substr(digest, 1, 12), "…` (full digest in the run bundle).\n\n", sep = "")
+}
 if (!is.null(record$software$container_url)) {
   cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
 }

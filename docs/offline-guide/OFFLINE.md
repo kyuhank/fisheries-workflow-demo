@@ -11,7 +11,7 @@ tool release does not replace the code used to produce the saved results.
 Unpack the versioned offline ZIP and open `START-HERE.html`. Follow
 the links from a result to its input records, job script and calculation library.
 `code.html` displays the preserved sources. These pages use local files and need
-no login or internet connection. The interactive HTML displays saved results;
+no login or internet connection. The interactive page opens saved Quarto result PDFs;
 new calculations use the commands below.
 
 ## Restore the software
