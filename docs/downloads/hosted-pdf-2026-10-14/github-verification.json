@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "checked_utc": "2026-10-14T02:57:38.510910+00:00",
+  "scope": "Independent anonymous GitHub run and job metadata; no dispatch or mutation",
+  "cases": [
+    {
+      "run": 38502460010,
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/38502460010",
+      "commit": "361219f17e4ff70bcfa212454ecce23fc555c993",
+      "event": "workflow_dispatch",
+      "conclusion": "success",
+      "attempt": 1,
+      "created_at": "2026-10-14T02:42:45Z",
+      "updated_at": "2026-10-14T02:47:24Z",
+      "repository_private": false,
+      "jobs": [
+        {
+          "id": 115652351546,
+          "name": "analysis",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-14T02:42:49Z",
+          "completed_at": "2026-10-14T02:47:24Z",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_name": "GitHub Actions 1000003433",
+          "runner_group_name": "GitHub Actions"
+        }
+      ]
+    },
+    {
+      "run": 38503008128,
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/38503008128",
+      "commit": "361219f17e4ff70bcfa212454ecce23fc555c993",
+      "event": "workflow_dispatch",
+      "conclusion": "success",
+      "attempt": 1,
+      "created_at": "2026-10-14T02:49:03Z",
+      "updated_at": "2026-10-14T02:52:46Z",
+      "repository_private": false,
+      "jobs": [
+        {
+          "id": 115654071605,
+          "name": "analysis",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-14T02:49:06Z",
+          "completed_at": "2026-10-14T02:52:45Z",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_name": "GitHub Actions 1000003434",
+          "runner_group_name": "GitHub Actions"
+        }
+      ]
+    },
+    {
+      "run": 38503457611,
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/38503457611",
+      "commit": "361219f17e4ff70bcfa212454ecce23fc555c993",
+      "event": "workflow_dispatch",
+      "conclusion": "success",
+      "attempt": 1,
+      "created_at": "2026-10-14T02:54:05Z",
+      "updated_at": "2026-10-14T02:56:40Z",
+      "repository_private": false,
+      "jobs": [
+        {
+          "id": 115655475857,
+          "name": "analysis",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-14T02:54:09Z",
+          "completed_at": "2026-10-14T02:56:39Z",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_name": "GitHub Actions 1000003436",
+          "runner_group_name": "GitHub Actions"
+        }
+      ]
+    }
+  ]
+}
