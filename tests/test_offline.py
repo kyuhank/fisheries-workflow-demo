@@ -142,8 +142,15 @@ class PreservedSourceTest(unittest.TestCase):
                                   container_rootfs_diff_ids=list(offline.DIFF_IDS),
                                   container_reference_kind='upstream registry source pin')
         if result.get('data_kind') == 'public-wcpfc-albacore':
+            original_record = copy.deepcopy(record)
             page = reports.output_page(job, result, record, [])
-            self.assertIn('<p>Execution: Local Docker.</p>', page)
+            self.assertIn('data-result="submission"', page)
+            # Compact result pages leave complete provenance in the preserved
+            # record rather than dumping Docker identifiers beside the plot.
+            self.assertEqual(record, original_record)
+            self.assertEqual(record['execution']['provider'], 'Local Docker')
+            self.assertEqual(record['software']['container_config_id'], offline.IMAGE_ID)
+            self.assertEqual(record['software']['container_rootfs_diff_ids'], list(offline.DIFF_IDS))
         else:
             # The preserved historical synthetic renderer requires GitHub
             # metadata whenever execution is present; it cannot render Local.
@@ -151,11 +158,11 @@ class PreservedSourceTest(unittest.TestCase):
                 reports.output_page(job, result, record, [])
             record.pop('execution')
             page = reports.output_page(job, result, record, [])
+            self.assertIn(offline.IMAGE_ID, page)
+            for layer in offline.DIFF_IDS:
+                self.assertIn(layer, page)
         self.assertNotIn('Executed on GitHub Actions', page)
         self.assertNotIn('actions/runs/', page)
-        self.assertIn(offline.IMAGE_ID, page)
-        for layer in offline.DIFF_IDS:
-            self.assertIn(layer, page)
 
     def test_helper_records_local_provider_and_binds_external_receipt(self):
         # Explicit orchestration double: no R backend or numerical calculation.

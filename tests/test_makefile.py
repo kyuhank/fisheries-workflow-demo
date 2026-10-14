@@ -98,12 +98,21 @@ class MakefileTests(unittest.TestCase):
             self.executable(folder, 'quarto',
                             'from pathlib import Path\nimport sys\n'
                             'if sys.argv[1:] == ["--version"]: print("test-double")\n'
-                            'else: Path("report.html").write_text("TEST DOUBLE")\n')
+                            'elif sys.argv[1:] == ["typst", "--version"]: print("typst 0.14.2 (TEST DOUBLE)")\n'
+                            'else:\n'
+                            ' assert sys.argv[1:] == ["render", "report.qmd", "--to", "all"]\n'
+                            ' Path("report.html").write_text("TEST DOUBLE")\n'
+                            ' Path("report.pdf").write_bytes(b"%PDF-1.7\\nEXPLICIT RECIPE TEST DOUBLE; no Quarto execution")\n'
+                            ' Path("report.typ").write_text("// EXPLICIT RECIPE TEST DOUBLE")\n')
             environment = dict(os.environ)
             environment['PATH'] = str(folder) + os.pathsep + environment['PATH']
             with patch.dict(os.environ, environment), patch.object(RBridge, 'require_container', return_value='fixture'):
                 value = render_report(ROOT, 'cpue_report', {}, {}, report, 'fallback')
             self.assertEqual(value['version'], 'test-double')
             self.assertEqual((report / 'report.html').read_text(), 'TEST DOUBLE')
+            self.assertEqual((report / 'report.pdf').read_bytes(),
+                             b'%PDF-1.7\nEXPLICIT RECIPE TEST DOUBLE; no Quarto execution')
+            self.assertEqual(value['view'], 'report.pdf')
+            self.assertEqual(value['pdf_engine_version'], 'typst 0.14.2 (TEST DOUBLE)')
             self.assertEqual((report / 'report.qmd').read_bytes(),
                              (ROOT / 'jobs/cpue_report/report.qmd').read_bytes())

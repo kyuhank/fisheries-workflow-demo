@@ -140,7 +140,7 @@ def build():
         shutil.copytree(runner.directory, example_dir)
         (example_dir/'index.html').write_text('<!doctype html><html lang="en-NZ"><meta charset="utf-8"><title>Saved workflow example</title><style>body{font:17px/1.6 system-ui;max-width:850px;margin:50px auto;padding:0 24px}a{color:#1779a0}li{margin:12px 0}</style><h1>Saved workflow example</h1><p>These outputs were calculated when this version was built. Open their compiled Quarto PDFs without running code or connecting to the internet.</p><ol>' + ''.join(f'<li><a href="{key}/report.pdf">{job["title"]}</a> — {job["description"]}</li>' for key, job in SPEC.items()) + '</ol><p><a href="../index.html">Open the interactive demo</a></p></html>')
     notices = '\n\n'.join((ROOT/name).read_text() for name in ['THIRD_PARTY.md','LICENSE'])
-    payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'example_pdf_base64': saved['outputs']['assessment_report'].get('pdf_base64'), 'notices': notices,
+    payload = {'cloud': json.loads((ROOT/'cloud/config.json').read_text()), 'jobs': list(SPEC.values()), 'diagram': diagram, 'saved': saved, 'example': example, 'example_pdf_base64': saved['outputs']['assessment_report'].get('pdf_base64'), 'example_pdf_sha256': saved['records']['assessment_report']['outputs']['report.pdf'], 'notices': notices,
                'calculationBackend': 'container', 'offlineMode': 'saved'}
     if runner.source_context().get('data_kind') == 'public-wcpfc-albacore':
         data_page(runner.source_context())

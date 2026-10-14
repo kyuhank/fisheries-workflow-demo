@@ -161,7 +161,7 @@ class ReportTest(unittest.TestCase):
         self.assertIn('annual total catches in tonnes', text.lower())
         self.assertIn('fish-5', text)
         self.assertNotIn('fish-6', text)
-        self.assertIn('Data preserves all selected rows and the extraction SQL', text)
+        self.assertIn('First six rows shown.', text)
         self.assertNotIn(result['sql'], text)
         result['sets'].append({'set_id': 'new', 'year': 2024, 'vessel': 'B',
                                'hooks': 1000, 'catch_n': 3})
@@ -198,7 +198,7 @@ class ReportTest(unittest.TestCase):
         overlay = next(call for call in chart.call_args_list if call.args[1] == 'cpue')
         self.assertEqual(overlay.args[0], cpue_rates(result['series']['CPUE analysis A']))
         self.assertLess(page.index('Standardised and nominal'), page.index('Relative indices A and B'))
-        self.assertIn('An A-only effort filter does not apply to B', page)
+        self.assertIn('Any A effort filter applies to both; B uses its own eligible records.', page)
         self.assertNotIn('<details', page)
 
     def test_legacy_relative_cpue_has_explicit_overlay_absence(self):
@@ -225,7 +225,8 @@ class ReportTest(unittest.TestCase):
                 self.assertLessEqual(tags.count('svg'), 2)
                 self.assertLessEqual(tags.count('table'), 1)
                 self.assertEqual(tags.count('h1'), 1)
-                self.assertIn('Inputs &amp; versions', page)
+                self.assertIn('data-result="' + key + '"', page)
+                self.assertIn('<h1>' + SPEC[key]['title'] + '</h1>', page)
                 self.assertEqual(result, original)
                 if key.startswith(('cpue_', 'assessment_', 'mse_')) and key != 'mse_prepare':
                     self.assertGreaterEqual(tags.count('svg'), 1)

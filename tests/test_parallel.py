@@ -1,5 +1,6 @@
 """Hosted event/transfer tests with explicit coordinator doubles; no scientific execution."""
 import asyncio
+import base64
 import json
 import os
 from pathlib import Path
@@ -13,6 +14,16 @@ from workflow.engine import Workflow
 from tests.coordinator_fixtures import CoordinatorBridge, test_report
 from workflow.spec import SPEC, STAGES
 from verify import compare
+
+
+HOSTED_PDF_FIXTURE = b'%PDF-1.7\nEXPLICIT HOSTED SCHEDULER TEST DOUBLE; no Quarto execution'
+
+
+def hosted_report_fixture(*args, **kwargs):
+    """Supply transport bytes for event tests without claiming PDF compilation."""
+    metadata = test_report(*args, **kwargs)
+    (args[4] / 'report.pdf').write_bytes(HOSTED_PDF_FIXTURE)
+    return metadata
 
 
 class HostedProcessesTest(unittest.TestCase):
@@ -43,8 +54,16 @@ class HostedProcessesTest(unittest.TestCase):
 
             with patch('cloud.run.api', side_effect=api), patch('builtins.print'), \
                  patch('workflow.engine.reports.output_page', return_value='TEST DOUBLE'), \
-                 patch('workflow.engine.render_report', side_effect=test_report):
+                 patch('workflow.engine.render_report', side_effect=hosted_report_fixture):
                 full = asyncio.run(runner.run())
+                complete = [item['output'] for item in delivered
+                            if item['event']['state'] == 'complete']
+                self.assertEqual({item['event']['job'] for item in delivered
+                                  if item['event']['state'] == 'complete'}, set(SPEC))
+                for output in complete:
+                    self.assertEqual(base64.b64decode(output['pdf_base64']), HOSTED_PDF_FIXTURE)
+                    self.assertFalse(output['record']['report_rendering']['quarto_executed'])
+                    self.assertEqual(output['record']['report_rendering']['engine'], 'TEST DOUBLE')
                 retained = {key: runner.records[key].copy() for key in
                             ['cpue_b', 'prepare_b', 'assessment_b1', 'assessment_b2']}
                 self.assertEqual([item['event']['group'] for item in delivered

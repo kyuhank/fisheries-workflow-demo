@@ -1557,6 +1557,26 @@ function clearOutputPdf() {
   $("open-output-pdf").hidden = true;
   $("open-output-pdf").removeAttribute("href");
 }
+async function verifyOutputPdf(output) {
+  const expected = output.pdf_sha256 || output.record?.outputs?.["report.pdf"];
+  if (!output.pdf_base64) return;
+  if (!expected) throw Error("The PDF has no recorded checksum.");
+  const bytes = Uint8Array.from(atob(output.pdf_base64), (char) => char.charCodeAt(0));
+  const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))]
+    .map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  if (hash !== expected) throw Error("The PDF differs from its recorded checksum.");
+}
+async function displayPreservedOutput(title, output) {
+  const openedVersion = modeVersion;
+  try {
+    await verifyOutputPdf(output);
+    if (modeVersion !== openedVersion) return;
+    displayOutput(title, output, "Saved example output");
+  } catch (error) {
+    if (modeVersion !== openedVersion) return;
+    status("failed", "This output is unavailable", error.message);
+  }
+}
 function displayOutput(title, output, kind = "Job output") {
   const pdf = output.pdf_base64
     ? Uint8Array.from(atob(output.pdf_base64), (char) => char.charCodeAt(0))
@@ -1629,25 +1649,24 @@ async function openOutput(key) {
   }
   const openedMode = mode, openedVersion = modeVersion;
   const openedSignature = records[key].signature;
+  const openedRun = records[key].run_id;
+  const openedPdfHash = records[key].outputs?.["report.pdf"];
+  const isCurrent = () => mode === openedMode && modeVersion === openedVersion &&
+    records[key]?.signature === openedSignature && records[key]?.run_id === openedRun &&
+    records[key]?.outputs?.["report.pdf"] === openedPdfHash;
   try {
     const output = mode === "saved"
         ? payload.saved.outputs[key]
         : await call("view", { job: key });
-    if (output.pdf_base64 && output.record?.outputs?.["report.pdf"]) {
-      const bytes = Uint8Array.from(atob(output.pdf_base64), (char) => char.charCodeAt(0));
-      const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))]
-        .map((byte) => byte.toString(16).padStart(2, "0")).join("");
-      if (hash !== output.record.outputs["report.pdf"]) {
-        throw Error("The PDF differs from its recorded checksum.");
-      }
-    }
-    if (mode !== openedMode || modeVersion !== openedVersion ||
-        records[key]?.signature !== openedSignature) return;
+    if (!isCurrent()) return;
+    await verifyOutputPdf(output);
+    if (!isCurrent()) return;
     displayOutput(
       byKey[key].title, output,
       mode === "saved" ? "Saved example output" : "Job output",
     );
   } catch (error) {
+    if (!isCurrent()) return;
     status("failed", "This output is unavailable", error.message);
   }
 }
@@ -1661,15 +1680,16 @@ function renderOutputRun() {
 $("output-run").onclick = () => runFromJob(currentOutput?.record?.job || currentOutput?.job);
 $("cpue-results").onclick = () => records.cpue_summary
   ? openOutput("cpue_summary")
-  : displayOutput("Compare CPUE results", {
+  : displayPreservedOutput("Compare CPUE results", {
       html: payload.saved.outputs.cpue_summary.html,
       pdf_base64: payload.saved.outputs.cpue_summary.pdf_base64,
-    }, "Saved example output");
+      pdf_sha256: payload.saved.outputs.cpue_summary.record.outputs["report.pdf"],
+    });
 $("example").onclick = () =>
-  displayOutput(
+  displayPreservedOutput(
     "Assessment report",
-    { html: payload.example, pdf_base64: payload.example_pdf_base64 },
-    "Preserved example",
+    { html: payload.example, pdf_base64: payload.example_pdf_base64,
+      pdf_sha256: payload.example_pdf_sha256 },
   );
 $("licences").onclick = () => {
   const pre = document.createElement("pre");
