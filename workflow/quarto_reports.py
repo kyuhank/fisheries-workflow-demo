@@ -102,6 +102,11 @@ def render_report(root, key, result, record, folder, result_html, source_path=No
     typst_version = (typst_check.stdout or typst_check.stderr).strip()
     if not re.match(r'typst \d+\.\d+\.\d+', typst_version, re.I):
         raise RuntimeError('Typst version was not verified.')
+    # Quarto's package cache is scratch; the kept Typst source and figure assets
+    # above are the rendering inputs. Do not carry caches into run downloads.
+    cache = folder / '.quarto'
+    if cache.exists():
+        shutil.rmtree(cache)
     return {'engine': 'Quarto', 'version': version, 'calculation': 'R',
             'quarto_executed': True,
             'source': f'jobs/{key}/report.qmd' if formal else 'workflow/results.qmd',

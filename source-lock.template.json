@@ -3,7 +3,7 @@
   "repositories": {
     "cpue": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
-      "commit": "e5a124ec3adf9b18de44a71192e9f9d3516a64d0",
+      "commit": "6ae03144434e26a8e70a403f4384bf8251b4eb8f",
       "checkout": "components/cpue",
       "jobs": [
         "submission",
