@@ -581,7 +581,7 @@ function renderDiagram() {
       y: label.y,
       class: "edge-label",
     });
-    text.textContent = label.text;
+    text.textContent = publicExample && label.text === "Other data" ? "Catch" : label.text;
     svg.append(text);
   }
   for (const note of layout.notes || []) {
