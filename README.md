@@ -40,7 +40,8 @@ for the extraction record.
 
 Recorded SQL extracts the CPUE rows from a SQLite snapshot. Annual South Pacific
 albacore catches, in tonnes, come from a separate yearbook series; they are not
-a sum of the selected fleet's catch numbers.
+a sum of the selected fleet's catch numbers. They are the diagram's other
+inputs in this example.
 
 CPUE A fits a quasipoisson GLM with year and cell–quarter effects and a
 `log(hooks / 1000)` offset. It predicts fish per 1,000 hooks in each stratum and
