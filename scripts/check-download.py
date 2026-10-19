@@ -204,9 +204,16 @@ def main():
         assert mock.bundle_calls==before and not received
         page.locator('#all-tasks').click()
         page.locator('tr[data-job="mse_buffered"] .open-output').click()
+        page.wait_for_function("currentOutput?.record.job === 'mse_buffered' && $('output-dialog').open && !$('open-output-pdf').hidden")
+        pdf_type = page.evaluate("fetch($('open-output-pdf').href).then(r=>r.headers.get('content-type'))")
+        assert pdf_type == 'application/pdf', pdf_type
         with page.expect_download() as individual:page.locator('#save-output').click()
-        individual.value.save_as(str(directory/'individual.html'))
-        assert (directory/'individual.html').read_text()==fixture['saved']['outputs']['mse_buffered']['html']
+        assert individual.value.suggested_filename == 'mse_buffered-results.pdf'
+        individual.value.save_as(str(directory/'individual.pdf'))
+        pdf = (directory/'individual.pdf').read_bytes()
+        assert pdf.startswith(b'%PDF-')
+        assert pdf == base64.b64decode(fixture['saved']['outputs']['mse_buffered']['pdf_base64'])
+        assert hashlib.sha256(pdf).hexdigest() == page.evaluate("currentOutput.record.outputs['report.pdf']")
         page.locator('[data-output="record"]').click()
         with page.expect_download() as individual_json:page.locator('#download-job-record').click()
         individual_json.value.save_as(str(directory/'individual.json'))
@@ -218,7 +225,7 @@ def main():
         assert page.locator('#download').is_enabled()
         page.locator('#mode').select_option('cloud');page.wait_for_function("mode==='cloud' && ready")
         assert page.locator('#download').is_disabled()
-        results.append('Failed partial outputs0.6 plus old full bundle blocked; no /bundle call; individual HTML/JSON still downloadable; Saved/Live switch preserves block')
+        results.append('Failed partial outputs0.6 plus old full bundle blocked; no /bundle call; individual PDF matches its MIME, filename, bytes and recorded SHA; record JSON still downloadable; Saved/Live switch preserves block')
         assert not errors, errors
         page.close()
 
