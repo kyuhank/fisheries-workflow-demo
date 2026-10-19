@@ -19,9 +19,9 @@ function recordContext(output = currentOutput) {
     ),
     comparison: output.comparison || null,
     reproduction: [
-      "Download this run to retain its code, data, software details and reference outputs.",
-      "Follow REPRODUCE.txt in the downloaded run. For a single-job run, it reproduces and compares that job; other saved outputs are kept as earlier results.",
-      "Inspect code and software versions before comparing results. A job ID or checksum alone does not contain the underlying files.",
+      "Download this run to keep its code, data, software details and reference outputs.",
+      "Follow REPRODUCE.txt. A single-job download reproduces and compares that job; other results keep their original records.",
+      "Keep the underlying files as well as their IDs and checksums. Check code and software versions when comparing results.",
     ],
   };
 }

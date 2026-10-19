@@ -4,7 +4,7 @@ const publicExample = !!payload.saved?.outputs?.extract?.output?.sets?.[0]?.stra
 $("filter").closest("label").hidden = publicExample;
 if (publicExample) {
   document.querySelector(".intro").textContent =
-    "Fiji longline albacore · WCPFC/SPC public aggregates · CPUE → illustrative assessment → MSE.";
+    "Fiji longline albacore · public WCPFC data · CPUE → assessment → MSE.";
 }
 let planVersion = 0,
   jobs = payload.jobs,
@@ -1445,12 +1445,12 @@ function renderViewGuide() {
     ? manual
       ? "Confirm file transfer releases receiving analyses; other ready jobs continue."
       : mode === "saved"
-      ? "Inspect saved results. Output: analyses. Record: inputs and versions."
+      ? "Saved results with their inputs, code and settings."
       : "Update workflow reruns affected jobs and retains unchanged results."
     : manual
       ? "Arrows show input transfers. Confirm each handover to continue."
       : mode === "saved"
-      ? "Inspect saved results: data → CPUE → assessment → MSE."
+      ? "Saved results: data → CPUE → assessment → MSE."
       : "Arrows link each analysis to its inputs.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
   $("view-guide-link").textContent = orchestration ? "Workflow diagram"

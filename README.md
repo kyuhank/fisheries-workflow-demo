@@ -3,9 +3,29 @@
 [Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Code by job](jobs/README.md) · [Preserved releases](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
 Follow public catch and effort data through CPUE standardisation, stock
-assessment and management strategy evaluation (MSE). Each result links to its
-inputs, code, settings and software. The assessment and management models are
-teaching examples and provide no advice for South Pacific albacore.
+assessment and management strategy evaluation (MSE). Change an input or setting
+to see which analyses need to run again and which results can be retained.
+Each result links to its inputs, code, settings and software. The models
+demonstrate the workflow and provide no advice for South Pacific albacore.
+
+## Use the demo
+
+**View example** opens the saved results; **Live run** executes the R jobs and
+Quarto PDFs on GitHub Actions. CPUE plots show nominal and standardised rates
+together. **View** opens a job's PDF; **Inputs & versions** traces its sources.
+PDFs read saved numerical results. The three report jobs contain the methods
+and checks.
+
+**Run full workflow** starts with data through 2021. Selecting 2022 adds the
+final available year. After a setting changes, **Update workflow** reruns the
+affected analyses and retains unchanged results with their original records.
+**Run** prepares the selected job's required inputs and stops at that job.
+
+**Manual handover** pauses receiving jobs until **Confirm file transfer**;
+other ready jobs continue. **Reproduce & compare** repeats the recorded
+workflow and compares the selected result. **Download this run** preserves
+source, inputs, records and outputs before live results expire after about
+ten minutes.
 
 ## Data and methods
 
@@ -40,25 +60,6 @@ fractions describe those assumptions, rather than calibrated uncertainty or risk
 All rules share a simulator catch cap of 40% of true starting biomass; the
 low-biomass results are conditional on that guardrail.
 
-## Use the demo
-
-Plots are visible immediately. CPUE results overlay standardised and nominal rates on the same selected rows; assessment and MSE results show their main comparisons. View opens the compiled Quarto PDF, with Open PDF and Save PDF controls. Rendering reads saved numerical outputs. The three report jobs give the methods and checks.
-
-1. Choose **View example** to inspect the saved results, or **Live run** to
-   execute the R jobs and Quarto result views on GitHub Actions.
-2. Select a job and open **Output**. Use **Inputs & versions** to trace its
-   producing records and exact source.
-3. Choose **Run full workflow**. The default snapshot ends in 2021; select 2022
-   to include the final available year.
-4. Change a setting and choose **Update workflow**. Affected jobs rerun;
-   unchanged inputs retain their original records.
-
-**Run** prepares a job's required inputs and stops at that job.
-**Reproduce & compare** repeats the recorded workflow and compares the selected
-result with its reference. **Manual handover** waits for **Confirm file transfer**
-while other ready jobs continue. **Download this run** keeps source, inputs,
-records and outputs before live results expire after about ten minutes.
-
 ## Run or adapt the code
 
 The [22 job guides](jobs/README.md) show each input → method → output path.
@@ -78,10 +79,8 @@ catch units, assessment assumptions and the receiving file contracts before
 running later jobs. [ADAPT.md](ADAPT.md) describes the connections and source
 pins; [cloud/README.md](cloud/README.md) covers hosting.
 
-The separate [MQMF adaptation](EXISTING-ANALYSIS.md) preserves an existing
-prediction routine and historical abalone teaching data. It compares direct
-and mapped inputs, then a growth-setting update. It does not reconstruct the
-original CPUE standardisation.
+For an existing-analysis example, the [MQMF adaptation](EXISTING-ANALYSIS.md)
+preserves an abalone prediction routine and compares direct and mapped inputs.
 
 ## Preserve a run
 
