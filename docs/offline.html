@@ -2735,7 +2735,7 @@ const publicExample = !!payload.saved?.outputs?.extract?.output?.sets?.[0]?.stra
 $("filter").closest("label").hidden = publicExample;
 if (publicExample) {
   document.querySelector(".intro").textContent =
-    "Fiji longline albacore · WCPFC/SPC public aggregates · CPUE → illustrative assessment → MSE.";
+    "Fiji longline albacore · public WCPFC data · CPUE → assessment → MSE.";
 }
 let planVersion = 0,
   jobs = payload.jobs,
@@ -3312,7 +3312,7 @@ function renderDiagram() {
       y: label.y,
       class: "edge-label",
     });
-    text.textContent = label.text;
+    text.textContent = publicExample && label.text === "Other data" ? "Catch" : label.text;
     svg.append(text);
   }
   for (const note of layout.notes || []) {
@@ -4176,12 +4176,12 @@ function renderViewGuide() {
     ? manual
       ? "Confirm file transfer releases receiving analyses; other ready jobs continue."
       : mode === "saved"
-      ? "Inspect saved results. Output: analyses. Record: inputs and versions."
+      ? "Saved results with their inputs, code and settings."
       : "Update workflow reruns affected jobs and retains unchanged results."
     : manual
       ? "Arrows show input transfers. Confirm each handover to continue."
       : mode === "saved"
-      ? "Inspect saved results: data → CPUE → assessment → MSE."
+      ? "Saved results: data → CPUE → assessment → MSE."
       : "Arrows link each analysis to its inputs.";
   $("view-guide-link").href = orchestration ? "#workflow" : "#orchestration";
   $("view-guide-link").textContent = orchestration ? "Workflow diagram"
@@ -4623,9 +4623,9 @@ function recordContext(output = currentOutput) {
     ),
     comparison: output.comparison || null,
     reproduction: [
-      "Download this run to retain its code, data, software details and reference outputs.",
-      "Follow REPRODUCE.txt in the downloaded run. For a single-job run, it reproduces and compares that job; other saved outputs are kept as earlier results.",
-      "Inspect code and software versions before comparing results. A job ID or checksum alone does not contain the underlying files.",
+      "Download this run to keep its code, data, software details and reference outputs.",
+      "Follow REPRODUCE.txt. A single-job download reproduces and compares that job; other results keep their original records.",
+      "Keep the underlying files as well as their IDs and checksums. Check code and software versions when comparing results.",
     ],
   };
 }
