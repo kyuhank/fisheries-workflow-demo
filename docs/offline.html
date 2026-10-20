@@ -3312,7 +3312,7 @@ function renderDiagram() {
       y: label.y,
       class: "edge-label",
     });
-    text.textContent = publicExample && label.text === "Other data" ? "Catch" : label.text;
+    text.textContent = publicExample && ["Other data", "Catch"].includes(label.text) ? "Other inputs" : label.text;
     svg.append(text);
   }
   for (const note of layout.notes || []) {

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "operation": "interface-refresh",
-  "interface_source_commit": "237d6cbb70c057bbddce8f74e614cd2ca2168eb5",
+  "interface_source_commit": "29a3098a830bf7571cdbf6da8503b3e671c9c255",
   "analysis_reexecuted": false,
   "saved_analysis_execution": {
     "provider": "Local Docker",
@@ -19,12 +19,12 @@
     "app/style.css": "8fd376dd3429152b3176ee544760dbc19d4719662d282b45f2b6b3b7ebfdd09f",
     "app/cloud.js": "9fd3dc868202a075bbe48de96f975e5521afb6a585f1a12a7659dbd4ee2f8327",
     "app/lineage.js": "1af9550accb16c4ce6a442576b09bbad8d783b48263ae75e6d7ef544537e1e30",
-    "app/app.js": "e6af37951f9c34eb7536c5d27a4896fe87e4cbf33ac9e3c281016b3b081cf4f9",
+    "app/app.js": "0b62a4edebf05fe000c328b2c0b1a55c505657a6282dbb2f24420cdd5f3ec9d9",
     "app/record.js": "4bc166b19f57e3531e62ae285fa4775f7c5a089a7737949e7a8dae536c4de2b2",
     "scripts/refresh-interface.py": "7f68070c1d2901791188d3c8ab9d0f29395a04f86d96ae140c4076d33c237697"
   },
   "output_sha256": {
-    "docs/index.html": "52b6dc02c9fb0ead3d222bd24ba1315ae595107ac40568b2693f0084584f14cf",
-    "docs/offline.html": "52b6dc02c9fb0ead3d222bd24ba1315ae595107ac40568b2693f0084584f14cf"
+    "docs/index.html": "3bbfa5e6cb45c81dd1b96ce1b3e98a8bfdf099b2a00791e1c1f577144ace48fc",
+    "docs/offline.html": "3bbfa5e6cb45c81dd1b96ce1b3e98a8bfdf099b2a00791e1c1f577144ace48fc"
   }
 }
