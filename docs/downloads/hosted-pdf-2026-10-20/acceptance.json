@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "status": "passed_in_scope",
+  "scope": "Actual hosted execution and archive/output/compiled-PDF integrity. Original uninterrupted overall-browser acceptance remains HALTED; fresh third browser downloads are UNVERIFIED.",
+  "expected_commit": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+  "compute_receipt": {
+    "id": "FEEDBACK-2274cc47716e",
+    "revision": 1,
+    "receipt_sha256": "b1b7ff0854c0946a5ba3584673f699c44133695ab6fd3137dc67bbc930d9360c"
+  },
+  "mutation_counts": {
+    "session": 1,
+    "run": 3,
+    "transfer": 5
+  },
+  "cases": [
+    {
+      "name": "01-full2021-manual",
+      "status": "passed",
+      "request_id": "6c76482c-d737-4612-b887-39eb25aa779f",
+      "executed": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [],
+      "source_snapshot_rows": 662,
+      "hosted_projection_rows": 639,
+      "extracted_reference_rows": 132,
+      "catch_years": 22,
+      "fixed_support_cpue_oracles": "passed",
+      "current_cpue_b_oracle": "year+quarter formula, equal fixed weights, reconstructed year/quarter scores, response-scale arithmetic; no B=nominal assertion",
+      "quarto_reports": 22,
+      "checksummed_bundle_files": 479,
+      "bundle_sha256": "72ed7ad579fee7804df06b31510461ee8bc0adad037525717c2170f7341087eb",
+      "checkpoint_sha256": "96c77dac54821e95bdddd2303b71ff372623fdc4cb67c484f6d3e90d45285f31",
+      "record_and_raw_retention_verified": true,
+      "event_barriers_verified": true,
+      "bundle_checkpoint_output_custody_verified": true,
+      "execution_identity": {
+        "github_run": "39368772780",
+        "commit": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+        "public_verification": "pending_parent",
+        "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39368772780"
+      },
+      "compiled_pdf_custody": true,
+      "pdf_sha256": {
+        "submission": "e08db5d506cc2dc3649571a2269aeddf46ea883f43a88c5aa5efa7cf67e4e821",
+        "qc": "84c5141cdc585b270d31a58ca3889b151cfe1f4dc64f138a04416b31988bfbe8",
+        "database": "30e88f18d997ad943e453873b34fafcf6e7f1de792f830471bed8f8c62b1c86b",
+        "extract": "115720403f6e15fa0cdab8dce4d41050eefea6fdc63d4733972df5292e0d2d2b",
+        "cpue_a": "287d63f8b85eadcacd422c4a5ba61f6243a3ca032e49719f00f4a9bbc36e235b",
+        "cpue_b": "fd2a951d1a9a0d98a15b3722d219dd8bb7dbf9086421bee644f2bc9d1787f0e5",
+        "cpue_summary": "ca2118b16bc67f0b1c9a57172b76d7039ef8314872ee382805b3234aaf1819c5",
+        "cpue_report": "bd1df5454cb904e1b98c315b785356c4a0ff2b77452bc317fed1d4b06fff0e7b",
+        "prepare_a": "4d7b944ebeb1b2500e27b85c240dee72bbcc606626112b6a76589dc331f311bf",
+        "prepare_b": "7f9cf86a868b8ca8f03c70584d8e6b03be5cf83ac3178557370bfddfde70028e",
+        "assessment_a1": "27519cdd2208305b4e26c147ba1f4e0e4c5f75bed79702d738007f35525c18d5",
+        "assessment_a2": "ead7e3837fec8af3b438c5468a4b73d06bdc53127af39531a8be78a364320a87",
+        "assessment_b1": "e5d9d96c25b86c0c8f2a4c65b9334dbc48432ecaef98538b0fa3a4ebcef95a5b",
+        "assessment_b2": "fc9bcb11b23b1bd92863176cf0b8a103caa279f3d2ce7289f92d42343235aeac",
+        "assessment_summary": "9c32fdc36e9b25533ea65fffdc04d491001027598784c0606ff959a866185ccc",
+        "assessment_report": "dbeb26e1508b2ef6fc6bbcb95dc1bf836961f3baa6fb42f52447210842962469",
+        "mse_prepare": "757e465579b8d27e8558a97dd93ce895a78f6b3e451ea1e84775340cac0d796d",
+        "mse_constant": "4933f17b61006411360d4386603e267e4e563e25495429b396893b0c32511a93",
+        "mse_index": "8a2d0398b73ef2c8eb5e1f5ab5794bbdeb5794f89df7e70836838663f4e41d25",
+        "mse_buffered": "ef0de04e9a9a955c29aad5c185c54282e2d114c8cf413d04ec8660d0098412a7",
+        "mse_summary": "d3d15de6cc04c3f1e70d557b708355a3ca27a3b688f274b7d69b8412629bfdeb",
+        "mse_report": "ee6baaa49cf553e04f439711288fb88d9d6f16f197f376da908c70d84e285a5f"
+      },
+      "browser_buttons_verified": true
+    },
+    {
+      "name": "02-growth035-manual",
+      "status": "passed",
+      "request_id": "9f3350be-6b33-4d9e-a102-b0e57035118e",
+      "executed": [
+        "assessment_a2",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_b1"
+      ],
+      "source_snapshot_rows": 662,
+      "hosted_projection_rows": 639,
+      "extracted_reference_rows": 132,
+      "catch_years": 22,
+      "fixed_support_cpue_oracles": "passed",
+      "current_cpue_b_oracle": "year+quarter formula, equal fixed weights, reconstructed year/quarter scores, response-scale arithmetic; no B=nominal assertion",
+      "quarto_reports": 22,
+      "checksummed_bundle_files": 479,
+      "bundle_sha256": "30a43f219310638ecb8e669a2c69fe41f926fd86b4eb617a88233daae3ed5e4a",
+      "checkpoint_sha256": "fc3b4cca927e352d453d0fe6dbf6beff17d3f6db14d99cb59292e945d757f5a1",
+      "record_and_raw_retention_verified": true,
+      "event_barriers_verified": true,
+      "bundle_checkpoint_output_custody_verified": true,
+      "execution_identity": {
+        "github_run": "39369308028",
+        "commit": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+        "public_verification": "pending_parent",
+        "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39369308028"
+      },
+      "compiled_pdf_custody": true,
+      "pdf_sha256": {
+        "submission": "e08db5d506cc2dc3649571a2269aeddf46ea883f43a88c5aa5efa7cf67e4e821",
+        "qc": "84c5141cdc585b270d31a58ca3889b151cfe1f4dc64f138a04416b31988bfbe8",
+        "database": "30e88f18d997ad943e453873b34fafcf6e7f1de792f830471bed8f8c62b1c86b",
+        "extract": "115720403f6e15fa0cdab8dce4d41050eefea6fdc63d4733972df5292e0d2d2b",
+        "cpue_a": "287d63f8b85eadcacd422c4a5ba61f6243a3ca032e49719f00f4a9bbc36e235b",
+        "cpue_b": "fd2a951d1a9a0d98a15b3722d219dd8bb7dbf9086421bee644f2bc9d1787f0e5",
+        "cpue_summary": "ca2118b16bc67f0b1c9a57172b76d7039ef8314872ee382805b3234aaf1819c5",
+        "cpue_report": "bd1df5454cb904e1b98c315b785356c4a0ff2b77452bc317fed1d4b06fff0e7b",
+        "prepare_a": "4d7b944ebeb1b2500e27b85c240dee72bbcc606626112b6a76589dc331f311bf",
+        "prepare_b": "7f9cf86a868b8ca8f03c70584d8e6b03be5cf83ac3178557370bfddfde70028e",
+        "assessment_a1": "27519cdd2208305b4e26c147ba1f4e0e4c5f75bed79702d738007f35525c18d5",
+        "assessment_a2": "ec7f77c0a9cefa981ae8132f8657be44eae7f10dfaaf9451c1371ef62866da45",
+        "assessment_b1": "e5d9d96c25b86c0c8f2a4c65b9334dbc48432ecaef98538b0fa3a4ebcef95a5b",
+        "assessment_b2": "c23f36706beab41329354ed32254e974f2875d1df2ce4f8050dfd6fc35b94e6a",
+        "assessment_summary": "b5aa3d42602b4cd49932c9a0211ea2a92be823eae09544f8fcd3ed856d0e2260",
+        "assessment_report": "c53419f13b7bfe6031e6b463abae3563374f59767efb193764cf12157f223589",
+        "mse_prepare": "c6ce20a5c47d713d801e271b6f022a7023d3eb76dce5a194de0174a1eace6f63",
+        "mse_constant": "772f149be7abafdd529acf2f93d0863377bd8ce3c91d39cf3382afe0335f83ad",
+        "mse_index": "374cc6bee3e7f18b04ad7dc2fa1e6ce95279a74c0398a81ccf4b141920e0da02",
+        "mse_buffered": "426a1736f73adcce4793061dc0391c475295a88f6d380ec6f5c553ed3720629b",
+        "mse_summary": "45abb2c8d47c2727347e1c7a01f3b10833b70f333721918e8332707af83e8a40",
+        "mse_report": "5eab3b8dcba9c98003136de2b56a1f188afbcaedac7c75e567a82e4a567d34c3"
+      },
+      "browser_buttons_verified": true
+    },
+    {
+      "name": "03-buffer060-auto",
+      "status": "passed",
+      "request_id": "88bef5ae-163f-4311-8d14-5ac21ab4b8b7",
+      "executed": [
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index"
+      ],
+      "source_snapshot_rows": 662,
+      "hosted_projection_rows": 639,
+      "extracted_reference_rows": 132,
+      "catch_years": 22,
+      "fixed_support_cpue_oracles": "passed",
+      "current_cpue_b_oracle": "year+quarter formula, equal fixed weights, reconstructed year/quarter scores, response-scale arithmetic; no B=nominal assertion",
+      "quarto_reports": 22,
+      "checksummed_bundle_files": 479,
+      "bundle_sha256": "9d8deec806a5ccb6316beae83489a6b933b03879ef57fdc3d027ffdba75306fe",
+      "checkpoint_sha256": "47b67dec6745af38999a57ea3fb3232841ef77b484f833e0467e5193de3e19ed",
+      "record_and_raw_retention_verified": true,
+      "event_barriers_verified": true,
+      "bundle_checkpoint_output_custody_verified": true,
+      "execution_identity": {
+        "github_run": "39369773568",
+        "commit": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+        "public_verification": "pending_parent",
+        "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39369773568"
+      },
+      "compiled_pdf_custody": true,
+      "pdf_sha256": {
+        "submission": "e08db5d506cc2dc3649571a2269aeddf46ea883f43a88c5aa5efa7cf67e4e821",
+        "qc": "84c5141cdc585b270d31a58ca3889b151cfe1f4dc64f138a04416b31988bfbe8",
+        "database": "30e88f18d997ad943e453873b34fafcf6e7f1de792f830471bed8f8c62b1c86b",
+        "extract": "115720403f6e15fa0cdab8dce4d41050eefea6fdc63d4733972df5292e0d2d2b",
+        "cpue_a": "287d63f8b85eadcacd422c4a5ba61f6243a3ca032e49719f00f4a9bbc36e235b",
+        "cpue_b": "fd2a951d1a9a0d98a15b3722d219dd8bb7dbf9086421bee644f2bc9d1787f0e5",
+        "cpue_summary": "ca2118b16bc67f0b1c9a57172b76d7039ef8314872ee382805b3234aaf1819c5",
+        "cpue_report": "bd1df5454cb904e1b98c315b785356c4a0ff2b77452bc317fed1d4b06fff0e7b",
+        "prepare_a": "4d7b944ebeb1b2500e27b85c240dee72bbcc606626112b6a76589dc331f311bf",
+        "prepare_b": "7f9cf86a868b8ca8f03c70584d8e6b03be5cf83ac3178557370bfddfde70028e",
+        "assessment_a1": "27519cdd2208305b4e26c147ba1f4e0e4c5f75bed79702d738007f35525c18d5",
+        "assessment_a2": "ec7f77c0a9cefa981ae8132f8657be44eae7f10dfaaf9451c1371ef62866da45",
+        "assessment_b1": "e5d9d96c25b86c0c8f2a4c65b9334dbc48432ecaef98538b0fa3a4ebcef95a5b",
+        "assessment_b2": "c23f36706beab41329354ed32254e974f2875d1df2ce4f8050dfd6fc35b94e6a",
+        "assessment_summary": "b5aa3d42602b4cd49932c9a0211ea2a92be823eae09544f8fcd3ed856d0e2260",
+        "assessment_report": "c53419f13b7bfe6031e6b463abae3563374f59767efb193764cf12157f223589",
+        "mse_prepare": "c6ce20a5c47d713d801e271b6f022a7023d3eb76dce5a194de0174a1eace6f63",
+        "mse_constant": "772f149be7abafdd529acf2f93d0863377bd8ce3c91d39cf3382afe0335f83ad",
+        "mse_index": "374cc6bee3e7f18b04ad7dc2fa1e6ce95279a74c0398a81ccf4b141920e0da02",
+        "mse_buffered": "8499e4e978137292970d64d2afa314b16cc8cf727a6a4e5a65bacea890567a41",
+        "mse_summary": "b0c6467559a49ce1e62fae4c7ac2b5d25662b070642c33c2b1355065150c997d",
+        "mse_report": "5315fb20144f0821b39a775c52caec3b925c7d5a10b3a6a9990c344de128433a"
+      }
+    }
+  ],
+  "independent_parent_github_gate": {
+    "schema_version": 1,
+    "status": "PASS",
+    "scope": "Independent GitHub source/workflow/completion only. Browser artifact halt and GET recovery are separate gates.",
+    "expected_commit": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+    "runs": [
+      {
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "path": ".github/workflows/live.yml",
+        "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39368772780",
+        "id": "39368772780",
+        "repository": "kyuhank/fisheries-workflow-demo",
+        "labels": [
+          [
+            "ubuntu-latest"
+          ]
+        ],
+        "checks": {
+          "terminal_success": true,
+          "exact_source": true,
+          "paper_workflow": true,
+          "dispatch": true,
+          "main_branch": true,
+          "public_repository": true,
+          "standard_ubuntu_success": true
+        },
+        "parent_status": "PASS",
+        "files": {
+          "39368772780-completed.json": "9bbac180dd5c4ae5fec746e8a450a1ef9b184600b7d85680f96b1568542fd83f",
+          "39368772780-jobs.json": "77a2a85a221df7819426e67e4aa9763bf47581a7743549ac484582f20a066f4b",
+          "39368772780.log": "2016eb9c7f2dbd9cb825dca9b1201f29ec721f3b594e804ad0b9b87131dc76de"
+        }
+      },
+      {
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "path": ".github/workflows/live.yml",
+        "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39369308028",
+        "id": "39369308028",
+        "repository": "kyuhank/fisheries-workflow-demo",
+        "labels": [
+          [
+            "ubuntu-latest"
+          ]
+        ],
+        "checks": {
+          "terminal_success": true,
+          "exact_source": true,
+          "paper_workflow": true,
+          "dispatch": true,
+          "main_branch": true,
+          "public_repository": true,
+          "standard_ubuntu_success": true
+        },
+        "parent_status": "PASS",
+        "files": {
+          "39369308028-completed.json": "6ab03d5b27fc3e329ce6aefd75043b1423147e7d12a536aac208cca1d2ea5c19",
+          "39369308028-jobs.json": "0e8299780418c080834966198c58df3a8c5878d304b232747c7e554980d619c2",
+          "39369308028.log": "a311e505bb752c6862ded070c7a6d3305b4b00649ddadf52080b1065a94d1360"
+        }
+      },
+      {
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+        "head_branch": "main",
+        "event": "workflow_dispatch",
+        "path": ".github/workflows/live.yml",
+        "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39369773568",
+        "id": "39369773568",
+        "repository": "kyuhank/fisheries-workflow-demo",
+        "labels": [
+          [
+            "ubuntu-latest"
+          ]
+        ],
+        "checks": {
+          "terminal_success": true,
+          "exact_source": true,
+          "paper_workflow": true,
+          "dispatch": true,
+          "main_branch": true,
+          "public_repository": true,
+          "standard_ubuntu_success": true
+        },
+        "parent_status": "PASS",
+        "files": {
+          "39369773568-completed.json": "be95765d4f365af5b96ec5e8fba436dcdb0921e97029618207ea61bf42e82395",
+          "39369773568-jobs.json": "ccafdad163b80ca3283ce0f31bbd45d0148b9b62c984a808663b0bf9f66ecb89",
+          "39369773568.log": "c2250a14ce5ee35f1e59e17f89bab89d62d5dbdbcf837d5e40d9f3329c147786"
+        }
+      }
+    ]
+  },
+  "browser_coverage": {
+    "verified_cases": 2,
+    "actual_save_pdf_downloads": 32,
+    "actual_archive_downloads": 2,
+    "third_case": "UNVERIFIED: no fresh third-case Save PDF or browser archive download is claimed."
+  },
+  "recovery_chronology": {
+    "status": "complete_in_declared_scope",
+    "original_driver": {
+      "status": "HALTED_NO_REPLAY",
+      "error": "GET /bundle HTTP 503; code=none.",
+      "seconds": 1005.3426251169294,
+      "receipt_sha256": "6dfe45fd1b019ea9700c7759d855b4027533044483de0f659dea0fbd801f9936",
+      "halted_acceptance_sha256": "2090a9d25c563fdc399f9c0674c755fe3112eb72936bf8033d128204a2ee527f"
+    },
+    "capture_resume": {
+      "status": "CAPTURE_COMPLETED",
+      "seconds": 37.129892605007626,
+      "extra_mutations": 0
+    },
+    "final_artifact_verification": {
+      "status": "passed",
+      "executed": 3,
+      "retained": 19,
+      "compiled_pdf_custody": 22,
+      "actual_source": "Retained verify() executed before first browser-client failure.",
+      "source_report_sha256": "dc552bf405c2adb0dc80bb1355b342c64572ebdc895bf64211aeb82b668b6834"
+    },
+    "browser_completion_attempts": [
+      {
+        "status": "HALTED_NO_REPLAY",
+        "error": "Response.body: Protocol error (Network.getResponseBody): Request content was evicted from inspector cache",
+        "seconds": 6.329290576046333,
+        "forwarded_api_gets": 0,
+        "extra_posts": 0,
+        "bootstrap_get_info_aborted": 1
+      },
+      {
+        "status": "HALTED_NO_REPLAY",
+        "error": "Page.wait_for_function: Timeout 45000ms exceeded.",
+        "seconds": 59.40860957594123,
+        "forwarded_api_gets": 0,
+        "extra_posts": 0,
+        "bootstrap_get_info_aborted": 1
+      }
+    ],
+    "bootstrap_limit": "Initial GET /info was locally aborted to avoid new-session creation. Both attempts stopped before restoring original real terminal state and before any API download reads.",
+    "fresh_browser_coverage": {
+      "verified_cases": 2,
+      "actual_save_pdf_downloads": 32,
+      "actual_archive_downloads": 2,
+      "third_case": "UNVERIFIED: no fresh third-case Save PDF or browser archive download is claimed."
+    },
+    "historical_browser_equivalence": "Separate parent comparison; earlier AEC execution is not a replacement fresh execution. Raw old/new numerical or PDF byte equality is not claimed."
+  },
+  "limits": [
+    "No uninterrupted original-driver PASS.",
+    "No fresh third-case browser download PASS.",
+    "No old/new raw numerical/PDF byte-equality claim.",
+    "No scientific-validity or efficiency claim."
+  ]
+}

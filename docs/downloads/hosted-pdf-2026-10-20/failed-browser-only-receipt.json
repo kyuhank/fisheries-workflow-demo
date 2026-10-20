@@ -1,0 +1,14 @@
+{
+  "status": "HALTED_NO_REPLAY",
+  "started_at": "2026-10-20T04:42:07.064515+00:00",
+  "attempt": 1,
+  "client": "codex",
+  "worker": "/root/demo_clarity_execution",
+  "plan_sha256": "0ee1d3152147876cf253e675fdc5775156322816292862bf3b9a21b30f0e460c",
+  "error": "Page.wait_for_function: Timeout 45000ms exceeded.",
+  "ended_at": "2026-10-20T04:43:06.473268+00:00",
+  "elapsed_seconds": 59.40860957594123,
+  "forwarded_api_gets": 0,
+  "blocked_non_read_requests": 0,
+  "bootstrap_gets_aborted": 1
+}

@@ -1,0 +1,33 @@
+{
+  "status": "CAPTURE_COMPLETED",
+  "argv": [
+    "/usr/bin/python3",
+    "/home/kyuhank/klab/.local/workspace-executions/d84cc0553ff54f86bb2d224666ba641f/tasks/TASK-cf2394c1a64f/evidence/cpue-b-adjustment-20261014/live115/check_live_browser115.py",
+    "--checkout",
+    "/home/kyuhank/klab/.local/workspace-executions/d84cc0553ff54f86bb2d224666ba641f/tasks/TASK-cf2394c1a64f/demo-reader-clarity-20261020",
+    "--expected-commit",
+    "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+    "--compute-receipt-file",
+    "/home/kyuhank/klab/.local/workspace-executions/d84cc0553ff54f86bb2d224666ba641f/tasks/TASK-cf2394c1a64f/evidence/clarity-20261020/finish-reconciliation/live-route-receipt.json",
+    "--free-services-file",
+    "/home/kyuhank/klab/.local/workspace-executions/d84cc0553ff54f86bb2d224666ba641f/tasks/TASK-cf2394c1a64f/evidence/clarity-20261020/finish-reconciliation/current-free-services.json",
+    "--edge-function-version",
+    "20",
+    "--output",
+    "/home/kyuhank/klab/.local/workspace-executions/d84cc0553ff54f86bb2d224666ba641f/tasks/TASK-cf2394c1a64f/evidence/clarity-20261020/finish-reconciliation/live-browser",
+    "--resume"
+  ],
+  "attempt": 1,
+  "started_at": "2026-10-20T04:36:07.441539+00:00",
+  "plan_sha256": "d56f510bc8095a6b54d82a5272bacc299fa652027f7b6dbbd2082c9c0a072d99",
+  "client": "codex",
+  "worker": "/root/demo_clarity_execution",
+  "client_pid": 2480006,
+  "ended_at": "2026-10-20T04:36:44.571606+00:00",
+  "elapsed_seconds": 37.129892605007626,
+  "exit_code": 0,
+  "stop_reason": null,
+  "mutation_journal_unchanged": true,
+  "original_go_receipt_unchanged": true,
+  "scope": "Unchanged --resume captures original-ID archives/outputs only; browser and acceptance verification remain separate."
+}

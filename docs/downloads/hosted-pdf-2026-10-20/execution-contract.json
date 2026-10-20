@@ -1,0 +1,10 @@
+{
+  "final_commit": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+  "compute_choice": "FEEDBACK-2274cc47716e",
+  "actual_ui": "https://kyuhank.github.io/fisheries-workflow-demo/",
+  "api": "https://gvunwnpsfmylmqfqowzp.supabase.co/functions/v1/paper-api",
+  "maximum_run_posts": 3,
+  "script_sha256": "d7f34eb24c7557f6bbc79342b4a09f99cebfbb0c1d74fe19d67adc3c5c30e22f",
+  "helper_sha256": "4e32ef05d0249f92cbaab3cb109cf11b4318d474a08e64b475038bcbd5251d3c",
+  "unknown_rule": "Stop mutations; GET-only recover owned existing request; never reset/resubmit."
+}

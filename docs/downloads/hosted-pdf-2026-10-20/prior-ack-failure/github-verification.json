@@ -1,0 +1,32 @@
+{
+  "status": "HISTORICAL_FAILURE_PRESERVED",
+  "runs": [
+    {
+      "id": 39364235932,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "aecbf8e3967d26c09f2ec6fc5a09fa860052eb4a",
+      "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39364235932",
+      "path": ".github/workflows/live.yml",
+      "event": "workflow_dispatch"
+    },
+    {
+      "id": 39365020682,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "aecbf8e3967d26c09f2ec6fc5a09fa860052eb4a",
+      "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39365020682",
+      "path": ".github/workflows/live.yml",
+      "event": "workflow_dispatch"
+    },
+    {
+      "id": 39365433531,
+      "status": "completed",
+      "conclusion": "failure",
+      "head_sha": "aecbf8e3967d26c09f2ec6fc5a09fa860052eb4a",
+      "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39365433531",
+      "path": ".github/workflows/live.yml",
+      "event": "workflow_dispatch"
+    }
+  ]
+}

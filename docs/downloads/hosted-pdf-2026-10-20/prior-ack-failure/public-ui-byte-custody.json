@@ -1,0 +1,9 @@
+{
+  "published_sha256": "f5428794e6ccd653cc560ef20042d94a58d0725fcaeb3a65e0053968a7e08d7a",
+  "checkout_sha256": "f5428794e6ccd653cc560ef20042d94a58d0725fcaeb3a65e0053968a7e08d7a",
+  "whole_document_identical": true,
+  "browser_client_sha256": "d33fbb2b881c33f62d2c5a2e5357f1ee0c18a0880b111a8dbe5aeee182221781",
+  "browser_client_identical": true,
+  "expected_live_commit": "aecbf8e3967d26c09f2ec6fc5a09fa860052eb4a",
+  "scope": "Exact current published UI bytes and client required; all actual Live output records must bind to the supplied final public SHA."
+}

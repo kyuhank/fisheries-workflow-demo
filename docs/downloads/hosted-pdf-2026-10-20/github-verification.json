@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "scope": "Independent GitHub source/workflow/completion only. Browser artifact halt and GET recovery are separate gates.",
+  "expected_commit": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+  "runs": [
+    {
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+      "head_branch": "main",
+      "event": "workflow_dispatch",
+      "path": ".github/workflows/live.yml",
+      "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39368772780",
+      "id": "39368772780",
+      "repository": "kyuhank/fisheries-workflow-demo",
+      "labels": [
+        [
+          "ubuntu-latest"
+        ]
+      ],
+      "checks": {
+        "terminal_success": true,
+        "exact_source": true,
+        "paper_workflow": true,
+        "dispatch": true,
+        "main_branch": true,
+        "public_repository": true,
+        "standard_ubuntu_success": true
+      },
+      "parent_status": "PASS",
+      "files": {
+        "39368772780-completed.json": "9bbac180dd5c4ae5fec746e8a450a1ef9b184600b7d85680f96b1568542fd83f",
+        "39368772780-jobs.json": "77a2a85a221df7819426e67e4aa9763bf47581a7743549ac484582f20a066f4b",
+        "39368772780.log": "2016eb9c7f2dbd9cb825dca9b1201f29ec721f3b594e804ad0b9b87131dc76de"
+      }
+    },
+    {
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+      "head_branch": "main",
+      "event": "workflow_dispatch",
+      "path": ".github/workflows/live.yml",
+      "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39369308028",
+      "id": "39369308028",
+      "repository": "kyuhank/fisheries-workflow-demo",
+      "labels": [
+        [
+          "ubuntu-latest"
+        ]
+      ],
+      "checks": {
+        "terminal_success": true,
+        "exact_source": true,
+        "paper_workflow": true,
+        "dispatch": true,
+        "main_branch": true,
+        "public_repository": true,
+        "standard_ubuntu_success": true
+      },
+      "parent_status": "PASS",
+      "files": {
+        "39369308028-completed.json": "6ab03d5b27fc3e329ce6aefd75043b1423147e7d12a536aac208cca1d2ea5c19",
+        "39369308028-jobs.json": "0e8299780418c080834966198c58df3a8c5878d304b232747c7e554980d619c2",
+        "39369308028.log": "a311e505bb752c6862ded070c7a6d3305b4b00649ddadf52080b1065a94d1360"
+      }
+    },
+    {
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+      "head_branch": "main",
+      "event": "workflow_dispatch",
+      "path": ".github/workflows/live.yml",
+      "html_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39369773568",
+      "id": "39369773568",
+      "repository": "kyuhank/fisheries-workflow-demo",
+      "labels": [
+        [
+          "ubuntu-latest"
+        ]
+      ],
+      "checks": {
+        "terminal_success": true,
+        "exact_source": true,
+        "paper_workflow": true,
+        "dispatch": true,
+        "main_branch": true,
+        "public_repository": true,
+        "standard_ubuntu_success": true
+      },
+      "parent_status": "PASS",
+      "files": {
+        "39369773568-completed.json": "be95765d4f365af5b96ec5e8fba436dcdb0921e97029618207ea61bf42e82395",
+        "39369773568-jobs.json": "ccafdad163b80ca3283ce0f31bbd45d0148b9b62c984a808663b0bf9f66ecb89",
+        "39369773568.log": "c2250a14ce5ee35f1e59e17f89bab89d62d5dbdbcf837d5e40d9f3329c147786"
+      }
+    }
+  ]
+}

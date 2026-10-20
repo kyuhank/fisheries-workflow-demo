@@ -1,0 +1,17 @@
+{
+  "bundle_sha256": "bd06b9ad17455cba02fb2d0daab767174875676d1f8a2b3d3827043c5d5664ce",
+  "bundle_request_id": "6fe375d3-1543-4955-b863-6581ac6592a0",
+  "saved_pdf_sha256": {
+    "assessment_a2": "4db2aedbcf687151f7ee169a2d777fde3c9704e273ec824b6777685f24d9868f",
+    "assessment_b2": "9ebac0c1a733e00068f7806e6c97a3dd6e868604a31ba4e7f397de0de00d32e2",
+    "assessment_summary": "a46a0cfdcc85bb03edc32087404fa966d77627d365633694ebc9db5534675673",
+    "assessment_report": "75cd8c109a68f7737450ccc817f63d707df6afd066f4f010b4936cf90851a00e",
+    "mse_prepare": "416fe6cc5a5caefc1e01c47a40db2ecce878113ef3aa6b27f07998a3b8735a26",
+    "mse_constant": "de04f84679507c5c3413bb288dd47672cd5b54aa089023a8be22e5981ba2bad6",
+    "mse_index": "3208d24e5e3872b3e076c9943a188947532f002688431f2b2db678163ed2b8b3",
+    "mse_buffered": "eddc8b7a6a69487b2b1bacd37560c613bbc0cc9b7dc5d4f1fc6ee0e8e58be5b1",
+    "mse_summary": "f908a453b9acbadea945898334bed5bb4dfdd256da2406a6641d710677d4aefe",
+    "mse_report": "a3d8cc90f26890a0a104f07581510e05d75ee911bc8c33288d7fa2937b3c4f45"
+  },
+  "all_outputs_custody": "Endpoint/checkpoint/bundle/raw-record PDF equality checked for all22; browser downloads for this case changed jobs."
+}

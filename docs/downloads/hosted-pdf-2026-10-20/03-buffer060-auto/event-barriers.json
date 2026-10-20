@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "planned_jobs": [
+    "mse_buffered",
+    "mse_summary",
+    "mse_report"
+  ],
+  "handovers": [],
+  "recipient_receipts_precede_running": true,
+  "peer_groups_precede_dependants": true
+}

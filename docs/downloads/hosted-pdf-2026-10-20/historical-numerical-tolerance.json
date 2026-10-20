@@ -1,0 +1,140 @@
+{
+  "status": "PASS",
+  "scope": "All22 originalAEC versus current379 buffer numerical path values; not raw byte/PDF equality or fresh browser execution",
+  "relative_tolerance": 1e-06,
+  "absolute_tolerance": 1e-09,
+  "jobs": {
+    "reference/prepare_a/output.json": {
+      "numeric_values": 110,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.1102230246251565e-15
+    },
+    "reference/assessment_b2/output.json": {
+      "numeric_values": 191,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.9801868478275253e-15
+    },
+    "reference/submission/output.json": {
+      "numeric_values": 3248,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 0
+    },
+    "reference/prepare_b/output.json": {
+      "numeric_values": 110,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 9.947598300641403e-14
+    },
+    "reference/assessment_a1/output.json": {
+      "numeric_values": 191,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 3.026798367500305e-09
+    },
+    "reference/assessment_b1/output.json": {
+      "numeric_values": 191,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.9984014443252818e-15
+    },
+    "reference/assessment_a2/output.json": {
+      "numeric_values": 191,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.3676063831005244e-14
+    },
+    "reference/mse_index/output.json": {
+      "numeric_values": 6717,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.979060471057892e-09
+    },
+    "reference/mse_report/output.json": {
+      "numeric_values": 6858,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.979060471057892e-09
+    },
+    "reference/cpue_b/output.json": {
+      "numeric_values": 780,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 9.947598300641403e-14
+    },
+    "reference/qc/output.json": {
+      "numeric_values": 1,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 0
+    },
+    "reference/mse_buffered/output.json": {
+      "numeric_values": 6718,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 9.992007221626409e-15
+    },
+    "reference/database/output.json": {
+      "numeric_values": 1896,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 0
+    },
+    "reference/mse_constant/output.json": {
+      "numeric_values": 6717,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 9.992007221626409e-15
+    },
+    "reference/assessment_summary/output.json": {
+      "numeric_values": 732,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 3.026798367500305e-09
+    },
+    "reference/mse_prepare/output.json": {
+      "numeric_values": 5207,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 2.964615315390051e-21
+    },
+    "reference/extract/output.json": {
+      "numeric_values": 713,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 0
+    },
+    "reference/cpue_report/output.json": {
+      "numeric_values": 1420,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.0125233984581428e-13
+    },
+    "reference/cpue_a/output.json": {
+      "numeric_values": 640,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.0125233984581428e-13
+    },
+    "reference/mse_summary/output.json": {
+      "numeric_values": 6858,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.979060471057892e-09
+    },
+    "reference/cpue_summary/output.json": {
+      "numeric_values": 1420,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 1.0125233984581428e-13
+    },
+    "reference/assessment_report/output.json": {
+      "numeric_values": 732,
+      "same_numeric_paths": true,
+      "tolerance_pass": true,
+      "max_absolute_difference": 3.026798367500305e-09
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "status": "HALTED_NO_REPLAY",
+  "started_at": "2026-10-20T04:40:27.350597+00:00",
+  "attempt": 1,
+  "client": "codex",
+  "worker": "/root/demo_clarity_execution",
+  "plan_sha256": "614c40242fc14c79e6c83febbb6d2a631698fc278853b3ab2cbe063ac80472d0",
+  "error": "Response.body: Protocol error (Network.getResponseBody): Request content was evicted from inspector cache",
+  "ended_at": "2026-10-20T04:40:33.680099+00:00",
+  "elapsed_seconds": 6.329290576046333,
+  "forwarded_api_gets": 0,
+  "blocked_non_read_requests": 0,
+  "bootstrap_gets_aborted": 1
+}

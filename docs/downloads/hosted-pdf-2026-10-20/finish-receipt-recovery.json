@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "scope": "Actual unforced hosted finish-receipt reconciliation, independently captured terminal-success log and archive-hash binding",
+  "receipt_stdout": {
+    "bundle_sha256": "30a43f219310638ecb8e669a2c69fe41f926fd86b4eb617a88233daae3ed5e4a",
+    "checkpoint_sha256": "fc3b4cca927e352d453d0fe6dbf6beff17d3f6db14d99cb59292e945d757f5a1",
+    "commit_sha": "379c2bac1cfd1ea8192056f5037100dac1a82e61",
+    "error": null,
+    "finish_body_sha256": "92f53291b5aa26ff8324cc12c88227c45588818d392df58405b52aba5b45e985",
+    "github_run": "39369308028",
+    "operation_id": "4f7c9db6-ee59-48c4-9eba-ca767aeccce9",
+    "payload_hash": "c7fd628c831021463897da887e12ec43904fed0461bb7de08cc5e04e9091a9bc",
+    "request_id": "9f3350be-6b33-4d9e-a102-b0e57035118e",
+    "run_id": "Run 002",
+    "status": "complete"
+  },
+  "bound_fields": [
+    "request_id",
+    "github_run",
+    "commit_sha",
+    "run_id",
+    "status",
+    "error",
+    "bundle_sha256",
+    "checkpoint_sha256"
+  ],
+  "github_log_sha256": "a311e505bb752c6862ded070c7a6d3305b4b00649ddadf52080b1065a94d1360",
+  "case_acceptance_sha256": "da58c2d7f9f814511ea14641c00840d74262021a40be7bb0b8b105bd35566141",
+  "limits": "PostgreSQL payload_hash is an opaque receipt identity, distinct from Python finish_body_sha256; no equality between these representations is asserted."
+}

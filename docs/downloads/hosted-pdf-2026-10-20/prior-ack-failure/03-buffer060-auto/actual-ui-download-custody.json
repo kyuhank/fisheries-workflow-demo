@@ -1,0 +1,10 @@
+{
+  "bundle_sha256": "ecb60cbbde4c2c8eb1ee7b8ed44c7b021909b1961568e6f6eca44968e98f1230",
+  "bundle_request_id": "431b21e7-a95d-499f-ba05-1a7a6cd6c3d5",
+  "saved_pdf_sha256": {
+    "mse_buffered": "ec4583206a5c34050e04dc84c00237cb143f2dae722a414defce2a3be902101e",
+    "mse_summary": "b8fd7786a6a802e1cefd302f8f982c5f341611241750f6ed35588ed55f86bc42",
+    "mse_report": "5642e602d0cf5ef573151e9fbab553e1aceca1ecf6c86c5dc35e1cfdb550978e"
+  },
+  "all_outputs_custody": "Endpoint/checkpoint/bundle/raw-record PDF equality checked for all22; browser downloads for this case changed jobs."
+}

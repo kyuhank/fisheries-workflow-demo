@@ -1,0 +1,49 @@
+{
+  "status": "complete_in_declared_scope",
+  "original_driver": {
+    "status": "HALTED_NO_REPLAY",
+    "error": "GET /bundle HTTP 503; code=none.",
+    "seconds": 1005.3426251169294,
+    "receipt_sha256": "6dfe45fd1b019ea9700c7759d855b4027533044483de0f659dea0fbd801f9936",
+    "halted_acceptance_sha256": "2090a9d25c563fdc399f9c0674c755fe3112eb72936bf8033d128204a2ee527f"
+  },
+  "capture_resume": {
+    "status": "CAPTURE_COMPLETED",
+    "seconds": 37.129892605007626,
+    "extra_mutations": 0
+  },
+  "final_artifact_verification": {
+    "status": "passed",
+    "executed": 3,
+    "retained": 19,
+    "compiled_pdf_custody": 22,
+    "actual_source": "Retained verify() executed before first browser-client failure.",
+    "source_report_sha256": "dc552bf405c2adb0dc80bb1355b342c64572ebdc895bf64211aeb82b668b6834"
+  },
+  "browser_completion_attempts": [
+    {
+      "status": "HALTED_NO_REPLAY",
+      "error": "Response.body: Protocol error (Network.getResponseBody): Request content was evicted from inspector cache",
+      "seconds": 6.329290576046333,
+      "forwarded_api_gets": 0,
+      "extra_posts": 0,
+      "bootstrap_get_info_aborted": 1
+    },
+    {
+      "status": "HALTED_NO_REPLAY",
+      "error": "Page.wait_for_function: Timeout 45000ms exceeded.",
+      "seconds": 59.40860957594123,
+      "forwarded_api_gets": 0,
+      "extra_posts": 0,
+      "bootstrap_get_info_aborted": 1
+    }
+  ],
+  "bootstrap_limit": "Initial GET /info was locally aborted to avoid new-session creation. Both attempts stopped before restoring original real terminal state and before any API download reads.",
+  "fresh_browser_coverage": {
+    "verified_cases": 2,
+    "actual_save_pdf_downloads": 32,
+    "actual_archive_downloads": 2,
+    "third_case": "UNVERIFIED: no fresh third-case Save PDF or browser archive download is claimed."
+  },
+  "historical_browser_equivalence": "Separate parent comparison; earlier AEC execution is not a replacement fresh execution. Raw old/new numerical or PDF byte equality is not claimed."
+}

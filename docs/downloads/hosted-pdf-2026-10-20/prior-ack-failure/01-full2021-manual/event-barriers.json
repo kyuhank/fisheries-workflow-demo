@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "planned_jobs": [
+    "submission",
+    "qc",
+    "database",
+    "extract",
+    "cpue_a",
+    "cpue_b",
+    "cpue_summary",
+    "cpue_report",
+    "prepare_a",
+    "prepare_b",
+    "assessment_a1",
+    "assessment_a2",
+    "assessment_b1",
+    "assessment_b2",
+    "assessment_summary",
+    "assessment_report",
+    "mse_prepare",
+    "mse_constant",
+    "mse_index",
+    "mse_buffered",
+    "mse_summary",
+    "mse_report"
+  ],
+  "handovers": [
+    {
+      "job": "cpue_a",
+      "group": [
+        "cpue_a",
+        "cpue_b"
+      ],
+      "state": "handover",
+      "record": null,
+      "message": "Updated inputs are ready for CPUE analysis A and CPUE analysis B. Click Confirm file transfer to continue.",
+      "boundary": "data",
+      "request_id": "ff93b3ba-35d8-4e0b-8859-bbb2b95b115e",
+      "transfer_count": 0
+    },
+    {
+      "job": "prepare_a",
+      "group": [
+        "prepare_a",
+        "prepare_b"
+      ],
+      "state": "handover",
+      "record": null,
+      "message": "Updated inputs are ready for Prepare inputs A and Prepare inputs B. Click Confirm file transfer to continue.",
+      "boundary": "cpue",
+      "request_id": "ff93b3ba-35d8-4e0b-8859-bbb2b95b115e",
+      "transfer_count": 1
+    },
+    {
+      "job": "mse_prepare",
+      "group": [
+        "mse_prepare"
+      ],
+      "state": "handover",
+      "record": null,
+      "message": "Updated inputs are ready for Prepare MSE. Click Confirm file transfer to continue.",
+      "boundary": "assessment",
+      "request_id": "ff93b3ba-35d8-4e0b-8859-bbb2b95b115e",
+      "transfer_count": 2
+    }
+  ],
+  "recipient_receipts_precede_running": true,
+  "peer_groups_precede_dependants": true
+}
