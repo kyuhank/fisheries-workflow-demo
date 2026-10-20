@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "repositories": {
+    "cpue": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+      "commit": "cba0a50179ad629d7e4df33734f198d6e9900b36",
+      "files": {
+        "LICENSE": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
+        "R/cpue.R": "e1072e9ffde45764666ff932fe160b9daf505908f96aa18b8abff73d8e151f3f",
+        "README.md": "7027d6c20eaf9173a0dadb2cbb49ba70427d5e338058425118ee482867738c7d",
+        "SOURCE.json": "bcc294ebbd374fe31da4a067855ff96eee8033fba5eca2413583472b144e4c84",
+        "jobs/cpue_a/README.md": "04c54f5067092a8ce62076fab146ba80f65465906800767c47a6dfa2465628de",
+        "jobs/cpue_a/run.R": "b3077be9fa282c54d4769dc8142659cf6b1ae28c53155641651b4ed97af6d51e",
+        "jobs/cpue_b/README.md": "868aef369c303e6fd10d080796ea536cccbaea1bf7aff48b04e3f73235887627",
+        "jobs/cpue_b/run.R": "1f8c9f2bbfd112bfb3065ae50b33f1d27849f699507c3839fb92fdf8ec21fb92",
+        "jobs/cpue_report/README.md": "03f8534c6368e150ecf343a03b4ee9f0669e044a924917d156cd5c9cdc63a854",
+        "jobs/cpue_report/report.qmd": "302882e383701373dec6e2d498dc2c4d6fde2e8e56bb688be92d7c51f19bcecb",
+        "jobs/cpue_report/run.R": "71deefbab947d096f044d675691d1640e6a2b16276ce100017ee4d91a32d3694",
+        "jobs/cpue_summary/README.md": "5c86b68010c6272aa176de5922803a7a5c06dd33ab30cfbf92d8374d06b1beee",
+        "jobs/cpue_summary/run.R": "c5034f2d8c16433cea975939eae287a39e348b5373776df8057268f696815aed",
+        "jobs/database/README.md": "bf4d7f23f359e1d0f4add7dad45530c5ddf5c4747d161b2bfa90f22a14346127",
+        "jobs/database/run.R": "915ca2f3d3252bfd6a73b6569734ff709648afcb557b15a6f5dab6bbb6a688be",
+        "jobs/extract/README.md": "74b6f2f8be9fe16fb627db6939ad0087d2c9eaf977248e69b39379ae4ab60460",
+        "jobs/extract/run.R": "8c94e3379ec3360fb77c6fa216fa4ab67f0392040ddb842fc96e90a3a69759ce",
+        "jobs/qc/README.md": "f2b8f741379b1185c589007cb395daef37ce83a19c3b03041a7e4cf2679fd41a",
+        "jobs/qc/run.R": "9737e611cdc352101b32c8b7e829e9fedb6842a5a2365da48735ba021a2c71bc",
+        "jobs/submission/README.md": "b025ba89f1d2b89126a3f3f95b5241cee04ceb6b728084f82eb2fbf0c33f760b",
+        "jobs/submission/run.R": "265e9b83beb85e729b168f3939365bdd28e7b514e2eb90438a09c705491a2472"
+      }
+    },
+    "assessment": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
+      "commit": "0e29121cd0807fb8e058025529c10670befaf702",
+      "files": {
+        "LICENSE": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
+        "R/assessment.R": "c807989ab5de3da1d4ac44cd7e11d84b2eee5d112c2ea74b481f896457abdf06",
+        "README.md": "d486fd1b76d10f8c6ebb9682e998678d9f9471ce30559e55f66ea7833e9c02e4",
+        "SOURCE.json": "a1297d15140b491b59f29e90dc078e3a6262c986bf2b49711924b5abc149a2c7",
+        "jobs/assessment_a1/README.md": "c1d5e63b75e9f165c921d5593c6766aaa0ec151891220ba0292f52fa19eac048",
+        "jobs/assessment_a1/run.R": "8076d304436a57dc2dd2374618d36a040df9659918289c7de69465223ef7e08a",
+        "jobs/assessment_a2/README.md": "b27d0f1edeeb7397bc3dc944d5cab2cb5182279f85134e339957836401f52d72",
+        "jobs/assessment_a2/run.R": "7892d48f728611645826db33fbde3511ada04d518c06a1977dd60d5fe370df47",
+        "jobs/assessment_b1/README.md": "457f33f739cfff7ae1c1e64994c898f156411cc3993652139b97221874b07717",
+        "jobs/assessment_b1/run.R": "e8f10d732e5e233dfa1707a6f0d7379d2cb01a9d2bd7f476b0dec68c01fec4ff",
+        "jobs/assessment_b2/README.md": "2860c374f2e11d02d18b6122e7c189ad5e436c9ee2b325804fef2d5b3332751a",
+        "jobs/assessment_b2/run.R": "bdc313361eeee533d77eea41f7dd297205c51151c7c857ba6f2f711eedcd1f24",
+        "jobs/assessment_report/README.md": "ecd99bc6b11d2839bba6c1ee3e0da2cb78a36a04424e725cb5b3c27476f23b1e",
+        "jobs/assessment_report/report.qmd": "e223eae52a8e41066ef1ebbe67d3cc634eb6eabc6e281abda760ad68e852e0cf",
+        "jobs/assessment_report/run.R": "2d7054dfee0b4b029c4db2f2d847e1ce5c4a6e97c7d4b7f77189f119b9448baa",
+        "jobs/assessment_summary/README.md": "0e7fdb79f1282b84e7c1519c0dfdc606e05ef592f1a68d135856df08485b3bb5",
+        "jobs/assessment_summary/run.R": "53197ec03051c810073b4fd23ec11bb2f5093efa1020250615ef8e0cb73d97ae",
+        "jobs/prepare_a/README.md": "740fe562f2f02eaae298d7f1f3454f36424d93cbd2d9d61ca10444b2602f8cf3",
+        "jobs/prepare_a/run.R": "2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9",
+        "jobs/prepare_b/README.md": "9f17bbe76005a1e95534e228ae77635cf511dfaf97f7110c78af147400de966f",
+        "jobs/prepare_b/run.R": "f014a6e0133069991570cd0b5f3458b287652a915b198a50c7a3f247cf1243c4"
+      }
+    },
+    "mse": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
+      "commit": "24c47d6f755f390f9e1865d7ec762d87d796937d",
+      "files": {
+        "LICENSE": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
+        "R/mse.R": "da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956",
+        "README.md": "3b3715613cc285bfe68119c7bf9dffcd8d65836798eb14f085b2ed6a0090e14c",
+        "SOURCE.json": "7058903ea840db7722e3259a9ff23bd63573bcb3001a6d29783de7f45d8fd455",
+        "jobs/mse_buffered/README.md": "46c88f7e32e0936bc23e41425d0522b5ff6b98f13a1dec8c6860a1faa259fcbc",
+        "jobs/mse_buffered/run.R": "db2b1a36dbbe4a60dffbe52fbb407e958f8d6c0282ae30fb5e5f62f10614919d",
+        "jobs/mse_constant/README.md": "432d29561f7c1fd07172f7c26384ad3bc4b06ccf6a8dd3cffc9cf8c4a2458ec5",
+        "jobs/mse_constant/run.R": "46cfef42dfdde27d8373c99aedea76133ae3529dc7284e24ed6c94536b616ee7",
+        "jobs/mse_index/README.md": "362fc92f3328d622a3cc09fd78ecca2e536539f219d3b584da262a14f2c26a91",
+        "jobs/mse_index/run.R": "d741a44bc969af921f6ab385bd5ed0a1569d80336770634b9f3d90ef99f938d5",
+        "jobs/mse_prepare/README.md": "2f09f955114c1eb07332e5f598e8c85050dd87f8304ece945e44b07137dd4788",
+        "jobs/mse_prepare/run.R": "dae23c4c405f5ac70aa64947d5a8c503e2c3e765d176d4c7fe7fe68d64a18cae",
+        "jobs/mse_report/README.md": "33bd44d0e91d2f48c5bd366e7f24bac8040bc51202857f9a071b385e34bc0f5a",
+        "jobs/mse_report/report.qmd": "db14307ad885bddd2267daf28bbabf5d57d009f05e4a3647bb44373af02f6171",
+        "jobs/mse_report/run.R": "0e4bc6fe0a570a0316bbea5bb6a1bcd375dc6c150f5b5e4c7b702cb24e4ad174",
+        "jobs/mse_summary/README.md": "18c116bed5b5644b1260715da4a8db190f4aad44eb80559c5dcb4a2a3b9f3200",
+        "jobs/mse_summary/run.R": "09719a18af53a22a4fce05e5f6d833e6adeedaa1dd2d4461b76e8cd7861627bc"
+      }
+    }
+  }
+}

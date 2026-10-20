@@ -1,9 +1,9 @@
 name: Check calculations
 on:
   push:
-    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['source-lock.template.json', 'source-files.sha256.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   pull_request:
-    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['source-lock.template.json', 'source-files.sha256.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check public source transport and archive integrity
+        run: python3 -m unittest discover -s tests -p test_source_hydration.py -v
       - name: Verify and assemble pinned analysis repositories
         run: python3 scripts/hydrate-sources.py
       - name: Check synthetic and public data with monorepo and pinned-component R/Quarto runs

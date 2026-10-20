@@ -74,7 +74,7 @@ def source_payload(sources=None):
               'examples/analyst-repositories.yaml', 'scripts/generate-data.R', 'scripts/import-r-data.py',
               'scripts/import-public-data.py',
               'scripts/seed-public-data.py',
-              'scripts/hydrate-sources.py', 'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md',
+              'scripts/hydrate-sources.py', 'source-files.sha256.json', 'scripts/check-multi-repository.py', 'scripts/MULTI_REPOSITORY.md',
               'OFFLINE.md', 'runtime-preservation.json', 'scripts/offline.sh',
               'scripts/offline-runtime.py', 'scripts/preserve-runtime.sh']]
     result = {p.relative_to(ROOT).as_posix(): p.read_bytes() for p in files if p.is_file()}
