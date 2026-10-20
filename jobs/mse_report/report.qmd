@@ -202,10 +202,11 @@ if (knitr::is_html_output()) {
 if (!is.null(record$software$container_url)) {
   cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
 }
-for (key in c("source", "analysis_source")) {
+source_labels <- c(source = "Coordinator source", analysis_source = "MSE component source")
+for (key in names(source_labels)) {
   source <- record[[key]]
   if (!is.null(source$repository) && !is.null(source$commit)) {
-    cat("[", key, " at ", substr(source$commit, 1, 8), "](",
+    cat("[", source_labels[[key]], " at ", substr(source$commit, 1, 8), "](",
         source$repository, "/commit/", source$commit, ")\n\n", sep = "")
   }
 }

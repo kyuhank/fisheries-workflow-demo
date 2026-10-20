@@ -23,10 +23,11 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 | Saved file | Contents |
 | --- | --- |
 | `runs/database/output.json` | saved calculation result |
+| `runs/database/report.pdf` | compiled Quarto result PDF |
 | `runs/database/report.html` | result page from [shared renderer](../../workflow/reports.py) |
 | `runs/database/record.json` | producing inputs, settings, exact code and software |
 | `runs/database/snapshot.sqlite` | accepted fixed database snapshot |
 
 **Used by:** [Extract data (`extract`)](../extract/README.md).
 
-[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/database/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/database/record.json)
+[Saved report (PDF)](https://kyuhank.github.io/fisheries-workflow-demo/example/database/report.pdf) · [HTML](https://kyuhank.github.io/fisheries-workflow-demo/example/database/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/database/record.json)

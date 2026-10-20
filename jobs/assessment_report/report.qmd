@@ -64,10 +64,11 @@ plot_series <- function(series, field, label) {
 ## Biomass comparison
 
 ```{r}
-plot_series(result$series, "B_over_K", "Biomass / carrying capacity")
+plot_series(result$series, "B_over_K", "Start-of-year biomass / carrying capacity")
 ```
 
-The trajectories describe the supplied index, catches and fixed model assumptions.
+Each trajectory shows start-of-year biomass divided by that case's fitted carrying
+capacity. The trajectories describe the supplied index, catches and fixed model assumptions.
 Differences among cases are not an uncertainty interval or stock-management advice.
 
 ```{r}
@@ -155,10 +156,11 @@ if (knitr::is_html_output()) {
 if (!is.null(record$software$container_url)) {
   cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
 }
-for (key in c("source", "analysis_source")) {
+source_labels <- c(source = "Coordinator source", analysis_source = "Assessment component source")
+for (key in names(source_labels)) {
   source <- record[[key]]
   if (!is.null(source$repository) && !is.null(source$commit)) {
-    cat("[", key, " at ", substr(source$commit, 1, 8), "](",
+    cat("[", source_labels[[key]], " at ", substr(source$commit, 1, 8), "](",
         source$repository, "/commit/", source$commit, ")\n\n", sep = "")
   }
 }

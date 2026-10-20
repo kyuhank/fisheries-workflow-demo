@@ -23,9 +23,10 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 | Saved file | Contents |
 | --- | --- |
 | `runs/prepare_b/output.json` | saved calculation result |
+| `runs/prepare_b/report.pdf` | compiled Quarto result PDF |
 | `runs/prepare_b/report.html` | result page from [shared renderer](../../workflow/reports.py) |
 | `runs/prepare_b/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** [Assessment B1 (`assessment_b1`)](../assessment_b1/README.md), [Assessment B2 (`assessment_b2`)](../assessment_b2/README.md).
 
-[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/record.json)
+[Saved report (PDF)](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/report.pdf) · [HTML](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/prepare_b/record.json)

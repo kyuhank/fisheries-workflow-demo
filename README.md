@@ -10,9 +10,10 @@ demonstrate the workflow and provide no advice for South Pacific albacore.
 
 ## Use the demo
 
-**View example** opens the saved results; **Live run** executes the R jobs and
-Quarto PDFs on GitHub Actions. CPUE plots show nominal and standardised rates
-together. **View** opens a job's PDF; **Inputs & versions** traces its sources.
+Choose **Run mode → View example** to inspect saved results, or **Live run**
+to calculate them on GitHub Actions. CPUE plots show nominal and standardised
+rates together. **View** in the diagram or **Output** in the tool opens a job's
+PDF; **Inputs & versions** traces its sources.
 PDFs read saved numerical results. The three report jobs contain the methods
 and checks.
 
@@ -22,8 +23,9 @@ affected analyses and retains unchanged results with their original records.
 **Run** prepares the selected job's required inputs and stops at that job.
 
 **Manual handover** pauses receiving jobs until **Confirm file transfer**;
-other ready jobs continue. **Reproduce & compare** repeats the recorded
-workflow and compares the selected result. **Download this run** preserves
+other ready jobs continue. In **Live run**, **Reproduce & compare** repeats
+the recorded workflow and compares the selected result. **Execution** opens
+its GitHub Actions run. **Download this run** preserves
 source, inputs, records and outputs before live results expire after about
 ten minutes.
 
@@ -74,6 +76,9 @@ make run                 # all jobs
 make job JOB=cpue_a       # CPUE A and required inputs
 ```
 
+These commands run the pinned component revisions. To run local job or model
+edits in this checkout, use `PAPER_SOURCE_MODE=monorepo make job JOB=cpue_a`.
+
 To use another fishery, start with the source mapping and saved SQL, then
 choose the CPUE covariates and prediction support explicitly. Review annual
 catch units, assessment assumptions and the receiving file contracts before
@@ -87,10 +92,10 @@ preserves an abalone prediction routine and compares direct and mapped inputs.
 
 Keep a downloaded run and its recorded execution image together. Follow the
 bundle's `REPRODUCE.txt` to repeat its declared scope. The
-[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.5.zip)
+[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.6.zip)
 includes local result and code pages, source archives, extraction SQL and all
 22 reference outputs; its
-[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.5.zip.sha256)
+[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.6.zip.sha256)
 identifies the download. Open `START-HERE.html`, then follow `OFFLINE.md`.
 The archived
 [v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)

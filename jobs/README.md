@@ -78,6 +78,10 @@ From the repository root, with Docker, Make, Python 3 and Git available:
 make job JOB=cpue_a
 ```
 
+This runs the pinned component revision. For local job or model edits in this
+checkout, use `PAPER_SOURCE_MODE=monorepo make job JOB=cpue_a`; adopting a change
+in the default route requires updating the component repository and source pin.
+
 The coordinator prepares missing or changed inputs and calls the R script in
 the recorded container. `OUTPUT=DIR` selects the result directory;
 `SETTINGS=FILE` supplies JSON settings. Inside the declared container, use

@@ -29,6 +29,11 @@ automatically discover an arbitrary analysis or repository.
 4. Add the node and connections to `app/diagram.json`; the build verifies these against the calculation graph. Write a concise job guide.
 5. Check the change inside the declared container. Edit page sources in `app/`; `docs/` is generated from accepted source and saved calculations.
 
+For local job or model edits, use `PAPER_SOURCE_MODE=monorepo make job JOB=cpue_a`
+(or `PAPER_SOURCE_MODE=monorepo make run` for all jobs). The default route runs
+the component revisions in `source-lock.template.json`; update those repositories
+and pins when adopting the change.
+
 The coordinator reads the declarations and checks saved inputs to select ready
 jobs. `workflow/Makefile` calls their R entry points. The coordinator then records
 the outputs and releases dependent jobs. Independent jobs can run together;
@@ -47,13 +52,22 @@ for images and containers.
 
 ## Separate analyst repositories
 
-The default execution uses three exact source pins in [source-lock.template.json](source-lock.template.json): preparation/CPUE owns eight jobs, assessment owns eight (including `prepare_a`/`prepare_b`), and MSE owns six. `scripts/hydrate-sources.py` checks the selected Git commits and clean source bytes, then assembles an offline snapshot. Hosted Actions hydrate before entering the preserved container. `make run`, `make check` and `make html` assemble and verify the pinned sources before entering the container; source checks stop execution if the required assembly is missing or inconsistent.
+The default execution uses three exact source pins in [source-lock.template.json](source-lock.template.json): preparation/CPUE owns eight jobs, assessment owns eight (including `prepare_a`/`prepare_b`), and MSE owns six.
+
+`scripts/hydrate-sources.py` checks the selected Git commits and clean source bytes,
+then assembles an offline snapshot. Hosted Actions hydrate before entering the
+preserved container. `make run`, `make check` and `make html` assemble and verify
+the pinned sources before entering the container; source checks stop execution
+if the required assembly is missing or inconsistent.
 
 The coordinator owns shared `common.R`, the driver, input graph, SQLite adapters, source resolver, reports and software image. CPUE owns `R/cpue.R`, assessment owns `R/assessment.R`, and MSE owns `R/mse.R`. The exact per-job library declarations in `workflow/sources.py` control both loading and fingerprints. MSE preparation also loads assessment's `surplus_path`. A library revision invalidates jobs loading those bytes and their descendants; changing unrelated documentation or a component commit alone does not invalidate unchanged dependencies.
 
 `workflow/contracts.py` checks relative CPUE indices, annual catch in tonnes, years and admissible values before assessment preparation, and the four assessment cases and required fields before MSE preparation. Records distinguish component `analysis_source` and `code_sources` from the coordinator's `source`/`execution`; inputs retain producer runs, source pins, signatures and artifact checksums. Downloaded runs preserve the component sources, source lock and origin manifest for network-disabled reproduction.
 
-For the monorepo fallback use `PAPER_SOURCE_MODE=monorepo make run`. The [repository map](examples/analyst-repositories.yaml) is a reader guide; the executable registered pins are the JSON lock and `workflow/jobs.json`. A single host coordinates these jobs; repository separation does not establish multiple human analysts or operational fisheries use.
+The [repository map](examples/analyst-repositories.yaml) is a reader guide; the
+executable registered pins are the JSON lock and `workflow/jobs.json`. A single
+host coordinates these jobs; repository separation does not establish multiple
+human analysts or operational fisheries use.
 
 ## Change the example
 
@@ -94,8 +108,7 @@ Keep earlier release archives and image copies. A new release should retain its
 own source pins, input snapshots, settings, outputs, execution records and
 checksums. `scripts/release.py` adds local reading and execution tools to the
 saved run without replacing its recorded analysis sources. Support-tool versions
-can therefore differ from the saved analysis version. Change software only by
-checking and recording a new image, then preserving that image as well.
+can therefore differ from the saved analysis version.
 
 ## Numerical comparisons
 

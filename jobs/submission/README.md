@@ -25,9 +25,10 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 | Saved file | Contents |
 | --- | --- |
 | `runs/submission/output.json` | saved calculation result |
+| `runs/submission/report.pdf` | compiled Quarto result PDF |
 | `runs/submission/report.html` | result page from [shared renderer](../../workflow/reports.py) |
 | `runs/submission/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** [Quality check (`qc`)](../qc/README.md).
 
-[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/record.json)
+[Saved report (PDF)](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/report.pdf) · [HTML](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/submission/record.json)

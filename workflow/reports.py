@@ -533,7 +533,7 @@ def result_view(job, result):
                'Fitted CPUE': [{'year': row['year'], 'index': row['fitted_index']} for row in rows]}
         body = '<p>Fit the annual CPUE index and carry catch removals through the stock model.</p>'
         body += paired_plots('Observed and fitted CPUE', plot(fit, 'index', 'Relative CPUE', points=('Observed CPUE',)),
-                             'Biomass trajectory', plot({'Biomass': rows}, 'B_over_K', 'Biomass / carrying capacity'))
+                             'Biomass trajectory', plot({'Biomass': rows}, 'B_over_K', 'Start-of-year biomass / carrying capacity'))
         body += (f'<p class="result-method">Schaefer model · intrinsic growth {result["r"]:.2f} per year · '
                  'R/RTMB fit · initial biomass equals carrying capacity.</p>'
                  '<p>Points are observed indices; the fitted line follows model biomass. Biomass is relative to the fitted capacity.</p>')
@@ -545,8 +545,8 @@ def result_view(job, result):
         return body + table(checks, [('check', 'Recorded check'), ('value', 'Result')]) + '<p class="muted">These checks do not establish model adequacy.</p>'
     if key == 'assessment_summary':
         body = '<p>Compare the four fitted biomass trajectories.</p>'
-        body += plot(result['series'], 'B_over_K', 'Biomass / each case’s carrying capacity')
-        body += '<p>The cases combine two CPUE indices and two fixed growth settings. Their differences are sensitivities, not an uncertainty interval.</p>'
+        body += plot(result['series'], 'B_over_K', 'Start-of-year biomass / each case’s carrying capacity')
+        body += '<p>Each case has its own fitted carrying capacity. The cases combine two CPUE indices and two fixed growth settings. Their differences are sensitivities, not an uncertainty interval.</p>'
         rows = [{'case': name, 'year': values[-1]['year'], 'value': values[-1]['B_over_K']}
                 for name, values in result['series'].items() if values]
         return body + table(rows, [('case', 'Case'), ('year', 'Final year'), ('value', 'B / K')])

@@ -25,9 +25,10 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 | Saved file | Contents |
 | --- | --- |
 | `runs/mse_index/output.json` | saved calculation result |
+| `runs/mse_index/report.pdf` | compiled Quarto result PDF |
 | `runs/mse_index/report.html` | result page from [shared renderer](../../workflow/reports.py) |
 | `runs/mse_index/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** [MSE results summary (`mse_summary`)](../mse_summary/README.md).
 
-[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/record.json)
+[Saved report (PDF)](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/report.pdf) · [HTML](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_index/record.json)

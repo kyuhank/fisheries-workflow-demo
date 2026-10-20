@@ -25,9 +25,10 @@ See the [job guide](../README.md#run-and-inspect-a-job) for container and output
 | Saved file | Contents |
 | --- | --- |
 | `runs/cpue_b/output.json` | annual indices, absolute CPUE, prediction support and model checks |
+| `runs/cpue_b/report.pdf` | compiled Quarto result PDF |
 | `runs/cpue_b/report.html` | result page from [shared renderer](../../workflow/reports.py) |
 | `runs/cpue_b/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** [Compare CPUE results (`cpue_summary`)](../cpue_summary/README.md), [Prepare inputs B (`prepare_b`)](../prepare_b/README.md).
 
-[Saved report](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/record.json)
+[Saved report (PDF)](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/report.pdf) · [HTML](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/report.html) · [Run record](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_b/record.json)
