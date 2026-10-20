@@ -266,8 +266,11 @@ class MultiRepositoryTests(unittest.TestCase):
             runner.records[key] = {'job': key, 'run_id': 'SOFTWARE CHECKPOINT FIXTURE',
                                    'outputs': {'output.json': check.sha256(folder / 'output.json')},
                                    'analysis_source': runner.sources.origin(key),
-                                   'code_sources': runner.sources.code_sources(key)}
+                                   'code_sources': runner.sources.code_sources(key),
+                                   'report_rendering': {'engine': 'SOFTWARE TEST DOUBLE', 'quarto_executed': False}}
             runner.records[key]['signature'] = runner.signature(key)
+        self.assertTrue(runner.valid('extract'))
+        self.assertTrue(runner.valid('cpue_a'))
         saved = copy.deepcopy(runner.records)
         original = (runner.directory / 'cpue_a/output.json').read_bytes()
         suite = check.EvidenceSuite.__new__(check.EvidenceSuite)
