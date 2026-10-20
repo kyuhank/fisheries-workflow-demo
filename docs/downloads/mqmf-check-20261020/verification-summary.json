@@ -1,0 +1,109 @@
+{
+  "status": "PASSED",
+  "checks": [
+    {
+      "check": "source_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "check": "current_demo_comparison_bytes_unchanged",
+      "passed": true
+    },
+    {
+      "check": "single_command_completed",
+      "passed": true
+    },
+    {
+      "check": "ledger_counts_and_complete",
+      "passed": true
+    },
+    {
+      "check": "raw_mapping_preflight_receipt",
+      "passed": true
+    },
+    {
+      "check": "mapped_csv_json_72_values_exact",
+      "passed": true
+    },
+    {
+      "check": "mapping_export_hashes",
+      "passed": true
+    },
+    {
+      "check": "baseline_reported_output_hashes",
+      "passed": true
+    },
+    {
+      "check": "update_reported_output_hashes",
+      "passed": true
+    },
+    {
+      "check": "fresh_reported_output_hashes",
+      "passed": true
+    },
+    {
+      "check": "baseline_native_adapter_24_predictions",
+      "passed": true
+    },
+    {
+      "check": "update_two_jobs_and_reference_bytes_retained",
+      "passed": true
+    },
+    {
+      "check": "parameter_only_update",
+      "passed": true
+    },
+    {
+      "check": "mixed_producer_identity_preserved",
+      "passed": true
+    },
+    {
+      "check": "selective_fresh_24_predictions",
+      "passed": true
+    },
+    {
+      "check": "selective_fresh_120_consumer_values",
+      "passed": true
+    },
+    {
+      "check": "consumer_table_arithmetic",
+      "passed": true
+    },
+    {
+      "check": "declared_perturbation_detectable",
+      "passed": true
+    },
+    {
+      "check": "declared_wrong_scale_rejected_before_consumer_R",
+      "passed": true
+    },
+    {
+      "check": "all_records_output_input_and_source_closure_hashes",
+      "passed": true
+    },
+    {
+      "check": "bundles_readable_and_crc_checked",
+      "passed": true
+    },
+    {
+      "check": "pinned_equations_arithmetic_crosscheck",
+      "passed": true
+    }
+  ],
+  "verification_scope": "Mechanical checks by the Codex execution worker. The raw mapping exactness comes from the preserved runtime preflight; separate host checks verify CSV/JSON values and source/output hashes. No independent human evaluation or scientific approval occurred.",
+  "logical_steps": 9,
+  "external_function_calls": 5,
+  "baseline_predictions": {
+    "values": 24,
+    "max_absolute_difference": 0
+  },
+  "fresh_predictions": {
+    "values": 24,
+    "max_absolute_difference": 0
+  },
+  "fresh_consumer": {
+    "values": 120,
+    "max_absolute_difference": 0
+  },
+  "source_files_unchanged": 38
+}

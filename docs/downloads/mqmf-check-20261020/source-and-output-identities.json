@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "candidate_status": "SELECTED_EXECUTION_EVIDENCE",
+  "demo_repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+  "demo_commit": "38cb37a0abc402d299abc7575c50f4581f3339eb",
+  "source_manifest_sha256": "37ff456d1f75497c0aa0acce1765f64d000a41d3918f04dfc8c0f2c0c5b6eecb",
+  "source_before_after_identical": true,
+  "unchanged_source_file_count": 38,
+  "copied_coordinator_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+  "external_repository": "https://github.com/haddonm/MQMF",
+  "external_commit": "f171966258b9dd8d6cdfcc150930cdb45d23cf65",
+  "external_file": {
+    "path": "R/spm.r",
+    "sha256": "bf7553d3b6b066c3b0ec935cf905e841ba8dab8d8cbb590e0d998907cb2b2b3a"
+  },
+  "raw_data": {
+    "path": "data/abdat.RData",
+    "sha256": "e834f391f492043cacc461b22e034171654e378ebcc296b9ec4bff267194304d"
+  },
+  "runtime_config_id": "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158",
+  "runtime_source_digest": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+  "platform": "linux/amd64",
+  "execution_id": "9fa5e105-733b-4bc2-bb24-f64cbf9ccdbc",
+  "actual_client": "codex",
+  "execution_start_utc": "2026-10-20T02:09:06.658741+00:00",
+  "execution_end_utc": "2026-10-20T02:09:09.731238+00:00",
+  "exit_code": 0,
+  "stdout_sha256": "bdbc89a297fa478b3a02a8aa6acb3b4477ea2b32109196ecaf315a6b868ade57",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "full_output_file_count": 467,
+  "full_output_bytes": 5787275,
+  "full_output_manifest_sha256": "ff0fd34bbfb1c780f541f1b5a9e8499f801e718d703c2f88e10b4acab9340b65",
+  "coordinator_comparison": {
+    "scope": "Copied coordinator source at 819c67034625b9a30b4196fd5ec17b0c74f60ba7 versus top-level demo at 38cb37a0abc402d299abc7575c50f4581f3339eb; read-only byte comparison. This is execution of the older three-node adaptation, not the current full 22-job release.",
+    "files": [
+      {
+        "adaptation_bytes": 82,
+        "adaptation_path": "workflow/__init__.py",
+        "adaptation_sha256": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09",
+        "bytes_identical": true,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 82,
+        "current_demo_path": "workflow/__init__.py",
+        "current_demo_sha256": "bd72f1d82e914507bdcf0b10fd833453ca72f775668e6b6ed73e1c3536c96c09"
+      },
+      {
+        "adaptation_bytes": 27115,
+        "adaptation_path": "workflow/engine.py",
+        "adaptation_sha256": "08bd514322582887885cc2df60c4e7554aa2f887661a84c4db438a9dd576a7bb",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 33291,
+        "current_demo_path": "workflow/engine.py",
+        "current_demo_sha256": "2d9a589d3797ddd8f0ac40725dbcbe63361fddcfe16b7f592664483d7eee4513"
+      },
+      {
+        "adaptation_bytes": 3898,
+        "adaptation_path": "workflow/spec.py",
+        "adaptation_sha256": "22ea6fe3ab628669902e2304a15da8eeef36a0858d18f24eb2a93f0c6b8e9127",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 4000,
+        "current_demo_path": "workflow/spec.py",
+        "current_demo_sha256": "8393a6890397668039973eb2533d6c2d3c8fef9371f2a0eb0b05d1cbe4ee70d0"
+      },
+      {
+        "adaptation_bytes": 15075,
+        "adaptation_path": "workflow/sources.py",
+        "adaptation_sha256": "a5849b35edf4ab261e59623a46da3371c6a2c77e5c81df1be3ade9c41290e4dd",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 15215,
+        "current_demo_path": "workflow/sources.py",
+        "current_demo_sha256": "cef3cfe54a69bb00f60cef07cbebd2ea95b6653644e0bbeae5808f25fd2d8651"
+      },
+      {
+        "adaptation_bytes": 4095,
+        "adaptation_path": "workflow/contracts.py",
+        "adaptation_sha256": "8e2f8a669a352ad06cb4c2e7fb1ccb51700da0b21a19e06b702aea8736d0b04b",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 4085,
+        "current_demo_path": "workflow/contracts.py",
+        "current_demo_sha256": "47a545933da474435944a833cacf30e40eb354992ea07fe8d4b36d7dd8dadec4"
+      },
+      {
+        "adaptation_bytes": 31344,
+        "adaptation_path": "workflow/reports.py",
+        "adaptation_sha256": "b425143aace26c14c52a2327412822effcf2635629fc882c00efc9682e7f518c",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 41745,
+        "current_demo_path": "workflow/reports.py",
+        "current_demo_sha256": "1d827748c451d80f2d4a14c4f7533647a4a0044e18f0329e8e3dcca2acc90ede"
+      },
+      {
+        "adaptation_bytes": 4576,
+        "adaptation_path": "workflow/r_bridge.py",
+        "adaptation_sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93",
+        "bytes_identical": true,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 4576,
+        "current_demo_path": "workflow/r_bridge.py",
+        "current_demo_sha256": "89f6abf7cfc34b2b3eb91ade4b135067b88af73cea8b60bf228315e9795acc93"
+      },
+      {
+        "adaptation_bytes": 4590,
+        "adaptation_path": "workflow/r_driver.R",
+        "adaptation_sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039",
+        "bytes_identical": true,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 4590,
+        "current_demo_path": "workflow/r_driver.R",
+        "current_demo_sha256": "9db3abe51ae42530430d18cec6e70f7df4c02030309611f588a5b1ed36390039"
+      },
+      {
+        "adaptation_bytes": 2220,
+        "adaptation_path": "workflow/quarto_reports.py",
+        "adaptation_sha256": "ad1f50536a9d53ff26357f582c0cb8d9060146f23336336952cf67b3ace3355d",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 6596,
+        "current_demo_path": "workflow/quarto_reports.py",
+        "current_demo_sha256": "9b26ac62ffd9c3fb751d9e1f77d38dd5ab115c471b9b3ad54a5089a841b21ca3"
+      },
+      {
+        "adaptation_bytes": 306,
+        "adaptation_path": "workflow/Makefile",
+        "adaptation_sha256": "9a61f97bbe928d620484704ac144f05122367000db697bea811f4c52c3213157",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 553,
+        "current_demo_path": "workflow/Makefile",
+        "current_demo_sha256": "cf21c41ee8613cc2ef1283a065d642e4143a5c8b8e73471f85fb4ae5117646bf"
+      },
+      {
+        "adaptation_bytes": 4816,
+        "adaptation_path": "workflow/r/common.R",
+        "adaptation_sha256": "9f492453c63857879c20de638b06c2c7028a00b99afeef0d1e8a76c49f81f191",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 5574,
+        "current_demo_path": "workflow/r/common.R",
+        "current_demo_sha256": "4befb1217f341840864249e30182819e3452c685dd30267c0f6bb7f3870b912d"
+      },
+      {
+        "adaptation_bytes": 1088,
+        "adaptation_path": "notices/LICENSE-coordinator-MIT.txt",
+        "adaptation_sha256": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
+        "bytes_identical": true,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 1088,
+        "current_demo_path": "LICENSE",
+        "current_demo_sha256": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403"
+      },
+      {
+        "adaptation_bytes": 6908,
+        "adaptation_path": "upstream/original-jobs.json",
+        "adaptation_sha256": "b63eb3c8c57324a841f6d333eb6c7f49962b235580cdf0570b4874f8b51c720a",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 6923,
+        "current_demo_path": "workflow/jobs.json",
+        "current_demo_sha256": "720ff27af2922406812f5a49a21d88dece73e1146cd6f449545ad66e76c1ce0e"
+      },
+      {
+        "adaptation_bytes": 19898,
+        "adaptation_path": "workflow/offline.py",
+        "adaptation_sha256": "e75f7b6816a25243cdfefd99de686202fa954471f8da376f8e071178dca8d788",
+        "bytes_identical": false,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 20238,
+        "current_demo_path": "workflow/offline.py",
+        "current_demo_sha256": "ee0533903abf24f5f1051f40c29b3378783757e6a885cefb8e7d0fd95eab1dcc"
+      },
+      {
+        "adaptation_bytes": 1449,
+        "adaptation_path": "runtime-preservation.json",
+        "adaptation_sha256": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197",
+        "bytes_identical": true,
+        "copied_from_commit": "819c67034625b9a30b4196fd5ec17b0c74f60ba7",
+        "current_demo_bytes": 1449,
+        "current_demo_path": "runtime-preservation.json",
+        "current_demo_sha256": "e8cb573a79b2a1c062adfc1d990202efce5c93250e8379c157af968870589197"
+      }
+    ],
+    "methods": [
+      {
+        "ast_identical": true,
+        "copied_method_sha256": "5282fa8772b5fdc43291c64ecbb8915a31eed5f281bd222dfcdb2a2363a328ab",
+        "current_method_sha256": "5282fa8772b5fdc43291c64ecbb8915a31eed5f281bd222dfcdb2a2363a328ab",
+        "method": "Workflow.plan",
+        "text_identical": true
+      },
+      {
+        "ast_identical": true,
+        "copied_method_sha256": "5cafe6cba98bc40aad1219d2e0aee903c38c78f693873a98086cd6fc18556a1f",
+        "current_method_sha256": "5cafe6cba98bc40aad1219d2e0aee903c38c78f693873a98086cd6fc18556a1f",
+        "method": "Workflow.run",
+        "text_identical": true
+      },
+      {
+        "ast_identical": false,
+        "copied_method_sha256": "591939b1035cf05d816f4af4b95594af7764da2c039c8116531472818ce7a7e7",
+        "current_method_sha256": "613deed1c3810b837b85b4688cd6d1d7b108f416239511fe8c8ca00e8f30cc86",
+        "method": "Workflow.valid",
+        "text_identical": false
+      }
+    ]
+  }
+}
