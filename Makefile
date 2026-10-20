@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := run
-.PHONY: hydrate-sources run container job reproduce compare check html inside-run inside-job inside-reproduce inside-compare inside-check inside-synthetic-check inside-public-check inside-public-source-check inside-public-baseline-check inside-public-update-check inside-public-reproduction-check inside-component-check inside-html inside-live
+.PHONY: hydrate-sources run container job reproduce compare check html inside-run inside-job inside-reproduce inside-compare inside-check inside-science-check inside-synthetic-check inside-public-check inside-public-source-check inside-public-baseline-check inside-public-update-check inside-public-reproduction-check inside-component-check inside-component-synthetic-check inside-component-public-check inside-html inside-live
 
 IMAGE := ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
 IMAGE_URL := https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow
@@ -78,11 +78,14 @@ inside-compare:
 	exec python3 verify.py "$$@"
 
 inside-check:
-	@command -v make && make --version | head -n 1
-	@Rscript --vanilla tests/test-r-models.R
+	@$(MAKE) --no-print-directory --silent inside-science-check
 	@$(MAKE) --no-print-directory --silent inside-synthetic-check
 	@$(MAKE) --no-print-directory --silent inside-public-check
 	@$(MAKE) --no-print-directory --silent inside-component-check
+
+inside-science-check:
+	@command -v make && make --version | head -n 1
+	@Rscript --vanilla tests/test-r-models.R
 
 # Legacy fixtures retain their declared synthetic defaults in a fresh process.
 inside-synthetic-check:
@@ -112,9 +115,15 @@ inside-public-reproduction-check:
 # Exercise the actual pinned repositories as well as the local source tree.
 # Missing or incompatible pins fail this gate; monorepo success cannot replace it.
 inside-component-check:
+	@$(MAKE) --no-print-directory --silent inside-component-synthetic-check
+	@$(MAKE) --no-print-directory --silent inside-component-public-check
+
+inside-component-synthetic-check:
 	@PAPER_SOURCE_MODE=multi-repository PAPER_DATA_MODE=synthetic python3 -m unittest -v \
 		tests.test_native_integration.NativeIntegrationTest.test_1_fresh_R_results_and_genuine_Quarto_custody \
 		tests.test_native_integration.NativeIntegrationTest.test_6_download_reproduces_actual_results_inside_same_container
+
+inside-component-public-check:
 	@PAPER_SOURCE_MODE=multi-repository PAPER_DATA_MODE=public python3 -m unittest tests.test_public_integration -v
 
 inside-html:
