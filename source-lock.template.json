@@ -18,7 +18,7 @@
     },
     "assessment": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
-      "commit": "0fa5dcfa5db194cd0610ca0d47f4cff6c0494212",
+      "commit": "0e29121cd0807fb8e058025529c10670befaf702",
       "checkout": "components/assessment",
       "jobs": [
         "prepare_a",
