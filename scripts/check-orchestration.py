@@ -7,6 +7,8 @@ from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
 
+from pdf_checks import assert_pdf_output, close_pdf_output, expected_record
+
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = ROOT / '.test-output'
 ARTIFACTS.mkdir(exist_ok=True)
@@ -124,10 +126,9 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.locator('#jobs-view #run').count() == 1
     page.wait_for_function("document.querySelector('#mode').value === 'saved'")
     page.locator('#mode').select_option('saved')
-    assert 'saved' in page.locator('#view-guide-description').inner_text()
-    assert all(label in page.locator('#view-guide-description').inner_text() for label in ('Output', 'Record'))
+    assert page.locator('#view-guide-description').inner_text() == 'Saved results with their inputs, code and settings.'
     switch_with_guide(page, 'workflow')
-    assert 'saved results' in page.locator('#view-guide-description').inner_text()
+    assert page.locator('#view-guide-description').inner_text() == 'Saved results: data → CPUE → assessment → MSE.'
     switch_with_guide(page, 'orchestration')
     assert page.locator('#show-tasks').inner_text().startswith('Tasks')
     assert page.locator('#workspace-title').inner_text() == 'Tasks'
@@ -149,12 +150,15 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     page.set_viewport_size({'width': 1440, 'height': 1000})
     page.locator('#tasks .cpue').click()
     assert page.locator('#job-table-body tr').count() == 4
+    assert page.locator('#job-table-body .open-output').first.inner_text() == 'Output'
+    assert page.locator('#job-table-body .open-job-record').first.inner_text() == 'Record'
     assert page.locator('tr[data-job="cpue_a"] .job-number').inner_text() == 'Job 05'
     assert page.locator('tr[data-job="cpue_report"] .job-number').inner_text() == 'Job 08'
+    expected = expected_record(page, 'cpue_a')
     page.locator('tr[data-job="cpue_a"] .open-output').click()
+    assert_pdf_output(page, 'cpue_a', expected, phrases=('CPUE analysis A',))
     assert page.locator('#output-kind').text_content().startswith('Job 05 · ')
-    assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'CPUE analysis A'
-    page.locator('#output-close').click()
+    close_pdf_output(page)
     page.locator('tr[data-job="cpue_a"] .open-job-record').click()
     page.locator('#output-record:visible').wait_for()
     assert page.locator('#output-record').is_visible()
@@ -176,9 +180,10 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert card.locator('.state').inner_text() == 'Complete'
     assert 'exact input versions' in page.locator('.dependency-record-note').inner_text()
     before = run_selection(page)
+    expected = expected_record(page, 'mse_prepare')
     card.locator('.open-output').click()
-    assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'Prepare MSE'
-    page.locator('#output-close').click()
+    assert_pdf_output(page, 'mse_prepare', expected, phrases=('Prepare MSE',))
+    close_pdf_output(page)
     card.locator('.open-job-record').click()
     page.locator('#output-record:visible').wait_for()
     assert page.locator('#output-title').inner_text() == 'Prepare MSE'
@@ -216,6 +221,9 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.locator('tr[data-job="submission"] .state').inner_text() == 'Ready'
     page.locator('tr[data-job="cpue_a"] .job-name').click()
     assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'No output yet'
+    assert page.locator('#open-output-pdf').is_hidden()
+    assert page.locator('#open-output-pdf').get_attribute('href') is None
+    assert page.evaluate('outputPdfUrl === null && outputPdfBytes === null')
     assert page.locator('#output-run').is_enabled()
     page.locator('#output-close').click()
     page.locator('#run').click()

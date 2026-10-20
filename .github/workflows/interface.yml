@@ -1,9 +1,9 @@
 name: Check diagram
 on:
   push:
-    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
+    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', 'scripts/pdf_checks.py', '.github/workflows/interface.yml']
   pull_request:
-    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', '.github/workflows/interface.yml']
+    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', 'scripts/pdf_checks.py', '.github/workflows/interface.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,6 +29,8 @@ jobs:
             "$IMAGE" make --no-print-directory --silent inside-html
       - name: Install browser checks
         run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends poppler-utils
           python3 -m venv .browser-check
           .browser-check/bin/pip install playwright==1.60.0
           .browser-check/bin/python -m playwright install --with-deps chromium webkit

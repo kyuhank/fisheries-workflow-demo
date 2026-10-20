@@ -14,6 +14,9 @@ import zipfile
 
 from playwright.sync_api import sync_playwright
 
+from pdf_checks import (assert_pdf_output, check_pdf_rejections,
+                        close_pdf_output, expected_record)
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -131,10 +134,11 @@ def main():
         assert page.evaluate('typeof Worker === "function" && !document.querySelector("#worker-source")')
         keys = page.evaluate('jobs.map(job => job.key)')
         for key in keys:
+            expected = expected_record(page, key)
             page.evaluate('(key) => openOutput(key)', key)
-            page.frame_locator('#output-frame').locator('body').wait_for()
+            _, output = assert_pdf_output(page, key, expected, save=True)
             assert page.evaluate('currentOutput.record.job') == key
-            record = page.evaluate('currentOutput.record')
+            record = output['record']
             assert record['data_source']['observation_unit'] == 'Released fleet–quarter–5-degree-cell aggregate', key
             assert any(name.endswith('jobs/' + key + '/run.R') for name in record['code']), key
             assert re.fullmatch(r'ghcr.io/pacificcommunity/fisheries-workflow@sha256:[a-f0-9]{64}', record['execution']['container'])
@@ -145,7 +149,8 @@ def main():
             assert record['data_source']['observation_unit'] in page.locator('.record-card').first.inner_text()
             assert 'Synthetic' not in page.locator('.record-card').first.inner_text()
             assert page.locator('#reproduce-job').is_disabled()
-            page.locator('#output-close').click()
+            close_pdf_output(page)
+        check_pdf_rejections(page)
         with page.expect_download() as download:
             page.locator('#download').click()
         path = Path(directory) / 'saved.zip'

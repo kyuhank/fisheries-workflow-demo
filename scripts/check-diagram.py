@@ -10,6 +10,8 @@ from threading import Thread
 
 from playwright.sync_api import sync_playwright
 
+from pdf_checks import assert_pdf_output, close_pdf_output, expected_record
+
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--engine", choices=("chromium", "webkit"), default="chromium")
@@ -33,7 +35,8 @@ def hosted_docs():
 
 
 with hosted_docs() as url, sync_playwright() as playwright:
-    options = {"executable_path": args.executable} if args.executable else {}
+    options = {"executable_path": args.executable} if args.executable else (
+        {"channel": "chromium"} if args.engine == "chromium" else {})
     browser = getattr(playwright, args.engine).launch(**options)
     page = browser.new_page(viewport={"width": 1440, "height": 1050})
     page.route("https://**/*", lambda route: route.abort())
@@ -94,9 +97,11 @@ with hosted_docs() as url, sync_playwright() as playwright:
     node.click()
     assert page.locator("#selection-title").inner_text() == "CPUE analysis A"
     assert not page.locator("#output-dialog").is_visible()
+    expected = expected_record(page, "cpue_a")
     node.locator(".node-view").press("Enter")
-    assert page.frame_locator("#output-frame").locator("h1").inner_text() == "CPUE analysis A"
-    page.locator("#output-close").click()
+    assert_pdf_output(page, "cpue_a", expected, phrases=("CPUE analysis A",),
+                      save=True, open_link=args.engine == "chromium")
+    close_pdf_output(page)
     page.locator('.job[data-job="prepare_a"]').press("Enter")
     assert page.locator("#selection-title").inner_text() == "Prepare inputs A"
     page.locator('[data-tab="jobs"]').click()
@@ -104,16 +109,19 @@ with hosted_docs() as url, sync_playwright() as playwright:
     assert page.locator('#workspace-activity').bounding_box()['height'] < 50
     page.locator('#tasks .assessment').click()
     assert page.locator('#job-table-body tr').count() == 8
+    expected = expected_record(page, 'assessment_a1')
     page.locator('#job-table-body tr[data-job="assessment_a1"] .open-output').click()
-    assert page.frame_locator('#output-frame').locator('h1').inner_text() == 'Assessment A1'
-    page.locator('#output-close').click()
+    assert_pdf_output(page, 'assessment_a1', expected, phrases=('Assessment A1',))
+    close_pdf_output(page)
     page.locator('#show-tasks').click()
     page.locator('#tasks .mse').click()
     assert page.locator('#job-table-body tr').count() == 6
+    expected = expected_record(page, 'mse_report')
     page.locator('#job-table-body tr[data-job="mse_report"] .open-output').click()
-    assert page.frame_locator('#output-frame').locator('h1').inner_text().strip()
+    assert_pdf_output(page, 'mse_report', expected,
+                      phrases=('Management strategy comparison report',))
     assert page.evaluate('currentOutput.record.job') == 'mse_report'
-    page.locator('#output-close').click()
+    close_pdf_output(page)
     page.locator('[data-tab="workflow"]').click()
     assert page.locator('[data-reference]').count() == 0
     page.locator('.workflow-node[data-job="mse_prepare"] .node-view').press('Enter')

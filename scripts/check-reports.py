@@ -5,6 +5,8 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
+from pdf_checks import assert_pdf_output, close_pdf_output, expected_record, verified_html
+
 ROOT = Path(__file__).resolve().parents[1]
 JOB_KEYS = [job['key'] for job in json.loads((ROOT / 'workflow/jobs.json').read_text())['jobs']]
 parser = argparse.ArgumentParser(description=__doc__)
@@ -35,58 +37,58 @@ def run(page):
 def inspect(page, key, report=False):
     page.locator('[data-tab="jobs"]').click()
     page.locator('#all-tasks').click()
+    expected = expected_record(page, key)
     page.locator(f'tr[data-job="{key}"] .open-output').click()
-    frame = page.frame_locator('#output-frame')
-    frame.locator('h1').wait_for()
-    if report:
-        assert len(frame.locator('h2').all_text_contents()) >= 2, key
-        assert frame.locator('svg, img').count() >= 1, key
-    body = frame.locator('body').inner_text()
-    output = page.evaluate('currentOutput')
-    assert output['record']['job'] == key
-    assert output['record']['data_source']['cpue_scope'].startswith('Fiji fleet;')
-    assert 'Synthetic fisheries workflow' not in body
-    rendering = output['record']['report_rendering']
-    assert rendering['engine'] == 'Quarto' and rendering['quarto_executed'] is True, key
-    assert frame.locator('details, summary').count() == 0, key
-    if not report:
-        assert rendering['presentation_source'] == 'workflow/results.qmd', key
-        assert rendering['execution_engine'] == 'static', key
-        assert 'report-body.html' in rendering['artifacts'], key
-        assert frame.locator('svg').count() <= 2, key
-        assert frame.locator('pre').count() == 0, key
-    if key in ('cpue_a', 'cpue_b', 'cpue_summary'):
-        assert 'Standardised' in body and 'Nominal' in body, key
-        assert frame.locator('svg').first.get_attribute('aria-label') == 'Fish per 1,000 hooks', key
-        assert 'same selected rows' in body, key
-    if key == 'cpue_summary':
-        assert 'An A-only effort filter does not apply to B' in body
-    if key.startswith('assessment_') and key[-2:] in ('a1', 'a2', 'b1', 'b2'):
-        assert 'Observed CPUE' in body and 'Fitted CPUE' in body and 'Biomass trajectory' in body, key
-        assert frame.locator('svg').count() == 2, key
-    if key == 'mse_summary':
-        assert frame.locator('svg').first.get_attribute('aria-label').startswith('Management trade-off')
-    if key == 'extract':
-        assert 'Records → CPUE' in body and 'Annual catch → assessment inputs' in body
-        selected = output['output']
-        fields = {'set_id', 'source_row', 'year', 'fleet', 'quarter', 'cell', 'stratum', 'hooks', 'catch_n'}
-        assert all(set(row) == fields and row['fleet'] == 'FJ'
-                   and row['hooks'] > 0 and row['catch_n'] >= 0 for row in selected['sets'])
-        assert len({row['stratum'] for row in selected['sets']}) == 6
-        assert len(selected['sets']) == 6 * len(selected['catch'])
-        assert all(set(row) == {'year', 'catch_t'} for row in selected['catch'])
-        assert max(row['year'] for row in selected['sets']) == output['record']['snapshot']
-    if key == 'cpue_report':
-        assert 'quasipoisson' in body and 'cell–quarter' in body
-        assert output['output']['data_kind'] == 'public-wcpfc'
-    if key in ('assessment_report', 'mse_report'):
-        assert 'not a validated stock-wide abundance index' in body
-    if key == 'mse_report':
-        assert 'Shared guardrail' in body and 'true starting biomass' in body
-    preview = page.context.new_page()
-    preview.set_content(output['html'])
-    preview.screenshot(path=str(destination / f'{key}.png'), full_page=True)
-    preview.close()
+    body, output = assert_pdf_output(page, key, expected, save=report)
+    page.screenshot(path=str(destination / f'{key}-displayed-pdf.png'))
+    with verified_html(page, output) as frame:
+        frame.locator('h1').wait_for()
+        if report:
+            assert len(frame.locator('h2').all_text_contents()) >= 2, key
+            assert frame.locator('svg, img').count() >= 1, key
+        assert output['record']['job'] == key
+        assert output['record']['data_source']['cpue_scope'].startswith('Fiji fleet;')
+        assert 'Synthetic fisheries workflow' not in body
+        rendering = output['record']['report_rendering']
+        assert rendering['engine'] == 'Quarto' and rendering['quarto_executed'] is True, key
+        assert frame.locator('details, summary').count() == 0, key
+        if not report:
+            assert rendering['presentation_source'] == 'workflow/results.qmd', key
+            assert rendering['execution_engine'] == 'static', key
+            assert 'report-body.html' in rendering['artifacts'], key
+            assert frame.locator('svg').count() <= 2, key
+            assert frame.locator('pre').count() == 0, key
+        if key in ('cpue_a', 'cpue_b', 'cpue_summary'):
+            assert 'Standardised' in body and 'Nominal' in body, key
+            assert frame.locator('svg').first.get_attribute('aria-label') == 'Fish per 1,000 hooks', key
+            assert 'same selected rows' in body, key
+        if key == 'cpue_summary':
+            assert 'Any A effort filter applies to both; B uses its own eligible records.' in body
+        if key.startswith('assessment_') and key[-2:] in ('a1', 'a2', 'b1', 'b2'):
+            assert 'Observed CPUE' in body and 'Fitted CPUE' in body and 'Biomass trajectory' in body, key
+            assert frame.locator('svg').count() == 2, key
+        if key == 'mse_summary':
+            assert frame.locator('svg').first.get_attribute('aria-label').startswith('Management trade-off')
+            assert all(phrase in body for phrase in ('Catch and final biomass', 'Mean annual realised catch',
+                                                     'Constant catch', 'Index rule', 'Buffered rule'))
+        if key == 'extract':
+            assert 'Records → CPUE' in body and 'Annual catch → assessment inputs' in body
+            selected = output['output']
+            fields = {'set_id', 'source_row', 'year', 'fleet', 'quarter', 'cell', 'stratum', 'hooks', 'catch_n'}
+            assert all(set(row) == fields and row['fleet'] == 'FJ'
+                       and row['hooks'] > 0 and row['catch_n'] >= 0 for row in selected['sets'])
+            assert len({row['stratum'] for row in selected['sets']}) == 6
+            assert len(selected['sets']) == 6 * len(selected['catch'])
+            assert all(set(row) == {'year', 'catch_t'} for row in selected['catch'])
+            assert max(row['year'] for row in selected['sets']) == output['record']['snapshot']
+        if key == 'cpue_report':
+            assert 'quasipoisson' in body and 'cell–quarter' in body
+            assert output['output']['data_kind'] == 'public-wcpfc'
+        if key in ('assessment_report', 'mse_report'):
+            assert 'not a validated stock-wide abundance index' in body
+        if key == 'mse_report':
+            assert 'Shared guardrail' in body and 'true starting biomass' in body
+        frame.screenshot(path=str(destination / f'{key}-archived-html.png'), full_page=True)
     if report:
         assert output['record']['report_rendering']['engine'] == 'Quarto'
         assert output['record']['report_rendering']['quarto_executed'] is True
@@ -94,7 +96,7 @@ def inspect(page, key, report=False):
         assert page.locator('.record-input').count() == 1
         if page.locator('#mode').input_value() == 'cloud':
             assert '@sha256:' in output['record']['execution']['container']
-    page.locator('#output-close').click()
+    close_pdf_output(page)
     return body, output
 
 
@@ -150,7 +152,8 @@ with sync_playwright() as playwright:
         inspect(page, key, True)
     assert not errors, errors
     result = {'mode': mode, 'distinct_reports': True, 'all_native_views_quarto': True,
-              'visible_plot_first_results': True, 'collapsed_controls': False,
+              'displayed_pdf_bytes_and_text': True, 'archived_html_plot_structure': True,
+              'collapsed_controls': False,
               'settings_updates': args.online,
               'retained_inputs': True, 'mse_assessment_inputs': True,
               'saved_reports': True, 'page_errors': errors,
