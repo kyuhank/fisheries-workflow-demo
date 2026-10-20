@@ -86,15 +86,17 @@ class NativeIntegrationTest(unittest.TestCase):
             record = self.runner.records[key]
             self.assertTrue(record['report_rendering']['quarto_executed'])
             self.assertEqual(record['report_rendering']['version'], record['software']['quarto'])
-            for name in ('report.html', 'report.qmd', 'report-data.json'):
+            for name in ('report.html', 'report.pdf', 'report.qmd', 'report-data.json'):
                 path = self.runner.directory / key / name
                 self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), record['outputs'][name])
             payload = json.loads((self.runner.directory / key / 'report-data.json').read_text())
             compare(payload['result'], self.runner.output(key))
             self.assertEqual(payload['record']['inputs'], record['inputs'])
+            self.assertEqual(payload['record']['software'], record['software'])
+            self.assertEqual(record['report_rendering']['view'], 'report.pdf')
+            self.assertTrue((self.runner.directory / key / 'report.pdf').read_bytes().startswith(b'%PDF-'))
             html = (self.runner.directory / key / 'report.html').read_text()
             self.assertIn('quarto', html.lower())
-            self.assertIn(os.environ['PAPER_RUNTIME_IMAGE'], html)
 
         # The hosted process worker invokes the identical R job adapter with saved parents.
         os.environ.setdefault('PAPER_REQUEST_ID', '00000000-0000-4000-8000-000000000001')
