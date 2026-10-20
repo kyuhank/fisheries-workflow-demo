@@ -1,0 +1,6 @@
+test_growth_then_buffer_updates_match_fresh_full_workflows (tests.test_public_integration.PublicReaderUpdateIntegrationTest.test_growth_then_buffer_updates_match_fresh_full_workflows) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 152.356s
+
+OK

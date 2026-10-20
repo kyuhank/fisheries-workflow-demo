@@ -1,0 +1,7 @@
+test_1_default_public_workflow_has_22_jobs_and_actual_fixed_support (tests.test_public_integration.PublicNativeIntegrationTest.test_1_default_public_workflow_has_22_jobs_and_actual_fixed_support) ... ok
+test_2_2022_data_update_matches_a_fresh_full_workflow (tests.test_public_integration.PublicNativeIntegrationTest.test_2_2022_data_update_matches_a_fresh_full_workflow) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 123.800s
+
+OK
