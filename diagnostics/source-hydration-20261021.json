@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "verified_utc": "2026-10-20T16:08:37.600853+00:00",
+  "source_commit": "b30a68eca0d15af9b49e45302f07dbb9f6950a19",
+  "reported_failure": {
+    "run": 39440567036,
+    "job": 118688984961,
+    "stage": "Pinned CPUE source retrieval, before analysis",
+    "error": "Git clone returned HTTP 403",
+    "underlying_server_cause": "Not established"
+  },
+  "repair": {
+    "live_source_commit": "2014eabf35825b92bf344d4b8d619e07da541555",
+    "method": "Commit archives checked against the existing independently Git-derived file inventory and SHA256 pins",
+    "component_files": 59,
+    "component_pins": {
+      "cpue": "cba0a50179ad629d7e4df33734f198d6e9900b36",
+      "assessment": "0e29121cd0807fb8e058025529c10670befaf702",
+      "mse": "24c47d6f755f390f9e1865d7ec762d87d796937d"
+    },
+    "manifest": "source-files.sha256.json"
+  },
+  "live": {
+    "github_run": "39444849224",
+    "commit": "2014eabf35825b92bf344d4b8d619e07da541555",
+    "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+    "settings": {
+      "last_year": 2021,
+      "min_hooks_a": 0,
+      "growth_rate_2": 0.3,
+      "mse": true,
+      "mse_buffer": 0.8
+    },
+    "executed_jobs": [
+      "submission",
+      "qc",
+      "database",
+      "extract",
+      "cpue_a",
+      "cpue_b",
+      "cpue_summary",
+      "cpue_report",
+      "prepare_a",
+      "prepare_b",
+      "assessment_a1",
+      "assessment_a2",
+      "assessment_b1",
+      "assessment_b2",
+      "assessment_summary",
+      "assessment_report",
+      "mse_prepare",
+      "mse_constant",
+      "mse_index",
+      "mse_buffered",
+      "mse_summary",
+      "mse_report"
+    ],
+    "pdfs": [
+      {
+        "job": "assessment_a1",
+        "path": "reference/assessment_a1/report.pdf",
+        "sha256": "7a755cafc91264c41ab041a9c1f8ed2ee50fa519049399de1a010e91579ac038"
+      },
+      {
+        "job": "assessment_a2",
+        "path": "reference/assessment_a2/report.pdf",
+        "sha256": "267e4a979a775b919fe82fe5f30f7d7534b8a230c9c0a06e8b22eb048b548c72"
+      },
+      {
+        "job": "assessment_b1",
+        "path": "reference/assessment_b1/report.pdf",
+        "sha256": "b31f24ce322ddaf8817f73b9058085642dd46d56298dff6427dd269179a4f952"
+      },
+      {
+        "job": "assessment_b2",
+        "path": "reference/assessment_b2/report.pdf",
+        "sha256": "542bbd1e6ded4ded5d7d8fc45501d2c37e8c2e0cc578f29d40c3b18433059471"
+      },
+      {
+        "job": "assessment_report",
+        "path": "reference/assessment_report/report.pdf",
+        "sha256": "9f6d52044bb3e737c9c1faf8eeb825ce60de5d6a2c0960568181d2c13ff247b0"
+      },
+      {
+        "job": "assessment_summary",
+        "path": "reference/assessment_summary/report.pdf",
+        "sha256": "8d4c169d87eac5a3cd05f4c03a2cd4b15b0cef8a60a541cbb58e3782b1573284"
+      },
+      {
+        "job": "cpue_a",
+        "path": "reference/cpue_a/report.pdf",
+        "sha256": "4d7a4f7736fc1a57a5812a798e84593747d24e02d516013b1240adfaf30260f8"
+      },
+      {
+        "job": "cpue_b",
+        "path": "reference/cpue_b/report.pdf",
+        "sha256": "3b774c6cfac5f26478e59867ee90d681751acafe21d7e9a6ad942da91614e8bd"
+      },
+      {
+        "job": "cpue_report",
+        "path": "reference/cpue_report/report.pdf",
+        "sha256": "3bff58959d72cf53ab5ef5bfacd5328c0a0ff4371fe4f21bf10e3b551431dff3"
+      },
+      {
+        "job": "cpue_summary",
+        "path": "reference/cpue_summary/report.pdf",
+        "sha256": "390e5381589005c03c30b7fe894cfc06cd78c633e80149a0a32a90b736fe7153"
+      },
+      {
+        "job": "database",
+        "path": "reference/database/report.pdf",
+        "sha256": "5560204d63354489c351a2f4ad034920633a9dcc569b24da4267246dd636d241"
+      },
+      {
+        "job": "extract",
+        "path": "reference/extract/report.pdf",
+        "sha256": "62c220efde3c318ec40eed0d3847a6bd4a5aebda20aa6f9e1f1d50dfd3ab1638"
+      },
+      {
+        "job": "mse_buffered",
+        "path": "reference/mse_buffered/report.pdf",
+        "sha256": "4cea7e41d51e6999044602bdeb068e04068601b41cddba4cb6ea3567d342c6bc"
+      },
+      {
+        "job": "mse_constant",
+        "path": "reference/mse_constant/report.pdf",
+        "sha256": "062349fec0290e2e6441650a8ba6da846b6803e9177274e21939344a9f8a5ed8"
+      },
+      {
+        "job": "mse_index",
+        "path": "reference/mse_index/report.pdf",
+        "sha256": "4403bac8c75abc99a0e2439a4766ed698971bc3227cfd93db0ef3c6eba2c2278"
+      },
+      {
+        "job": "mse_prepare",
+        "path": "reference/mse_prepare/report.pdf",
+        "sha256": "bfa62b0810439809e75be3f500d4878496299a9269b92983395e78c581da1bdf"
+      },
+      {
+        "job": "mse_report",
+        "path": "reference/mse_report/report.pdf",
+        "sha256": "a31d2ca5980246f0cb807c7354d05ba4ee10f9909527834011678d250b32b530"
+      },
+      {
+        "job": "mse_summary",
+        "path": "reference/mse_summary/report.pdf",
+        "sha256": "69f4c169115e22d55cf1d4e041123ef37b7b82b0d839c8d0590fbe642a53b263"
+      },
+      {
+        "job": "prepare_a",
+        "path": "reference/prepare_a/report.pdf",
+        "sha256": "c0b5189ebcac195d6c70a057cf16e0ea0b4d37460ae9cfd15339aba0aef8ad50"
+      },
+      {
+        "job": "prepare_b",
+        "path": "reference/prepare_b/report.pdf",
+        "sha256": "f05a6487fca1e5a7697c910b68748de171d3f70c85c22776b7baf8c42b158acc"
+      },
+      {
+        "job": "qc",
+        "path": "reference/qc/report.pdf",
+        "sha256": "06318daf3a5eaacc976e96a72bae563333784e7e49d7b092e42ae397b9d564a9"
+      },
+      {
+        "job": "submission",
+        "path": "reference/submission/report.pdf",
+        "sha256": "f2b34c5472acacce339acda94f8482e2af7ba7eda7340dc5810b830de9b2f10c"
+      }
+    ],
+    "bundle_sha256": "d7c43e88f4ec82adf5c5cac0defc95f3f1e9b281273ce749a1a6d22c4076a4c3",
+    "bundle_bytes": 7295968,
+    "checksummed_files": 481,
+    "records_match_bundle": true,
+    "source_files_match_verified_checkout": true
+  },
+  "checks": [
+    {
+      "workflow": "Check calculations",
+      "run": 39453204217,
+      "source_commit": "b30a68eca0d15af9b49e45302f07dbb9f6950a19",
+      "conclusion": "success",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39453204217"
+    },
+    {
+      "workflow": "Check diagram",
+      "run": 39453204108,
+      "source_commit": "b30a68eca0d15af9b49e45302f07dbb9f6950a19",
+      "conclusion": "success",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39453204108"
+    }
+  ],
+  "delivery": {
+    "analysis_code_data_pins_and_transport_unchanged_since_live": true,
+    "post_live_changes": "CI assertions, test targets and four-lane grouping; application, numerical models and data are unchanged",
+    "public_reader_sha256": "f5428794e6ccd653cc560ef20042d94a58d0725fcaeb3a65e0053968a7e08d7a",
+    "workshop_changes": 0,
+    "manuscript_changes": 0,
+    "new_paid_services": 0
+  },
+  "scope": "Execution, artifact integrity, PDF navigation and reproduction checks. This does not establish scientific validity or future service availability."
+}
