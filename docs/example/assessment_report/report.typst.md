@@ -55,7 +55,8 @@ Compare how two CPUE indices and two fixed growth assumptions affect the fitted 
 :::
 
 
-The trajectories describe the supplied index, catches and fixed model assumptions.
+Each trajectory shows start-of-year biomass divided by that case's fitted carrying
+capacity. The trajectories describe the supplied index, catches and fixed model assumptions.
 Differences among cases are not an uncertainty interval or stock-management advice.
 
 
@@ -125,8 +126,8 @@ Calculation image: `sha256:9dea950a713b…` (full digest in the run bundle).
 
 [Container package](https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow)
 
-[source at 6dc2b71b](https://github.com/kyuhank/fisheries-workflow-demo/commit/6dc2b71b24c946b17f05c93fe4d7810e29c36d1e)
+[Coordinator source at b343d9d1](https://github.com/kyuhank/fisheries-workflow-demo/commit/b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406)
 
-[analysis_source at 9b30d4f6](https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/9b30d4f6d2afbaddc68ab31d83911b308037cb02)
+[Assessment component source at 0e29121c](https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/0e29121cd0807fb8e058025529c10670befaf702)
 
 Annual values are available in the **Data** tab. Input files, settings, source versions and checksums are available in **Inputs & versions** and the downloaded run. Rendering reads saved results and does not fit models again.

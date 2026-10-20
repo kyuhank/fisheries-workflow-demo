@@ -5,10 +5,10 @@
     "provider": "Local Docker",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "6dc2b71b24c946b17f05c93fe4d7810e29c36d1e",
+    "commit": "b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "execution_host": "NC240124",
-    "compute_selection_receipt": "FEEDBACK-29ab92be1faf"
+    "compute_selection_receipt": "FEEDBACK-5e1e4f404060"
   },
   "settings": {
     "last_year": 2021,
@@ -41,9 +41,9 @@
     "mse_summary",
     "mse_report"
   ],
-  "analysis_and_reports_seconds": 57.39999023202108,
+  "analysis_and_reports_seconds": 54.04185897600837,
   "timing_scope": "Fresh workflow including R analyses, checks and all report rendering; excludes source retrieval, container image download and runner queue.",
-  "source_lock_sha256": "900ad5fe5861a7e0489bed2f831375b31cd86aec7061c2d872db3de775b813b1",
+  "source_lock_sha256": "c60a13dac1fbc0e2266124efe0f51ff7d12c3ecb80d287a9599824322148104b",
   "builder_sha256": "a0abfb4d12adefbde6b73f795d168169df29c7dc80ad4aaf7634f6f60a7e93c0",
   "extracted_records": 132,
   "annual_catches": 22,

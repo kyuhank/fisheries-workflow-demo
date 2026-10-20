@@ -2,11 +2,11 @@
 
 Compare the four fitted biomass trajectories.
 
-![](report-plot-01.svg){fig-alt="Biomass / each case's carrying capacity"}
+![](report-plot-01.svg){fig-alt="Start-of-year biomass / each case's carrying capacity"}
 
-Biomass / each case's carrying capacity
+Start-of-year biomass / each case's carrying capacity
 
-The cases combine two CPUE indices and two fixed growth settings. Their differences are sensitivities, not an uncertainty interval.
+Each case has its own fitted carrying capacity. The cases combine two CPUE indices and two fixed growth settings. Their differences are sensitivities, not an uncertainty interval.
 
   Case            Final year   B / K
   --------------- ------------ --------

@@ -51,23 +51,28 @@ plot_series <- function(series, field, label) {
   years <- unlist(lapply(series, function(rows) vapply(rows, function(x) x$year, numeric(1))))
   values <- unlist(lapply(series, function(rows) vapply(rows, function(x) x[[field]], numeric(1))))
   colours <- c("#1378a3", "#b56435", "#7357a8", "#328363")
+  old_mar <- par("mar")
+  on.exit(par(mar = old_mar))
+  par(mar = c(4, 4, 5, 1))
   plot(range(years), range(c(0, values)), type = "n", xlab = "Year", ylab = label)
   for (i in seq_along(series)) {
     lines(vapply(series[[i]], function(x) x$year, numeric(1)),
           vapply(series[[i]], function(x) x[[field]], numeric(1)),
           col = colours[(i - 1) %% length(colours) + 1], lwd = 2)
   }
-  legend("topright", names(series), col = colours[seq_along(series)], lty = 1, bty = "n")
+  legend("top", names(series), inset = c(0, -0.34), xpd = NA, ncol = 2,
+         col = colours[seq_along(series)], lty = 1, lwd = 2, cex = 0.8, bty = "n")
 }
 ```
 
 ## Biomass comparison
 
 ```{r}
-plot_series(result$series, "B_over_K", "Biomass / carrying capacity")
+plot_series(result$series, "B_over_K", "Start-of-year biomass / carrying capacity")
 ```
 
-The trajectories describe the supplied index, catches and fixed model assumptions.
+Each trajectory shows start-of-year biomass divided by that case's fitted carrying
+capacity. The trajectories describe the supplied index, catches and fixed model assumptions.
 Differences among cases are not an uncertainty interval or stock-management advice.
 
 ```{r}
@@ -155,10 +160,11 @@ if (knitr::is_html_output()) {
 if (!is.null(record$software$container_url)) {
   cat("[Container package](", record$software$container_url, ")\n\n", sep = "")
 }
-for (key in c("source", "analysis_source")) {
+source_labels <- c(source = "Coordinator source", analysis_source = "Assessment component source")
+for (key in names(source_labels)) {
   source <- record[[key]]
   if (!is.null(source$repository) && !is.null(source$commit)) {
-    cat("[", key, " at ", substr(source$commit, 1, 8), "](",
+    cat("[", source_labels[[key]], " at ", substr(source$commit, 1, 8), "](",
         source$repository, "/commit/", source$commit, ")\n\n", sep = "")
   }
 }

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "scope": "Local reproducibility and presentation verification of final1.11.6 teaching-workflow release; not scientific validation.",
+  "coordinator_commit": "b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406",
+  "component_commits": {
+    "cpue": "cba0a50179ad629d7e4df33734f198d6e9900b36",
+    "assessment": "0e29121cd0807fb8e058025529c10670befaf702",
+    "mse": "24c47d6f755f390f9e1865d7ec762d87d796937d"
+  },
+  "runtime_image_id": "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158",
+  "runtime_upstream_digest": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+  "actual_jobs": 49,
+  "targeted_tests_passed": 16,
+  "literal_documented_paths_passed": [
+    "sh scripts/offline.sh reproduce",
+    "sh scripts/offline.sh compare",
+    "PAPER_SOURCE_MODE=monorepo make job JOB=cpue_a"
+  ],
+  "numerical_checks": "22 original/first/final/reproduced outputs byte-identical; 22 archived old/final outputs byte-identical; 5 selected host-job outputs byte-identical.",
+  "compiled_reports": "22 Quarto/Typst PDFs and recorded artifact hashes passed. Exact coordinator/component source links checked in all three formal report PDF/HTML pairs.",
+  "presentation": "Actual corrected assessment legend has all four labels above trajectories without overlap; CPUE nominal/standardised overlay and MSE end-year biomass label remain visible.",
+  "release_archives": [
+    {
+      "name": "fisheries-workflow-1.11.6.zip",
+      "sha256": "2ef8c959ebdb0f2381a253a33f67e505533efa1955384656739ad9948ffef693",
+      "bytes": 28893370
+    },
+    {
+      "name": "fisheries-workflow-offline-1.11.6.zip",
+      "sha256": "b28f012bbdb1c3be11f804f0b15ac9f34a79937b7a9b87e7f82e4634c5098292",
+      "bytes": 25806341
+    }
+  ],
+  "limits": "Local commands only; no hosted execution, human quality score, scientific adequacy approval or efficiency claim."
+}

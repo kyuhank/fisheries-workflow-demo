@@ -14,9 +14,9 @@ Relative CPUE
 ::: section
 ## Biomass trajectory
 
-![](report-plot-02.svg){fig-alt="Biomass / carrying capacity"}
+![](report-plot-02.svg){fig-alt="Start-of-year biomass / carrying capacity"}
 
-Biomass / carrying capacity
+Start-of-year biomass / carrying capacity
 :::
 :::::
 

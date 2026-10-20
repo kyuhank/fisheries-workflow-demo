@@ -1,0 +1,159 @@
+{
+  "status": "PASS",
+  "outputs": [
+    {
+      "job": "assessment_a1",
+      "old_sha256": "53b68124738d7abc5d7204ec88db718c091cb8b1448e0d982d33efd18d4aaa65",
+      "new_sha256": "53b68124738d7abc5d7204ec88db718c091cb8b1448e0d982d33efd18d4aaa65",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "assessment_a2",
+      "old_sha256": "dc2e0ae4ff30b62c97fd08e5c89ffd618ca69c7b1ea7434b908d3860d1aa0964",
+      "new_sha256": "dc2e0ae4ff30b62c97fd08e5c89ffd618ca69c7b1ea7434b908d3860d1aa0964",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "assessment_b1",
+      "old_sha256": "ff332bcb9e2ad3f36e25920af82efc679071e3b5a561c873d5fe8c9870cf5058",
+      "new_sha256": "ff332bcb9e2ad3f36e25920af82efc679071e3b5a561c873d5fe8c9870cf5058",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "assessment_b2",
+      "old_sha256": "b05abc33699faffbc8aaf21434647607f6918ddf9cf7ad26d5edc3e24d87a818",
+      "new_sha256": "b05abc33699faffbc8aaf21434647607f6918ddf9cf7ad26d5edc3e24d87a818",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "assessment_report",
+      "old_sha256": "9b1f859265e720ea42d38c88dd8f0d6428992b9bc0f5295ff03a23aa668a7eec",
+      "new_sha256": "9b1f859265e720ea42d38c88dd8f0d6428992b9bc0f5295ff03a23aa668a7eec",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "assessment_summary",
+      "old_sha256": "9b1f859265e720ea42d38c88dd8f0d6428992b9bc0f5295ff03a23aa668a7eec",
+      "new_sha256": "9b1f859265e720ea42d38c88dd8f0d6428992b9bc0f5295ff03a23aa668a7eec",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "cpue_a",
+      "old_sha256": "de11c95efea030dad4a5a79bfeec4fe5e2f0eb3bb59b87dfd2e10bdb4d34561f",
+      "new_sha256": "de11c95efea030dad4a5a79bfeec4fe5e2f0eb3bb59b87dfd2e10bdb4d34561f",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "cpue_b",
+      "old_sha256": "ad580d1a5aabd123eefdd079f289456318dc6595b174ecef6abb51060872d417",
+      "new_sha256": "ad580d1a5aabd123eefdd079f289456318dc6595b174ecef6abb51060872d417",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "cpue_report",
+      "old_sha256": "5b1089c0a72253a42d6a5d7fa0ef5ee7d70b2ac61f4a99a4378da3c8e30cc64c",
+      "new_sha256": "5b1089c0a72253a42d6a5d7fa0ef5ee7d70b2ac61f4a99a4378da3c8e30cc64c",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "cpue_summary",
+      "old_sha256": "5b1089c0a72253a42d6a5d7fa0ef5ee7d70b2ac61f4a99a4378da3c8e30cc64c",
+      "new_sha256": "5b1089c0a72253a42d6a5d7fa0ef5ee7d70b2ac61f4a99a4378da3c8e30cc64c",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "database",
+      "old_sha256": "7a8fd051241afc57328d2b369b2b5d32d78ba99e4684ed6d8e00fc9a4fdcee61",
+      "new_sha256": "7a8fd051241afc57328d2b369b2b5d32d78ba99e4684ed6d8e00fc9a4fdcee61",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "extract",
+      "old_sha256": "197bf805c09ddfb2341491dc521bfdb598f14b241dae4c6019561b4145f13330",
+      "new_sha256": "197bf805c09ddfb2341491dc521bfdb598f14b241dae4c6019561b4145f13330",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "mse_buffered",
+      "old_sha256": "42afd601b07864784ad811597f7cdad0e32344f3d2fb9b1379904fdbbafdfc74",
+      "new_sha256": "42afd601b07864784ad811597f7cdad0e32344f3d2fb9b1379904fdbbafdfc74",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "mse_constant",
+      "old_sha256": "82b20a2aaed7306c56e578ec24416f8c2e5c0069dec2e4b84dcdb683b1b14958",
+      "new_sha256": "82b20a2aaed7306c56e578ec24416f8c2e5c0069dec2e4b84dcdb683b1b14958",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "mse_index",
+      "old_sha256": "4cd28a69888ec1fe3e5984ef62750e022c3439948647c60a809eb51054fd9b8d",
+      "new_sha256": "4cd28a69888ec1fe3e5984ef62750e022c3439948647c60a809eb51054fd9b8d",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "mse_prepare",
+      "old_sha256": "7a145d16baecb1df27645cdb3a2a088dcf146a34ec191215cc089f54d2a1cbe1",
+      "new_sha256": "7a145d16baecb1df27645cdb3a2a088dcf146a34ec191215cc089f54d2a1cbe1",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "mse_report",
+      "old_sha256": "9590825f9237f99d262b78f8e92399431b758a71d7acb31bc03d1f06d0d2e191",
+      "new_sha256": "9590825f9237f99d262b78f8e92399431b758a71d7acb31bc03d1f06d0d2e191",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "mse_summary",
+      "old_sha256": "9590825f9237f99d262b78f8e92399431b758a71d7acb31bc03d1f06d0d2e191",
+      "new_sha256": "9590825f9237f99d262b78f8e92399431b758a71d7acb31bc03d1f06d0d2e191",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "prepare_a",
+      "old_sha256": "904b5e1f6f00b34defb9c83d7199126a3595a5fa50d189c3599243526e316fdd",
+      "new_sha256": "904b5e1f6f00b34defb9c83d7199126a3595a5fa50d189c3599243526e316fdd",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "prepare_b",
+      "old_sha256": "70b6c1cf6f483581fbc7e2e4c1e6fe326bf656da7ebffe0d7c7a5bd91a06a0ea",
+      "new_sha256": "70b6c1cf6f483581fbc7e2e4c1e6fe326bf656da7ebffe0d7c7a5bd91a06a0ea",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "qc",
+      "old_sha256": "19560a26f7c8c006be15e6fb6ed4d80684de6328e76920e718c16fc44b010f60",
+      "new_sha256": "19560a26f7c8c006be15e6fb6ed4d80684de6328e76920e718c16fc44b010f60",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    },
+    {
+      "job": "submission",
+      "old_sha256": "800c9dfe5e455cd8d975b30c57eb3c1edd1443137bbcd159e49adcd1074d727a",
+      "new_sha256": "800c9dfe5e455cd8d975b30c57eb3c1edd1443137bbcd159e49adcd1074d727a",
+      "same_bytes": true,
+      "same_bytes_as_first_build": true
+    }
+  ]
+}

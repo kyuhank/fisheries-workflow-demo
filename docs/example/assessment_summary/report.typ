@@ -376,11 +376,11 @@
 <compare-assessments>
 Compare the four fitted biomass trajectories.
 
-#box(image("report-plot-01.svg", alt: "Biomass / each case's carrying capacity"))
+#box(image("report-plot-01.svg", alt: "Start-of-year biomass / each case's carrying capacity"))
 
-Biomass / each case's carrying capacity
+Start-of-year biomass / each case's carrying capacity
 
-The cases combine two CPUE indices and two fixed growth settings. Their differences are sensitivities, not an uncertainty interval.
+Each case has its own fitted carrying capacity. The cases combine two CPUE indices and two fixed growth settings. Their differences are sensitivities, not an uncertainty interval.
 
 #table(
   columns: 3,

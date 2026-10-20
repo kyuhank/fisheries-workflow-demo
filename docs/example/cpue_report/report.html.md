@@ -99,4 +99,8 @@ The first plot shows the effect of holding cell–quarter composition fixed for 
 
 Produced in **Run 001** from preserved results; rendering fits no models. Annual values and the full method record are in **Data**. Producing runs, input checksums, code, settings and software are in **Inputs & versions** and the downloadable bundle.
 
-[Calculation container](https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow) · [Source 6dc2b71b24c9](https://github.com/kyuhank/fisheries-workflow-demo/commit/6dc2b71b24c946b17f05c93fe4d7810e29c36d1e)
+[Calculation container](https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow)
+
+[Coordinator source at b343d9d1c704](https://github.com/kyuhank/fisheries-workflow-demo/commit/b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406)
+
+[CPUE component source at cba0a50179ad](https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/cba0a50179ad629d7e4df33734f198d6e9900b36)

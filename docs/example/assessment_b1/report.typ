@@ -388,9 +388,9 @@ Relative CPUE
 #block[
 == Biomass trajectory
 <biomass-trajectory>
-#box(image("report-plot-02.svg", alt: "Biomass / carrying capacity"))
+#box(image("report-plot-02.svg", alt: "Start-of-year biomass / carrying capacity"))
 
-Biomass / carrying capacity
+Start-of-year biomass / carrying capacity
 
 ]
 ]

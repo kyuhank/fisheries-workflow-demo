@@ -188,12 +188,14 @@ Produced in **`r record$run_id`** from preserved results; rendering fits no mode
 ```{r}
 #| results: asis
 if (!is.null(record$software$container_url)) {
-  cat("[Calculation container](", record$software$container_url, ")", sep = "")
+  cat("[Calculation container](", record$software$container_url, ")\n\n", sep = "")
 }
-if (!is.null(record$source$repository) && !is.null(record$source$commit)) {
-  commit_url <- paste0(record$source$repository, "/commit/", record$source$commit)
-  if (!is.null(record$software$container_url)) cat(" · ")
-  cat("[Source ", substr(record$source$commit, 1, 12), "](", commit_url, ")", sep = "")
+source_labels <- c(source = "Coordinator source", analysis_source = "CPUE component source")
+for (key in names(source_labels)) {
+  source <- record[[key]]
+  if (!is.null(source$repository) && !is.null(source$commit)) {
+    cat("[", source_labels[[key]], " at ", substr(source$commit, 1, 12), "](",
+        source$repository, "/commit/", source$commit, ")\n\n", sep = "")
+  }
 }
-cat("\n\n")
 ```
