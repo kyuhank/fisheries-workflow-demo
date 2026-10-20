@@ -8,8 +8,10 @@ import json
 import multiprocessing
 import os
 from pathlib import Path
+import re
 import sys
 import time
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 import uuid
@@ -45,11 +47,65 @@ class TemporaryAPIError(RuntimeError):
     """A temporary API failure that allows later reconnection."""
 
 
+def finish_binding(body):
+    """Keep the original runner identity and decoded archive hashes for readback."""
+    github_run, commit = os.environ.get('GITHUB_RUN_ID', ''), os.environ.get('GITHUB_SHA', '')
+    if not re.fullmatch(r'\d{1,20}', github_run) or not re.fullmatch(r'[a-f0-9]{40}', commit):
+        return None
+    result, error = body.get('result'), body.get('error') or None
+    run_id = result.get('run_id') if isinstance(result, dict) else None
+    if not error and (not isinstance(run_id, str) or not run_id):
+        return None
+    try:
+        hashes = {name + '_sha256': digest(base64.b64decode(body[name], validate=True))
+                  for name in ('bundle', 'checkpoint')}
+    except (KeyError, TypeError, ValueError):
+        return None
+    return {'request_id': REQUEST, 'github_run': github_run, 'commit_sha': commit,
+            'status': 'failed' if error else 'complete', 'error': error,
+            'run_id': run_id, **hashes}
+
+
+def finish_receipt(operation, expected, wire_hash):
+    """Probe the known receipt once; a terminal status alone is not an acknowledgement."""
+    query = urlencode({'request': REQUEST, 'operation_id': operation})
+    request = Request(API + '/runner/finish-receipt?' + query,
+                      headers={'Authorization': 'Bearer ' + _token})
+    try:
+        with urlopen(request, timeout=30) as response:
+            receipt = json.load(response)['receipt']
+    except HTTPError as error:
+        if error.code in (404, 408, 429, 500, 502, 503, 504):
+            return None
+        raise RuntimeError(f'finish-receipt: HTTP {error.code}: Receipt lookup rejected.') from None
+    except (URLError, TimeoutError, ConnectionError, IncompleteRead, json.JSONDecodeError, KeyError, TypeError):
+        return None
+    if receipt is None:
+        return None
+    if (not isinstance(receipt, dict) or not set(expected).issubset(receipt) or
+            receipt.get('operation_id') != operation or
+            not isinstance(receipt.get('payload_hash'), str) or
+            not re.fullmatch(r'[a-f0-9]{64}', receipt['payload_hash']) or
+            any(receipt.get(key) != value for key, value in expected.items()) or
+            any(not isinstance(receipt.get(key), str) or
+                not re.fullmatch(r'[a-f0-9]{64}', receipt[key])
+                for key in ('bundle_sha256', 'checkpoint_sha256'))):
+        raise RuntimeError('finish-receipt: The original finish receipt did not match.')
+    # PostgreSQL's opaque jsonb fingerprint is distinct from this wire-byte hash.
+    print('Finish acknowledgement reconciled: ' + json.dumps({
+        **expected, 'operation_id': operation, 'payload_hash': receipt['payload_hash'],
+        'finish_body_sha256': wire_hash,
+    }, sort_keys=True), flush=True)
+    return {'ok': True}
+
+
 def api(path, body=None):
     global _token, _expires
     if body is not None and path in ('event', 'finish'):
         body = {'operation_id': str(uuid.uuid4()), **body}
     payload = json.dumps(body).encode() if body is not None else None
+    expected = finish_binding(body) if path == 'finish' and body is not None else None
+    wire_hash = digest(payload) if expected is not None else None
     # A bound finish may spend 100.5s across the run read and receipt RPC
     # database retries. Allow response overhead; the workflow deadline still applies.
     service_timeout = 120 if path == 'finish' else 30
@@ -87,6 +143,10 @@ def api(path, body=None):
                 raise RuntimeError(failure) from None
         except (URLError, TimeoutError, ConnectionError, IncompleteRead, json.JSONDecodeError):
             failure = f'{path}: The service connection was interrupted.'
+        if path == 'finish' and not identity and expected is not None:
+            acknowledged = finish_receipt(body['operation_id'], expected, wire_hash)
+            if acknowledged:
+                return acknowledged
         if attempt == 2:
             raise TemporaryAPIError(failure) from None
         time.sleep(.5 * 2 ** attempt)

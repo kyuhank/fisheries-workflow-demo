@@ -9,6 +9,7 @@ import {
 import { setup } from "./setup.ts";
 import { createDatabase, DatabaseError } from "./database.ts";
 import { validateRunnerWrite } from "./runner-write.ts";
+import { finishReceipt } from "./finish-receipt.ts";
 import { runScope, runSettings } from "./request.ts";
 import { confirmTransfer } from "./transfer.ts";
 import { publishedBundle } from "./publication.ts";
@@ -258,6 +259,11 @@ export async function handle(request: Request) {
     }
     if (path.startsWith("/runner/")) {
       const id = u.searchParams.get("request") || "";
+      if (path === "/runner/finish-receipt") {
+        return reply(await finishReceipt(
+          request, id, u.searchParams.get("operation_id") || "", runner, db,
+        ));
+      }
       const run = await runner(request, id, path === "/runner/finish");
       if (path === "/runner/context") {
         const [s] = await db(

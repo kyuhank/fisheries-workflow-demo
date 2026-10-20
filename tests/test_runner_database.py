@@ -4,6 +4,8 @@ Use a local postgres:17-alpine container with --network none, then set
 PAPER_TEST_POSTGRES_CONTAINER to its name. No hosted database is accessed.
 """
 from concurrent.futures import ThreadPoolExecutor
+import base64
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -39,10 +41,13 @@ class RunnerDatabaseTest(unittest.TestCase):
         if json.loads(details.stdout)[0]['HostConfig']['NetworkMode'] != 'none':
             raise RuntimeError('Database checks require a container with --network none.')
         cls.sql("do $$ declare name text; begin "
-                "for name in select unnest(array['anon','authenticated','service_role']) loop "
+                "for name in select unnest(array['anon','authenticated','service_role','authenticator']) loop "
                 "if not exists(select 1 from pg_roles where rolname=name) then "
                 "execute format('create role %I',name); end if; end loop; end $$;")
         cls.apply_schema()
+        # Match the hosted service role, without changing production grants/policies.
+        cls.sql("alter role service_role bypassrls; grant select on public.paper_runs,"
+                "public.paper_sessions,public.paper_runner_receipts to service_role;")
 
     @classmethod
     def apply_schema(cls):
@@ -234,7 +239,7 @@ class RunnerDatabaseTest(unittest.TestCase):
                                        "'settings',proconfig) from pg_proc where "
                                        "oid='public.paper_runner_finish(uuid,uuid,text,jsonb)'::regprocedure;"))
         self.assertFalse(metadata['definer'])
-        self.assertEqual(set(metadata['settings']), {'search_path=""', 'statement_timeout=20s'})
+        self.assertEqual(set(metadata['settings']), {'search_path=""', 'statement_timeout=20s', 'work_mem=16MB'})
         original = json.loads(self.sql("select to_jsonb(proconfig) from pg_proc where "
                                       "oid='public.paper_runner_write(uuid,uuid,text,jsonb)'::regprocedure;"))
         self.assertEqual(original, ['search_path=""'])
@@ -277,3 +282,68 @@ class RunnerDatabaseTest(unittest.TestCase):
             'job': 'prepare_a', 'state': 'received', 'boundary': 'cpue',
             'group': ['prepare_a', 'prepare_b']}})
         self.assertEqual(self.value('status', 'paper_runs'), 'running')
+
+    def receipt(self, operation):
+        return json.loads(self.sql("set role service_role; select coalesce(public.paper_runner_finish_receipt("
+                                   f"'{self.request}',{literal(operation)}),'null'::jsonb);"))
+
+    def test_finish_readback_matches_exact_original_operation_and_decoded_archives(self):
+        operation = str(uuid.uuid4())
+        self.sql(f"update public.paper_runs set github_run='39365433531',commit_sha='{'a' * 40}' "
+                 f"where id='{self.request}';")
+        body = {**self.finish(),
+                'checkpoint': base64.b64encode(b'checkpoint\x00').decode(),
+                'bundle': base64.b64encode(b'bundle\xff').decode()}
+        self.assertIsNone(self.receipt(operation))
+        self.finish_rpc(operation, 'finish', body)
+        first = self.receipt(operation)
+        self.assertEqual(first, {
+            'request_id': self.request, 'operation_id': operation,
+            # This is PostgreSQL's stored fingerprint, not a Python wire hash.
+            'payload_hash': self.sql("select payload_hash from public.paper_runner_receipts "
+                                     f"where request_id='{self.request}' and operation_id='{operation}';"),
+            'github_run': '39365433531', 'commit_sha': 'a' * 40, 'status': 'complete',
+            'error': None, 'run_id': 'Run 001',
+            'bundle_sha256': hashlib.sha256(b'bundle\xff').hexdigest(),
+            'checkpoint_sha256': hashlib.sha256(b'checkpoint\x00').hexdigest()})
+        self.assertEqual(len(first['payload_hash']), 64)
+        self.assertEqual(self.receipt(operation), first)
+        self.assertIsNone(self.receipt(str(uuid.uuid4())))
+        self.assertEqual(self.value('count(*)', 'paper_runner_receipts'), '1')
+        self.assertEqual(self.value('count(*)', 'paper_events'), '0')
+        self.assertEqual(self.state(), 'final')
+        self.assertEqual(self.value('status', 'paper_runs'), 'complete')
+        self.assertIn('Operation identifier already used',
+                      self.finish_rpc(operation, 'finish', {**body, 'bundle': 'changed'}, success=False))
+        self.assertIn('Run is no longer active',
+                      self.finish_rpc(str(uuid.uuid4()), 'finish', body, success=False))
+
+    def test_finish_readback_retains_failed_outcome_and_excludes_active_event_receipts(self):
+        event, operation = str(uuid.uuid4()), str(uuid.uuid4())
+        self.write(event, 'event', self.event('running', 'working'))
+        self.assertIsNone(self.receipt(event))
+        body = {**self.finish(error='Original calculation failed.'),
+                'bundle': base64.b64encode(b'bundle').decode(),
+                'checkpoint': base64.b64encode(b'checkpoint').decode()}
+        self.finish_rpc(operation, 'finish', body)
+        receipt = self.receipt(operation)
+        self.assertEqual(receipt['status'], 'failed')
+        self.assertEqual(receipt['error'], 'Original calculation failed.')
+        self.assertIsNone(receipt['run_id'])
+        self.assertEqual(self.value('status', 'paper_runs'), 'failed')
+
+    def test_finish_readback_is_stable_invoker_and_service_role_only(self):
+        metadata = json.loads(self.sql("select jsonb_build_object('definer',prosecdef,"
+                                       "'volatility',provolatile,'arguments',pronargs,'settings',proconfig) "
+                                       "from pg_proc where oid="
+                                       "'public.paper_runner_finish_receipt(uuid,uuid)'::regprocedure;"))
+        self.assertFalse(metadata['definer'])
+        self.assertEqual(metadata['volatility'], 's')
+        self.assertEqual(metadata['arguments'], 2)
+        self.assertEqual(metadata['settings'], ['search_path=""'])
+        for role in ('anon', 'authenticated'):
+            self.assertIn('permission denied', self.sql(
+                f"set role {role}; select public.paper_runner_finish_receipt("
+                f"'{self.request}','{uuid.uuid4()}');", success=False))
+        self.assertEqual(self.sql("select has_function_privilege('service_role',"
+                                 "'public.paper_runner_finish_receipt(uuid,uuid)','execute');"), 't')
