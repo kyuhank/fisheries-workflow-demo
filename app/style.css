@@ -111,7 +111,7 @@ h1 {
 }
 .controls {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 22px;
   margin-bottom: 20px;
 }
@@ -157,6 +157,7 @@ select {
 }
 .controls > .quiet {
   margin-left: auto;
+  margin-top: 22px;
 }
 .status {
   display: flex;
@@ -2016,6 +2017,7 @@ dialog iframe {
   .controls > .quiet {
     align-self: center;
     justify-self: end;
+    margin-top: 0;
   }
   .orchestration-workspace {
     display: block;
@@ -2060,6 +2062,9 @@ dialog iframe {
   }
 }
 @media (max-width:420px) {
+  .controls label {
+    grid-template-rows: 2lh auto auto;
+  }
   .orchestration-workspace .task-card-heading {
     grid-template-columns: 32px minmax(0,1fr);
   }
