@@ -935,7 +935,7 @@ function renderDependencies() {
   const groups = [
     { role: "inputs", title: "Required inputs", keys: job.parents, empty: "No upstream jobs. This job starts with supplied data." },
     { role: "current", title: "This job", keys: [job.key] },
-    { role: "outputs", title: "Uses this output", keys: children.map((child) => child.key), empty: "No downstream jobs. Review or download the output when it is available." },
+    { role: "outputs", title: "Downstream jobs", keys: children.map((child) => child.key), empty: "No downstream jobs. Review or download the output when it is available." },
   ];
   const flow = $("dependency-flow");
   flow.replaceChildren();
@@ -960,7 +960,7 @@ function renderDependencies() {
   }
   $("dependency-rule").textContent = job.parents.length
     ? `${job.title} needs ${job.parents.length === 1 ? "the required input" : `all ${job.parents.length} required inputs`}. ` +
-      (children.length ? `${children.length} ${children.length === 1 ? "job uses" : "jobs use"} its output directly.` : "No jobs use its output directly.")
+      (children.length ? `${children.length} ${children.length === 1 ? "job depends" : "jobs depend"} directly on this analysis.` : "No jobs depend directly on this analysis.")
     : `${job.title} starts this workflow from supplied catch and effort records.`;
 }
 
@@ -1350,9 +1350,9 @@ for (const id of ["snapshot", "filter", "growth-rate", "mse-buffer"]) {
 $("handover").onchange = () => {
   status(
     "",
-    "Connection mode selected",
+    "Input transfer updated",
     $("handover").value === "manual"
-      ? "Receiving analyses wait for a file transfer; independent work can continue. Click Confirm file transfer at each analyst boundary."
+      ? "Receiving jobs pause at each analyst handover. Select Confirm file transfer to continue; other ready jobs keep running."
       : "Recorded inputs pass directly to dependent jobs. Each result keeps its inputs and versions.",
   );
   render();
@@ -1756,8 +1756,8 @@ $("save-output").onclick = () => {
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"
-    ? "GitHub execution."
-    : "Saved outputs; no execution.";
+    ? "Run analyses on GitHub Actions."
+    : "View saved results without rerunning the analyses.";
 }
 
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
@@ -1844,7 +1844,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
       ready = true;
       explainMode();
       status("", Object.keys(records).length ? "Results available" : "Ready to run",
-        "Each run uses the recorded container.");
+        "New runs use the current code and configured container image.");
       await refreshPlan();
     } catch (error) {
       if (version !== modeVersion) return;
@@ -1859,7 +1859,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   $("run-id").textContent = latestRun;
   $("execution-note").textContent = mode === "cloud"
     ? "Live results expire after 10 minutes. Download this run to keep them."
-    : "Saved container outputs are included in this HTML file. New runs use the live website.";
+    : "This file contains the saved results and run records. Use the live website to calculate new results.";
   render();
 }
 $("mode").onchange = () => activateMode($("mode").value);

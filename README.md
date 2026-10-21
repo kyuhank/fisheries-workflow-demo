@@ -14,8 +14,8 @@ Choose **Run mode → View example** to inspect saved results, or **Live run**
 to calculate them on GitHub Actions. CPUE plots show nominal and standardised
 rates together. **View** in the diagram or **Output** in the tool opens a job's
 PDF; **Inputs & versions** traces its sources.
-PDFs read saved numerical results. The three report jobs contain the methods
-and checks.
+The plots and tables use saved numerical results; opening a PDF does not repeat
+the calculations. The three report jobs contain the methods and checks.
 
 **Run full workflow** starts with data through 2021. Selecting 2022 adds the
 final available year. After a setting changes, **Update workflow** reruns the
@@ -23,8 +23,10 @@ affected analyses and retains unchanged results with their original records.
 **Run** prepares the selected job's required inputs and stops at that job.
 
 **Manual handover** pauses receiving jobs until **Confirm file transfer**;
-other ready jobs continue. In **Live run**, **Reproduce & compare** repeats
-the recorded workflow and compares the selected result. **Execution** opens
+other ready jobs continue. In **Live run**, **Reproduce & compare** restores the
+recorded settings, runs the current code and compares its new numerical output
+with the selected run's saved output. Repeating an older analysis requires its
+original code and container image. **Execution** opens
 its GitHub Actions run. **Download this run** preserves
 source, inputs, records and outputs before live results expire after about
 ten minutes.
@@ -50,7 +52,8 @@ CPUE A fits a quasipoisson GLM with year and cell–quarter effects and a
 averages those predictions with equal fixed weights. CPUE B uses year and quarter
 effects. Both indices are divided by their first-year value. The outputs preserve
 nominal and standardised CPUE, prediction support, weights and model checks.
-Quarter effects partly confound spatial differences on this support.
+Quarter effects remain partly confounded with spatial differences within the
+six cell–quarter strata.
 These selected released strata do not represent the whole stock; the example
 supplies no confidence intervals. The selected Fiji fleet index is not a validated
 stock-wide abundance measure. Synthetic vessel records remain available as
@@ -58,8 +61,11 @@ regression fixtures.
 
 The four Schaefer assessment cases combine these indices with fixed growth
 assumptions. Seeded MSE trials compare constant catch, an index rule and a
-buffered rule under shared simulated conditions. Case differences and trial
-fractions describe those assumptions, rather than calibrated uncertainty or risk.
+buffered rule under shared simulated conditions. Results depend on the fitted
+assessment cases and simulation assumptions. The low-biomass percentage counts
+trials in which biomass falls below 20% of carrying capacity at the start or end
+of any simulated year, including the initial state. It is not a calibrated risk
+estimate.
 All rules share a simulator catch cap of 40% of true starting biomass; the
 low-biomass results are conditional on that guardrail.
 

@@ -21,12 +21,12 @@
       </header>
       <section class="controls"
         aria-label="Analysis settings">
-        <label>Run mode<select id="mode" aria-describedby="mode-help"><option value="cloud" selected>Live run</option><option value="saved">View example</option></select><small id="mode-help">GitHub execution.</small></label>
+        <label>Run mode<select id="mode" aria-describedby="mode-help"><option value="cloud" selected>Live run</option><option value="saved">View example</option></select><small id="mode-help">Run analyses on GitHub Actions.</small></label>
         <label>Input transfer<select id="handover" aria-describedby="handover-help"><option value="connected">Automatic transfer</option><option value="manual">Manual handover</option></select><small id="handover-help">Automatic input transfer.</small></label>
         <label>Last data year<select id="snapshot" aria-describedby="snapshot-help"><option selected>2021</option><option>2022</option></select><small id="snapshot-help">Includes this year.</small></label>
         <label hidden>CPUE A records<select id="filter" aria-describedby="filter-help"><option value="0">All valid effort</option><option value="1200">At least 1,200 hooks</option></select><small id="filter-help">Effort filter for the synthetic example.</small></label>
-        <label>Growth (A2/B2)<select id="growth-rate" aria-describedby="growth-rate-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="growth-rate-help">Fixed intrinsic growth.</small></label>
-        <label>MSE catch buffer<select id="mse-buffer" aria-describedby="mse-buffer-help"><option value="0.6">60% of target</option><option value="0.8" selected>80% of target</option><option value="1">100% of target</option></select><small id="mse-buffer-help">Stepped target; change capped at ±15%.</small></label>
+        <label>Growth rate: A2 and B2<select id="growth-rate" aria-describedby="growth-rate-help"><option value="0.25">0.25 per year</option><option value="0.30" selected>0.30 per year</option><option value="0.35">0.35 per year</option></select><small id="growth-rate-help">Annual intrinsic growth rate fixed in these two assessment cases.</small></label>
+        <label>MSE catch buffer<select id="mse-buffer" aria-describedby="mse-buffer-help"><option value="0.6">60% of target</option><option value="0.8" selected>80% of target</option><option value="1">100% of target</option></select><small id="mse-buffer-help">Scales the Buffered rule's catch target. Annual changes in requested catch are limited to 15%.</small></label>
         <button id="reset" class="quiet" disabled>Start afresh</button></section>
       <aside id="mode-notice" class="mode-notice" role="status" hidden><div><strong>Showing the saved example</strong><p id="mode-notice-message"></p></div><button id="dismiss-mode-notice" class="quiet" aria-label="Dismiss mode notice">Dismiss ×</button></aside>
       <section class="status" id="status"
