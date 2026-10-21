@@ -130,7 +130,7 @@ def main():
         assert page.locator('#filter').is_hidden()
         assert page.locator('#snapshot').input_value() == '2021'
         assert page.locator('#snapshot option').all_text_contents() == ['2021', '2022']
-        assert 'no execution' in page.locator('#mode-help').inner_text()
+        assert 'without rerunning the analyses' in page.locator('#mode-help').inner_text()
         assert page.evaluate('typeof Worker === "function" && !document.querySelector("#worker-source")')
         keys = page.evaluate('jobs.map(job => job.key)')
         for key in keys:

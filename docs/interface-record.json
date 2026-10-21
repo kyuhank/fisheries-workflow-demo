@@ -1,30 +1,30 @@
 {
   "schema_version": 1,
   "operation": "interface-refresh",
-  "interface_source_commit": "29a3098a830bf7571cdbf6da8503b3e671c9c255",
+  "interface_source_commit": "ae3ba74bf1cd7ced11a28147dc1ee90b97d4cbb8",
   "analysis_reexecuted": false,
   "saved_analysis_execution": {
     "provider": "Local Docker",
     "purpose": "saved-example-build",
     "repository": "kyuhank/fisheries-workflow-demo",
-    "commit": "6dc2b71b24c946b17f05c93fe4d7810e29c36d1e",
+    "commit": "b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406",
     "container": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
     "execution_host": "NC240124",
-    "compute_selection_receipt": "FEEDBACK-29ab92be1faf"
+    "compute_selection_receipt": "FEEDBACK-5e1e4f404060"
   },
-  "saved_build_record_sha256": "37f4df3da1f8bfbfbaa6ee457a7f92d4fca213ba17a67125e1497bbde83a04a9",
-  "saved_payload_sha256": "d8aa02e5baadd7454be2d62899a11c405209eb9ddfaf71cc938d9e2db22a4612",
+  "saved_build_record_sha256": "1b5d5c4a7f7bff5337f9316e0849fd5b3da6b96b53101241acfbb7a92d37a183",
+  "saved_payload_sha256": "c00529f8e4e8448c5528cf0ef59a1257afb1ee902fd6137405501a2922b4bbfc",
   "interface_input_sha256": {
-    "app/index.html": "2ae80887de6b4aaf3251728a297bb8472e8294805b3ee819e071d01f738ab9b4",
+    "app/index.html": "ad2d27b1d6b991fdd3643ba26d16379d48d80ba004267d0a8d1ec985c25fcb39",
     "app/style.css": "8fd376dd3429152b3176ee544760dbc19d4719662d282b45f2b6b3b7ebfdd09f",
     "app/cloud.js": "9fd3dc868202a075bbe48de96f975e5521afb6a585f1a12a7659dbd4ee2f8327",
     "app/lineage.js": "1af9550accb16c4ce6a442576b09bbad8d783b48263ae75e6d7ef544537e1e30",
-    "app/app.js": "0b62a4edebf05fe000c328b2c0b1a55c505657a6282dbb2f24420cdd5f3ec9d9",
+    "app/app.js": "244b93e6d307ac46288378b1286a95c2f358c328aa123de8b9b264205efdb9a2",
     "app/record.js": "4bc166b19f57e3531e62ae285fa4775f7c5a089a7737949e7a8dae536c4de2b2",
     "scripts/refresh-interface.py": "7f68070c1d2901791188d3c8ab9d0f29395a04f86d96ae140c4076d33c237697"
   },
   "output_sha256": {
-    "docs/index.html": "3bbfa5e6cb45c81dd1b96ce1b3e98a8bfdf099b2a00791e1c1f577144ace48fc",
-    "docs/offline.html": "3bbfa5e6cb45c81dd1b96ce1b3e98a8bfdf099b2a00791e1c1f577144ace48fc"
+    "docs/index.html": "fa869fbab0b4640dfd9d509fcbf97172dba7e6792a3cdae35c5e0e030b0301bf",
+    "docs/offline.html": "fa869fbab0b4640dfd9d509fcbf97172dba7e6792a3cdae35c5e0e030b0301bf"
   }
 }
