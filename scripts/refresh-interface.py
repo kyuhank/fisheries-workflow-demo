@@ -44,9 +44,17 @@ def refresh():
     for name in ['index.html', 'offline.html']:
         (ROOT / 'docs' / name).write_text(page)
     build = ROOT / 'docs/build-record.json'
+    saved_build = json.loads(build.read_text())
+    if 'execution' in saved_build:
+        saved_execution = saved_build['execution']
+    elif saved_build.get('schema_version') == 2 and saved_build.get('saved_state_sha256'):
+        saved_execution = {key: saved_build[key] for key in
+                           ['producing_runs', 'saved_state_sha256', 'jobs']}
+    else:
+        raise ValueError('The saved build has no execution identity')
     record = {'schema_version': 1, 'operation': 'interface-refresh',
               'interface_source_commit': commit, 'analysis_reexecuted': False,
-              'saved_analysis_execution': json.loads(build.read_text())['execution'],
+              'saved_analysis_execution': saved_execution,
               'saved_build_record_sha256': sha(build.read_bytes()),
               'saved_payload_sha256': sha(raw.encode()),
               'interface_input_sha256': {name: sha(data) for name, data in sources.items()},

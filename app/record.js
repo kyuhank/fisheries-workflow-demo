@@ -57,7 +57,7 @@ function renderRecord() {
   const cards = uiElement("div", "record-cards");
   const source = record.analysis_source || record.source || {};
   const software = record.software || {};
-  const image = record.execution?.container || software.container;
+  const image = record.runtime?.image || record.execution?.container || software.container;
   const dataSource = record.data_source;
   const observationSource = dataSource?.sources?.find((item) =>
     item.member?.includes("PUBLIC"));
@@ -111,7 +111,7 @@ function renderRecord() {
       card.append(uiElement("code", "record-image-digest", image.split("@")[1]));
       card.append(uiElement("small", "", [
         software.r && `R ${software.r}`,
-        software.RTMB && `RTMB ${software.RTMB}`,
+        (software.RTMB || software.packages?.RTMB) && `RTMB ${software.RTMB || software.packages.RTMB}`,
         software.quarto && `Quarto ${software.quarto}`,
       ].filter(Boolean).join(" · ")));
     }
@@ -305,7 +305,7 @@ async function reproduceOutput(reference, context) {
       changed_materials: changed,
       reference_jobs: context.jobs,
       reference_output: reference.output,
-      relative_tolerance: 1e-6,
+      relative_tolerance: 1e-8,
       absolute_tolerance: 1e-9,
       assessment_gradient_magnitude_and_difference_limit: 1e-7,
       assessment_log_residual_absolute_tolerance: 1e-8,

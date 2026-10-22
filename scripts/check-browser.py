@@ -73,7 +73,8 @@ class MockCloud:
             self.result = {**selected, 'run_id': run_id, 'records': updated}
             value = {'id': run_id}
         elif path == 'state':
-            value = {'run': {'id': self.result['run_id'], 'status': 'complete', 'result': self.result},
+            value = {'run': {'id': self.result['run_id'], 'status': 'complete',
+                             'result': {key: value for key, value in self.result.items() if key != 'records'}},
                      'events': [], 'state': {'records': self.records}}
         elif path == 'output':
             key = route.request.url.split('job=')[1].split('&')[0]
@@ -141,10 +142,10 @@ def main():
             record = output['record']
             assert record['data_source']['observation_unit'] == 'Released fleet–quarter–5-degree-cell aggregate', key
             assert any(name.endswith('jobs/' + key + '/run.R') for name in record['code']), key
-            assert re.fullmatch(r'ghcr.io/pacificcommunity/fisheries-workflow@sha256:[a-f0-9]{64}', record['execution']['container'])
+            assert re.fullmatch(r'ghcr.io/pacificcommunity/fisheries-workflow@sha256:[a-f0-9]{64}', (record.get('runtime', {}).get('image') or record['software']['container']))
             assert record['software'].get('R') or record['software'].get('r'), key
             page.locator('[data-output="record"]').click()
-            assert page.locator('.record-image-digest').inner_text() == record['execution']['container'].split('@')[1]
+            assert page.locator('.record-image-digest').inner_text() == (record.get('runtime', {}).get('image') or record['software']['container']).split('@')[1]
             assert page.locator('.record-source').count() >= 1
             assert record['data_source']['observation_unit'] in page.locator('.record-card').first.inner_text()
             assert 'Synthetic' not in page.locator('.record-card').first.inner_text()

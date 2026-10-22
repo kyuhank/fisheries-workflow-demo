@@ -40,7 +40,7 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     assert page.evaluate('Object.keys(currentOutput.record.code).some(name => name.endsWith("jobs/assessment_a2/run.R"))')
     commit = page.evaluate('(currentOutput.record.analysis_source || currentOutput.record.source).commit')
     assert page.locator('a.record-source').filter(has_text='Job code & guide').get_attribute('href').endswith('/' + commit + '/jobs/assessment_a2')
-    assert page.locator('.record-image-digest').inner_text() == page.evaluate('currentOutput.record.execution.container.split("@")[1]')
+    assert page.locator('.record-image-digest').inner_text() == page.evaluate('(currentOutput.record.runtime?.image || currentOutput.record.execution?.container || currentOutput.record.software.container).split("@")[1]')
     assert page.locator('.record-image-link').get_attribute('href') == 'https://github.com/orgs/pacificcommunity/packages/container/package/fisheries-workflow'
     page.locator('.record-input').click()
     expect(page.locator('.record-heading')).to_contain_text('Job 09 · Prepare inputs A · Run 001')
@@ -52,9 +52,9 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
     transfer.value.save_as(path)
     saved = json.loads(path.read_text())
     assert set(saved['jobs']) == {'submission', 'qc', 'database', 'extract', 'cpue_a'}
-    assert all(record['code'] and record['software'] and record['execution']['container'] for record in saved['jobs'].values())
+    assert all(record['code'] and record['software'] and (record.get('runtime', {}).get('image') or record['software'].get('container') or record['execution'].get('container')) for record in saved['jobs'].values())
     assert page.evaluate('compareOutput({x:1}, {x:1.01})') == 'output.x'
-    assert page.evaluate('compareOutput({x:1}, {x:1.0000001})') is None
+    assert page.evaluate('compareOutput({x:1}, {x:1.000000001})') is None
     comparison_policy = page.evaluate("""() => {
       let checked = 0;
       const expectPolicy = (value, label) => { if (!value) throw Error(label); checked++; };

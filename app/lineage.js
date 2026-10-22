@@ -155,7 +155,7 @@ function compareOutput(expected, actual, path = "output", assessmentContext = nu
   if (typeof expected === "number") {
     return Number.isFinite(expected) && typeof actual === "number" && Number.isFinite(actual) &&
         Math.abs(expected - actual) <=
-          Math.max(1e-9, 1e-6 * Math.max(Math.abs(expected), Math.abs(actual)))
+          Math.max(1e-9, 1e-8 * Math.max(Math.abs(expected), Math.abs(actual)))
       ? null
       : current;
   }
@@ -176,7 +176,7 @@ function compareOutput(expected, actual, path = "output", assessmentContext = nu
         typeof expected[key] === "number" && typeof actual[key] === "number" &&
         Number.isFinite(expected[key]) && Number.isFinite(actual[key]) &&
         Math.abs(expected[key] - actual[key]) <=
-          Math.max(1e-8, 1e-6 * Math.max(Math.abs(expected[key]), Math.abs(actual[key])))) continue;
+          Math.max(1e-8, 1e-8 * Math.max(Math.abs(expected[key]), Math.abs(actual[key])))) continue;
     const difference = compareValue(
       expected[key],
       actual[key],

@@ -238,7 +238,8 @@ class CloudRun {
         const finalRecords = update.state?.records || this.run.result?.records;
         if (!finalRecords) throw Error("The completed run has no producing records.");
         this.records = finalRecords;
-        return { ...this.run.result, records: finalRecords };
+        this.run.result = { ...this.run.result, records: finalRecords };
+        return this.run.result;
       }
       if (!cursor) {
         this.onPhase(
