@@ -33,6 +33,8 @@ extract <- function(path) {
  html<-release_text(path);match<-regmatches(html,regexec('<script id="demo-payload" type="application/json">\\s*(.*?)\\s*</script>',html,perl=TRUE))[[1L]]
  jsonlite::fromJSON(match[[2L]],simplifyVector=FALSE)
 }
+stopifnot(file.info(file.path(restored,'offline.html'))$size < 300,
+  grepl('url=index.html',release_text(file.path(restored,'offline.html')),fixed=TRUE))
 payload<-extract(file.path(restored,'index.html'))
 stopifnot('bundle'%in%names(payload$saved),is.null(payload$saved$bundle),identical(names(payload$saved$outputs),'cpue_a'))
 stopifnot(length(payload$jobs)==22L,payload$cloud$url=='',payload$cloud$data_kind=='public-wcpfc-albacore')

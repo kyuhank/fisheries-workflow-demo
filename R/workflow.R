@@ -410,11 +410,13 @@ workflow_bundle <- function(workflow, path) {
     if (!file.copy(source, dest)) stop("Cannot archive coordinator source: ", name)
   }
   source_archive(workflow$sources, stage)
-  if (!is.null(workflow$hosted_data)) json_write(workflow$hosted_data, file.path(stage, "data/frozen-source.json"))
+  if (!is.null(workflow$hosted_data)) writeBin(charToRaw(json_encode(workflow$hosted_data)), file.path(stage, "data/frozen-source.json"))
   dir.create(file.path(stage, "reference"))
-  saved <- list.files(workflow$output, recursive = TRUE, all.files = TRUE, no.. = TRUE)
-  saved <- saved[!grepl("(^|/)\\.quarto(/|$)", saved)]
-  for (name in saved[!dir.exists(file.path(workflow$output, saved))]) {
+  saved <- c("state.json", unlist(lapply(names(workflow$records), function(key) {
+    paste0(key, "/", c("record.json", names(workflow$records[[key]]$outputs)))
+  }), use.names = FALSE))
+  # Preserve every recorded artifact; context, response and cache files are scratch.
+  for (name in unique(saved)) {
     dest <- source_path(file.path(stage, "reference"), name, exists = FALSE)
     dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
     if (!file.copy(source_path(workflow$output, name), dest)) stop("Cannot archive reference: ", name)
@@ -430,7 +432,7 @@ workflow_bundle <- function(workflow, path) {
     record <- workflow$records[[key]]
     overrides[[key]] <- record$runtime[intersect(c("image", "platform", "package_url"), names(record$runtime))]
   }
-  json_write(list(schema_version = 1L, jobs = overrides), file.path(stage, "runtime-overrides.json"))
+  json_write(list(schema_version = 1L, jobs = overrides), file.path(stage, "runtime-preserved.json"))
   target <- if (identical(workflow$last_plan$scope, "job")) workflow$last_plan$start else NULL
   command <- paste0("make reproduce", if (!is.null(target)) paste0(" JOB=", shQuote(target)) else "")
   writeLines(c("Host prerequisites: R with jsonlite, digest, DBI and RSQLite; Make; Docker; POSIX shell.",

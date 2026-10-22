@@ -63,6 +63,11 @@ runtime_binding <- function(job, sources) {
     if (!identical(overrides$schema_version, 1L) || !is.list(overrides$jobs)) stop("Invalid runtime overrides")
     overrides <- overrides$jobs
   }
+  if (identical(Sys.getenv("PAPER_OFFLINE"), "1") && file.exists(file.path(sources$root, "runtime-preserved.json"))) {
+    preserved <- json_read(file.path(sources$root, "runtime-preserved.json"))
+    if (!identical(preserved$schema_version, 1L) || !is.list(preserved$jobs)) stop("Invalid preserved job runtime")
+    if (!is.null(preserved$jobs[[key]])) overrides[[key]] <- preserved$jobs[[key]]
+  }
   entry <- modifyList(entry, overrides[[key]] %||% list())
   if (!setequal(names(entry), c("image", "platform", "package_url")) ||
       !is.character(entry$package_url) || length(entry$package_url) != 1L ||

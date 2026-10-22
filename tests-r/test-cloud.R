@@ -143,13 +143,123 @@ check('parent and forked child share one ordered queue', {
   cloud_publish(queue, list(event = list(state = 'running', message = 'parent')))
   stopifnot(isTRUE(parallel::mccollect(child)[[1L]]), setequal(readLines(log), c('child', 'parent')), !length(cloud_pending(queue)))
 })
-check('checkpoint roundtrip preserves bytes and hidden files', {
+checkpoint_member <- function(bytes) list(sha256 = digest::digest(bytes, algo = 'sha256', serialize = FALSE),
+  content_base64 = cloud_base64_encode(bytes))
+checkpoint_map <- function(value) cloud_base64_encode(c(cloud_checkpoint_magic(), memCompress(charToRaw(json_encode(value)), 'bzip2')))
+checkpoint_text <- function(value) cloud_base64_encode(c(cloud_checkpoint_magic(), memCompress(charToRaw(value), 'bzip2')))
+with_checkpoint_limits <- function(changes, action) {
+  original <- cloud_checkpoint_limits
+  limits <- modifyList(original(), changes)
+  cloud_checkpoint_limits <<- function() limits
+  on.exit(cloud_checkpoint_limits <<- original, add = TRUE)
+  force(action)
+}
+check('solid checkpoint preserves bytes, empty files and hidden files without scratch caches', {
   directory <- tempfile('checkpoint-'); dir.create(directory)
   dir.create(file.path(directory, 'job')); writeBin(as.raw(0:255), file.path(directory, 'job/output.bin'))
+  writeBin(raw(), file.path(directory, 'empty'))
   writeLines('state', file.path(directory, '.state'))
+  writeBin(charToRaw('First line\n표준화 café\r\n'), file.path(directory, 'utf8.txt'))
+  writeBin(as.raw(c(65, 0, 66)), file.path(directory, 'nul.bin'))
+  writeBin(as.raw(c(255, 254, 128)), file.path(directory, 'nonutf8.bin'))
+  dir.create(file.path(directory, '.quarto')); writeLines('scratch', file.path(directory, '.quarto/cache'))
   encoded <- cloud_checkpoint(directory); restored <- tempfile('restored-')
+  stopifnot(identical(head(cloud_base64(encoded), length(cloud_checkpoint_magic())), cloud_checkpoint_magic()))
   cloud_restore(encoded, restored)
-  stopifnot(identical(cloud_bytes(file.path(restored, 'job/output.bin')), as.raw(0:255)), file.exists(file.path(restored, '.state')))
+  stopifnot(identical(cloud_bytes(file.path(restored, 'job/output.bin')), as.raw(0:255)),
+    file.exists(file.path(restored, '.state')), file.info(file.path(restored, 'empty'))$size == 0,
+    !dir.exists(file.path(restored, '.quarto')))
+  for (name in c('utf8.txt', 'nul.bin', 'nonutf8.bin')) stopifnot(identical(cloud_bytes(file.path(restored, name)), cloud_bytes(file.path(directory, name))))
+  decoded <- cloud_checkpoint_json(cloud_base64(encoded)[-seq_along(cloud_checkpoint_magic())], cloud_checkpoint_limits()$json)
+  stopifnot('content_utf8' %in% names(decoded[['utf8.txt']]), 'content_base64' %in% names(decoded[['nul.bin']]),
+    'content_base64' %in% names(decoded[['nonutf8.bin']]))
+})
+check('completed checkpoints preserve recorded artifacts and omit calculation scratch files', {
+  directory <- tempfile('recorded-checkpoint-'); dir.create(directory); dir.create(file.path(directory, 'job'))
+  writeLines('saved output', file.path(directory, 'job/output.json'))
+  writeBin(as.raw(c(1, 0, 2)), file.path(directory, 'job/snapshot.sqlite'))
+  writeLines('temporary context', file.path(directory, 'job/context.json'))
+  dir.create(file.path(directory, '.runtime')); writeLines('cached runtime', file.path(directory, '.runtime/info.json'))
+  outputs <- list('output.json' = file_sha256(file.path(directory, 'job/output.json')),
+    'snapshot.sqlite' = file_sha256(file.path(directory, 'job/snapshot.sqlite')))
+  record <- list(run_id = 'Run 001', outputs = outputs)
+  json_write(record, file.path(directory, 'job/record.json'))
+  json_write(list(schema_version = 2L, records = list(job = record)), file.path(directory, 'state.json'))
+  restored <- tempfile('recorded-restored-'); cloud_restore(cloud_checkpoint(directory), restored)
+  stopifnot(setequal(list.files(restored, recursive = TRUE, all.files = TRUE, no.. = TRUE),
+    c('state.json', 'job/record.json', 'job/output.json', 'job/snapshot.sqlite')),
+    identical(cloud_bytes(file.path(directory, 'job/snapshot.sqlite')), cloud_bytes(file.path(restored, 'job/snapshot.sqlite'))))
+  writeLines('changed output', file.path(directory, 'job/output.json'))
+  reject(cloud_checkpoint(directory), 'recorded file checksum mismatch')
+})
+check('checkpoint validates every hash, encoding and path before writing files', {
+  good <- checkpoint_member(charToRaw('saved output'))
+  bad <- good; bad$sha256 <- paste(rep('0', 64), collapse = '')
+  target <- tempfile('bad-checkpoint-')
+  reject(cloud_restore(checkpoint_map(list(first = good, second = bad)), target), 'file checksum mismatch')
+  stopifnot(!dir.exists(target))
+  bad <- good; bad$content_base64 <- 'Zh=='
+  reject(cloud_restore(checkpoint_map(list(bad = bad)), target), 'Invalid preserved archive encoding')
+  for (name in c('../outside', '/outside', 'C:/outside', 'job/../outside', 'job\\outside', 'job//outside')) {
+    value <- setNames(list(good), name)
+    reject(cloud_restore(checkpoint_map(value), target), 'Unsafe source path')
+  }
+  reject(cloud_restore(checkpoint_map(setNames(list(good, good), c('job', 'job/output'))), target), 'Conflicting preserved checkpoint paths')
+  stopifnot(!length(list.files(target, all.files = TRUE, no.. = TRUE)))
+  dir.create(file.path(target, 'existing'))
+  reject(cloud_restore(checkpoint_map(list(existing = good)), target), 'Conflicting preserved checkpoint paths')
+  outside <- tempfile('checkpoint-outside-'); dir.create(outside)
+  stopifnot(file.symlink(outside, file.path(target, 'linked')))
+  reject(cloud_restore(checkpoint_map(list(first = good, 'linked/output' = good)), target), 'Symlink source path')
+  stopifnot(!file.exists(file.path(target, 'first')), !length(list.files(outside)))
+})
+check('checkpoint rejects duplicate JSON fields and malformed compressed content', {
+  good <- checkpoint_member(charToRaw('value')); member <- json_encode(good)
+  reject(cloud_restore(checkpoint_text(paste0('{"job":', member, ',"job":', member, '}')), tempfile()), 'Duplicate preserved checkpoint JSON field')
+  reject(cloud_restore(checkpoint_text(paste0('{"job":{"sha256":"', good$sha256, '","sha256":"', good$sha256,
+    '","content_base64":"', good$content_base64, '"}}')), tempfile()), 'Duplicate preserved checkpoint JSON field')
+  reject(cloud_restore(checkpoint_text('{broken'), tempfile()), 'Invalid preserved checkpoint JSON')
+  reject(cloud_restore(cloud_base64_encode(c(cloud_checkpoint_magic(), charToRaw('not gzip'))), tempfile()), 'Invalid preserved checkpoint compression')
+  bytes <- cloud_base64(checkpoint_map(list(job = good)))
+  reject(cloud_restore(cloud_base64_encode(head(bytes, -2L)), tempfile()), 'compression checksum')
+  bytes[[length(bytes) - 7L]] <- as.raw(bitwXor(as.integer(bytes[[length(bytes) - 7L]]), 1L))
+  reject(cloud_restore(cloud_base64_encode(bytes), tempfile()), 'compression checksum')
+})
+check('checkpoint enforces compressed, expanded, file-count and file-size bounds', {
+  good <- checkpoint_member(charToRaw('value')); encoded <- checkpoint_map(list(first = good, second = good))
+  with_checkpoint_limits(list(compressed = 10L), reject(cloud_restore(encoded, tempfile()), 'compressed size limit'))
+  with_checkpoint_limits(list(json = 20L), reject(cloud_restore(encoded, tempfile()), 'expanded size limit'))
+  with_checkpoint_limits(list(files = 1L), reject(cloud_restore(encoded, tempfile()), 'file count'))
+  with_checkpoint_limits(list(file = 2L), reject(cloud_restore(encoded, tempfile()), 'Invalid preserved checkpoint file'))
+  with_checkpoint_limits(list(total = 6L), reject(cloud_restore(encoded, tempfile()), 'file size limit'))
+  directory <- tempfile('checkpoint-limits-'); dir.create(directory)
+  writeLines('value', file.path(directory, 'first')); writeLines('value', file.path(directory, 'second'))
+  with_checkpoint_limits(list(files = 1L), reject(cloud_checkpoint(directory), 'file count'))
+  with_checkpoint_limits(list(file = 2L), reject(cloud_checkpoint(directory), 'file size limit'))
+  with_checkpoint_limits(list(total = 6L), reject(cloud_checkpoint(directory), 'file size limit'))
+  with_checkpoint_limits(list(json = 20L), reject(cloud_checkpoint(directory), 'expanded size limit'))
+  with_checkpoint_limits(list(compressed = 10L), reject(cloud_checkpoint(directory), 'compressed size limit'))
+})
+check('previous solid gzip checkpoints remain readable and validate their footer', {
+  value <- list(job = checkpoint_member(charToRaw('saved output')))
+  bytes <- c(cloud_checkpoint_magic(2L), cloud_checkpoint_gzip(charToRaw(json_encode(value))))
+  restored <- tempfile('gzip-restored-'); cloud_restore(cloud_base64_encode(bytes), restored)
+  stopifnot(identical(cloud_bytes(file.path(restored, 'job')), charToRaw('saved output')))
+  bytes[[length(bytes) - 7L]] <- as.raw(bitwXor(as.integer(bytes[[length(bytes) - 7L]]), 1L))
+  reject(cloud_restore(cloud_base64_encode(bytes), tempfile()), 'compression checksum')
+  # A forged gzip footer cannot bypass the streaming expanded-size bound.
+  bytes[(length(bytes) - 3L):length(bytes)] <- as.raw(c(1, 0, 0, 0))
+  with_checkpoint_limits(list(json = 20L), reject(cloud_restore(cloud_base64_encode(bytes), tempfile()), 'expanded size limit'))
+})
+check('legacy ZIP checkpoints still restore binary and hidden files', {
+  directory <- tempfile('legacy-checkpoint-'); dir.create(directory)
+  writeBin(as.raw(0:255), file.path(directory, 'binary')); writeLines('state', file.path(directory, '.state'))
+  archive <- tempfile(fileext = '.zip'); previous <- setwd(directory)
+  stopifnot(utils::zip(archive, files = c('binary', '.state'), flags = '-q') == 0L); setwd(previous)
+  restored <- tempfile('legacy-restored-'); cloud_restore(cloud_base64_encode(cloud_bytes(archive)), restored)
+  stopifnot(identical(cloud_bytes(file.path(restored, 'binary')), as.raw(0:255)), file.exists(file.path(restored, '.state')))
+  with_checkpoint_limits(list(files = 1L), reject(cloud_restore(cloud_base64_encode(cloud_bytes(archive)), tempfile()), 'file count'))
+  with_checkpoint_limits(list(file = 2L), reject(cloud_restore(cloud_base64_encode(cloud_bytes(archive)), tempfile()), 'file size limit'))
 })
 check('ZIP traversal is rejected and ZIP symlinks become plain bytes', {
   directory <- tempfile('zip-'); dir.create(directory); dir.create(file.path(directory, 'child'))
@@ -216,12 +326,13 @@ check('hosted callbacks adopt forked acknowledgements and retain final custody',
     json_write(list(answer = 42), file.path(folder, 'output.json'))
     json_write(workflow_state(runner), file.path(runner$output, 'state.json'))
     runner$notify(list(state = 'complete', job = 'job'), workflow_state(runner), runner$output)
-    list(run_id = 'Run 001')
+    list(run_id = 'Run 001', records = list(job = list(run_id = 'Run 001')), jobs = list(job = list(title = 'Job')))
   }
   workflow_bundle <- function(runner, path) writeBin(charToRaw('mock workflow archive'), path)
   cloud_run(client, file.path(fake_root, 'results'))
   stopifnot(identical(readLines(file.path(fake_root, 'events')), c('event:0', 'event:1')), identical(finished$result$run_id, 'Run 001'),
-    !length(finished$pending_events), !grepl('private-', json_encode(finished)), isTRUE(finished$state$handover_state$connected),
+    !length(finished$pending_events), !any(c('records', 'jobs') %in% names(finished$result)),
+    !grepl('private-', json_encode(finished)), isTRUE(finished$state$handover_state$connected),
     identical(finished$state$handover_state$transfer_count, 2L))
   restored <- tempfile('finish-checkpoint-'); cloud_restore(finished$checkpoint, restored)
   stopifnot(file.exists(file.path(restored, 'state.json')))

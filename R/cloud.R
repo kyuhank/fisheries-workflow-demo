@@ -175,37 +175,204 @@ cloud_flush <- function(delivery, required = FALSE) cloud_queue_lock(delivery, f
   cloud_flush_locked(delivery, json_read(delivery$path), required))
 cloud_pending <- function(delivery) cloud_queue_lock(delivery, function() json_read(delivery$path)$pending)
 
+# The checkpoint is opaque to the service. One compressed stream avoids repeating
+# the same analysis records across individually compressed files.
+cloud_checkpoint_limits <- function() list(compressed = 12000000L, json = 96000000L,
+  files = 4096L, file = 8000000L, total = 64000000L)
+cloud_checkpoint_magic <- function(version = 3L) {
+  if (!version %in% c(2L, 3L)) stop("Unknown preserved checkpoint version")
+  charToRaw(paste0("FWCP", version, "\n"))
+}
+cloud_checkpoint_name <- function(name) {
+  if (!is.character(name) || length(name) != 1L || is.na(name) || !nzchar(name) ||
+      grepl("^[A-Za-z]:|^/|\\\\|//|/$|[[:cntrl:]]", name) ||
+      any(strsplit(name, "/", fixed = TRUE)[[1L]] %in% c(".", "..", "")))
+    stop("Unsafe source path in preserved checkpoint")
+  invisible(name)
+}
+cloud_checkpoint_gzip <- function(bytes) {
+  path <- tempfile(fileext = ".gz"); on.exit(unlink(path), add = TRUE)
+  connection <- gzfile(path, "wb")
+  tryCatch(writeBin(bytes, connection), finally = close(connection))
+  cloud_bytes(path)
+}
+cloud_checkpoint_json <- function(bytes, limit, version = 3L) {
+  if (version == 3L) {
+    if (length(bytes) < 14L || !identical(bytes[1:4], charToRaw("BZh9")))
+      stop("Invalid preserved checkpoint compression")
+    path <- tempfile(fileext = ".bz2"); on.exit(unlink(path), add = TRUE)
+    writeBin(bytes, path); connection <- bzfile(path, "rb")
+    expanded <- tryCatch(readBin(connection, "raw", n = limit + 1L),
+      error = function(error) stop("Invalid preserved checkpoint compression"),
+      finally = close(connection))
+    if (length(expanded) > limit) stop("Preserved checkpoint exceeds the expanded size limit")
+    # R's bzfile may silently return partial data after a truncated footer.
+    # FWCP3 uses the canonical BZip stream made by memCompress at level nine.
+    if (!identical(memCompress(expanded, "bzip2"), bytes))
+      stop("Invalid preserved checkpoint compression checksum")
+  } else {
+    if (length(bytes) < 18L || !identical(bytes[1:4], as.raw(c(31, 139, 8, 0))))
+      stop("Invalid preserved checkpoint compression")
+    # gzcon can return truncated bytes after a CRC failure; check its footer too.
+    footer <- tail(bytes, 8L)
+    size <- sum(as.integer(footer[5:8]) * 256^(0:3))
+    if (size > limit) stop("Preserved checkpoint exceeds the expanded size limit")
+    connection <- gzcon(rawConnection(bytes, "rb"), allowNonCompressed = FALSE)
+    expanded <- tryCatch(readBin(connection, "raw", n = limit + 1L),
+      error = function(error) stop("Invalid preserved checkpoint compression"),
+      finally = close(connection))
+    if (length(expanded) > limit) stop("Preserved checkpoint exceeds the expanded size limit")
+    crc <- paste(sprintf("%02x", rev(as.integer(footer[1:4]))), collapse = "")
+    if (length(expanded) != size || !identical(digest::digest(expanded, algo = "crc32", serialize = FALSE), crc))
+      stop("Invalid preserved checkpoint compression checksum")
+  }
+  value <- tryCatch(jsonlite::fromJSON(rawToChar(expanded), simplifyVector = FALSE),
+    error = function(error) stop("Invalid preserved checkpoint JSON"))
+  unique_fields <- function(item) {
+    if (is.list(item)) {
+      if (!is.null(names(item)) && anyDuplicated(names(item))) stop("Duplicate preserved checkpoint JSON field")
+      invisible(lapply(item, unique_fields))
+    }
+  }
+  unique_fields(value)
+  value
+}
 cloud_restore <- function(encoded, directory) {
   if (is.null(encoded) || identical(encoded, "")) return(invisible(NULL))
-  archive <- tempfile(fileext = ".zip"); writeBin(cloud_base64(encoded), archive)
-  on.exit(unlink(archive), add = TRUE)
-  members <- utils::unzip(archive, list = TRUE)
-  if (anyDuplicated(members$Name)) stop("Duplicate preserved archive member")
+  limits <- cloud_checkpoint_limits(); magic <- cloud_checkpoint_magic()
+  if (!is.character(encoded) || length(encoded) != 1L || is.na(encoded) ||
+      nchar(encoded, type = "bytes") > 4 * ceiling((limits$compressed + length(magic)) / 3))
+    stop("Preserved checkpoint exceeds the compressed size limit")
+  bytes <- cloud_base64(encoded)
+  if (length(bytes) > limits$compressed + length(magic)) stop("Preserved checkpoint exceeds the compressed size limit")
+  files <- list()
+  version <- if (length(bytes) >= length(magic) && identical(head(bytes, length(magic)), magic)) 3L
+    else if (length(bytes) >= length(magic) && identical(head(bytes, length(magic)), cloud_checkpoint_magic(2L))) 2L
+    else NULL
+  if (!is.null(version)) {
+    compressed <- bytes[-seq_along(magic)]
+    if (length(compressed) > limits$compressed) stop("Preserved checkpoint exceeds the compressed size limit")
+    members <- cloud_checkpoint_json(compressed, limits$json, version)
+    if (!is.list(members) || is.null(names(members)) || !length(members) || length(members) > limits$files)
+      stop("Invalid preserved checkpoint file count")
+    total <- 0
+    for (name in names(members)) {
+      cloud_checkpoint_name(name)
+      member <- members[[name]]
+      encoding <- setdiff(names(member), "sha256")
+      if (!is.list(member) || length(member) != 2L || length(encoding) != 1L ||
+          !encoding %in% c("content_base64", if (version == 3L) "content_utf8") ||
+          !is.character(member$sha256) || length(member$sha256) != 1L || is.na(member$sha256) ||
+          !grepl("^[a-f0-9]{64}$", member$sha256) || !is.character(member[[encoding]]) ||
+          length(member[[encoding]]) != 1L || is.na(member[[encoding]]))
+        stop("Invalid preserved checkpoint file")
+      value <- member[[encoding]]
+      if (encoding == "content_base64") {
+        if (nchar(value, type = "bytes") > 4 * ceiling(limits$file / 3)) stop("Invalid preserved checkpoint file")
+        content <- cloud_base64(value)
+      } else {
+        if (!isTRUE(validUTF8(value)) || nchar(value, type = "bytes") > limits$file)
+          stop("Invalid preserved checkpoint file")
+        content <- charToRaw(enc2utf8(value))
+      }
+      total <- total + length(content)
+      if (length(content) > limits$file || total > limits$total) stop("Preserved checkpoint exceeds the file size limit")
+      if (!identical(digest::digest(content, algo = "sha256", serialize = FALSE), member$sha256))
+        stop("Preserved checkpoint file checksum mismatch")
+      files[[name]] <- content
+    }
+  } else {
+    # Earlier checkpoints used ZIP. Read each member as bytes, never as a link.
+    if (length(bytes) > limits$compressed) stop("Preserved checkpoint exceeds the compressed size limit")
+    archive <- tempfile(fileext = ".zip"); writeBin(bytes, archive)
+    on.exit(unlink(archive), add = TRUE)
+    members <- utils::unzip(archive, list = TRUE)
+    if (!nrow(members) || nrow(members) > limits$files) stop("Invalid preserved checkpoint file count")
+    if (anyDuplicated(members$Name)) stop("Duplicate preserved archive member")
+    if (any(!is.finite(members$Length) | members$Length < 0 | members$Length > limits$file) ||
+        sum(members$Length) > limits$total) stop("Preserved checkpoint exceeds the file size limit")
+    for (i in seq_len(nrow(members))) {
+      name <- members$Name[[i]]; is_directory <- endsWith(name, "/")
+      if (is_directory) name <- substring(name, 1L, nchar(name) - 1L)
+      cloud_checkpoint_name(name)
+      if (is_directory) next
+      connection <- unz(archive, members$Name[[i]], open = "rb")
+      content <- tryCatch(readBin(connection, "raw", n = members$Length[[i]] + 1L), finally = close(connection))
+      if (length(content) != members$Length[[i]]) stop("Invalid preserved file length")
+      files[[name]] <- content
+    }
+  }
+  # Validate every path before restoring any file, including existing symlinks.
   dir.create(directory, recursive = TRUE, showWarnings = FALSE)
-  # Reading individual members as bytes never restores ZIP symlinks.
-  for (i in seq_len(nrow(members))) {
-    name <- members$Name[[i]]; is_directory <- endsWith(name, "/")
-    if (is_directory) name <- substring(name, 1L, nchar(name) - 1L)
-    if (grepl("^[A-Za-z]:", name) || members$Length[[i]] > 8000000) stop("Invalid preserved file")
+  for (name in names(files)) {
+    parts <- strsplit(name, "/", fixed = TRUE)[[1L]]
+    if (length(parts) > 1L && any(vapply(seq_len(length(parts) - 1L), function(i)
+        paste(parts[seq_len(i)], collapse = "/") %in% names(files), logical(1))))
+      stop("Conflicting preserved checkpoint paths")
+  }
+  paths <- lapply(names(files), function(name) {
     path <- source_path(directory, name, exists = FALSE)
-    if (is_directory) { dir.create(path, recursive = TRUE, showWarnings = FALSE); next }
-    connection <- unz(archive, members$Name[[i]], open = "rb")
-    bytes <- tryCatch(readBin(connection, "raw", n = members$Length[[i]] + 1L), finally = close(connection))
-    if (length(bytes) != members$Length[[i]]) stop("Invalid preserved file length")
-    dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE); writeBin(bytes, path)
+    parent <- dirname(path)
+    while (!identical(parent, directory) && !dir.exists(parent)) {
+      if (file.exists(parent)) stop("Conflicting preserved checkpoint paths")
+      parent <- dirname(parent)
+    }
+    if (dir.exists(path)) stop("Conflicting preserved checkpoint paths")
+    path
+  })
+  for (i in seq_along(files)) {
+    dir.create(dirname(paths[[i]]), recursive = TRUE, showWarnings = FALSE)
+    writeBin(files[[i]], paths[[i]])
   }
   invisible(NULL)
 }
 cloud_checkpoint <- function(directory) {
-  archive <- tempfile(fileext = ".zip"); on.exit(unlink(archive), add = TRUE)
+  limits <- cloud_checkpoint_limits()
   names <- list.files(directory, recursive = TRUE, all.files = TRUE, no.. = TRUE)
   names <- names[!dir.exists(file.path(directory, names)) & !grepl("(^|/)\\.quarto(/|$)", names)]
-  if (!length(names)) stop("Cannot preserve an empty checkpoint")
-  for (name in names) source_path(directory, name)
-  previous <- setwd(directory); on.exit(setwd(previous), add = TRUE)
-  status <- utils::zip(archive, files = names, flags = "-q")
-  if (status != 0L || !file.exists(archive)) stop("Cannot preserve checkpoint")
-  cloud_base64_encode(cloud_bytes(archive))
+  state_path <- file.path(directory, "state.json")
+  if (file.exists(state_path)) {
+    state <- json_read(state_path)
+    recorded <- is.list(state$records) && (length(state$records) == 0L ||
+      all(vapply(state$records, function(record) is.list(record$outputs) && !is.null(names(record$outputs)), logical(1))))
+    if (identical(state$schema_version, 2L) && recorded) {
+      names <- "state.json"
+      for (key in names(state$records)) {
+        record <- state$records[[key]]
+        path <- source_path(directory, paste0(key, "/record.json"))
+        if (!identical(json_encode(json_read(path)), json_encode(record))) stop("Preserved checkpoint record mismatch")
+        for (name in names(record$outputs)) {
+          hash <- record$outputs[[name]]
+          if (!is.character(hash) || length(hash) != 1L || is.na(hash) || !grepl("^[a-f0-9]{64}$", hash) ||
+              !identical(file_sha256(source_path(directory, paste0(key, "/", name))), hash))
+            stop("Preserved checkpoint recorded file checksum mismatch")
+        }
+        names <- c(names, paste0(key, "/", c("record.json", names(record$outputs))))
+      }
+    }
+  }
+  if (!length(names) || length(names) > limits$files) stop("Invalid preserved checkpoint file count")
+  files <- list(); total <- 0
+  for (name in names) {
+    cloud_checkpoint_name(name); path <- source_path(directory, name)
+    size <- file.info(path)$size; total <- total + size
+    if (!is.finite(size) || size > limits$file || total > limits$total)
+      stop("Preserved checkpoint exceeds the file size limit")
+    content <- cloud_bytes(path)
+    if (length(content) != size) stop("Preserved checkpoint changed while reading")
+    text <- tryCatch(rawToChar(content), error = function(error) NULL)
+    member <- list(sha256 = digest::digest(content, algo = "sha256", serialize = FALSE))
+    if (!is.null(text) && isTRUE(validUTF8(text)) && identical(charToRaw(text), content)) {
+      Encoding(text) <- "UTF-8"
+      member$content_utf8 <- text
+    } else member$content_base64 <- cloud_base64_encode(content)
+    files[[name]] <- member
+  }
+  bytes <- charToRaw(json_encode(files))
+  if (length(bytes) > limits$json) stop("Preserved checkpoint exceeds the expanded size limit")
+  compressed <- memCompress(bytes, "bzip2")
+  if (length(compressed) > limits$compressed) stop("Preserved checkpoint exceeds the compressed size limit")
+  cloud_base64_encode(c(cloud_checkpoint_magic(), compressed))
 }
 cloud_handover <- function(client, delivery, transfer_count, connected = FALSE, timeout = 180) {
   deadline <- client$now() + timeout
@@ -276,7 +443,8 @@ cloud_run <- function(client, directory = file.path(tempdir(), "paper-results"),
   source(file.path(root, "scripts/release.R"), local = TRUE)
   release_saved_bundle(original, bundle, json_read(file.path(root, "build-info.json"))$version)
   body <- list(operation_id = cloud_uuid(), checkpoint = cloud_checkpoint(directory),
-    bundle = cloud_base64_encode(cloud_bytes(bundle)), state = workflow_state(runner), result = result,
+    bundle = cloud_base64_encode(cloud_bytes(bundle)), state = workflow_state(runner),
+    result = if (is.list(result)) result[setdiff(names(result), c("records", "jobs"))] else result,
     error = error, pending_events = cloud_pending(delivery))
   # Preserve the exact payload locally if an uncertain service response exhausts retries.
   json_write(body, file.path(dirname(delivery$path), "finish.json"))

@@ -162,6 +162,11 @@ release_readers <- function(directory, version) {
     '<p>The coordinator is in <code>R/</code>; each analysis owns <code>components/&lt;analysis&gt;/Makefile</code>, its R library and job scripts. <code>source-lock.json</code> and <code>source-origins.json</code> identify exact revisions and bytes.</p><ul>',
     paste(items, collapse = "\n"), '</ul>')), file.path(directory, "code.html"), useBytes = TRUE)
 }
+release_archive_interface <- function(stage, interface) {
+  writeLines(interface$html, file.path(stage, "index.html"), useBytes = TRUE)
+  writeLines('<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=index.html"><title>Saved workflow</title><a href="index.html">Open the saved workflow</a>', file.path(stage, "offline.html"), useBytes = TRUE)
+  json_write(interface$receipt, file.path(stage, "INTERFACE.json"))
+}
 release_saved_bundle <- function(archive, destination, version) {
   stage <- tempfile("saved-reader-"); dir.create(stage); on.exit(unlink(stage, recursive = TRUE), add = TRUE)
   release_unpack(archive, stage)
@@ -171,8 +176,7 @@ release_saved_bundle <- function(archive, destination, version) {
   if (any(grepl("^(docs|dist)/|(^|/)(saved-bundle|fisheries-workflow[^/]*)\\.zip$", names(original)))) stop("Source bundle contains a previous built release")
   release_readers(stage, version)
   interface <- release_interface(stage, json_read(file.path(stage, "reference/state.json")))
-  for (name in c("index.html", "offline.html")) writeLines(interface$html, file.path(stage, name), useBytes = TRUE)
-  json_write(interface$receipt, file.path(stage, "INTERFACE.json"))
+  release_archive_interface(stage, interface)
   public_source <- file.path(stage, "data/public-source.json")
   if (file.exists(public_source)) release_data_page(json_read(public_source), stage, stage)
   json_write(list(schema_version = 1L, relative = 1e-8, absolute = 1e-9,
@@ -200,8 +204,7 @@ release_main <- function(args = commandArgs(trailingOnly = TRUE)) {
   release_unpack(file.path(settings$docs, "saved-bundle.zip"), stage)
   if (!all(file.exists(file.path(stage, c("START-HERE.html", "comparison-policy.json"))))) stop("Build the R site from completed outputs before packaging")
   interface <- release_interface(stage, json_read(file.path(stage, "reference/state.json")))
-  for (name in c("index.html", "offline.html")) writeLines(interface$html, file.path(stage, name), useBytes = TRUE)
-  json_write(interface$receipt, file.path(stage, "INTERFACE.json"))
+  release_archive_interface(stage, interface)
   public_source <- file.path(stage, "data/public-source.json")
   if (file.exists(public_source)) release_data_page(json_read(public_source), stage, stage)
   release_manifest(stage, verify = FALSE)

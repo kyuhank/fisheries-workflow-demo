@@ -56,6 +56,7 @@ compare:
 check:
 	@Rscript --vanilla tests-r/test-workflow.R
 	@Rscript --vanilla tests-r/test-inputs.R
+	@Rscript --vanilla tests-r/test-runtime.R
 	@Rscript --vanilla tests-r/test-cloud.R
 	@Rscript --vanilla tests-r/test-local.R
 	@Rscript --vanilla tests-r/test-release.R

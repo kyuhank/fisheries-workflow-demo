@@ -271,6 +271,9 @@ live_execute <- function(gate, case, previous) {
     if (identical(run$status, "complete") && length(update$events) < 100L) {
       live_assert(is.null(pending), "Request completed with an unacknowledged boundary")
       value <- run$result
+      live_assert(is.list(update$state$records), "Completed state has no producing records")
+      if (!is.null(value$records)) live_assert(live_equal(value$records, update$state$records), "Duplicate completed records differ")
+      value$records <- update$state$records
       live_assert(identical(value$schema_version, 2L) && live_equal(value$run, case$run) && live_equal(value$retained, case$retained) &&
         identical(value$start, case$body$start) && identical(value$scope, case$body$scope) && live_equal(value$settings, case$body$settings), "Completed plan/settings differ")
       plans <- Filter(function(event) identical(event$state, "plan"), events)

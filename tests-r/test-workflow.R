@@ -30,6 +30,7 @@ for (group in names(source_groups)) {
   }
 }
 lock$snapshot_manifest <- "source-origins.json"
+json_write(list(schema_version = 1L, jobs = json_object()), file.path(fixture, "runtime-overrides.json"))
 json_write(lock, file.path(fixture, "source-lock.json"))
 json_write(list(schema_version = 1L, sources = origins), file.path(fixture, "source-origins.json"))
 backend <- list(
@@ -94,8 +95,16 @@ stopifnot(identical(json_encode(restored$records), json_encode(workflow$records)
 archive <- file.path(fixture, "bundle.zip")
 workflow_bundle(workflow, archive)
 contents <- utils::unzip(archive, list = TRUE)$Name
-stopifnot(all(c("source-lock.json", "source-origins.json", "runtime-catalogue.json", "runtime-overrides.json", "reference/state.json", "SHA256SUMS.json") %in% contents))
+stopifnot(all(c("source-lock.json", "source-origins.json", "runtime-catalogue.json", "runtime-overrides.json", "runtime-preserved.json", "reference/state.json", "SHA256SUMS.json") %in% contents))
 stopifnot(!any(startsWith(contents, "docs/")), !any(startsWith(contents, "app/")))
+# Archives retain committed configuration bytes and every recorded artifact only.
+archive_root <- tempfile("bundle-source-check-"); dir.create(archive_root)
+utils::unzip(archive, exdir = archive_root)
+stopifnot(identical(file_sha256(file.path(archive_root, "runtime-overrides.json")), file_sha256(file.path(fixture, "runtime-overrides.json"))))
+for (key in names(workflow$records)) for (name in names(workflow$records[[key]]$outputs))
+  stopifnot(identical(file_sha256(file.path(archive_root, "reference", key, name)), workflow$records[[key]]$outputs[[name]]))
+stopifnot(!any(grepl("test-start|test-end|context.json|response.json", contents)))
+unlink(archive_root, recursive = TRUE)
 # A malformed response cannot create a successful record; successful peers survive resume.
 broken_backend <- backend
 broken_backend$calculate <- function(job, context, folder, runtime) {
