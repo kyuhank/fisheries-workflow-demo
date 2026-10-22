@@ -128,7 +128,7 @@ release_data_page <- function(source, root, docs) {
     release_html(basename(item$file)), '</a> · SHA-256 <code>', release_html(item$sha256), '</code></li>'), character(1))
   writeLines(release_page("Public albacore data", paste0('<a href="index.html">← Workflow</a><h1>Public albacore data</h1>',
     '<p>WCPFC/SPC released Fiji fleet–quarter–5° cell aggregates, 2000–2022. Rows are not individual fishing sets; vessel identities are unavailable.</p><ul>', paste(citations, collapse = "\n"),
-    '</ul><p><a href="data/fiji-source.csv">Source projection</a> · <a href="data/annual-catch.csv">Annual catch</a> · <a href="data/extract.sql">Selection SQL</a></p>',
+    '</ul><p><a download href="data/fiji-source.csv">Source projection</a> · <a download href="data/annual-catch.csv">Annual catch</a> · <a download href="data/extract.sql">Selection SQL</a></p>',
     '<p>The SQL selects six cell–quarter strata observed in every year. CPUE A uses year and stratum effects; CPUE B uses year and quarter. Predictions average these six strata equally, in fish per 1,000 hooks; each relative index starts at one.</p>',
     '<p>HHOOKS is hundreds of hooks (multiplied by 100); ALB_N counts fish. Masked catch/effort cells are excluded; their zeros are not observed zero catches. Annual South Pacific stock catch is a separate all-fleet, all-gear series in metric tonnes.</p>',
     '<p>The small Fiji index is not validated as stock-wide abundance. Simplified assessments and management trials provide no stock advice. WCPFC/SPC notices and attribution remain with the data; the code licence does not relicense them.</p>',

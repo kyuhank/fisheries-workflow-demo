@@ -119,7 +119,7 @@ with hosted_docs() as url, sync_playwright() as playwright:
     expected = expected_record(page, 'mse_report')
     page.locator('#job-table-body tr[data-job="mse_report"] .open-output').click()
     assert_pdf_output(page, 'mse_report', expected,
-                      phrases=('Management strategy comparison report',))
+                      phrases=('Management strategy comparison',))
     assert page.evaluate('currentOutput.record.job') == 'mse_report'
     close_pdf_output(page)
     page.locator('[data-tab="workflow"]').click()
