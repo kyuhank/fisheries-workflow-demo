@@ -140,7 +140,12 @@
       "Timeout",
       "Unknown dispatch stays locked"
     ],
-    "scope": "Local HTTP fixtures and browser layouts; these checks do not establish hosted execution."
+    "scope": "Local HTTP fixtures and browser layouts; these checks do not establish hosted execution.",
+    "layout_browsers": [
+      "Chromium",
+      "WebKit"
+    ],
+    "layout_ci_source": "a6820ccec9a3abdb3c4425bcc7efa6d19709dc92"
   },
   "continuous_integration": {
     "calculation_server_database": {
@@ -164,7 +169,9 @@
       "test_sources_sha256": {
         "scripts/check-diagram.py": "e260304b9a38b0d6c29793b26b8eb43c91ab13ccbffba07007fbd3d9e7a7e094",
         "scripts/check-orchestration.py": "c4816e2e966377eba6d67ac1e39cc5f2e5daf4f7ff1d40e15de5e7e2e9b72ba5",
-        "scripts/pdf_checks.py": "599a37ef8affee87b023c3e04ab8f62c1a39432d17ffdf774e695a4714abb0bf"
+        "scripts/pdf_checks.py": "599a37ef8affee87b023c3e04ab8f62c1a39432d17ffdf774e695a4714abb0bf",
+        "scripts/check-reports.py": "374db004d441d1040b085ec22b8d13d8d6d0d71bea28974f908ace13bf1b0ccc",
+        "scripts/check-mse.py": "67e0a10e5f66884dcae5aae88fb8acde9276733d1a28753e3d20cc88b60bf264"
       },
       "local_current_pdf_checks": [
         {
@@ -176,6 +183,18 @@
           "check": "orchestration-current-docs",
           "status": "passed",
           "elapsed_seconds": 8.836100412998348
+        }
+      ],
+      "local_current_content_checks": [
+        {
+          "check": "reports-current-docs",
+          "status": "passed",
+          "elapsed_seconds": 7.1327221089741215
+        },
+        {
+          "check": "mse-current-docs",
+          "status": "passed",
+          "elapsed_seconds": 6.629808734054677
         }
       ]
     },
@@ -200,6 +219,38 @@
       "status": "passed",
       "source_commit": "0faf5548bcd3432de86d0624fd30e2f657c09974",
       "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39774061647"
+    },
+    "interface_a682": {
+      "status": "failed",
+      "source_commit": "a6820ccec9a3abdb3c4425bcc7efa6d19709dc92",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39775093889",
+      "browser_installation": "passed",
+      "browser_installation_seconds": 88,
+      "layout_checks": {
+        "chromium": {
+          "status": "passed",
+          "live_node_positions": 704,
+          "saved_node_positions": 88
+        },
+        "webkit": {
+          "status": "passed",
+          "live_node_positions": 704,
+          "saved_node_positions": 88
+        }
+      },
+      "passed_other_checks": [
+        "records",
+        "connection",
+        "browser",
+        "settings",
+        "orchestration",
+        "16handoverfixtures"
+      ],
+      "failed_checks": [
+        "Reports: expected an extractable standardised legend word; the PDF embeds SVG legend glyphs.",
+        "MSE: old scope wording no longer matched the frozen report's explicit guardrail and risk scope."
+      ],
+      "scope": "Both browser layout checks passed. The combined CI remained failed on content assertions and is retained as failed."
     }
   },
   "native_publication_payload": {
@@ -515,6 +566,17 @@
       "webkit_result": "not executed",
       "reason": "A hardcoded earlier MSE report title did not match the frozen current PDF.",
       "resolution": "Updated two title/analyst text assertions to MSE report/MSE analyst and Prepare MSE/MSE analyst; all PDF-byte/hash and other checks remain required. The next complete CI outcome is pending."
+    },
+    {
+      "check": "Combined browser checks at a682",
+      "status": "failed_harness_assertions",
+      "source_commit": "a6820ccec9a3abdb3c4425bcc7efa6d19709dc92",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39775093889",
+      "chromium_layout": "passed",
+      "webkit_layout": "passed",
+      "live_node_positions_per_browser": 704,
+      "reason": "Two content checks still expected earlier wording: an extractable CPUE legend label and the earlier MSE explanatory scope.",
+      "resolution": "Require the actual CPUE model, nominal conversion, units and assessment index text, and the current 40% starting-biomass guardrail with illustrative-risk scope. PDF hashes, plotted output checks, analyst/run records and all other checks remain required. The next complete CI result is pending."
     }
   ],
   "limits": [

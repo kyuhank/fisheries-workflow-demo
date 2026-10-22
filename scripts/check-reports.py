@@ -37,7 +37,9 @@ with sync_playwright() as playwright:
             if key.startswith(('cpue_', 'assessment_', 'mse_')) and key != 'mse_prepare':
                 assert frame.locator('img, svg').count() >= 1, key
             if key in ('cpue_a', 'cpue_b', 'cpue_report'):
-                assert 'standardised' in text.casefold() and 'nominal' in text.casefold(), key
+                assert all(phrase in text.casefold() for phrase in (
+                    'quasipoisson glm', 'nominal = 1,000', 'annual fish / annual hooks',
+                    'relative index passed to assessment')), key
                 analyses = output['output'].get('analyses', {key: output['output']})
                 assert all(value['effort_unit'] == 'Fish per 1000 hooks' for value in analyses.values()), key
             if key == 'extract':
