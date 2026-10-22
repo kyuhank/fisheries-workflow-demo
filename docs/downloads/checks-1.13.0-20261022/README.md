@@ -18,7 +18,7 @@ Inspect a job PDF: [CPUE](../../example/cpue_report/report.pdf) · [assessment](
 
 Live checks also passed for the complete workflow, a growth-rate update with manual transfer, and an MSE-buffer update. They verified accepted outputs, PDFs and retained records. [Run details and timings](verification.json) distinguish hosted execution from local reproduction.
 
-A new live CPUE A run reached ‘Results are ready’. Its five PDFs and downloaded ZIP were verified from captured outputs and independent read-only checks. Both browser helpers retained failed assertion receipts; no helper-script pass is claimed. [Full browser CI](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39776621497) passed separately.
+A new live CPUE A run reached ‘Results are ready’. Its five PDFs and downloaded ZIP were verified from captured outputs and independent read-only checks. Both browser helpers retained failed assertion receipts; no helper-script pass is claimed. [Full browser CI](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39778288474) passed separately.
 
 Sources: [coordinator](https://github.com/kyuhank/fisheries-workflow-demo/tree/1f3bb8740c5db464656918802f06c83fad67b15b), [producing version](https://github.com/kyuhank/fisheries-workflow-demo/tree/2a8dc292696fa42866b1f28139c23510dc75f140), [CPUE](https://github.com/kyuhank/fisheries-workflow-cpue-demo/tree/7d17fc5962466cdabc27d17e004bed87136b38bc), [assessment](https://github.com/kyuhank/fisheries-workflow-assessment-demo/tree/50412b29afff933601eb2c04ffa56b71702538ac), [MSE](https://github.com/kyuhank/fisheries-workflow-mse-demo/tree/bfd7066a5b7fad6bc302bf311d63b20e32dfa9a4).
 
