@@ -331,7 +331,7 @@ check('hosted callbacks adopt forked acknowledgements and retain final custody',
   workflow_bundle <- function(runner, path) writeBin(charToRaw('mock workflow archive'), path)
   cloud_run(client, file.path(fake_root, 'results'))
   stopifnot(identical(readLines(file.path(fake_root, 'events')), c('event:0', 'event:1')), identical(finished$result$run_id, 'Run 001'),
-    !length(finished$pending_events), !any(c('records', 'jobs') %in% names(finished$result)),
+    !length(finished$pending_events), !'jobs' %in% names(finished$result), identical(finished$result$records, finished$state$records),
     !grepl('private-', json_encode(finished)), isTRUE(finished$state$handover_state$connected),
     identical(finished$state$handover_state$transfer_count, 2L))
   restored <- tempfile('finish-checkpoint-'); cloud_restore(finished$checkpoint, restored)
