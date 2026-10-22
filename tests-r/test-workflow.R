@@ -77,6 +77,22 @@ workflow <- new_workflow(output, runtime_backend = backend, handover = NULL, exe
 stopifnot(length(workflow_plan(workflow)$run) == 22L)
 run <- workflow_run(workflow)
 stopifnot(length(run$run) == 22L, length(workflow$records) == 22L)
+stopifnot(identical(workflow$records$cpue_a$inputs$extract$owner, workflow$records$extract$owner),
+          identical(workflow$records$cpue_a$inputs$extract$title, workflow$config$jobs$extract$title),
+          identical(workflow$records$cpue_a$inputs$extract$run_id, workflow$records$extract$run_id))
+# A corrected submission must not inherit proof for its earlier numerical output.
+receipt_folder <- file.path(fixture, "receipt-check"); dir.create(receipt_folder)
+receipt_runtime <- workflow_runtime(workflow, "submission")
+original_value <- list(sets = rows, catch = catches)
+json_write(list(result = original_value, effects = json_object()), file.path(receipt_folder, "response.json"))
+json_write(list(job = "submission", image_id = receipt_runtime$software$image_id,
+  exit_code = 0L, running = FALSE, container_id = strrep("a", 64L)),
+  file.path(receipt_folder, "container-inside-job.json"))
+original_record <- workflow_record(workflow, "submission", original_value, run$run_id, receipt_folder, receipt_runtime)
+stopifnot(original_record$execution$calculation$exit_code == 0L)
+corrected_value <- original_value; corrected_value$sets[[1L]]$hooks <- 2000L
+corrected_record <- workflow_record(workflow, "submission", corrected_value, run$run_id, receipt_folder, receipt_runtime)
+stopifnot(is.null(corrected_record$execution$calculation))
 stopifnot(all(vapply(names(workflow$records), function(key) workflow_valid(workflow, key), logical(1))))
 stopifnot(length(workflow_plan(workflow, "mse_buffered")$run) == 3L)
 stopifnot(length(workflow_plan(workflow, "mse_buffered", "job")$run) == 1L)

@@ -3,14 +3,14 @@
   "repositories": {
     "cpue": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
-      "commit": "d4454fcfa9a23bd590344ad92940a13fa0a41c06",
+      "commit": "30d5eae3d748d9417fd6cc482faf4994c8d07df8",
       "files": {
         "LICENSE": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
         "Makefile": "50092a2d4ed1f9b614d75eb0e2c00f1dab114753cbfad91c3ddb8a36a7566472",
-        "R/adapter.R": "3275ae29cb6b2a6b6d93a769f11b2d7908d26fd01d7c4c454c971594079928e4",
+        "R/adapter.R": "5304e0ea22bf7a697476bff79f38e7b5b496cac802f166d6d3861c325d4158ab",
         "R/common.R": "4befb1217f341840864249e30182819e3452c685dd30267c0f6bb7f3870b912d",
         "R/cpue.R": "e1072e9ffde45764666ff932fe160b9daf505908f96aa18b8abff73d8e151f3f",
-        "R/render.R": "ca56c3e303a7afebaed3455f6f0a7cfe123973cbb20d37819ae753e6ba22649e",
+        "R/render.R": "7da2973139ff5cb5e7d5fd862b567c9fb758f3fa4aeca0ac501a415ba0b0b476",
         "R/runtime.R": "d3d6c9d60998abcf49f3a8b870cf9e24ec2720a4091bed9bb7daf6d2e60dc716",
         "README.md": "697546d33041b67346e4ce0517f06ed6c4449baaf06f55bab457003043a895e3",
         "SOURCE.json": "e870f9f677bd7f54856d4cc6c360ef2c393ef189908c8f87a90b1adc0446a4d4",
@@ -21,7 +21,7 @@
         "jobs/cpue_b/README.md": "817f1b159edf0bc41f3f37ac2441d186f79e14e1bad00ff167b80ae77764cf0d",
         "jobs/cpue_b/run.R": "1f8c9f2bbfd112bfb3065ae50b33f1d27849f699507c3839fb92fdf8ec21fb92",
         "jobs/cpue_report/README.md": "4469b2aaed61152a8194d9ce5a6a1dfa7468ce122c9f4bc645185c965514e49a",
-        "jobs/cpue_report/report.qmd": "1d3b04219164a9b27645c93a6196c1f0c309a405aece58f14f7bb8f454bb9a73",
+        "jobs/cpue_report/report.qmd": "579e846c5368353f67e7ac7220911d750e8cd18836b895b92c2cfd0c7332f58e",
         "jobs/cpue_report/run.R": "71deefbab947d096f044d675691d1640e6a2b16276ce100017ee4d91a32d3694",
         "jobs/cpue_summary/README.md": "571bf848d695d64577961a01e3cc0c7dd9d14d0e6166df68f92cb6cb36fd4754",
         "jobs/cpue_summary/run.R": "c5034f2d8c16433cea975939eae287a39e348b5373776df8057268f696815aed",
@@ -33,7 +33,7 @@
         "jobs/qc/run.R": "9737e611cdc352101b32c8b7e829e9fedb6842a5a2365da48735ba021a2c71bc",
         "jobs/submission/README.md": "a579307297c4f8db23f6f9329f819a292fe76c2736b113652f5eb8cd276f7b52",
         "jobs/submission/run.R": "265e9b83beb85e729b168f3939365bdd28e7b514e2eb90438a09c705491a2472",
-        "reports/results.qmd": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+        "reports/results.qmd": "3cffb1488a9f45e2fae20fcb02212103fe96ce1949d8e358d1090ca0b040ff87",
         "runtime.json": "70b3bb02b177bcba45195a60bb0dc80a8546a0602455b8e485e51bd6d570efb9",
         "scripts/info.R": "5f2527c30622145fa51c3c7eb456faf0fa35017863c268b609e3196102e123bf",
         "scripts/launch.R": "81b431c3373385156b8088a8dce6c6e1e91da61c4735dd6e37f57c5e0c6cf912",
@@ -41,19 +41,19 @@
         "scripts/run-job.R": "b78d784a535b7bf732a7e1750438214b06cf0675b2d33c78656e5f81d55c68cb",
         "scripts/runtime.R": "b735c3f6f1c2212534dd07ed38b3f123b73c18b2997690f0ba3d86ec4e4f8350",
         "tests/test-adapter.R": "750460760b63caf89af0ba637705199bf1bcfb498bb251ff116b04ebc16d87e7",
-        "tests/test-render.R": "bb9fbe150b0c73d90d6d5af2a0cd2d1f5a646b88cdd58e1967d032197a04dd87"
+        "tests/test-render.R": "68ef8cdfef93ece46e77d720d7896665120c1d462fc391d3ed22455b643cd40d"
       }
     },
     "assessment": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
-      "commit": "0b7071600b636b17edacd00ed216af2aff19090a",
+      "commit": "6798a63a0ee7d5975d1d1fa2027284073015e0ee",
       "files": {
         "LICENSE": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
         "Makefile": "50092a2d4ed1f9b614d75eb0e2c00f1dab114753cbfad91c3ddb8a36a7566472",
-        "R/adapter.R": "3275ae29cb6b2a6b6d93a769f11b2d7908d26fd01d7c4c454c971594079928e4",
+        "R/adapter.R": "91022ee610307e0cfb7cb46e92b4a1c355edf4845997c886b6d359797c989b76",
         "R/assessment.R": "c807989ab5de3da1d4ac44cd7e11d84b2eee5d112c2ea74b481f896457abdf06",
         "R/common.R": "4befb1217f341840864249e30182819e3452c685dd30267c0f6bb7f3870b912d",
-        "R/render.R": "ca56c3e303a7afebaed3455f6f0a7cfe123973cbb20d37819ae753e6ba22649e",
+        "R/render.R": "7da2973139ff5cb5e7d5fd862b567c9fb758f3fa4aeca0ac501a415ba0b0b476",
         "R/runtime.R": "d3d6c9d60998abcf49f3a8b870cf9e24ec2720a4091bed9bb7daf6d2e60dc716",
         "README.md": "ea9c40206d486fd8fd7cfcf1751d9d4cc6c8480073379d0c48383ee593f337e4",
         "SOURCE.json": "9a68cc4c15e1b17ca128f4e167acf96cd4d28e771c1e34a8fd10cf5dfe638236",
@@ -68,7 +68,7 @@
         "jobs/assessment_b2/README.md": "f2ac6ce0bcaa72e7a7376be3c9dc263aadfd65e795ee1187836ef46ec788f609",
         "jobs/assessment_b2/run.R": "bdc313361eeee533d77eea41f7dd297205c51151c7c857ba6f2f711eedcd1f24",
         "jobs/assessment_report/README.md": "32cbc3b8b2ab64a27339c22e10a4b638e330246d3481ae2796d4373b60e6f272",
-        "jobs/assessment_report/report.qmd": "6e8365be425f87a1d5cac574d13d798df7222587ed86cd2b4d0d25f16612bf8d",
+        "jobs/assessment_report/report.qmd": "9d8ee11433a4e3945d4f097e276e5c18071f0419688a1742f607d407741dfbe6",
         "jobs/assessment_report/run.R": "2d7054dfee0b4b029c4db2f2d847e1ce5c4a6e97c7d4b7f77189f119b9448baa",
         "jobs/assessment_summary/README.md": "4eb2c27825e82fc9d35c8f311248f7601e71a7149e4843054f1417d2ef85e18b",
         "jobs/assessment_summary/run.R": "53197ec03051c810073b4fd23ec11bb2f5093efa1020250615ef8e0cb73d97ae",
@@ -76,7 +76,7 @@
         "jobs/prepare_a/run.R": "2c83b270a73eae3e39fb30bd6bc9a0cefe299c68a00186134b71ba1d6feb0bc9",
         "jobs/prepare_b/README.md": "fdd003bf2887f0faea50025fdfedd6126c22f94ed06d7a2507d95b64d06b2e99",
         "jobs/prepare_b/run.R": "f014a6e0133069991570cd0b5f3458b287652a915b198a50c7a3f247cf1243c4",
-        "reports/results.qmd": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+        "reports/results.qmd": "3cffb1488a9f45e2fae20fcb02212103fe96ce1949d8e358d1090ca0b040ff87",
         "runtime.json": "70b3bb02b177bcba45195a60bb0dc80a8546a0602455b8e485e51bd6d570efb9",
         "scripts/info.R": "5f2527c30622145fa51c3c7eb456faf0fa35017863c268b609e3196102e123bf",
         "scripts/launch.R": "81b431c3373385156b8088a8dce6c6e1e91da61c4735dd6e37f57c5e0c6cf912",
@@ -84,20 +84,20 @@
         "scripts/run-job.R": "b78d784a535b7bf732a7e1750438214b06cf0675b2d33c78656e5f81d55c68cb",
         "scripts/runtime.R": "b735c3f6f1c2212534dd07ed38b3f123b73c18b2997690f0ba3d86ec4e4f8350",
         "tests/test-adapter.R": "750460760b63caf89af0ba637705199bf1bcfb498bb251ff116b04ebc16d87e7",
-        "tests/test-render.R": "bb9fbe150b0c73d90d6d5af2a0cd2d1f5a646b88cdd58e1967d032197a04dd87"
+        "tests/test-render.R": "68ef8cdfef93ece46e77d720d7896665120c1d462fc391d3ed22455b643cd40d"
       }
     },
     "mse": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
-      "commit": "7ae67f11217ef10ba8f4fb3a52707707377c1f32",
+      "commit": "41319dc8ab17594350ed8e5d23bee916f64570c2",
       "files": {
         "LICENSE": "26c8d9e75d01952b966e310e5133714f48891fd9c1d3834ab8420c5681536403",
         "Makefile": "50092a2d4ed1f9b614d75eb0e2c00f1dab114753cbfad91c3ddb8a36a7566472",
-        "R/adapter.R": "3275ae29cb6b2a6b6d93a769f11b2d7908d26fd01d7c4c454c971594079928e4",
+        "R/adapter.R": "5304e0ea22bf7a697476bff79f38e7b5b496cac802f166d6d3861c325d4158ab",
         "R/assessment-recurrence.R": "86bb7635ba7b98c885bfba7ccda9d7364445268dd2dfba9253612345c5dc724e",
         "R/common.R": "4befb1217f341840864249e30182819e3452c685dd30267c0f6bb7f3870b912d",
         "R/mse.R": "da8b6531e0a89950c49617e2a7b6dd485e698bab7bdef06e64632a700ef7c956",
-        "R/render.R": "ca56c3e303a7afebaed3455f6f0a7cfe123973cbb20d37819ae753e6ba22649e",
+        "R/render.R": "7da2973139ff5cb5e7d5fd862b567c9fb758f3fa4aeca0ac501a415ba0b0b476",
         "R/runtime.R": "d3d6c9d60998abcf49f3a8b870cf9e24ec2720a4091bed9bb7daf6d2e60dc716",
         "README.md": "4ee582af594cbeca93b382d00d66e6515cfcc71bee81f351bc7beaa9cad9e9cd",
         "SOURCE.json": "4844d57f286b724c9fb6dab5d08971e740d5aa9039d23f1a1c02128f55129f69",
@@ -112,11 +112,11 @@
         "jobs/mse_prepare/README.md": "4f79d8163992662301e4a933757bc3be4ae6137b06bc9a16bbb688a98b163dc3",
         "jobs/mse_prepare/run.R": "dae23c4c405f5ac70aa64947d5a8c503e2c3e765d176d4c7fe7fe68d64a18cae",
         "jobs/mse_report/README.md": "24a4fd05b3c60784216e5b75f3ec3233207365a5fe1f34e2b2da770a825305c4",
-        "jobs/mse_report/report.qmd": "f2ed7712fae55d7cebf451ab2c4788a381bca9ab38dd0d6711a03a240702f693",
+        "jobs/mse_report/report.qmd": "61a37c3bfa4e0f89d48b870332c2d9b7e6e1fe95da7bc52b56daaf84aeb8852d",
         "jobs/mse_report/run.R": "0e4bc6fe0a570a0316bbea5bb6a1bcd375dc6c150f5b5e4c7b702cb24e4ad174",
         "jobs/mse_summary/README.md": "dc93028c7b0425912f62a958527b993ab3593f4c0e5dc7b78eab9501cdce0165",
         "jobs/mse_summary/run.R": "09719a18af53a22a4fce05e5f6d833e6adeedaa1dd2d4461b76e8cd7861627bc",
-        "reports/results.qmd": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+        "reports/results.qmd": "3cffb1488a9f45e2fae20fcb02212103fe96ce1949d8e358d1090ca0b040ff87",
         "runtime.json": "70b3bb02b177bcba45195a60bb0dc80a8546a0602455b8e485e51bd6d570efb9",
         "scripts/info.R": "5f2527c30622145fa51c3c7eb456faf0fa35017863c268b609e3196102e123bf",
         "scripts/launch.R": "81b431c3373385156b8088a8dce6c6e1e91da61c4735dd6e37f57c5e0c6cf912",
@@ -124,7 +124,7 @@
         "scripts/run-job.R": "b78d784a535b7bf732a7e1750438214b06cf0675b2d33c78656e5f81d55c68cb",
         "scripts/runtime.R": "b735c3f6f1c2212534dd07ed38b3f123b73c18b2997690f0ba3d86ec4e4f8350",
         "tests/test-adapter.R": "750460760b63caf89af0ba637705199bf1bcfb498bb251ff116b04ebc16d87e7",
-        "tests/test-render.R": "bb9fbe150b0c73d90d6d5af2a0cd2d1f5a646b88cdd58e1967d032197a04dd87"
+        "tests/test-render.R": "68ef8cdfef93ece46e77d720d7896665120c1d462fc391d3ed22455b643cd40d"
       }
     }
   }

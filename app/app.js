@@ -272,7 +272,7 @@ function badge(key) {
   span.className = "state";
   span.append(
     statusSymbol(state),
-    document.createTextNode(statusLabel(key) || state),
+    uiElement("span", "status-label", statusLabel(key) || state),
   );
   return span;
 }
@@ -387,10 +387,14 @@ function jobNode(node, colour, path) {
     title.append(part);
   }
   card.append(title);
-  const statusY = titleY + (lines.length - 1) * 24 + 26;
+  const statusLabelText = statusLabel(key) || state;
+  const statusLines = statusLabelText.split(" ");
+  const multilineStatus = statusLines.length > 1;
+  const statusY = titleY + (lines.length - 1) * 24 + (multilineStatus ? 21 : 23);
   const status = svgElement("g", {
-    class: "node-status",
+    class: "node-status" + (multilineStatus ? " multiline" : ""),
     transform: `translate(14 ${statusY - 12})`,
+    "aria-label": statusLabelText,
   });
   if (state === "running") {
     const spinner = svgElement("circle", {
@@ -419,13 +423,17 @@ function jobNode(node, colour, path) {
     icon.setAttribute("height", "14");
     status.append(icon);
   }
-  const statusText = svgElement("text", { x: 22, y: 12 });
-  statusText.textContent = statusLabel(key) || state;
+  const statusText = svgElement("text", { x: 18, y: 12 });
+  for (const [index, line] of statusLines.entries()) {
+    const part = svgElement("tspan", { x: index ? 0 : 18, y: 12 + index * 17 });
+    part.textContent = line;
+    statusText.append(part);
+  }
   status.append(statusText);
   card.append(status);
 
   const summary = key.endsWith("_summary");
-  if (summary) {
+  if (summary && !multilineStatus) {
     const subtitle = svgElement("text", {
       x: 14,
       y: statusY + 22,

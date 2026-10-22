@@ -1079,13 +1079,21 @@ dialog iframe {
 }
 .job-table .state {
   display: inline-flex;
-  white-space: nowrap;
+  white-space: normal;
   font-size: 12px;
   background: #f3f5f7;
   color: var(--muted);
   border-radius: 20px;
   padding: 6px 10px;
-  min-width: 94px;
+  min-width: 0;
+  max-width: 100%;
+}
+.state .status-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.state .symbol {
+  flex-shrink: 0;
 }
 .job-table .running .state {
   background: #f7e4b8;
@@ -1278,6 +1286,9 @@ dialog iframe {
 }
 .node-status text {
   fill: currentColor;
+}
+.node-status.multiline {
+  font-size: 15px;
 }
 .node-status-icon {
   fill: none;
@@ -1668,7 +1679,8 @@ dialog iframe {
     box-shadow: none;
   }
   .orchestration-workspace .job-table .job-progress {
-    flex: 0 0 135px;
+    flex: 0 1 135px;
+    max-width: 100%;
   }
   .orchestration-workspace .job-table .job-owner,
   .orchestration-workspace .job-table .job-origin {
@@ -1833,6 +1845,7 @@ dialog iframe {
   background: #f0f4f6;
   font-size: 10px;
   line-height: 1.4;
+  max-width: 100%;
 }
 .dependency-card.complete .state {
   background: #eaf4ee;

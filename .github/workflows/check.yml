@@ -9,7 +9,7 @@ permissions:
   contents: read
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       PAPER_DATA_MODE: public
@@ -20,11 +20,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up the host R coordinator
-        uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
-        with:
-          r-version: '4.5.1'
-          Ncpus: '2'
-          use-public-rspm: 'true'
+        run: sh scripts/setup-runner-r.sh
       - name: Install and record host package versions
         run: Rscript --vanilla scripts/setup-host.R
       - name: Verify and assemble pinned analysis repositories

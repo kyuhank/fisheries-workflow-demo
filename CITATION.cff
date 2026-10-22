@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "Cite the version used in your analysis."
 type: software
 title: "Fisheries workflow: a portable example from data to management trials"
-version: 1.12.0
+version: 1.13.0
 date-released: 2026-10-22
 authors:
   - family-names: Kim

@@ -23,6 +23,8 @@ def preview():
     raw = re.search(r'<script id="demo-payload" type="application/json">(.*?)</script>',
                     saved, re.S).group(1)
     fixture = json.loads(raw)
+    fixture['diagram'] = json.loads((ROOT / 'app/diagram.json').read_text())
+    raw = json.dumps(fixture).replace('</', '<\\/')
     html = (ROOT / 'app/index.html').read_text()
     for key, source in {
         'PAYLOAD': raw,

@@ -16,7 +16,7 @@ concurrency:
 jobs:
   analysis:
     if: github.repository == 'kyuhank/fisheries-workflow-demo' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
       PAPER_REQUEST_ID: ${{ inputs.request_id }}
@@ -25,14 +25,15 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          sparse-checkout: |
+            /*
+            !/docs/
+            !/dist/
+          sparse-checkout-cone-mode: false
       - name: Report runner setup
         run: sh scripts/announce.sh
       - name: Set up the host R coordinator
-        uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
-        with:
-          r-version: '4.5.1'
-          Ncpus: '2'
-          use-public-rspm: 'true'
+        run: sh scripts/setup-runner-r.sh
       - name: Install the four host packages
         run: Rscript scripts/setup-host.R
       - name: Prepare the pinned analysis repositories

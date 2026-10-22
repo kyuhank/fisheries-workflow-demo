@@ -3,7 +3,7 @@
   "repositories": {
     "cpue": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
-      "commit": "d4454fcfa9a23bd590344ad92940a13fa0a41c06",
+      "commit": "30d5eae3d748d9417fd6cc482faf4994c8d07df8",
       "checkout": "components/cpue",
       "jobs": [
         "submission",
@@ -18,7 +18,7 @@
     },
     "assessment": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
-      "commit": "0b7071600b636b17edacd00ed216af2aff19090a",
+      "commit": "6798a63a0ee7d5975d1d1fa2027284073015e0ee",
       "checkout": "components/assessment",
       "jobs": [
         "prepare_a",
@@ -33,7 +33,7 @@
     },
     "mse": {
       "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
-      "commit": "7ae67f11217ef10ba8f4fb3a52707707377c1f32",
+      "commit": "41319dc8ab17594350ed8e5d23bee916f64570c2",
       "checkout": "components/mse",
       "jobs": [
         "mse_prepare",

@@ -3,6 +3,7 @@ import argparse
 from contextlib import contextmanager
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -16,15 +17,35 @@ ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--engine", choices=("chromium", "webkit"), default="chromium")
 parser.add_argument("--executable", default=os.environ.get("CHROME_PATH"))
+parser.add_argument("--screenshots", type=Path)
 args = parser.parse_args()
 
 
 @contextmanager
 def hosted_docs():
-    """Serve the current web page without any analysis execution."""
+    """Serve current UI sources with saved reports, without running analyses."""
+    spec = importlib.util.spec_from_file_location('handover_preview', ROOT / 'scripts/check-handover.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    html, _ = module.preview()
+    index = html.encode()
+
     class QuietHandler(SimpleHTTPRequestHandler):
         def log_message(self, *_):
             pass
+
+        def do_GET(self):
+            if self.path.split('?', 1)[0] in ('/', '/index.html'):
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.send_header('Content-Length', str(len(index)))
+                self.end_headers()
+                self.wfile.write(index)
+            elif self.path == '/favicon.ico':
+                self.send_response(204)
+                self.end_headers()
+            else:
+                super().do_GET()
 
     with ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=ROOT/'docs')) as server:
         Thread(target=server.serve_forever, daemon=True).start()
@@ -67,11 +88,13 @@ with hosted_docs() as url, sync_playwright() as playwright:
                                    b.top < bounds.top - 1 || b.bottom > bounds.bottom + 1))
                         problems.push(node.key + ': text outside box: ' + text.textContent);
                 }
-                const stateText = group.querySelector('.node-status text').getBoundingClientRect();
                 const viewControl = group.querySelector('.node-view rect').getBoundingClientRect();
-                if (stateText.left < viewControl.right && stateText.right > viewControl.left &&
-                    stateText.top < viewControl.bottom && stateText.bottom > viewControl.top)
-                    problems.push(node.key + ': state text overlaps output control');
+                for (const line of group.querySelectorAll('.node-status tspan')) {
+                    const b = line.getBoundingClientRect();
+                    if (b.left < viewControl.right && b.right > viewControl.left &&
+                        b.top < viewControl.bottom && b.bottom > viewControl.top)
+                        problems.push(node.key + ': state text overlaps output control');
+                }
                 const title = group.querySelector('.node-title');
                 const renderedTitleSize = parseFloat(getComputedStyle(title).fontSize) *
                     Math.hypot(matrix.a, matrix.b);
@@ -153,6 +176,84 @@ with hosted_docs() as url, sync_playwright() as playwright:
     page.locator('#show-tasks').click()
     page.set_viewport_size({'width': 390, 'height': 844})
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
+
+    # Saved Complete cards miss the longer labels emitted during an actual run.
+    # Keep real saved records, so View remains present while each status is shown.
+    live_checks = []
+    for width, zoom in ((1440, 1), (1024, 1), (1440, 1.25), (390, 1)):
+        page.set_viewport_size({'width': width, 'height': 1050})
+        page.evaluate('zoom => document.body.style.zoom = zoom', str(zoom))
+        for state, activity, label in (
+            ('running', 'rendering', 'Rendering PDF'),
+            ('running', 'calculating', 'Calculating'),
+            ('running', 'preparing', 'Preparing'),
+            ('unconfirmed', '', 'Status unavailable'),
+            ('handover', '', 'Awaiting file'),
+            ('outdated', '', 'Inputs changed'),
+            ('retained', '', 'Retained'),
+            ('waiting', '', 'Waiting'),
+        ):
+            page.evaluate("""({state, activity}) => {
+                busy = true;
+                states = Object.fromEntries(jobs.map(job => [job.key, state]));
+                activities = Object.fromEntries(jobs.map(job => [job.key, activity]));
+                selectedTask = null;
+                jobStatusFilter = '';
+                workspaceView = 'jobs';
+                render();
+            }""", {'state': state, 'activity': activity})
+            page.locator('[data-tab="workflow"]').click()
+            problems = page.evaluate("""label => {
+                const problems = [];
+                const overlap = (a, b) => a.left < b.right && a.right > b.left &&
+                    a.top < b.bottom && a.bottom > b.top;
+                for (const group of document.querySelectorAll('.workflow-node')) {
+                    const key = group.dataset.job;
+                    const bounds = group.querySelector('.node-shape').getBoundingClientRect();
+                    const status = group.querySelector('.node-status');
+                    if (status.getAttribute('aria-label') !== label)
+                        problems.push(key + ': incomplete accessible status');
+                    const view = group.querySelector('.node-view rect').getBoundingClientRect();
+                    for (const line of group.querySelectorAll('text tspan, text:not(:has(tspan))')) {
+                        const b = line.getBoundingClientRect();
+                        if (!b.width || !b.height) continue;
+                        if (b.left < bounds.left - 1 || b.right > bounds.right + 1 ||
+                            b.top < bounds.top - 1 || b.bottom > bounds.bottom + 1)
+                            problems.push(key + ': text outside box: ' + line.textContent);
+                        if (line.closest('.node-status') && overlap(b, view))
+                            problems.push(key + ': status overlaps View: ' + line.textContent);
+                    }
+                }
+                if (document.documentElement.scrollWidth > innerWidth + 1)
+                    problems.push('page overflows horizontally');
+                return problems;
+            }""", label)
+            assert not problems, (width, zoom, label, problems)
+            if args.screenshots and label == 'Rendering PDF':
+                args.screenshots.mkdir(parents=True, exist_ok=True)
+                page.screenshot(path=str(args.screenshots / f'workflow-{width}-{zoom}.png'), full_page=True)
+            page.locator('[data-tab="jobs"]').click()
+            problems = page.evaluate("""() => {
+                const problems = [];
+                for (const badge of document.querySelectorAll('#job-table-body .state')) {
+                    const b = badge.getBoundingClientRect();
+                    const cell = badge.closest('td').getBoundingClientRect();
+                    if (!b.width || b.left < cell.left - 1 || b.right > cell.right + 1)
+                        problems.push(badge.closest('tr').dataset.job + ': status outside cell');
+                    const text = badge.querySelector('.status-label').getBoundingClientRect();
+                    if (text.left < b.left - 1 || text.right > b.right + 1 ||
+                        text.top < b.top - 1 || text.bottom > b.bottom + 1)
+                        problems.push(badge.closest('tr').dataset.job + ': label outside badge');
+                }
+                if (document.documentElement.scrollWidth > innerWidth + 1)
+                    problems.push('jobs page overflows horizontally');
+                return problems;
+            }""")
+            assert not problems, (width, zoom, label, problems)
+            if args.screenshots and label == 'Rendering PDF':
+                page.screenshot(path=str(args.screenshots / f'jobs-{width}-{zoom}.png'), full_page=True)
+            live_checks.append({'viewport': width, 'zoom': zoom, 'state': label, 'nodes': 22})
     assert not errors, errors
     browser.close()
-print(json.dumps({"engine": args.engine, "layout": checks, "selection_and_output": "passed"}))
+print(json.dumps({"engine": args.engine, "layout": checks, "live_layout": live_checks,
+                  "selection_and_output": "passed"}))

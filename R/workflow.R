@@ -186,13 +186,16 @@ workflow_record <- function(workflow, key, result, run_id, folder, runtime) {
   parents <- unlist(workflow$config$jobs[[key]]$parents)
   inputs <- lapply(parents, function(parent) {
     record <- workflow$records[[parent]]
-    list(run_id = record$run_id, checksum = record$outputs[["output.json"]], signature = record$signature, analysis_source = record$analysis_source)
+    list(run_id = record$run_id, owner = record$owner,
+      title = record$title %||% workflow$config$jobs[[parent]]$title,
+      checksum = record$outputs[["output.json"]], signature = record$signature, analysis_source = record$analysis_source)
   }); names(inputs) <- parents
   if (!length(inputs)) inputs <- json_object()
   messages <- vapply(Filter(function(event) identical(event$job, key) || (event$state %in% c("handover", "received") && key %in% unlist(event$group)), workflow$events), function(event) event$message, character(1))
   code <- source_code(workflow$sources, key, workflow$execution$hosted, workflow$execution$local); origins <- source_code_origins(workflow$sources, key)
   for (name in setdiff(names(code), names(origins))) origins[[name]] <- c(source_coordinator(workflow$sources), list(path = name, sha256 = code[[name]]))
-  record <- list(schema_version = 2L, job = key, owner = workflow$config$jobs[[key]]$owner, run_id = run_id,
+  record <- list(schema_version = 2L, job = key, title = workflow$config$jobs[[key]]$title,
+    owner = workflow$config$jobs[[key]]$owner, run_id = run_id,
     signature = workflow_signature(workflow, key), settings = workflow_job_settings(workflow, key), snapshot = workflow$settings$last_year,
     code = code, code_sources = origins, analysis_source = source_origin(workflow$sources, key),
     software = runtime$software, coordinator_software = workflow_host_software(), runtime = (runtime$descriptor %||% runtime)[intersect(c("image", "image_id", "platform", "rootfs_diff_ids", "package_url", "repository", "commit", "entrypoint"), names(runtime$descriptor %||% runtime))], outputs = outputs,
@@ -203,6 +206,20 @@ workflow_record <- function(workflow, key, result, run_id, folder, runtime) {
     record$execution <- workflow$execution
     record$execution$container <- runtime$software$container
     record$execution$image_id <- runtime$software$image_id
+  }
+  calculation_path <- file.path(folder, "container-inside-job.json")
+  if (file.exists(calculation_path)) {
+    calculation <- json_read(calculation_path)
+    if (!identical(calculation$job, key) || calculation$exit_code != 0L ||
+        !identical(calculation$running, FALSE) ||
+        !identical(calculation$image_id, runtime$software$image_id))
+      stop("Calculation receipt differs from the completed job: ", key)
+    response_path <- file.path(folder, "response.json")
+    # A QC correction may replace a submission without another container run.
+    # Its earlier successful receipt does not establish the corrected result.
+    if (file.exists(response_path) &&
+        identical(json_encode(json_read(response_path)$result), json_encode(result)))
+      record$execution$calculation <- calculation[c("container_id", "image_id", "exit_code", "started_at", "finished_at")]
   }
   source <- input_source(workflow)
   if (input_public(source)) record$data_source <- source$metadata

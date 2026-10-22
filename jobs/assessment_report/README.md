@@ -18,7 +18,7 @@ From the repository root, run this job and prepare any required inputs:
 make job JOB=assessment_report
 ```
 
-[run.R](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/0b7071600b636b17edacd00ed216af2aff19090a/jobs/assessment_report/run.R) is the entry point. It receives the coordinator’s named
+[run.R](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/6798a63a0ee7d5975d1d1fa2027284073015e0ee/jobs/assessment_report/run.R) is the entry point. It receives the coordinator’s named
 `context` and uses the recorded shared libraries; a copied script is not standalone.
 See the [job guide](../README.md) for container and output options.
 
@@ -26,7 +26,7 @@ See the [job guide](../README.md) for container and output options.
 | --- | --- |
 | `runs/assessment_report/output.json` | saved calculation result |
 | `runs/assessment_report/report.pdf` | compiled Quarto result PDF |
-| `runs/assessment_report/report.html` | result page from [report.qmd](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/0b7071600b636b17edacd00ed216af2aff19090a/jobs/assessment_report/report.qmd) |
+| `runs/assessment_report/report.html` | result page from [report.qmd](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/6798a63a0ee7d5975d1d1fa2027284073015e0ee/jobs/assessment_report/report.qmd) |
 | `runs/assessment_report/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** None.

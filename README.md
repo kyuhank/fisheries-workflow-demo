@@ -1,6 +1,6 @@
 # Fisheries workflow demonstration
 
-[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Offline download](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.12.0.zip)
+[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Offline download](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.13.0.zip)
 
 Follow public catch and effort data through CPUE standardisation, assessment and
 management strategy evaluation. R coordinates the jobs; each analysis repository

@@ -122,16 +122,23 @@ runtime_launch <- function(root, folder, job, identity, target, timeout = 180) {
   list(stdout = result$stdout, receipt = receipt)
 }
 
+runtime_inventory_scope <- function(root) {
+  # Read the opt-in declaration without running repository code on the host.
+  expressions <- parse(file.path(root, "R/adapter.R"), keep.source = FALSE)
+  declarations <- Filter(function(value) is.call(value) &&
+    identical(value[[1L]], as.name("<-")) && length(value) == 3L &&
+    identical(value[[2L]], as.name("runtime_info_scope")), as.list(expressions))
+  if (length(declarations) == 1L &&
+      identical(declarations[[1L]][[3L]], "component_environment")) "component_environment" else "job"
+}
+
 runtime_prepare <- function(job, sources, output) {
   binding <- runtime_binding(job, sources)
   entry <- binding$entry
-  probe_key <- value_sha256(list(job$key, entry,
-    code = lapply(c("Makefile", "R/adapter.R"), function(name) file_sha256(file.path(binding$origin$root, name)))))
-  if (exists(probe_key, envir = .runtime_cache, inherits = FALSE)) {
-    value <- get(probe_key, envir = .runtime_cache, inherits = FALSE)
-    value$root <- binding$origin$root
-    return(value)
-  }
+  origin <- binding$origin
+  declared <- unlist(json_read(file.path(origin$root, "SOURCE.json"))$jobs, use.names = FALSE)
+  if (!job$key %in% declared) stop("Runtime job is not declared by its component: ", job$key)
+  scope <- runtime_inventory_scope(origin$root)
   offline <- identical(Sys.getenv("PAPER_OFFLINE"), "1")
   preserved <- NULL
   catalogue <- file.path(sources$root, "runtime-catalogue.json")
@@ -143,12 +150,29 @@ runtime_prepare <- function(job, sources, output) {
     if (length(matches) != 1L) stop("Runtime catalogue must identify exactly one preserved image")
     preserved <- matches[[1L]]
   }
+  pull <- if (offline) "never" else Sys.getenv("PAPER_DOCKER_PULL", "missing")
+  # Only an explicit component-wide inventory can serve another declared job.
+  # Image bindings, source pins, probe code and preserved-image checks stay distinct.
+  probe_files <- c("Makefile", "R/adapter.R", "scripts/info.R", "SOURCE.json")
+  probe_key <- value_sha256(list(contract = 1L, scope = scope,
+    job = if (scope == "job") job$key else NULL, entry = entry,
+    source = origin[c("group", "repository", "commit")],
+    files = sources$files[[origin$group]],
+    probe = setNames(lapply(probe_files, function(name) file_sha256(file.path(origin$root, name))), probe_files),
+    offline = offline, pull = pull, preserved = preserved))
+  if (exists(probe_key, envir = .runtime_cache, inherits = FALSE)) {
+    value <- get(probe_key, envir = .runtime_cache, inherits = FALSE)
+    value$root <- origin$root
+    return(value)
+  }
   identity <- c(runtime_image(entry$image, entry$platform,
-    if (offline) "never" else Sys.getenv("PAPER_DOCKER_PULL", "missing"), preserved), list(package_url = entry$package_url))
+    pull, preserved), list(package_url = entry$package_url))
   probe <- file.path(output, ".runtime", probe_key)
   result <- runtime_launch(binding$origin$root, probe, job$key, identity, "info", 40)
   native <- jsonlite::fromJSON(result$stdout, simplifyVector = FALSE)
   if (!is.list(native) || !is.character(native$r) || !is.character(native$quarto)) stop("Runtime did not identify R and Quarto")
+  if (scope == "component_environment" && !identical(native$scope, scope))
+    stop("Runtime did not confirm its declared component environment inventory")
   descriptor <- c(identity, list(entrypoint = "Makefile:inside-job", rendering_entrypoint = "Makefile:render"))
   software <- c(native, list(container = identity$image, image_id = identity$image_id,
     image_kind = identity$image_kind, platform = identity$platform, rootfs_diff_ids = identity$rootfs_diff_ids))
