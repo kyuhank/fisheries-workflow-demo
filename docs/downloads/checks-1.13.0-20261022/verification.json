@@ -2,7 +2,7 @@
   "schema_version": 1,
   "version": "1.13.0",
   "checked_date": "2026-10-22",
-  "status": "execution_and_archive_passed_final_browser_ci_pending",
+  "status": "execution_archive_ci_passed_frontend_functionality_validated_from_captures",
   "source": {
     "coordinator_repository": "https://github.com/kyuhank/fisheries-workflow-demo",
     "calculation_commit": "2a8dc292696fa42866b1f28139c23510dc75f140",
@@ -21,7 +21,9 @@
       "scripts/check-handover.py": "aae6809a9316eb35852432eb80a75a29b9847afe9cdaa1161594eed87dd0b066",
       "app/cloud.js": "068bd261b84c032497a13c3359955369048bda5fb185f59c19b314b68e023a61"
     },
-    "hosted_execution_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476"
+    "hosted_execution_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
+    "verified_ci_commit": "b6d19728f2d272628909d4967599580f3c984a56",
+    "fresh_live_selection_commit": "a6820ccec9a3abdb3c4425bcc7efa6d19709dc92"
   },
   "archive": {
     "file": "fisheries-workflow-offline-1.13.0.zip",
@@ -162,41 +164,36 @@
       "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39764878403"
     },
     "final_interface": {
-      "status": "pending",
-      "source_commit": null,
+      "status": "passed",
+      "source_commit": "b6d19728f2d272628909d4967599580f3c984a56",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39776621497",
       "workflow_sha256": "e030df920fc84d5d41eb9c41385b0d505f25d4c98c143716bce212ee25e762f4",
-      "scope": "The reviewed workflow repair pins Ubuntu 24.04, selects the official HTTPS archive and bounds APT retries/timeouts. Two saved-PDF text assertions now match the frozen titles and analysts. Both browsers and all checks remain required.",
-      "test_sources_sha256": {
-        "scripts/check-diagram.py": "e260304b9a38b0d6c29793b26b8eb43c91ab13ccbffba07007fbd3d9e7a7e094",
-        "scripts/check-orchestration.py": "c4816e2e966377eba6d67ac1e39cc5f2e5daf4f7ff1d40e15de5e7e2e9b72ba5",
-        "scripts/pdf_checks.py": "599a37ef8affee87b023c3e04ab8f62c1a39432d17ffdf774e695a4714abb0bf",
-        "scripts/check-reports.py": "374db004d441d1040b085ec22b8d13d8d6d0d71bea28974f908ace13bf1b0ccc",
-        "scripts/check-mse.py": "67e0a10e5f66884dcae5aae88fb8acde9276733d1a28753e3d20cc88b60bf264"
+      "browsers": {
+        "chromium": {
+          "status": "passed",
+          "saved_node_positions": 88,
+          "live_node_positions": 704,
+          "selection_and_output": "passed"
+        },
+        "webkit": {
+          "status": "passed",
+          "saved_node_positions": 88,
+          "live_node_positions": 704,
+          "selection_and_output": "passed"
+        }
       },
-      "local_current_pdf_checks": [
-        {
-          "check": "diagram-current-docs",
-          "status": "passed",
-          "elapsed_seconds": 7.585316175012849
-        },
-        {
-          "check": "orchestration-current-docs",
-          "status": "passed",
-          "elapsed_seconds": 8.836100412998348
-        }
+      "checks": [
+        "All 22 saved Quarto PDFs and retained sources",
+        "Records and input navigation",
+        "Connection and settings fixtures",
+        "Saved orchestration views",
+        "Current CPUE model/conversion/index text",
+        "MSE guardrail and illustrative-risk scope",
+        "16 manual-transfer and interrupted-request fixtures"
       ],
-      "local_current_content_checks": [
-        {
-          "check": "reports-current-docs",
-          "status": "passed",
-          "elapsed_seconds": 7.1327221089741215
-        },
-        {
-          "check": "mse-current-docs",
-          "status": "passed",
-          "elapsed_seconds": 6.629808734054677
-        }
-      ]
+      "job_started_at": "2026-10-22T12:13:47Z",
+      "job_completed_at": "2026-10-22T12:17:41Z",
+      "scope": "The complete combined CI job passed. Earlier failed runs remain unchanged below."
     },
     "interface_f19": {
       "status": "cancelled",
@@ -251,6 +248,16 @@
         "MSE: old scope wording no longer matched the frozen report's explicit guardrail and risk scope."
       ],
       "scope": "Both browser layout checks passed. The combined CI remained failed on content assertions and is retained as failed."
+    },
+    "calculation_a682": {
+      "status": "passed",
+      "source_commit": "a6820ccec9a3abdb3c4425bcc7efa6d19709dc92",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39775093990"
+    },
+    "pages_b6d": {
+      "status": "passed",
+      "source_commit": "b6d19728f2d272628909d4967599580f3c984a56",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39776620560"
     }
   },
   "native_publication_payload": {
@@ -323,7 +330,7 @@
       }
     ],
     "timing_scope": "Full gates include service polling, publication, downloads and validation. Preparation and calculation/PDF spans are reported separately; these are observed runs, not a controlled benchmark.",
-    "deployed_frontend_attachment": "pending",
+    "deployed_frontend_attachment": "Earlier attachment failed; the separate new actual five-job frontend run is validated from preserved captures below.",
     "actual_publication_size_guard": "passed; exact final hosted wire byte count was not separately logged",
     "backend": {
       "source_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
@@ -577,6 +584,34 @@
       "live_node_positions_per_browser": 704,
       "reason": "Two content checks still expected earlier wording: an extractable CPUE legend label and the earlier MSE explanatory scope.",
       "resolution": "Require the actual CPUE model, nominal conversion, units and assessment index text, and the current 40% starting-biomass guardrail with illustrative-risk scope. PDF hashes, plotted output checks, analyst/run records and all other checks remain required. The next complete CI result is pending."
+    },
+    {
+      "check": "Earlier deployed-interface inspector cache",
+      "status": "failed_harness_capture",
+      "execution_source_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
+      "served_ui_commit": "0faf5548bcd3432de86d0624fd30e2f657c09974",
+      "reason": "The 18 MB navigation body was evicted from Chromium's inspector cache before hashing.",
+      "scope": "The page GET succeeded with the expected bytes; no completed-record/PDF/ZIP browser checks were reached."
+    },
+    {
+      "check": "Earlier read-only completion attachment",
+      "status": "completion_wait_failed_underlying_state_unknown",
+      "reason": "After increasing the local inspector buffer, the helper timed out waiting for completion. Response bodies and final DOM were not captured.",
+      "real_write_requests": 0,
+      "scope": "Successful state delivery, expiry and the underlying cause remain unestablished. The original three strict hosted gates are unaffected."
+    },
+    {
+      "check": "New five-job browser helper",
+      "status": "failed_harness_assertion",
+      "execution_source_commit": "a6820ccec9a3abdb3c4425bcc7efa6d19709dc92",
+      "reason": "It incorrectly required record-object iteration order to equal the ordered run array.",
+      "scope": "Actual UI completion and the exact five records were captured. The failed receipt remains failed."
+    },
+    {
+      "check": "Read-only five-job continuation helper",
+      "status": "failed_final_assertion",
+      "reason": "It displayed and verified all five PDFs and downloaded the ZIP before a final assertion failed; the exact assertion line and cause were not captured.",
+      "scope": "No new run or write request was made. Preserved PDF/download files and source/runtime/GitHub/publication checks pass independently; no automated browser-script pass is claimed."
     }
   ],
   "limits": [
@@ -599,5 +634,68 @@
     "standalone_browser_status": "passed",
     "standalone_browser_elapsed_seconds": 14.4652220539283,
     "scope": "The prior archive passed separately. The current archive above has its own fresh execution and browser evidence."
+  },
+  "live_frontend_functional_validation": {
+    "status": "validated_from_preserved_actual_captures",
+    "execution_source_commit": "a6820ccec9a3abdb3c4425bcc7efa6d19709dc92",
+    "ui_generation_commit": "0faf5548bcd3432de86d0624fd30e2f657c09974",
+    "served_ui_html_sha256": "3cde958f553af51b0e3241a743bfd801ee6cc9b8ee6d4a7d09d9f224e7da968d",
+    "github_run": "39776124875",
+    "github_conclusion": "success",
+    "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39776124875",
+    "run_jobs": [
+      "submission",
+      "qc",
+      "database",
+      "extract",
+      "cpue_a"
+    ],
+    "retained_jobs": [],
+    "actual_ui_terminal": "Results are ready; 5 jobs completed; 0 retained",
+    "real_session_posts": 1,
+    "real_run_posts": 1,
+    "additional_real_posts": 0,
+    "replayed_runs": 0,
+    "original_browser_harness": "failed",
+    "continuation_browser_harness": "failed",
+    "automated_harness_pass_claimed": false,
+    "independent_read_only_source_runtime_publication_validation": "passed",
+    "checked_pdfs": {
+      "submission": {
+        "analyst": "Data provider",
+        "run_id": "Run 001",
+        "pdf_sha256": "3988fdaf4a3818638aa76f440e94845c86665b92db1c7be4cf081e46c7823d3f",
+        "upstream_records_checked": 0
+      },
+      "qc": {
+        "analyst": "Data curator",
+        "run_id": "Run 001",
+        "pdf_sha256": "5ec2a82308bc01aac63603eee891c4b36c48c923c2e7f49714901e5c058e5311",
+        "upstream_records_checked": 1
+      },
+      "database": {
+        "analyst": "Data curator",
+        "run_id": "Run 001",
+        "pdf_sha256": "daa13cd17f4a88e834885dec86d93c1808d6393ce409fba270336e5b2f209b85",
+        "upstream_records_checked": 1
+      },
+      "extract": {
+        "analyst": "Data analyst",
+        "run_id": "Run 001",
+        "pdf_sha256": "632cf53790749322430deff3d50294a38e4d332eeb045f46fd9da40a2236394d",
+        "upstream_records_checked": 1
+      },
+      "cpue_a": {
+        "analyst": "CPUE analyst",
+        "run_id": "Run 001",
+        "pdf_sha256": "b8a770d8ddeaf84ae0691d118cbbf3dc4416da375433ff9ae40ab3468f050552",
+        "upstream_records_checked": 1
+      }
+    },
+    "downloaded_zip_bytes": 5228225,
+    "downloaded_zip_sha256": "a53c0dc98896b1680515b1f4670cd5ae84bf8f998ad80508e3f63c1e7f898cea",
+    "request_to_first_launch_seconds": 104.757,
+    "timing_scope": "One observed UI run. The earlier three hosted gates observed 73\u201382 seconds to first launch; these observations do not establish a causal performance improvement.",
+    "scope": "The real UI reached completion and the five displayed PDFs, analyst/run/upstream identities and downloaded ZIP were verified from preserved captures and an independently passing read-only reconciliation. Both browser-helper failure receipts remain failed."
   }
 }

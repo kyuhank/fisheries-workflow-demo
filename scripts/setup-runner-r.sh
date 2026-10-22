@@ -19,6 +19,9 @@ if ! test -x "$runner_r_bin/Rscript"; then
     "https://cdn.rstudio.com/r/ubuntu-2404/pkgs/r-${runner_r_version}_1_amd64.deb" \
     --output "$runner_r_deb"
   printf '%s  %s\n' '899c1b7e1875e4e46f0006f212772c6f9f1e4328fefd48eec2705fbabbb2b7f3' "$runner_r_deb" | sha256sum --check
+  # Keep dependency downloads on the official HTTPS mirror with finite waits.
+  sudo sed -i 's|http://azure\.archive\.ubuntu\.com/ubuntu/|https://archive.ubuntu.com/ubuntu/|' /etc/apt/apt-mirrors.txt
+  printf '%s\n' 'Acquire::Retries "2";' 'Acquire::http::Timeout "20";' 'Acquire::https::Timeout "20";' | sudo tee /etc/apt/apt.conf.d/80-runner-r > /dev/null
   sudo env DEBIAN_FRONTEND=noninteractive apt-get update -qq
   sudo env DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends "$runner_r_deb"
 fi

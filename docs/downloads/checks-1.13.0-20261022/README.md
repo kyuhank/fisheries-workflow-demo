@@ -1,6 +1,6 @@
 # Version 1.13.0 checks
 
-Local, offline and hosted execution checks passed. The final browser CI check is pending.
+Local, offline, hosted execution and browser CI checks passed.
 
 | Check | Result |
 | --- | --- |
@@ -9,7 +9,7 @@ Local, offline and hosted execution checks passed. The final browser CI check is
 | Job PDFs | One page each; producing analyst, run and incoming result links checked |
 | Runtime preparation | Three environment inventories; separate calculation and rendering containers for every job |
 | Standalone archive | All 22 saved PDFs, Data/Inputs & versions tabs and downloads checked |
-| Status layout | Text stays inside cards and clears View at desktop/mobile widths and 125% zoom |
+| Status layout | Chromium and WebKit pass desktop/mobile widths and 125% zoom; text stays inside cards and clears View |
 | Input transfer | 16 local service fixtures cover manual transfer, Connect, updates and interrupted requests |
 
 Inspect a job PDF: [CPUE](../../example/cpue_report/report.pdf) · [assessment](../../example/assessment_report/report.pdf) · [MSE](../../example/mse_report/report.pdf).
@@ -17,6 +17,8 @@ Inspect a job PDF: [CPUE](../../example/cpue_report/report.pdf) · [assessment](
 [Download the archive](../fisheries-workflow-offline-1.13.0.zip) · [Exact sources, PDF checksums, numerical tolerances and retained failures](verification.json).
 
 Live checks also passed for the complete workflow, a growth-rate update with manual transfer, and an MSE-buffer update. They verified accepted outputs, PDFs and retained records. [Run details and timings](verification.json) distinguish hosted execution from local reproduction.
+
+A new live CPUE A run reached ‘Results are ready’. Its five PDFs and downloaded ZIP were verified from captured outputs and independent read-only checks. Both browser helpers retained failed assertion receipts; no helper-script pass is claimed. [Full browser CI](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39776621497) passed separately.
 
 Sources: [coordinator](https://github.com/kyuhank/fisheries-workflow-demo/tree/1f3bb8740c5db464656918802f06c83fad67b15b), [producing version](https://github.com/kyuhank/fisheries-workflow-demo/tree/2a8dc292696fa42866b1f28139c23510dc75f140), [CPUE](https://github.com/kyuhank/fisheries-workflow-cpue-demo/tree/7d17fc5962466cdabc27d17e004bed87136b38bc), [assessment](https://github.com/kyuhank/fisheries-workflow-assessment-demo/tree/50412b29afff933601eb2c04ffa56b71702538ac), [MSE](https://github.com/kyuhank/fisheries-workflow-mse-demo/tree/bfd7066a5b7fad6bc302bf311d63b20e32dfa9a4).
 
