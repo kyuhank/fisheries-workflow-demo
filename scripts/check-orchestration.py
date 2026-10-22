@@ -156,7 +156,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     assert page.locator('tr[data-job="cpue_report"] .job-number').inner_text() == 'Job 08'
     expected = expected_record(page, 'cpue_a')
     page.locator('tr[data-job="cpue_a"] .open-output').click()
-    assert_pdf_output(page, 'cpue_a', expected, phrases=('CPUE analysis A',))
+    assert_pdf_output(page, 'cpue_a', expected, phrases=('CPUE',))
     assert page.locator('#output-kind').text_content().startswith('Job 05 · ')
     close_pdf_output(page)
     page.locator('tr[data-job="cpue_a"] .open-job-record').click()

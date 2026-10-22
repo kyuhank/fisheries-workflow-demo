@@ -280,7 +280,8 @@ local_api <- function(backend, method, path, query = list(), body = NULL, author
   local_error('Unknown local operation.', 404L)
 }
 local_query <- function(value) {
-  if (!nzchar(value %||% '')) return(list())
+  value <- sub('^\\?', '', value %||% '')
+  if (!nzchar(value)) return(list())
   result <- list()
   for (pair in strsplit(value, '&', fixed = TRUE)[[1L]]) {
     pieces <- strsplit(pair, '=', fixed = TRUE)[[1L]]; key <- utils::URLdecode(pieces[[1L]])

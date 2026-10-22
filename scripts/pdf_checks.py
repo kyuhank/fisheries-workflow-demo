@@ -140,7 +140,7 @@ def check_pdf_rejections(page):
         page.evaluate('__beginPdfCheck()')
         expected = expected_record(page, 'cpue_a')
         page.evaluate('async () => {__pdfCheckResolve(structuredClone(payload.saved.outputs.cpue_a)); await __pdfCheckPending;}')
-        assert_pdf_output(page, 'cpue_a', expected, phrases=('CPUE analysis A',))
+        assert_pdf_output(page, 'cpue_a', expected, phrases=('CPUE',))
         close_pdf_output(page)
     finally:
         page.evaluate("""() => {

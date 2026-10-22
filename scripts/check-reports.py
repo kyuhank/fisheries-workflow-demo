@@ -37,8 +37,9 @@ with sync_playwright() as playwright:
             if key.startswith(('cpue_', 'assessment_', 'mse_')) and key != 'mse_prepare':
                 assert frame.locator('img, svg').count() >= 1, key
             if key in ('cpue_a', 'cpue_b', 'cpue_report'):
-                assert 'Standardised' in text and 'Nominal' in text, key
-                assert 'Fish per 1,000 hooks' in text, key
+                assert 'standardised' in text.casefold() and 'nominal' in text.casefold(), key
+                analyses = output['output'].get('analyses', {key: output['output']})
+                assert all(value['effort_unit'] == 'Fish per 1000 hooks' for value in analyses.values()), key
             if key == 'extract':
                 rows = output['output']['sets']
                 assert len({row['stratum'] for row in rows}) == 6

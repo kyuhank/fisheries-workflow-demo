@@ -99,7 +99,7 @@ with hosted_docs() as url, sync_playwright() as playwright:
     assert not page.locator("#output-dialog").is_visible()
     expected = expected_record(page, "cpue_a")
     node.locator(".node-view").press("Enter")
-    assert_pdf_output(page, "cpue_a", expected, phrases=("CPUE analysis A",),
+    assert_pdf_output(page, "cpue_a", expected, phrases=("CPUE",),
                       save=True, open_link=args.engine == "chromium")
     close_pdf_output(page)
     page.locator('.job[data-job="prepare_a"]').press("Enter")

@@ -43,7 +43,7 @@ with sync_playwright() as playwright:
             assert frame.locator('details, summary').count() == 0
             expect(frame.locator('table:visible').first).to_be_visible()
         assert 'true starting biomass' in body and 'conditional on' in body
-        assert 'not a validated stock-wide abundance' in body
+        assert 'not validated as stock-wide' in body
         assert page.evaluate('Object.keys(currentOutput.record.inputs)') == ['mse_prepare']
         close_pdf_output(page)
     reports = {}
@@ -53,14 +53,13 @@ with sync_playwright() as playwright:
         reports[key], _ = assert_pdf_output(page, key, expected, save=True)
         assert reports[key].strip()
         if key == 'mse_summary':
-            assert all(phrase in reports[key] for phrase in ('Catch and final biomass', 'Mean annual realised catch',
-                                                            'Constant catch', 'Index rule', 'Buffered rule'))
+            assert all(phrase in reports[key] for phrase in ('Final B/K', 'Catch (t/y)', 'Constant catch', 'Index rule', 'Buffered rule'))
             assert set(page.evaluate('Object.keys(currentOutput.record.inputs)')) == set(PEERS)
         else:
             assert page.evaluate('Object.keys(currentOutput.record.inputs)') == ['mse_summary']
             rendering = page.evaluate('currentOutput.record.report_rendering')
             assert rendering['engine'] == 'Quarto' and rendering['quarto_executed'] is True
-            assert 'Shared guardrail' in reports[key]
+            assert '40%' in reports[key] and 'true starting biomass' in reports[key]
         close_pdf_output(page)
     assert reports['mse_report'] != reports['mse_summary']
     page.close()

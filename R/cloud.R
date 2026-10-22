@@ -444,7 +444,7 @@ cloud_run <- function(client, directory = file.path(tempdir(), "paper-results"),
   release_saved_bundle(original, bundle, json_read(file.path(root, "build-info.json"))$version)
   body <- list(operation_id = cloud_uuid(), checkpoint = cloud_checkpoint(directory),
     bundle = cloud_base64_encode(cloud_bytes(bundle)), state = workflow_state(runner),
-    result = if (is.list(result)) result[setdiff(names(result), c("records", "jobs"))] else result,
+    result = if (is.list(result)) result[setdiff(names(result), "jobs")] else result,
     error = error, pending_events = cloud_pending(delivery))
   # Preserve the exact payload locally if an uncertain service response exhausts retries.
   json_write(body, file.path(dirname(delivery$path), "finish.json"))

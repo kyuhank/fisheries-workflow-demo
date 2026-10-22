@@ -235,7 +235,7 @@ class CloudRun {
             this.run.error || "The online execution ended before completing.",
           );
         }
-        const finalRecords = update.state?.records || this.run.result?.records;
+        const finalRecords = this.run.result?.records || update.state?.records;
         if (!finalRecords) throw Error("The completed run has no producing records.");
         this.records = finalRecords;
         this.run.result = { ...this.run.result, records: finalRecords };

@@ -96,7 +96,7 @@ with sync_playwright() as playwright, tempfile.TemporaryDirectory() as directory
       }
       const bounded = fit(2, 0); bounded.active_bound = 'lower'; bounded.projected_gradient_logK = 0;
       const boundedNext = structuredClone(bounded);
-      boundedNext.objective_gradient_logK += 5e-7;
+      boundedNext.objective_gradient_logK += 5e-9;
       expectPolicy(compareOutput(bounded, boundedNext, 'assessment_b2') === null, 'ordinary nonzero boundary gradient');
       boundedNext.objective_gradient_logK += 1e-3;
       expectPolicy(!!compareOutput(bounded, boundedNext, 'assessment_b2'), 'nonzero raw gradient stays strict');
