@@ -239,7 +239,7 @@ class RunnerDatabaseTest(unittest.TestCase):
                                        "'settings',proconfig) from pg_proc where "
                                        "oid='public.paper_runner_finish(uuid,uuid,text,jsonb)'::regprocedure;"))
         self.assertFalse(metadata['definer'])
-        self.assertEqual(set(metadata['settings']), {'search_path=""', 'statement_timeout=20s', 'work_mem=16MB'})
+        self.assertEqual(set(metadata['settings']), {'search_path=""', 'statement_timeout=45s', 'work_mem=16MB'})
         original = json.loads(self.sql("select to_jsonb(proconfig) from pg_proc where "
                                       "oid='public.paper_runner_write(uuid,uuid,text,jsonb)'::regprocedure;"))
         self.assertEqual(original, ['search_path=""'])
@@ -251,6 +251,33 @@ class RunnerDatabaseTest(unittest.TestCase):
                             f"'finish',{literal(json.dumps(self.finish()))}::jsonb); "
                             "select current_setting('statement_timeout')||','||current_setting('lock_timeout');")
         self.assertEqual(settings, '8s,8s')
+
+    def test_finish_budget_migration_preserves_the_receipt_and_other_rpc_settings(self):
+        operation, body = str(uuid.uuid4()), self.finish()
+        self.finish_rpc(operation, 'finish', body)
+        before = self.sql("select jsonb_build_object('body',prosrc,'acl',proacl,"
+                          "'definer',prosecdef) from pg_proc where "
+                          "oid='public.paper_runner_finish(uuid,uuid,text,jsonb)'::regprocedure;")
+        original = self.sql("select to_jsonb(proconfig) from pg_proc where "
+                            "oid='public.paper_runner_write(uuid,uuid,text,jsonb)'::regprocedure;")
+        self.sql("alter function public.paper_runner_finish(uuid,uuid,text,jsonb) "
+                 "set statement_timeout='20s';")
+        migration = (ROOT / 'supabase/migrations/20261022111252_finish_transport_budget.sql').read_text()
+        self.sql(migration)
+        self.sql(migration)
+        after = self.sql("select jsonb_build_object('body',prosrc,'acl',proacl,"
+                         "'definer',prosecdef) from pg_proc where "
+                         "oid='public.paper_runner_finish(uuid,uuid,text,jsonb)'::regprocedure;")
+        self.assertEqual(before, after)
+        settings = json.loads(self.sql("select to_jsonb(proconfig) from pg_proc where "
+                                       "oid='public.paper_runner_finish(uuid,uuid,text,jsonb)'::regprocedure;"))
+        self.assertEqual(set(settings), {'search_path=""', 'statement_timeout=45s', 'work_mem=16MB'})
+        self.assertEqual(original, self.sql("select to_jsonb(proconfig) from pg_proc where "
+                                           "oid='public.paper_runner_write(uuid,uuid,text,jsonb)'::regprocedure;"))
+        self.finish_rpc(operation, 'finish', body)
+        self.assertEqual(self.value('count(*)', 'paper_runner_receipts'), '1')
+        self.assertEqual(self.value('status', 'paper_runs'), 'complete')
+        self.assertEqual(self.state(), 'final')
 
     def test_late_setup_message_does_not_move_a_handover_backwards(self):
         self.write(str(uuid.uuid4()), 'event', self.event('handover', 'waiting'))

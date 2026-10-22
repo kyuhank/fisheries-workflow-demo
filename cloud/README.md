@@ -5,10 +5,10 @@ A private GitHub App starts `live.yml` in this repository. Its installation toke
 is restricted to this repository, with Actions write and Contents read permission;
 no GitHub credential is returned to the visitor.
 
-The standard GitHub runner downloads the image pinned in `live.yml`. The container
-retrieves the preserved WCPFC projection from PostgreSQL, runs the `jobs/*/run.R` entry
-points and renders all 22 Quarto result views and reports. It saves the outputs, reports and a
-portable run bundle. The runner authenticates with GitHub OIDC;
+The GitHub runner retrieves the pinned analysis repositories and starts the host R
+coordinator. Each job runs its component’s Makefile in its assigned immutable image.
+The coordinator retrieves the preserved WCPFC projection from PostgreSQL and saves
+results, execution records and a portable run bundle. The runner authenticates with GitHub OIDC;
 the API verifies the repository, owner, workflow, branch, event, commit and run.
 A reader's random session capability permits access only to that temporary session.
 The API accepts supplied settings, not arbitrary commands, repositories or queries.
@@ -29,12 +29,11 @@ The API accepts supplied settings, not arbitrary commands, repositories or queri
   a day. The hosting uses Supabase Free and public standard GitHub runners.
   No paid runner or service upgrade is enabled. Free-service limits or inactivity
   can interrupt online execution. Downloaded results remain readable.
-- The atomic completion RPC has a 20-second SQL limit and a transaction-scoped
-  16 MB `work_mem` setting, hoisted before the generated SQL materialises its
-  large JSON argument.
-  Nested writes share that setting; memory use can exceed 16 MB. Other RPCs keep
-  the database default. A failed completion leaves the prior checkpoint for
-  recovery, but Run download is available only after successful publication.
+- The atomic completion RPC has a 45-second SQL limit and a transaction-scoped
+  16 MB `work_mem` setting. This is not a total memory limit. The API makes one
+  database attempt with a 50-second deadline; the R runner checks the original
+  receipt before retrying an uncertain completion. Other RPCs keep their existing
+  limits. Run downloads require completed publication and a recorded archive.
 
 ## Hosting another copy
 

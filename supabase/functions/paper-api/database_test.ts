@@ -173,7 +173,7 @@ Deno.test("an aborted read retries within the ordinary deadline without exposing
   });
 });
 
-Deno.test("a large finish keeps its original bytes and receipt after a lost response", async () => {
+Deno.test("a large finish preserves its bytes and uses one longer database request", async () => {
   await inspectTransport(async (deadlines, diagnostics) => {
     const operation = "00000000-0000-4000-8000-000000000002";
     const body = {
@@ -196,36 +196,25 @@ Deno.test("a large finish keeps its original bytes and receipt after a lost resp
       async (url, options) => {
         urls.push(String(url));
         requests.push(String(options!.body));
-        if (requests.length === 1) {
-          // A changed caller object must not mutate an already submitted receipt.
-          body.p_body.checkpoint = "private changed checkpoint";
-          return new Response("private database response", { status: 503 });
-        }
+        body.p_body.checkpoint = "private changed checkpoint";
         return Response.json(null);
       },
     );
     const result = await db("rpc/paper_runner_write", "POST", body);
     if (
-      result !== null || requests.length !== 2 ||
+      result !== null || requests.length !== 1 ||
       requests.some((value) => value !== original) ||
       requests.some((value) => JSON.parse(value).p_operation !== operation) ||
       urls.some((url) => url !== "https://private.invalid/rest/v1/rpc/paper_runner_finish") ||
-      JSON.stringify(deadlines) !== "[25000,25000]"
-    ) throw Error("Large result custody changed during its receipt retry.");
-    const observed = diagnostics[0]?.[1] as Record<string, unknown>;
-    if (
-      diagnostics.length !== 1 || observed.class !== "HTTPError" ||
-      observed.phase !== "runner_finish" || observed.status !== 503 ||
-      JSON.stringify(diagnostics).includes("private") ||
-      JSON.stringify(diagnostics).includes(operation)
-    ) throw Error("Finish diagnostics exposed data or lost their phase.");
+      JSON.stringify(deadlines) !== "[50000]" || diagnostics.length !== 0
+    ) throw Error("The finish bytes, endpoint or database request budget changed.");
     await db("rpc/paper_runner_write", "POST", {
       p_operation: operation,
       p_action: "event",
       p_body: { event: { state: "running" } },
     });
-    if (deadlines[2] !== 8000 ||
-      urls[2] !== "https://private.invalid/rest/v1/rpc/paper_runner_write") {
+    if (deadlines[1] !== 8000 ||
+      urls[1] !== "https://private.invalid/rest/v1/rpc/paper_runner_write") {
       throw Error("The finish path or deadline leaked into ordinary event delivery.");
     }
   });
@@ -250,12 +239,12 @@ Deno.test("an interrupted finish remains bounded and cannot claim success", asyn
     } catch (error) {
       if (
         !(error instanceof DatabaseError) || !error.retryable ||
-        attempts !== 3 || JSON.stringify(deadlines) !== "[25000,25000,25000]" ||
+        attempts !== 1 || JSON.stringify(deadlines) !== "[50000]" ||
         error.message !== "The database connection was interrupted."
       ) throw Error("Finish failure bounds or public error changed.");
     }
     if (
-      diagnostics.length !== 3 ||
+      diagnostics.length !== 1 ||
       diagnostics.some((entry) => {
         const value = entry[1] as Record<string, unknown>;
         return value.class !== "OtherError" || value.phase !== "runner_finish" ||
@@ -288,7 +277,7 @@ Deno.test("the restricted finish endpoint rejects an event without retries or a 
   });
 });
 
-Deno.test("a direct finish RPC retries only the same acknowledged receipt", async () => {
+Deno.test("a direct finish leaves a lost response to the runner's receipt check", async () => {
   await inspectTransport(async (deadlines) => {
     const body = { p_request: "fixed-run", p_operation: "fixed-operation", p_action: "finish", p_body: {} };
     const original = JSON.stringify(body), requests: string[] = [];
@@ -297,16 +286,49 @@ Deno.test("a direct finish RPC retries only the same acknowledged receipt", asyn
         throw Error("The direct finish receipt changed endpoints.");
       }
       requests.push(String(options!.body));
-      if (requests.length === 1) {
-        body.p_operation = "changed caller";
-        throw new TypeError("lost response after commit");
-      }
-      return Response.json(null);
+      body.p_operation = "changed caller";
+      throw new TypeError("lost response after commit");
     });
-    const result = await db("rpc/paper_runner_finish", "POST", body);
-    if (result !== null || requests.length !== 2 || requests.some((r) => r !== original) ||
-      JSON.stringify(deadlines) !== "[25000,25000]") {
-      throw Error("The direct finish receipt was not repeated safely.");
+    try {
+      await db("rpc/paper_runner_finish", "POST", body);
+      throw Error("An unacknowledged finish claimed success.");
+    } catch (error) {
+      if (!(error instanceof DatabaseError) || !error.retryable ||
+        requests.length !== 1 || requests[0] !== original ||
+        JSON.stringify(deadlines) !== "[50000]") {
+        throw Error("The direct finish was repeated before the runner's receipt check.");
+      }
     }
   });
+});
+
+Deno.test("finish HTTP and truncated-response failures are returned without an inner retry", async () => {
+  for (const status of [400, 401, 403, 429, 500, 502, 503, 504, 200]) {
+    await inspectTransport(async (deadlines, diagnostics) => {
+      let attempts = 0;
+      const db = createDatabase("https://private.invalid", "private-key", async () => {
+        attempts++;
+        return new Response(status === 200 ? '{"incomplete":' : "private SQL details", { status });
+      });
+      try {
+        await db("rpc/paper_runner_write", "POST", {
+          p_action: "finish", p_operation: "private-operation",
+        });
+        throw Error("An unacknowledged finish claimed success.");
+      } catch (error) {
+        if (!(error instanceof DatabaseError) ||
+          error.retryable !== ![400, 401, 403].includes(status) || attempts !== 1 ||
+          JSON.stringify(deadlines) !== "[50000]" || error.message.includes("private")) {
+          throw Error("A finish failed to preserve its single-attempt error contract.");
+        }
+      }
+      const observed = diagnostics[0]?.[1] as Record<string, unknown>;
+      if (diagnostics.length !== 1 || observed.phase !== "runner_finish" ||
+        observed.class !== (status === 200 ? "SyntaxError" : "HTTPError") ||
+        observed.status !== status ||
+        JSON.stringify(diagnostics).includes("private")) {
+        throw Error("Finish diagnostics exposed data or lost their phase.");
+      }
+    });
+  }
 });

@@ -160,7 +160,7 @@ grant execute on function public.paper_runner_write to service_role;
 -- Delegate to the same atomic receipt function without changing its payload.
 create or replace function public.paper_runner_finish(
  p_request uuid,p_operation uuid,p_action text,p_body jsonb
-) returns void language plpgsql security invoker set search_path='' set statement_timeout='20s' set work_mem='16MB' as $$
+) returns void language plpgsql security invoker set search_path='' set statement_timeout='45s' set work_mem='16MB' as $$
 begin
  if p_action is distinct from 'finish' then
   raise exception 'Invalid completed execution action';

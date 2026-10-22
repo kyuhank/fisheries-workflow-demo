@@ -4,21 +4,23 @@ export class DatabaseError extends Error {
   }
 }
 
-/** Retry reads, repeatable patches and the transactional runner receipt RPC. */
+/** Retry reads, repeatable patches and ordinary runner receipt writes. */
 export function createDatabase(url: string, key: string, transport = fetch) {
   return async function db(path: string, method = "GET", body?: unknown) {
     const runnerWrite = method === "POST" &&
       ["rpc/paper_runner_write", "rpc/paper_runner_finish"].includes(path);
     const repeatable = ["GET", "PATCH"].includes(method) || runnerWrite;
-    const attempts = repeatable ? 3 : 1;
     const finish = runnerWrite &&
       (body as { p_action?: unknown } | undefined)?.p_action === "finish";
+    // The runner retries a finish after reading its atomic receipt. Avoid a
+    // second retry loop here while an earlier database request may still run.
+    const attempts = finish ? 1 : repeatable ? 3 : 1;
     // PostgREST hoists the finish RPC's finite SQL budget before executing it.
     // Preserve the request envelope and the original receipt implementation.
     const transportPath = finish ? "rpc/paper_runner_finish" : path;
     // A finish carries the checkpoint and reproducibility bundle. Give that
     // transport more time; PostgreSQL's own statement/lock limits still apply.
-    const deadline = finish ? 25000 : 8000;
+    const deadline = finish ? 50000 : 8000;
     const phase = finish ? "runner_finish"
       : runnerWrite ? "runner_write"
       : method === "GET" && path.startsWith("paper_runs?") ? "run_read"
