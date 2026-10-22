@@ -182,7 +182,7 @@ with tempfile.TemporaryDirectory() as directory, sync_playwright() as playwright
     before = run_selection(page)
     expected = expected_record(page, 'mse_prepare')
     card.locator('.open-output').click()
-    assert_pdf_output(page, 'mse_prepare', expected, phrases=('Management trial inputs',))
+    assert_pdf_output(page, 'mse_prepare', expected, phrases=('Prepare MSE', 'MSE analyst'))
     close_pdf_output(page)
     card.locator('.open-job-record').click()
     page.locator('#output-record:visible').wait_for()

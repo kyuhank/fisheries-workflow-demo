@@ -160,7 +160,24 @@
       "status": "pending",
       "source_commit": null,
       "workflow_sha256": "e030df920fc84d5d41eb9c41385b0d505f25d4c98c143716bce212ee25e762f4",
-      "scope": "The reviewed workflow repair pins Ubuntu24.04, selects the official HTTPS archive and bounds APT retries/timeouts. Both browsers and all checks remain required."
+      "scope": "The reviewed workflow repair pins Ubuntu 24.04, selects the official HTTPS archive and bounds APT retries/timeouts. Two saved-PDF text assertions now match the frozen titles and analysts. Both browsers and all checks remain required.",
+      "test_sources_sha256": {
+        "scripts/check-diagram.py": "e260304b9a38b0d6c29793b26b8eb43c91ab13ccbffba07007fbd3d9e7a7e094",
+        "scripts/check-orchestration.py": "c4816e2e966377eba6d67ac1e39cc5f2e5daf4f7ff1d40e15de5e7e2e9b72ba5",
+        "scripts/pdf_checks.py": "599a37ef8affee87b023c3e04ab8f62c1a39432d17ffdf774e695a4714abb0bf"
+      },
+      "local_current_pdf_checks": [
+        {
+          "check": "diagram-current-docs",
+          "status": "passed",
+          "elapsed_seconds": 7.585316175012849
+        },
+        {
+          "check": "orchestration-current-docs",
+          "status": "passed",
+          "elapsed_seconds": 8.836100412998348
+        }
+      ]
     },
     "interface_f19": {
       "status": "cancelled",
@@ -169,6 +186,20 @@
       "reason": "The 10-minute job limit expired during APT browser-dependency downloads.",
       "layout_and_handover_tests": "skipped",
       "webkit_result": "not executed"
+    },
+    "interface_0faf": {
+      "status": "failed",
+      "source_commit": "0faf5548bcd3432de86d0624fd30e2f657c09974",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39774057767",
+      "browser_installation": "passed",
+      "browser_installation_seconds": 92,
+      "failure": "The first Chromium check expected the earlier MSE PDF title. The actual saved PDF title is MSE report.",
+      "webkit_result": "not executed"
+    },
+    "pages_0faf": {
+      "status": "passed",
+      "source_commit": "0faf5548bcd3432de86d0624fd30e2f657c09974",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39774061647"
     }
   },
   "native_publication_payload": {
@@ -473,7 +504,17 @@
       "reason": "APT dependency downloads from the Azure Ubuntu mirror stalled until the job timeout.",
       "test_steps_executed": false,
       "webkit_result": "not executed",
-      "resolution": "Prepared a workflow-only official-mirror/timeout repair; its next CI outcome is pending."
+      "resolution": "The workflow-only official-mirror/timeout repair completed browser installation in92seconds at the next source. That run failed a separate stale PDF-title assertion; the final full CI check remains pending."
+    },
+    {
+      "check": "First browser run after the dependency repair",
+      "status": "failed_harness_assertion",
+      "source_commit": "0faf5548bcd3432de86d0624fd30e2f657c09974",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39774057767",
+      "browser_installation": "passed in 92 seconds",
+      "webkit_result": "not executed",
+      "reason": "A hardcoded earlier MSE report title did not match the frozen current PDF.",
+      "resolution": "Updated two title/analyst text assertions to MSE report/MSE analyst and Prepare MSE/MSE analyst; all PDF-byte/hash and other checks remain required. The next complete CI outcome is pending."
     }
   ],
   "limits": [
