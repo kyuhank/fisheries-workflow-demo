@@ -406,6 +406,7 @@ cloud_run <- function(client, directory = file.path(tempdir(), "paper-results"),
   control <- new.env(parent = emptyenv()); control$transfer_count <- 0L; control$connected <- FALSE
   runner <- NULL
   notify <- function(event, state, output = NULL) {
+    if (identical(event$state, "activity") && isTRUE(event$activity %in% c("preparing", "calculating"))) return(invisible(NULL))
     # The handover callback runs in a child; adopt its returned state in the parent.
     acknowledgment <- state$handover_state
     if (identical(event$state, "received") && is.list(acknowledgment) && !is.null(acknowledgment$transfer_count)) {
@@ -422,7 +423,10 @@ cloud_run <- function(client, directory = file.path(tempdir(), "paper-results"),
         pdf_base64 = cloud_base64_encode(cloud_bytes(file.path(folder, "report.pdf"))),
         record = state$records[[key]], output = json_read(file.path(folder, "output.json")))
     }
-    cloud_publish(delivery, list(event = event, state = state, output = published))
+    body <- list(event = event)
+    if (event$state %in% c("plan", "complete", "received", "failed")) body$state <- state
+    if (!is.null(published)) body$output <- published
+    cloud_publish(delivery, body)
     cat(event$job %||% "workflow", event$state, event$message %||% "", "\n")
   }
   handover <- if (identical(context$handover, "manual")) function(boundary, group)

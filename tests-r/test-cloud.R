@@ -292,7 +292,7 @@ check('hosted callbacks adopt forked acknowledgements and retain final custody',
   json_write(list(version = '0.0.0-test'), file.path(fake_root, 'build-info.json'))
   context <- list(id = request, checkpoint = NULL, settings = list(last_year = 2021L, mse = TRUE), handover = 'manual',
     commit_sha = env('GITHUB_SHA'), github_run = env('GITHUB_RUN_ID'), start_job = 'submission', scope = 'workflow')
-  finished <- NULL; counter_log <- file.path(fake_root, 'counters')
+  finished <- NULL; event_bodies <- list(); counter_log <- file.path(fake_root, 'counters')
   client <- make_client(function(url, headers = list(), payload = NULL, timeout = 30) {
     if (grepl('/context?', url, fixed = TRUE)) return(ok(context))
     if (grepl('/data?', url, fixed = TRUE)) return(ok(list(sets = list(), catch = list())))
@@ -303,6 +303,7 @@ check('hosted callbacks adopt forked acknowledgements and retain final custody',
     }
     body <- jsonlite::fromJSON(rawToChar(payload), simplifyVector = FALSE)
     if (grepl('/finish?', url, fixed = TRUE)) finished <<- body
+    if (grepl('/event?', url, fixed = TRUE)) event_bodies[[length(event_bodies) + 1L]] <<- body
     if (identical(body$event$state, 'handover')) cat('event:', body$event$transfer_count, '\n', file = file.path(fake_root, 'events'), append = TRUE, sep = '')
     ok()
   })
@@ -312,9 +313,15 @@ check('hosted callbacks adopt forked acknowledgements and retain final custody',
     e <- new.env(); e$output <- output; e$notify <- notify; e$handover <- handover; e$execution <- execution; e$handover_state <- list(transfer_count = 99L)
     e
   }
-  workflow_state <- function(runner) list(schema_version = 2L, records = list(job = list(run_id = 'Run 001')), handover_state = runner$handover_state, execution = runner$execution)
+  workflow_state <- function(runner) list(schema_version = 2L,
+    records = list(job = list(run_id = 'Run 001'), retained = list(run_id = 'Run 000', signature = 'original producer')),
+    handover_state = runner$handover_state, execution = runner$execution, fixture_padding = strrep('s', 8192L))
   workflow_run <- function(runner, start, scope) {
     runner$notify(list(state = 'plan'), workflow_state(runner), runner$output)
+    runner$notify(list(state = 'running', job = 'job'), workflow_state(runner), runner$output)
+    runner$notify(list(state = 'activity', activity = 'preparing', job = 'job'), workflow_state(runner), runner$output)
+    runner$notify(list(state = 'activity', activity = 'calculating', job = 'job'), workflow_state(runner), runner$output)
+    runner$notify(list(state = 'activity', activity = 'rendering', job = 'job'), workflow_state(runner), runner$output)
     for (i in 1:2) {
       runner$notify(list(state = 'handover', job = 'job'), workflow_state(runner), runner$output)
       child <- parallel::mcparallel(runner$handover('boundary', 'job'), mc.set.seed = FALSE)
@@ -326,7 +333,7 @@ check('hosted callbacks adopt forked acknowledgements and retain final custody',
     json_write(list(answer = 42), file.path(folder, 'output.json'))
     json_write(workflow_state(runner), file.path(runner$output, 'state.json'))
     runner$notify(list(state = 'complete', job = 'job'), workflow_state(runner), runner$output)
-    list(run_id = 'Run 001', records = list(job = list(run_id = 'Run 001')), jobs = list(job = list(title = 'Job')))
+    list(run_id = 'Run 001', records = workflow_state(runner)$records, jobs = list(job = list(title = 'Job')))
   }
   workflow_bundle <- function(runner, path) writeBin(charToRaw('mock workflow archive'), path)
   cloud_run(client, file.path(fake_root, 'results'))
@@ -336,5 +343,40 @@ check('hosted callbacks adopt forked acknowledgements and retain final custody',
     identical(finished$state$handover_state$transfer_count, 2L))
   restored <- tempfile('finish-checkpoint-'); cloud_restore(finished$checkpoint, restored)
   stopifnot(file.exists(file.path(restored, 'state.json')))
+})
+check('hosted progress keeps ordered transitions without redundant full-state writes', {
+  states <- vapply(event_bodies, function(body) body$event$state, character(1))
+  stopifnot(identical(states, c('plan', 'running', 'activity', 'handover', 'received', 'handover', 'received', 'complete')),
+    identical(event_bodies[[3L]]$event$activity, 'rendering'),
+    !any(vapply(event_bodies, function(body) isTRUE(body$event$activity %in% c('preparing', 'calculating')), logical(1))))
+  for (body in event_bodies) {
+    full <- body$event$state %in% c('plan', 'complete', 'received', 'failed')
+    stopifnot(identical('state' %in% names(body), full),
+      identical('output' %in% names(body), identical(body$event$state, 'complete')))
+    if (!full) stopifnot(nchar(json_encode(body), type = 'bytes') < nchar(json_encode(finished$state), type = 'bytes') / 8)
+  }
+  operations <- vapply(event_bodies, function(body) body$operation_id, character(1))
+  stopifnot(!anyDuplicated(operations), all(grepl('^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$', operations)),
+    identical(event_bodies[[4L]]$event$request_id, request), identical(event_bodies[[4L]]$event$transfer_count, 0L),
+    identical(event_bodies[[6L]]$event$transfer_count, 1L), identical(event_bodies[[5L]]$state$handover_state$transfer_count, 1L),
+    identical(event_bodies[[7L]]$state$handover_state$transfer_count, 2L), isTRUE(event_bodies[[7L]]$state$handover_state$connected))
+  published <- event_bodies[[8L]]$output
+  stopifnot(identical(published$html, '<p>saved output</p>\n'), identical(cloud_base64(published$pdf_base64), charToRaw('%PDF-test')),
+    identical(published$record, finished$state$records$job), identical(published$output, list(answer = 42L)),
+    identical(finished$result$records$retained, list(run_id = 'Run 000', signature = 'original producer')))
+})
+check('hosted failures retain the full state and finish custody', {
+  original_run <- workflow_run
+  workflow_run <- function(runner, start, scope) {
+    json_write(workflow_state(runner), file.path(runner$output, 'state.json'))
+    runner$notify(list(state = 'failed', job = 'job', message = 'fixture calculation failed'), workflow_state(runner), runner$output)
+    stop('fixture calculation failed')
+  }
+  client$request <- '00000000-0000-4000-8000-000000000002'; context$id <- client$request
+  reject(cloud_run(client, file.path(fake_root, 'failed-results')), 'fixture calculation failed')
+  workflow_run <- original_run
+  failure <- tail(event_bodies, 1L)[[1L]]
+  stopifnot(identical(failure$event$state, 'failed'), identical(failure$state, finished$state), !'output' %in% names(failure),
+    identical(finished$error, 'fixture calculation failed'), is.null(finished$result), !length(finished$pending_events))
 })
 cat(length(passed), 'hosted transport and custody fixtures passed. No external service or model used.\n')
