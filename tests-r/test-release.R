@@ -39,8 +39,11 @@ payload<-extract(file.path(restored,'index.html'))
 stopifnot('bundle'%in%names(payload$saved),is.null(payload$saved$bundle),identical(names(payload$saved$outputs),'cpue_a'))
 stopifnot(length(payload$jobs)==22L,payload$cloud$url=='',payload$cloud$data_kind=='public-wcpfc-albacore')
 stopifnot(payload$saved$outputs$cpue_a$record$signature=='invented',is.null(payload$example))
-stopifnot(identical(charToRaw(payload$saved$outputs$cpue_a$html), readBin(file.path(folder,'report.html'),'raw',n=file.info(file.path(folder,'report.html'))$size)))
-stopifnot(identical(digest::digest(charToRaw(payload$saved$outputs$cpue_a$html),algo='sha256',serialize=FALSE),record$outputs[['report.html']]))
+# The archive embeds its canonical PDF; original HTML remains directly available.
+stopifnot(is.null(payload$saved$outputs$cpue_a$html),
+  identical(payload$saved$outputs$cpue_a$pdf_base64, release_base64(readBin(file.path(folder,'report.pdf'),'raw',n=file.info(file.path(folder,'report.pdf'))$size))),
+  identical(file_sha256(file.path(restored,'reference/cpue_a/report.html')), record$outputs[['report.html']]),
+  grepl('reference/cpue_a/report.html',release_text(file.path(restored,'START-HERE.html')),fixed=TRUE))
 stopifnot(!grepl('PREVIOUS_COMPILED_ZIP_MARKER',release_text(file.path(restored,'index.html')),fixed=TRUE))
 for(name in c('data.html','data/fiji-source.csv','data/annual-catch.csv','data/extract.sql'))stopifnot(file.exists(file.path(restored,name)))
 profile<-json_read(file.path(restored,'data/public-source.json'))
@@ -49,7 +52,7 @@ stopifnot(nrow(utils::read.csv(file.path(restored,'data/annual-catch.csv')))==le
 stopifnot(identical(release_text(file.path(restored,'data/extract.sql')),release_text('workflow/extract-public.sql')))
 stopifnot(grepl('Masked catch/effort cells are excluded',release_text(file.path(restored,'data.html')),fixed=TRUE))
 receipt<-json_read(file.path(restored,'INTERFACE.json'))
-stopifnot(!receipt$bundle_embedded,identical(receipt$output_sha256,file_sha256(file.path(restored,'index.html'))))
+stopifnot(!receipt$bundle_embedded,!receipt$html_embedded,identical(receipt$output_sha256,file_sha256(file.path(restored,'index.html'))))
 for(name in names(receipt$source_files))stopifnot(identical(receipt$source_files[[name]],file_sha256(file.path(restored,name))))
 stopifnot(identical(file_sha256(file.path(fixture,'app/app.js')),file_sha256(file.path(restored,'app/app.js'))))
 # A public page can offer exactly the finished clean archive, whose own pages have no ZIP.
@@ -57,6 +60,7 @@ values<-release_values(restored,state)
 encoded<-release_base64(readBin(wrapped,'raw',n=file.info(wrapped)$size))
 public<-release_interface(restored,state,values=values,bundle=encoded)
 stopifnot(identical(public$payload$saved$bundle,encoded),public$receipt$bundle_embedded,!grepl('\n',encoded,fixed=TRUE))
+stopifnot(public$receipt$html_embedded, identical(public$payload$saved$outputs$cpue_a$html,release_text(file.path(folder,'report.html'))))
 # Rewrapping a clean bundle does not carry the prior embedded ZIP forward.
 again<-tempfile(fileext='.zip');release_saved_bundle(wrapped,again,'0.0.0-fixture')
 twice<-tempfile('interface-twice-');dir.create(twice);release_unpack(again,twice)

@@ -98,9 +98,14 @@ release_interface <- function(root, state, values = NULL, bundle = NULL) {
     hashes[["data/public-data.json"]] <- file_sha256(receipt)
   }
   saved <- state; saved$outputs <- values; saved["bundle"] <- list(bundle)
+  # Archive views use the embedded PDFs. Original HTML stays in reference/.
+  if (is.null(bundle)) saved$outputs <- lapply(saved$outputs, function(value) {
+    value$html <- NULL
+    value
+  })
   example <- values$assessment_report
   payload <- list(cloud = cloud, jobs = unname(jobs), diagram = diagram, saved = saved,
-    example = example$html %||% NULL, example_pdf_base64 = example$pdf_base64 %||% NULL,
+    example = if (is.null(bundle)) NULL else example$html %||% NULL, example_pdf_base64 = example$pdf_base64 %||% NULL,
     example_pdf_sha256 = example$record$outputs[["report.pdf"]] %||% NULL,
     notices = paste(release_text(file.path(root, "THIRD_PARTY.md")), release_text(file.path(root, "LICENSE")), sep = "\n\n"),
     calculationBackend = "container", offlineMode = "saved")
@@ -114,7 +119,7 @@ release_interface <- function(root, state, values = NULL, bundle = NULL) {
     template <- gsub(marker, inserts[[name]], template, fixed = TRUE)
   }
   list(html = template, payload = payload, receipt = list(schema_version = 1L,
-    source_files = hashes, saved_state_sha256 = value_sha256(state), saved_state_encoding = "sorted-json-r-v1", bundle_embedded = !is.null(bundle),
+    source_files = hashes, saved_state_sha256 = value_sha256(state), saved_state_encoding = "sorted-json-r-v1", bundle_embedded = !is.null(bundle), html_embedded = !is.null(bundle),
     output_sha256 = digest::digest(charToRaw(paste0(template, "\n")), algo = "sha256", serialize = FALSE)))
 }
 release_data_page <- function(source, root, docs) {
