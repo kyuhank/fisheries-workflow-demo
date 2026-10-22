@@ -18,7 +18,7 @@ From the repository root, run this job and prepare any required inputs:
 make job JOB=assessment_a2
 ```
 
-[run.R](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/6798a63a0ee7d5975d1d1fa2027284073015e0ee/jobs/assessment_a2/run.R) is the entry point. It receives the coordinator’s named
+[run.R](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/50412b29afff933601eb2c04ffa56b71702538ac/jobs/assessment_a2/run.R) is the entry point. It receives the coordinator’s named
 `context` and uses the recorded shared libraries; a copied script is not standalone.
 See the [job guide](../README.md) for container and output options.
 
@@ -26,7 +26,7 @@ See the [job guide](../README.md) for container and output options.
 | --- | --- |
 | `runs/assessment_a2/output.json` | saved calculation result |
 | `runs/assessment_a2/report.pdf` | compiled Quarto result PDF |
-| `runs/assessment_a2/report.html` | result page from [component renderer](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/6798a63a0ee7d5975d1d1fa2027284073015e0ee/R/render.R) |
+| `runs/assessment_a2/report.html` | result page from [component renderer](https://github.com/kyuhank/fisheries-workflow-assessment-demo/blob/50412b29afff933601eb2c04ffa56b71702538ac/R/render.R) |
 | `runs/assessment_a2/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** [Compare assessments (`assessment_summary`)](../assessment_summary/README.md), [Prepare MSE (`mse_prepare`)](../mse_prepare/README.md).

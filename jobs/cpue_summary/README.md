@@ -18,7 +18,7 @@ From the repository root, run this job and prepare any required inputs:
 make job JOB=cpue_summary
 ```
 
-[run.R](https://github.com/kyuhank/fisheries-workflow-cpue-demo/blob/30d5eae3d748d9417fd6cc482faf4994c8d07df8/jobs/cpue_summary/run.R) is the entry point. It receives the coordinator’s named
+[run.R](https://github.com/kyuhank/fisheries-workflow-cpue-demo/blob/7d17fc5962466cdabc27d17e004bed87136b38bc/jobs/cpue_summary/run.R) is the entry point. It receives the coordinator’s named
 `context` and uses the recorded shared libraries; a copied script is not standalone.
 See the [job guide](../README.md) for container and output options.
 
@@ -26,7 +26,7 @@ See the [job guide](../README.md) for container and output options.
 | --- | --- |
 | `runs/cpue_summary/output.json` | saved calculation result |
 | `runs/cpue_summary/report.pdf` | compiled Quarto result PDF |
-| `runs/cpue_summary/report.html` | result page from [component renderer](https://github.com/kyuhank/fisheries-workflow-cpue-demo/blob/30d5eae3d748d9417fd6cc482faf4994c8d07df8/R/render.R) |
+| `runs/cpue_summary/report.html` | result page from [component renderer](https://github.com/kyuhank/fisheries-workflow-cpue-demo/blob/7d17fc5962466cdabc27d17e004bed87136b38bc/R/render.R) |
 | `runs/cpue_summary/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** [CPUE report (`cpue_report`)](../cpue_report/README.md).
