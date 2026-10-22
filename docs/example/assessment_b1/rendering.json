@@ -1,0 +1,68 @@
+{
+  "engine": "Quarto",
+  "version": "1.9.37",
+  "calculation": "R",
+  "quarto_executed": true,
+  "source": "reports/results.qmd",
+  "presentation_source": "reports/results.qmd",
+  "execution_engine": "knitr",
+  "plot_generator": "R from saved results",
+  "models_refitted": false,
+  "simulations_repeated": false,
+  "formats": [
+    "html",
+    "typst"
+  ],
+  "view": "report.pdf",
+  "pdf_engine": "Typst",
+  "pdf_engine_version": "typst 0.14.2 (b33de9de)",
+  "job": "assessment_b1",
+  "timeout_seconds": 300,
+  "input_sha256": {
+    "report-data.json": "974a8fdf2de221cdb851a39061a024f7ad149d90ff0034c17178e7cdbf654d2e"
+  },
+  "presentation_source_sha256": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+  "software": {
+    "R": "R version 4.6.0 (2026-04-24)",
+    "Quarto": "1.9.37",
+    "Typst": "typst 0.14.2 (b33de9de)",
+    "jsonlite": "2.0.0",
+    "knitr": "1.52",
+    "rmarkdown": "2.32",
+    "image": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+  },
+  "commands": [
+    "quarto render report.qmd --to html --output report.html --no-clean",
+    "quarto render report.qmd --to typst --output report.pdf --no-clean"
+  ],
+  "artifacts": [
+    "report.html",
+    "report.pdf",
+    "report.qmd",
+    "report-data.json",
+    "report.typ",
+    "report.html.md",
+    "report.typst.md",
+    "report_files/figure-html/unnamed-chunk-1-1.svg",
+    "report_files/figure-typst/unnamed-chunk-1-1.svg",
+    "report-html.log",
+    "report-typst.log",
+    "report-view.R",
+    "report-job.txt"
+  ],
+  "artifact_sha256": {
+    "report.html": "2757b2670fde9d55e69aaa923ac89fd759a39fabe9cefc15f14f83d8290c44d4",
+    "report.pdf": "bd6eb76c28ece4841ece534312031a3a9336c4e5ab790f2c63da81a695a6468f",
+    "report.qmd": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+    "report-data.json": "974a8fdf2de221cdb851a39061a024f7ad149d90ff0034c17178e7cdbf654d2e",
+    "report.typ": "7c4c8353e67b24f373551909004d0bea97af327c66904ddd349631d4d56d8d53",
+    "report.html.md": "12432b91bb010903270f9821677df6edc60cd24f18a1b2709f775f76644ee03d",
+    "report.typst.md": "7d0f9d50a49b3a9eea847283e90b632285346551eeb2a823a2beb151aed52e67",
+    "report_files/figure-html/unnamed-chunk-1-1.svg": "9379ebebb1e256bbf6bb88120f3a8c0a295369014189bd1c144a3bc5fb8c3fce",
+    "report_files/figure-typst/unnamed-chunk-1-1.svg": "9379ebebb1e256bbf6bb88120f3a8c0a295369014189bd1c144a3bc5fb8c3fce",
+    "report-html.log": "c9626f9a58e7846ef8eabea6b27394219bdf89895677af49ed233519c01eaa14",
+    "report-typst.log": "8993c836c1b877016f1684f3e9946a3600e262a91ec6e65f5a86e1c5d14a59ed",
+    "report-view.R": "ca56c3e303a7afebaed3455f6f0a7cfe123973cbb20d37819ae753e6ba22649e",
+    "report-job.txt": "25d1ea88cb1269a1ff4477573922442592eb8167c0564a23b65702f75ea8e977"
+  }
+}

@@ -30,55 +30,88 @@ margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 
 <body>
 
-<style>body{font:15px/1.5 system-ui,sans-serif;color:#293039;max-width:920px;margin:22px auto;padding:0 22px}h1{font-size:23px;line-height:1.25;font-weight:600;margin:0 0 12px}h2{font-size:17px;font-weight:600;margin:22px 0 8px}p{max-width:80ch;margin:8px 0}small,.muted{color:#626a73}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:8px 10px;border-bottom:1px solid #d8dce0}th{font-weight:600;background:white}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}.note{border-left:2px solid #a48242;padding:6px 12px;background:white}footer{margin-top:22px;border-top:1px solid #d8dce0;padding-top:10px;color:#626a73;font-size:12px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#245b86}.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}.pdf-legend{display:none}</style>
-<h1>Prepare inputs A</h1><article class="result-view" data-result="prepare_a"><p>22 annual index/catch pairs · 2000–2021.</p><p>The saved CPUE index and annual removals are joined by year for the stock model.</p>
-<table class="caption-top">
+
+
+
+
+<style>
+body { max-width: 880px; margin: 24px auto; padding: 0 20px; font: 16px/1.45 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 27px; line-height: 1.2; }
+h2 { font-size: 20px; margin-top: 20px; }
+a { color: #1779a0; overflow-wrap: anywhere; }
+img, svg { max-width: 100%; height: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 6px; border-bottom: 1px solid #dde5eb; text-align: left; }
+.cell-output-display { overflow-x: auto; }
+</style>
+<h1 id="assessment-inputs-a">Assessment inputs A</h1>
+<p>22 annual index/catch pairs, 2000–2021.</p>
+<table>
 <thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th">Relative CPUE</th>
-<th data-quarto-table-cell-role="th">Catch (t)</th>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:left;">
+Relative CPUE
+</th>
+<th style="text-align:left;">
+Removals (t)
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td>2000</td>
-<td>1</td>
-<td>49980</td>
+<tr>
+<td style="text-align:left;">
+2000
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+49980
+</td>
 </tr>
-<tr class="even">
-<td>2001</td>
-<td>0.8098</td>
-<td>65636</td>
+<tr>
+<td style="text-align:left;">
+2001
+</td>
+<td style="text-align:left;">
+0.8098
+</td>
+<td style="text-align:left;">
+65640
+</td>
 </tr>
-<tr class="odd">
-<td>2002</td>
-<td>0.7066</td>
-<td>77856</td>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+0.3949
+</td>
+<td style="text-align:left;">
+72600
+</td>
 </tr>
-<tr class="even">
-<td>2003</td>
-<td>0.562</td>
-<td>65395</td>
-</tr>
-<tr class="odd">
-<td>2004</td>
-<td>0.7018</td>
-<td>65470</td>
-</tr>
-<tr class="even">
-<td>2005</td>
-<td>0.7437</td>
-<td>67016</td>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+0.5626
+</td>
+<td style="text-align:left;">
+70330
+</td>
 </tr>
 </tbody>
 </table>
-<p class="muted">First six years shown.</p></article><p>The selected Fiji fleet index is not a validated stock-wide abundance index. Using it with stock-wide catches is a teaching assumption.</p>
-
-
-
-
-<!-- Both bodies use the same saved result. No executable cells or model fitting. -->
+<p>Joined by year. First and last two rows shown; complete input pairs are in Data.</p>
+<p><strong>Scope:</strong> selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.</p>
+<hr>
+<p>Run <code>001</code>. <a href="report-data.json">Data &amp; full record</a> · <a href="https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/0b7071600b636b17edacd00ed216af2aff19090a">Code 0b707160</a> · <a href="https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93">Workflow 9cb9e72e</a> · Image 9dea950a713b.</p>
+<p>Data: WCPFC/SPC public statistics. <a href="https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip">Source 1</a> · <a href="https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip">Source 2</a>.</p>
 
 
 

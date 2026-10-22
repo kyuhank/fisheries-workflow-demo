@@ -412,7 +412,6 @@
 )
 
 #show: doc => article(
-  title: [Management strategy comparison report],
   lang: "en",
   region: "NZ",
   fontsize: 10pt,
@@ -421,82 +420,29 @@
   doc,
 )
 
-Compare catch, biomass and catch stability for three rules under the same simulated future conditions.
-
-#strong[Path:] Four fitted cases → shared trials and catch rules → management comparison.
-
-= Management comparison
-<management-comparison>
-#box(image("report_files/figure-typst/unnamed-chunk-2-1.svg"))
-
-Compare biomass alongside realised catch and annual catch changes. These conditional trials provide neither calibrated risk estimates nor evidence that a rule would be safe without the shared harvest guardrail. Fixed case differences do not include assessment parameter uncertainty or select a rule for a real fishery.
-
-Some requested catches exceeded the harvest guardrail. Metrics use realised catches.
-
-== Catch, biomass and catch stability
-<catch-biomass-and-catch-stability>
-#table(
-  columns: (18.07%, 24.1%, 12.05%, 25.3%, 20.48%),
-  align: (left,right,right,right,right,),
-  table.header([Rule], [Mean catch (t/year)], [Final B/K], [Trials below 0.2 (%)], [Catch change (%)],),
-  table.hline(),
-  [Constant catch], [69874.22], [0.155], [57.5], [1.769],
-  [Index rule], [62659.38], [0.424], [0.0], [6.707],
-  [Buffered rule], [57497.83], [0.528], [0.0], [6.388],
-)
-Mean catch is in tonnes per year; final B/K is the median across trials. The threshold column counts trials below 0.2 of carrying capacity at any time. Catch change averages each trial's #NormalTok("100 × sum(abs(C_t − C_(t−1))) / sum(C_t)"); using realised catches, including the first change from the reference catch. Cases and scenarios have equal weight, not estimated probabilities.
-
-== Trajectories by growth scenario
-<trajectories-by-growth-scenario>
-#box(image("report_files/figure-typst/unnamed-chunk-5-1.svg"))
-
-#block[
-#box(image("report_files/figure-typst/unnamed-chunk-5-2.svg"))
-
-]
-== Trial assumptions and limits
-<trial-assumptions-and-limits>
-One scenario keeps the growth multiplier at one. The other uses 0.7 for six years, then returns to one. Mean-one lognormal growth and observation errors have coefficients of variation 0.2 and 0.15 before the growth cap is applied. The preparation result preserves seeds, RNG settings and actual paired error vectors. Surplus production uses starting biomass; realised catch is then removed.
-
-- Fixed growth sensitivities and initial biomass; fitted cases are not weighted probabilities.
-- Growth and observation errors are declared toy lognormal perturbations.
-- No assessment is refitted during these management trials.
-- Empirical trial fractions are conditional illustrations, not validated risk estimates.
-- Annual growth is capped at one to retain the simple Euler update within its stable range.
-
-= Methods
-<methods>
-#strong[Source coverage:] Fiji fleet; six observed cell--quarter strata, 2000--2022. #strong[Annual catch:] South Pacific albacore nominal catch estimates; all gears and fleets.
-
-The selected Fiji fleet index is not a validated stock-wide abundance index. Using it with stock-wide catches is a teaching assumption.
-
-Four fitted Schaefer cases supply starting biomass, capacity, growth and catchability. Constant catch, an index rule and a buffered rule use the same saved growth and observation errors for #strong[15 years], with #strong[20 trials] per case and scenario. Each year, observe an index → set catch → update biomass → observe again. The index rules use a three-year observed mean. Reference catch C₀ and index I₀ are the last three historical-year means. Rₜ is the mean of the current simulated index and previous two indices, divided by I₀.
+= Management strategy comparison
+<management-strategy-comparison>
+#box(image("report_files/figure-typst/unnamed-chunk-1-1.svg"))
 
 #table(
-  columns: (50%, 50%),
-  align: (left,left,),
-  table.header([Rule], [Requested catch],),
+  columns: (18.29%, 14.63%, 12.2%, 17.07%, 20.73%, 17.07%),
+  align: (left,left,left,left,left,left,),
+  table.header([Rule], [Catch (t/y)], [Final B/K], [Below 0.2 (%)], [Catch change (%)], [Capped trials],),
   table.hline(),
-  [Constant], [C₀],
-  [Index], [C₀ × min(2, Rₜ)],
-  [Buffered], [b × C₀ × m(Rₜ), limited to ±15% of the previous request (initially C₀)],
+  [Constant catch], [69870], [0.1548], [57.5], [1.769], [79],
+  [Index rule], [62660], [0.4239], [0], [6.707], [0],
+  [Buffered rule], [57500], [0.5276], [0], [6.388], [0],
 )
-Here b is 0.8. The step multiplier m is 0.5, 1, 1.25 for Rₜ below 0.8, between 0.8 and 1.1, or at least 1.1, respectively.
+Catch is the trial mean; final B/K is the trial median. Below-threshold means any year. Catch change includes the first change from reference catch; capped trials requested more than the guardrail allowed.
 
-#strong[Shared guardrail:] realised catch is capped at 40% of true starting biomass. This simulator safeguard uses biomass unavailable to the index rules; every rule's biomass and low-biomass statistics are conditional on that guardrail. Growth is capped at 1 per year.
+15 years; 20 trials per case/scenario. Realised catch ≤ 40% of true starting biomass. Equal case/scenario weights; all comparisons are conditional on the shared guardrail. Toy lognormal errors and fixed fitted cases provide illustrative trial fractions, not calibrated risk.
 
-= Analysis record
-<analysis-record>
-Produced in #strong[Run 001]. Retained inputs keep their original producing runs.
+Constant catch holds the reference catch; the index rule follows the recent observed index; the buffered rule adds step changes and annual change limits. All use paired growth/observation errors; no assessment is refitted. Growth/observation CV: 0.2/0.15. Annual growth cap: 1. Scenario details and rule settings are in Data.
 
-Execution: Local Docker.
+#strong[Scope:] selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.
 
-Calculation image: #NormalTok("sha256:9dea950a713b…"); (full digest in the run bundle).
+#horizontalrule
 
-#link("https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow")[Container package]
+Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-mse-demo/commit/7ae67f11217ef10ba8f4fb3a52707707377c1f32")[Code 7ae67f11] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
 
-#link("https://github.com/kyuhank/fisheries-workflow-demo/commit/b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406")[Coordinator source at b343d9d1]
-
-#link("https://github.com/kyuhank/fisheries-workflow-mse-demo/commit/24c47d6f755f390f9e1865d7ec762d87d796937d")[MSE component source at 24c47d6f]
-
-Annual values are available in the #strong[Data] tab. Input files, settings, source versions and checksums are available in #strong[Inputs & versions] and the downloaded run. Rendering reads saved results and does not fit models again.
+Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].

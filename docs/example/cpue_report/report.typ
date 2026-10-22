@@ -412,7 +412,6 @@
 )
 
 #show: doc => article(
-  title: [CPUE analysis report],
   lang: "en",
   region: "NZ",
   fontsize: 10pt,
@@ -421,52 +420,30 @@
   doc,
 )
 
-See how standardisation changes annual CPUE, then compare the two saved relative indices.
+= CPUE analysis
+<cpue-analysis>
+#box(image("report_files/figure-typst/unnamed-chunk-1-1.svg"))
 
-= Standardised and nominal CPUE
-<standardised-and-nominal-cpue>
-#box(image("report_files/figure-typst/unnamed-chunk-2-1.svg"))
+Nominal = 1,000 × annual fish / annual hooks, using the same selected records as each standardised curve. Quasipoisson GLM: year + cell--quarter stratum; Quasipoisson GLM: year + quarter. Arithmetic mean of response-scale predictions with equal fixed stratum weights.
 
-Standardised A averages predictions at 1,000 hooks over the same 6 cell--quarter strata with equal weights each year. Nominal CPUE is 1,000 × annual total catch / annual total hooks from the same A records. Any A effort filter applies to both curves.
-
-= Relative indices for analyses A and B
-<relative-indices-for-analyses-a-and-b>
-#box(image("report_files/figure-typst/unnamed-chunk-4-1.svg"))
-
-Each index is divided by its own first-year prediction (first year = 1). A adjusts cell--quarter composition; B adjusts quarter only on the same fixed prediction support. B may use different records because the optional effort filter applies to A.
-
-= Methods and checks
-<methods-and-checks>
-The saved models are quasipoisson GLMs with a log link and a #NormalTok("log(hooks / 1000)"); offset. A adjusts for cell--quarter composition; B adjusts quarter only; quarter effects partly confound spatial differences on this support. The source rows are fleet--cell--quarter aggregates, not individual fishing sets.
-
-#strong[A:] #NormalTok("catch_n ~ factor(year) + factor(stratum) + offset(log(hooks/1000))");
-
-#strong[B:] #NormalTok("catch_n ~ factor(year) + factor(quarter) + offset(log(hooks/1000))");
-
-A effort threshold: #strong[0 hooks per record] (0 retains all eligible records).
+== Relative indices
+<relative-indices>
+#box(image("report_files/figure-typst/unnamed-chunk-1-2.svg"))
 
 #table(
   columns: 6,
-  align: (left,right,right,left,left,right,),
-  table.header([Analysis], [Rows used], [Excluded], [Converged], [Score error], [Dispersion],),
+  align: (left,left,left,left,left,left,),
+  table.header([Analysis], [Rows], [Excluded], [Min hooks], [Converged], [Dispersion],),
   table.hline(),
-  [A], [132], [0], [TRUE], [4.24e-13], [1213.277],
-  [B], [132], [0], [TRUE], [1.33e-15], [3011.218],
+  [A], [132], [0], [0], [Yes], [1213],
+  [B], [132], [0], [0], [Yes], [3011],
 )
-A's fixed prediction weights: #NormalTok("20S_170E_Q4"); (0.1667); #NormalTok("20S_175E_Q1"); (0.1667); #NormalTok("20S_175E_Q2"); (0.1667); #NormalTok("20S_175E_Q3"); (0.1667); #NormalTok("20S_175E_Q4"); (0.1667); #NormalTok("25S_175E_Q3"); (0.1667).
+Each index is scaled to its own first year (= 1). Dispersion is the Pearson residual sum of squares / residual df.
 
-Score error is the maximum relative difference between fitted and observed annual, stratum or quarter catch totals. Dispersion is the Pearson sum of squares divided by residual degrees of freedom.
+#strong[Scope:] Fiji fleet; six observed cell--quarter strata, 2000--2022. Fleet--cell--quarter aggregates; vessel effects and confidence intervals are unavailable. Released zeros are retained; absent/suppressed values are excluded.
 
-= Interpretation and limits
-<interpretation-and-limits>
-The first plot shows the effect of holding cell--quarter composition fixed for A's selected records. The index covers the selected fleet and released strata; vessel identifiers are unavailable. Released zero counts are retained, while absent or suppressed values are not zero catch. An effort filter may require model predictions for omitted year--stratum combinations. No confidence intervals are supplied, and this workflow example provides no stock-wide or official assessment advice.
+#horizontalrule
 
-= Analysis record
-<analysis-record>
-Produced in #strong[Run 001] from preserved results; rendering fits no models. Annual values and the full method record are in #strong[Data]. Producing runs, input checksums, code, settings and software are in #strong[Inputs & versions] and the downloadable bundle.
+Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/d4454fcfa9a23bd590344ad92940a13fa0a41c06")[Code d4454fcf] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
 
-#link("https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow")[Calculation container]
-
-#link("https://github.com/kyuhank/fisheries-workflow-demo/commit/b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406")[Coordinator source at b343d9d1c704]
-
-#link("https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/cba0a50179ad629d7e4df33734f198d6e9900b36")[CPUE component source at cba0a50179ad]
+Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].

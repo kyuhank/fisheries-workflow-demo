@@ -1,10 +1,11 @@
 ---
-title: "Surplus-production assessment report"
 lang: en-NZ
 keep-md: true
 format:
   html:
+    minimal: true
     embed-resources: true
+    fig-format: svg
     toc: false
     theme: none
   typst:
@@ -20,114 +21,76 @@ execute:
   echo: false
   warning: false
   message: false
+  fig-width: 8
+  fig-height: 3.1
 ---
 
 <style>
-body { max-width: 880px; margin: 32px auto; padding: 0 20px; font: 16px/1.6 system-ui, sans-serif; color: #243649; }
-h1 { font-size: 28px; line-height: 1.2; }
-h2 { font-size: 20px; margin-top: 28px; }
+body { max-width: 880px; margin: 24px auto; padding: 0 20px; font: 16px/1.45 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 27px; line-height: 1.2; }
+h2 { font-size: 20px; margin-top: 20px; }
 a { color: #1779a0; overflow-wrap: anywhere; }
 img, svg { max-width: 100%; height: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 8px 10px; border-bottom: 1px solid #dde5eb; text-align: left; }
-th { background: #f3f6f8; }
+th, td { padding: 6px; border-bottom: 1px solid #dde5eb; text-align: left; }
 .cell-output-display { overflow-x: auto; }
-pre { padding: 14px; background: #f3f6f8; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 </style>
 
-Compare how two CPUE indices and two fixed growth assumptions affect the fitted biomass trajectory.
+# Surplus-production assessment
 
-**Path:** Annual index and catches → fixed-growth Schaefer fit → biomass trajectory.
+![](report_files/figure-html/unnamed-chunk-1-1.svg)
 
-
-::: {.cell}
-
-:::
-
-
-## Biomass comparison
-
-
-::: {.cell}
-::: {.cell-output-display}
-![](report_files/figure-html/unnamed-chunk-2-1.png){width=672}
-:::
-:::
-
-
-Each trajectory shows start-of-year biomass divided by that case's fitted carrying
-capacity. The trajectories describe the supplied index, catches and fixed model assumptions.
-Differences among cases are not an uncertainty interval or stock-management advice.
-
-
-
-### Final annual values and fit checks
-
-
-::: {.cell}
-::: {.cell-output-display}
-
-
-|Case          | Year|   B/K| Harvest rate|
-|:-------------|----:|-----:|------------:|
-|Assessment A1 | 2021| 0.501|        0.136|
-|Assessment A2 | 2021| 0.495|        0.160|
-|Assessment B1 | 2021| 0.484|        0.143|
-|Assessment B2 | 2021| 0.479|        0.167|
-
-
-:::
-
-::: {.cell-output-display}
-
-
-|Case          | Growth (r)|Balance |Feasible |Gradient |Boundary | Convergence|
-|:-------------|----------:|:-------|:--------|:--------|:--------|-----------:|
-|Assessment A1 |       0.25|Pass    |Pass     |Pass     |FALSE    |           0|
-|Assessment A2 |       0.30|Pass    |Pass     |Pass     |FALSE    |           0|
-|Assessment B1 |       0.25|Pass    |Pass     |Pass     |FALSE    |           0|
-|Assessment B2 |       0.30|Pass    |Pass     |Pass     |FALSE    |           0|
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Case </th>
+   <th style="text-align:left;"> Fixed r (/y) </th>
+   <th style="text-align:left;"> Capacity K (t) </th>
+   <th style="text-align:left;"> Final B/K </th>
+   <th style="text-align:left;"> Fit checks </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Assessment A1 </td>
+   <td style="text-align:left;"> 0.25 </td>
+   <td style="text-align:left;"> 1029000 </td>
+   <td style="text-align:left;"> 0.5011 </td>
+   <td style="text-align:left;"> Pass </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Assessment A2 </td>
+   <td style="text-align:left;"> 0.3 </td>
+   <td style="text-align:left;"> 890200 </td>
+   <td style="text-align:left;"> 0.4949 </td>
+   <td style="text-align:left;"> Pass </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Assessment B1 </td>
+   <td style="text-align:left;"> 0.25 </td>
+   <td style="text-align:left;"> 1012000 </td>
+   <td style="text-align:left;"> 0.4845 </td>
+   <td style="text-align:left;"> Pass </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Assessment B2 </td>
+   <td style="text-align:left;"> 0.3 </td>
+   <td style="text-align:left;"> 877700 </td>
+   <td style="text-align:left;"> 0.4792 </td>
+   <td style="text-align:left;"> Pass </td>
+  </tr>
+</tbody>
+</table>
 
 
-:::
-:::
+B/K uses each case's carrying capacity. Checks cover balance, positive biomass, gradient, convergence and boundaries. Case differences are fixed-assumption sensitivities; they do not form an uncertainty interval.
 
+Fixed-growth Schaefer fits start biomass at K and fit K/q to annual log indices using catches in tonnes. Calculation checks do not establish biological adequacy.
 
-Convergence, biomass balance and positive-biomass feasibility check the fitted
-calculation. They do not establish biological adequacy or validate the CPUE
-as a stock-wide abundance measure.
+**Scope:** selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.
 
+---
 
+Run `001`. [Data & full record](report-data.json) · [Code 0b707160](https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/0b7071600b636b17edacd00ed216af2aff19090a) · [Workflow 9cb9e72e](https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93) · Image 9dea950a713b.
 
-
-## Methods
-
-
-**Source coverage:** Fiji fleet; six observed cell–quarter strata, 2000–2022. **Annual catch:** South Pacific albacore nominal catch estimates; all gears and fleets.
-
-The selected Fiji fleet index is not a validated stock-wide abundance index. Using it with stock-wide catches is a teaching assumption.
-
-The analysed series runs from 2000 to
-2021. Four cases combine indices A and B with fixed intrinsic growth rates of
-0.25 and 0.3
-per year. Biomass is the start-of-year, pre-catch state. The annual Schaefer model starts it
-at carrying capacity, adds surplus production and subtracts recorded catch in tonnes.
-R/RTMB fits carrying capacity by minimising squared log-index residuals within
-feasible bounds; log catchability is the mean difference between log index and log biomass. Initial
-biomass and growth are assumptions, rather than additional fitted parameters.
-
-## Analysis record
-
-Produced in **Run 001**. Retained inputs keep their original producing runs.
-
-Execution: Local Docker.
-
-Calculation image: `ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d`
-
-[Container package](https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow)
-
-[Coordinator source at b343d9d1](https://github.com/kyuhank/fisheries-workflow-demo/commit/b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406)
-
-[Assessment component source at 0e29121c](https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/0e29121cd0807fb8e058025529c10670befaf702)
-
-Annual values are available in the **Data** tab. Input files, settings, source versions and checksums are available in **Inputs & versions** and the downloaded run. Rendering reads saved results and does not fit models again.
+Data: WCPFC/SPC public statistics. [Source 1](https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip) · [Source 2](https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip).

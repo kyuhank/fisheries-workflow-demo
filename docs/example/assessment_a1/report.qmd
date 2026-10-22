@@ -1,22 +1,46 @@
 ---
 lang: en-NZ
+keep-md: true
 format:
   html:
     minimal: true
     embed-resources: true
-    include-before-body: report-body.html
+    fig-format: svg
+    toc: false
+    theme: none
   typst:
     papersize: a4
     margin:
       x: 15mm
       y: 15mm
     fontsize: 10pt
+    fig-format: svg
     keep-typ: true
     toc: false
+execute:
+  echo: false
+  warning: false
+  message: false
+  fig-width: 8
+  fig-height: 3.2
 ---
 
-::: {.content-visible when-format="typst"}
-{{< include report-body.md >}}
-:::
+<style>
+body { max-width: 880px; margin: 24px auto; padding: 0 20px; font: 16px/1.45 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 27px; line-height: 1.2; }
+h2 { font-size: 20px; margin-top: 20px; }
+a { color: #1779a0; overflow-wrap: anywhere; }
+img, svg { max-width: 100%; height: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 6px; border-bottom: 1px solid #dde5eb; text-align: left; }
+.cell-output-display { overflow-x: auto; }
+</style>
 
-<!-- Both bodies use the same saved result. No executable cells or model fitting. -->
+```{r}
+#| results: asis
+payload <- jsonlite::fromJSON("report-data.json", simplifyVector = FALSE)
+source("report-view.R")
+job <- trimws(readLines("report-job.txt", warn = FALSE))
+if (length(job) != 1L) stop("Expected one saved job key")
+report_result_view(job, payload$result, payload$record)
+```

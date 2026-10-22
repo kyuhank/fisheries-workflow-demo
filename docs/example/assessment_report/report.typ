@@ -412,7 +412,6 @@
 )
 
 #show: doc => article(
-  title: [Surplus-production assessment report],
   lang: "en",
   region: "NZ",
   fontsize: 10pt,
@@ -421,62 +420,28 @@
   doc,
 )
 
-Compare how two CPUE indices and two fixed growth assumptions affect the fitted biomass trajectory.
+= Surplus-production assessment
+<surplus-production-assessment>
+#box(image("report_files/figure-typst/unnamed-chunk-1-1.svg"))
 
-#strong[Path:] Annual index and catches → fixed-growth Schaefer fit → biomass trajectory.
-
-= Biomass comparison
-<biomass-comparison>
-#box(image("report_files/figure-typst/unnamed-chunk-2-1.svg"))
-
-Each trajectory shows start-of-year biomass divided by that case's fitted carrying capacity. The trajectories describe the supplied index, catches and fixed model assumptions. Differences among cases are not an uncertainty interval or stock-management advice.
-
-== Final annual values and fit checks
-<final-annual-values-and-fit-checks>
 #table(
-  columns: 4,
-  align: (left,right,right,right,),
-  table.header([Case], [Year], [B/K], [Harvest rate],),
+  columns: 5,
+  align: (left,left,left,left,left,),
+  table.header([Case], [Fixed r (/y)], [Capacity K (t)], [Final B/K], [Fit checks],),
   table.hline(),
-  [Assessment A1], [2021], [0.501], [0.136],
-  [Assessment A2], [2021], [0.495], [0.160],
-  [Assessment B1], [2021], [0.484], [0.143],
-  [Assessment B2], [2021], [0.479], [0.167],
+  [Assessment A1], [0.25], [1029000], [0.5011], [Pass],
+  [Assessment A2], [0.3], [890200], [0.4949], [Pass],
+  [Assessment B1], [0.25], [1012000], [0.4845], [Pass],
+  [Assessment B2], [0.3], [877700], [0.4792], [Pass],
 )
-#block[
-#table(
-  columns: (19.44%, 15.28%, 11.11%, 12.5%, 12.5%, 12.5%, 16.67%),
-  align: (left,right,left,left,left,left,right,),
-  table.header([Case], [Growth (r)], [Balance], [Feasible], [Gradient], [Boundary], [Convergence],),
-  table.hline(),
-  [Assessment A1], [0.25], [Pass], [Pass], [Pass], [FALSE], [0],
-  [Assessment A2], [0.30], [Pass], [Pass], [Pass], [FALSE], [0],
-  [Assessment B1], [0.25], [Pass], [Pass], [Pass], [FALSE], [0],
-  [Assessment B2], [0.30], [Pass], [Pass], [Pass], [FALSE], [0],
-)
-]
-Convergence, biomass balance and positive-biomass feasibility check the fitted calculation. They do not establish biological adequacy or validate the CPUE as a stock-wide abundance measure.
+B/K uses each case's carrying capacity. Checks cover balance, positive biomass, gradient, convergence and boundaries. Case differences are fixed-assumption sensitivities; they do not form an uncertainty interval.
 
-= Methods
-<methods>
-#strong[Source coverage:] Fiji fleet; six observed cell--quarter strata, 2000--2022. #strong[Annual catch:] South Pacific albacore nominal catch estimates; all gears and fleets.
+Fixed-growth Schaefer fits start biomass at K and fit K/q to annual log indices using catches in tonnes. Calculation checks do not establish biological adequacy.
 
-The selected Fiji fleet index is not a validated stock-wide abundance index. Using it with stock-wide catches is a teaching assumption.
+#strong[Scope:] selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.
 
-The analysed series runs from 2000 to 2021. Four cases combine indices A and B with fixed intrinsic growth rates of 0.25 and 0.3 per year. Biomass is the start-of-year, pre-catch state. The annual Schaefer model starts it at carrying capacity, adds surplus production and subtracts recorded catch in tonnes. R/RTMB fits carrying capacity by minimising squared log-index residuals within feasible bounds; log catchability is the mean difference between log index and log biomass. Initial biomass and growth are assumptions, rather than additional fitted parameters.
+#horizontalrule
 
-= Analysis record
-<analysis-record>
-Produced in #strong[Run 001]. Retained inputs keep their original producing runs.
+Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/0b7071600b636b17edacd00ed216af2aff19090a")[Code 0b707160] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
 
-Execution: Local Docker.
-
-Calculation image: #NormalTok("sha256:9dea950a713b…"); (full digest in the run bundle).
-
-#link("https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow")[Container package]
-
-#link("https://github.com/kyuhank/fisheries-workflow-demo/commit/b343d9d1c704cfe5f3c4fe61ccef1ae3e679e406")[Coordinator source at b343d9d1]
-
-#link("https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/0e29121cd0807fb8e058025529c10670befaf702")[Assessment component source at 0e29121c]
-
-Annual values are available in the #strong[Data] tab. Input files, settings, source versions and checksums are available in #strong[Inputs & versions] and the downloaded run. Rendering reads saved results and does not fit models again.
+Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].

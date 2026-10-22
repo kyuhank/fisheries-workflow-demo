@@ -1,0 +1,66 @@
+{
+  "engine": "Quarto",
+  "version": "1.9.37",
+  "calculation": "R",
+  "quarto_executed": true,
+  "source": "jobs/assessment_report/report.qmd",
+  "presentation_source": "jobs/assessment_report/report.qmd",
+  "execution_engine": "knitr",
+  "plot_generator": "R from saved results",
+  "models_refitted": false,
+  "simulations_repeated": false,
+  "formats": [
+    "html",
+    "typst"
+  ],
+  "view": "report.pdf",
+  "pdf_engine": "Typst",
+  "pdf_engine_version": "typst 0.14.2 (b33de9de)",
+  "job": "assessment_report",
+  "timeout_seconds": 300,
+  "input_sha256": {
+    "report-data.json": "4b1da6aa1de86471be6e9170473d8ebf4d98706983f54d9e22b87c6ebd3c976c"
+  },
+  "presentation_source_sha256": "6e8365be425f87a1d5cac574d13d798df7222587ed86cd2b4d0d25f16612bf8d",
+  "software": {
+    "R": "R version 4.6.0 (2026-04-24)",
+    "Quarto": "1.9.37",
+    "Typst": "typst 0.14.2 (b33de9de)",
+    "jsonlite": "2.0.0",
+    "knitr": "1.52",
+    "rmarkdown": "2.32",
+    "image": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+  },
+  "commands": [
+    "quarto render report.qmd --to html --output report.html --no-clean",
+    "quarto render report.qmd --to typst --output report.pdf --no-clean"
+  ],
+  "artifacts": [
+    "report.html",
+    "report.pdf",
+    "report.qmd",
+    "report-data.json",
+    "report.typ",
+    "report.html.md",
+    "report.typst.md",
+    "report_files/figure-html/unnamed-chunk-1-1.svg",
+    "report_files/figure-typst/unnamed-chunk-1-1.svg",
+    "report-html.log",
+    "report-typst.log",
+    "report-view.R"
+  ],
+  "artifact_sha256": {
+    "report.html": "1a549f9b82839bd9a88b911a01e3519eac77c6c591d659edb77fb4374367b21e",
+    "report.pdf": "7bc57ef72a1a875ea0bfb0ae5901635650e93cce9cab932656339ac0ef9f9a18",
+    "report.qmd": "6e8365be425f87a1d5cac574d13d798df7222587ed86cd2b4d0d25f16612bf8d",
+    "report-data.json": "4b1da6aa1de86471be6e9170473d8ebf4d98706983f54d9e22b87c6ebd3c976c",
+    "report.typ": "e23eaf9fa39b37ffaac6b29c1ed4b8d2b8847afc45e30a24aa5c6f7f7778f2ea",
+    "report.html.md": "6811bc309abd7a162c44ec555f42b3161c178d5b679d90f2088a7a8435451a38",
+    "report.typst.md": "bce0021751204c424686f8cb9823999bcb1d5ddc97da9fd23882d48dca570b88",
+    "report_files/figure-html/unnamed-chunk-1-1.svg": "e547cdf2e9ad3d8c6247ac34815c921bb4f091c4ac2dde9473dc2d0d5549868e",
+    "report_files/figure-typst/unnamed-chunk-1-1.svg": "e547cdf2e9ad3d8c6247ac34815c921bb4f091c4ac2dde9473dc2d0d5549868e",
+    "report-html.log": "c9626f9a58e7846ef8eabea6b27394219bdf89895677af49ed233519c01eaa14",
+    "report-typst.log": "8993c836c1b877016f1684f3e9946a3600e262a91ec6e65f5a86e1c5d14a59ed",
+    "report-view.R": "ca56c3e303a7afebaed3455f6f0a7cfe123973cbb20d37819ae753e6ba22649e"
+  }
+}

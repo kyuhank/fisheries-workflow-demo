@@ -1,0 +1,64 @@
+{
+  "engine": "Quarto",
+  "version": "1.9.37",
+  "calculation": "R",
+  "quarto_executed": true,
+  "source": "reports/results.qmd",
+  "presentation_source": "reports/results.qmd",
+  "execution_engine": "knitr",
+  "plot_generator": "R from saved results",
+  "models_refitted": false,
+  "simulations_repeated": false,
+  "formats": [
+    "html",
+    "typst"
+  ],
+  "view": "report.pdf",
+  "pdf_engine": "Typst",
+  "pdf_engine_version": "typst 0.14.2 (b33de9de)",
+  "job": "database",
+  "timeout_seconds": 300,
+  "input_sha256": {
+    "report-data.json": "6f67e7ea0065cbe463557058aeaaf03220ab8a343de57314f5bb8be95b93efd3"
+  },
+  "presentation_source_sha256": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+  "software": {
+    "R": "R version 4.6.0 (2026-04-24)",
+    "Quarto": "1.9.37",
+    "Typst": "typst 0.14.2 (b33de9de)",
+    "jsonlite": "2.0.0",
+    "knitr": "1.52",
+    "rmarkdown": "2.32",
+    "image": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d"
+  },
+  "commands": [
+    "quarto render report.qmd --to html --output report.html --no-clean",
+    "quarto render report.qmd --to typst --output report.pdf --no-clean"
+  ],
+  "artifacts": [
+    "report.html",
+    "report.pdf",
+    "report.qmd",
+    "report-data.json",
+    "report.typ",
+    "report.html.md",
+    "report.typst.md",
+    "report-html.log",
+    "report-typst.log",
+    "report-view.R",
+    "report-job.txt"
+  ],
+  "artifact_sha256": {
+    "report.html": "cd01b7796f17982751aa5ec3356380a7eab1907f5d2a8773dc22e73941ae1341",
+    "report.pdf": "e144a0200a6bf4f2968c8aabb950f810d176fa4c76edc0543bfbb7b3c7cf6036",
+    "report.qmd": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+    "report-data.json": "6f67e7ea0065cbe463557058aeaaf03220ab8a343de57314f5bb8be95b93efd3",
+    "report.typ": "fa1f3ecd8e19cfc58ed47ebf18528e775e2fa821b0b0ada6daa99b3c3808a7b1",
+    "report.html.md": "8664794edeb5f36bb5d6df119886225f31c538161312e2e9559ab3e66e754e39",
+    "report.typst.md": "c482efbd134bd3284cf336f04342cd08665b5478c587c3896d83409ecaae98a1",
+    "report-html.log": "c9626f9a58e7846ef8eabea6b27394219bdf89895677af49ed233519c01eaa14",
+    "report-typst.log": "8993c836c1b877016f1684f3e9946a3600e262a91ec6e65f5a86e1c5d14a59ed",
+    "report-view.R": "ca56c3e303a7afebaed3455f6f0a7cfe123973cbb20d37819ae753e6ba22649e",
+    "report-job.txt": "b66a511aeb53cea14af7ad2300ed0aa020b74e73fe664f1d3ff3cfe1e2b5f925"
+  }
+}

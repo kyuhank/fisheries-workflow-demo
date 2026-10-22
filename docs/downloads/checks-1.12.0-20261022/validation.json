@@ -1,0 +1,606 @@
+{
+  "schema_version": 1,
+  "reader_source_commit": "1610b37f7ac499c741451dfb525f8797f5ed39df",
+  "producing_source_commit": "9cb9e72ec890e86e1f268a23d829e7c2ab8bde93",
+  "component_pins": {
+    "cpue": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-cpue-demo",
+      "commit": "d4454fcfa9a23bd590344ad92940a13fa0a41c06",
+      "checkout": "components/cpue",
+      "jobs": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report"
+      ]
+    },
+    "assessment": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-assessment-demo",
+      "commit": "0b7071600b636b17edacd00ed216af2aff19090a",
+      "checkout": "components/assessment",
+      "jobs": [
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report"
+      ]
+    },
+    "mse": {
+      "repository": "https://github.com/kyuhank/fisheries-workflow-mse-demo",
+      "commit": "7ae67f11217ef10ba8f4fb3a52707707377c1f32",
+      "checkout": "components/mse",
+      "jobs": [
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ]
+    }
+  },
+  "native_jobs": 22,
+  "native_elapsed_seconds": 113.35,
+  "offline_reproduce_jobs": 22,
+  "offline_reproduce_elapsed_seconds": 116.082,
+  "downloaded_2022_reproduce_jobs": 22,
+  "downloaded_2022_reproduce_elapsed_seconds": 103.015,
+  "images": {
+    "images": {
+      "3280c4db93c6e2935bf0f9318b92df8d771932b6f84d1e7dea9babdb7b4e9a8b": {
+        "archive": "runtime-images/3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158.tar",
+        "image": "ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d",
+        "image_id": "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158",
+        "platform": "linux/amd64",
+        "rootfs_diff_ids": [
+          "sha256:98effb2dfe85d4c431f97d90482075f19e5fc3a57c2dd423d8bdfd4813620043",
+          "sha256:613659109016edd06de370f7bc2025e102bdcddaeac9de63a7b539d8bf3b1ae1",
+          "sha256:0b37a25965e9e9119a64e622f3101c8b7ef9f6eacab3a6dd9a4b062e9550f948",
+          "sha256:b52c4fe3ae39d7f3c34a04f72ac1e8ea873cbb9645bd2ea9bfe58f841059b60b",
+          "sha256:26cd91d7da066e47b7463ffd3d6e1795f3ba2d036f4a078b73cf3579830bc009",
+          "sha256:3a4afdc4e1d09235c386e112b3f8c8779ca06dcdeac06099001ba3260d49639d",
+          "sha256:853a19e9d9bf3fee97141848b791a845454f147bf9a3c61707b124c676288c6c",
+          "sha256:56accf9e26339a6b30b33f4f17954bb9931861898b4e82f41fc3ddce60c59f54",
+          "sha256:9d662917e398066bfc676c31a09d46648e38baf92db0ef55a76f1ae800732fca",
+          "sha256:655fde5934fb72434f5b0212542cb467d110a5d8c9e6fc2c8d5304643245afd3",
+          "sha256:616cadc63d516bc79ef6ffd13f95736739bdd9f8711ed03f93228276e318f545",
+          "sha256:60860921f93d2910563d7bb8e2bdcc06b93f70698e6e5c63b96de67f8dbb0700"
+        ],
+        "uses": [
+          {
+            "job": "submission",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "submission",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "qc",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "qc",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "database",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "database",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "extract",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "extract",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_a",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_a",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_b",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_b",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "prepare_a",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "prepare_a",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "prepare_b",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "prepare_b",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_summary",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_summary",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_a1",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_a1",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_a2",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_a2",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_b1",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_b1",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_b2",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_b2",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_report",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "cpue_report",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_summary",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_summary",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_prepare",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_prepare",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_report",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "assessment_report",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_constant",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_constant",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_index",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_index",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_buffered",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_buffered",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_summary",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_summary",
+            "role": "rendering",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_report",
+            "role": "calculation",
+            "run_id": "Run 001"
+          },
+          {
+            "job": "mse_report",
+            "role": "rendering",
+            "run_id": "Run 001"
+          }
+        ]
+      }
+    },
+    "preservation": "Save each listed image with docker image save. Verify image config, platform and ordered rootfs diff IDs after restoring. Offline execution disables pull and container networking.",
+    "schema_version": 2
+  },
+  "pdfs": [
+    {
+      "job": "assessment_a1",
+      "pages": 1,
+      "sha256": "beec44803522ac29757a710abf4be14d2171a3f46f85aae312d6e484adae0c1c"
+    },
+    {
+      "job": "assessment_a2",
+      "pages": 1,
+      "sha256": "22ee0bb37aa4fbb4af9f61790af7b8d76ae2dbba4a03d347836c6d28a6f3b945"
+    },
+    {
+      "job": "assessment_b1",
+      "pages": 1,
+      "sha256": "bd6eb76c28ece4841ece534312031a3a9336c4e5ab790f2c63da81a695a6468f"
+    },
+    {
+      "job": "assessment_b2",
+      "pages": 1,
+      "sha256": "aa073a7948b997c2d43c5cbcaa4e908884d948f26b3ec054d6b2390527026b84"
+    },
+    {
+      "job": "assessment_report",
+      "pages": 1,
+      "sha256": "7bc57ef72a1a875ea0bfb0ae5901635650e93cce9cab932656339ac0ef9f9a18"
+    },
+    {
+      "job": "assessment_summary",
+      "pages": 1,
+      "sha256": "572fb3c389bda279eb39b2239badd76718fce09d784a908a5d4ac94fc85fd298"
+    },
+    {
+      "job": "cpue_a",
+      "pages": 1,
+      "sha256": "501eb75ae0723286851a8558f9a2865012f88d0165bae21d66995cccc724686b"
+    },
+    {
+      "job": "cpue_b",
+      "pages": 1,
+      "sha256": "78e823b25500169de5225ec8758be19c12cb3becca560709014f13d3ce5ff530"
+    },
+    {
+      "job": "cpue_report",
+      "pages": 1,
+      "sha256": "542947b2b02d61a2de7389871f4191b1069f8654aa9d42eb2ce8675d1f4c7af9"
+    },
+    {
+      "job": "cpue_summary",
+      "pages": 1,
+      "sha256": "3368fb70b70fc72e0119c020b3c9403385399e3bb1fc78165095a3693c9a62e5"
+    },
+    {
+      "job": "database",
+      "pages": 1,
+      "sha256": "e144a0200a6bf4f2968c8aabb950f810d176fa4c76edc0543bfbb7b3c7cf6036"
+    },
+    {
+      "job": "extract",
+      "pages": 1,
+      "sha256": "fcf75a6f54e8ce72781afbdc1974388f5de4494fbd3f422640d7132a5efeb569"
+    },
+    {
+      "job": "mse_buffered",
+      "pages": 1,
+      "sha256": "c7e67f81bc430b4832d0aac323b858ad2ca99e18afb4d6dee284c2a3a3fd29bf"
+    },
+    {
+      "job": "mse_constant",
+      "pages": 1,
+      "sha256": "8e1b0140dc27c93625ba05f2a6d925b12f6b68e6f91a81abd41898f2e58290b0"
+    },
+    {
+      "job": "mse_index",
+      "pages": 1,
+      "sha256": "6e316b0838ba45453cc8b5c1e0dfdb81f6f7aeda8296976eb65b674beb50d408"
+    },
+    {
+      "job": "mse_prepare",
+      "pages": 1,
+      "sha256": "1ab285a898a7781a44e8c05551ae03f261da4976760df7745be0fa5de9f73e52"
+    },
+    {
+      "job": "mse_report",
+      "pages": 1,
+      "sha256": "acbed83e71df5ca0f085595bc1018f0aac6ccdbfaa6d8f354288cdeec627de67"
+    },
+    {
+      "job": "mse_summary",
+      "pages": 1,
+      "sha256": "4630f3a408b2a0a2a71e27a7920558af385e6cb08decbf7df6aad8371440720e"
+    },
+    {
+      "job": "prepare_a",
+      "pages": 1,
+      "sha256": "6d516f4e258cb9ac4c99fa2953426c81fe8a1c0f8275d73226b8f77e53a2fb87"
+    },
+    {
+      "job": "prepare_b",
+      "pages": 1,
+      "sha256": "f42ea38c264c900642fa5d20ea21125de8680aa853ff1902d8332a6d8b5d6895"
+    },
+    {
+      "job": "qc",
+      "pages": 1,
+      "sha256": "5200345074865c1f709950df684bebaac57b90fa478e5dac697805d4fc89c09c"
+    },
+    {
+      "job": "submission",
+      "pages": 1,
+      "sha256": "5eb0532dceca3ed917929e3dac55edc5980c26273d6d84a6172ae7ce78de29fa"
+    }
+  ],
+  "local_browser_cases": [
+    {
+      "case": "baseline-manual",
+      "elapsed_seconds": 150.3415305770468,
+      "run": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [],
+      "transfers": [
+        {
+          "boundary": "data",
+          "counter": 0,
+          "request_id": "71e1302c-a3ee-4735-abd3-9d5e1c7e190e",
+          "parallel_report_ready": false,
+          "connect": false
+        },
+        {
+          "boundary": "cpue",
+          "counter": 1,
+          "request_id": "71e1302c-a3ee-4735-abd3-9d5e1c7e190e",
+          "parallel_report_ready": true,
+          "connect": false
+        },
+        {
+          "boundary": "assessment",
+          "counter": 2,
+          "request_id": "71e1302c-a3ee-4735-abd3-9d5e1c7e190e",
+          "parallel_report_ready": true,
+          "connect": false
+        }
+      ],
+      "bundle_sha256": "e3639d184e83cc58d0a044b3b398c7316541f47fb03818b5bb247d8b28636e1c",
+      "bundle_bytes": 8846034
+    },
+    {
+      "case": "growth-connect",
+      "elapsed_seconds": 79.77225653198548,
+      "run": [
+        "assessment_a2",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_b1"
+      ],
+      "transfers": [
+        {
+          "boundary": "assessment",
+          "counter": 0,
+          "request_id": "78556823-7296-4480-a234-a2a36e934d43",
+          "parallel_report_ready": true,
+          "connect": true
+        }
+      ],
+      "bundle_sha256": "dc8b718ae2dd58098b20ef44dc878c92421f9972fa32dbeff3f721f6e0e81cdf",
+      "bundle_bytes": 8846513
+    },
+    {
+      "case": "buffer-auto",
+      "elapsed_seconds": 54.80666951893363,
+      "run": [
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index"
+      ],
+      "transfers": [],
+      "bundle_sha256": "51ae23859d359d8c6f9639accf27eea9cfdaa62b2568c716249c0aba9a98aae1",
+      "bundle_bytes": 8849853
+    },
+    {
+      "case": "year-2022",
+      "elapsed_seconds": 132.71246389404405,
+      "run": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [],
+      "transfers": [],
+      "bundle_sha256": "79f0cddae91610966204a329fa712760a8acc35466ddf5a5fa9cb02849102a41",
+      "bundle_bytes": 8867973
+    },
+    {
+      "case": "single-job",
+      "elapsed_seconds": 37.06068408093415,
+      "run": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a"
+      ],
+      "retained": [],
+      "transfers": [],
+      "bundle_sha256": "70dd4cf832b6a262e08dc25021f926ac4f9e2f4dd467b6c8b086bddc1385d48c",
+      "bundle_bytes": 5020250
+    }
+  ],
+  "local_browser_external_requests": [],
+  "public_source_csv_rows": 662,
+  "annual_catch_rows": 23,
+  "data_years": [
+    2000,
+    2022
+  ],
+  "finish_wire_bytes": 15331329,
+  "finish_limit_bytes": 16000000,
+  "finish_transport_scope": "Serializer check with real artifacts and HTTP double; not a hosted dispatch",
+  "host_packages_preserved_and_installed": 24,
+  "limits": "2 CPUs/4 GiB coordinator; each job container 1 CPU/2 GiB and network none; timings exclude image retrieval and GitHub queue",
+  "scope": "Technical execution, artifact custody and reproduction; no stock-assessment performance claim"
+}

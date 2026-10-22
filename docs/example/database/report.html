@@ -30,69 +30,144 @@ margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 
 <body>
 
-<style>body{font:15px/1.5 system-ui,sans-serif;color:#293039;max-width:920px;margin:22px auto;padding:0 22px}h1{font-size:23px;line-height:1.25;font-weight:600;margin:0 0 12px}h2{font-size:17px;font-weight:600;margin:22px 0 8px}p{max-width:80ch;margin:8px 0}small,.muted{color:#626a73}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:8px 10px;border-bottom:1px solid #d8dce0}th{font-weight:600;background:white}svg{max-width:100%;height:auto}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f5f5;padding:12px}.note{border-left:2px solid #a48242;padding:6px 12px;background:white}footer{margin-top:22px;border-top:1px solid #d8dce0;padding-top:10px;color:#626a73;font-size:12px}details{margin:18px 0}summary{cursor:pointer;font-weight:600;color:#245b86}.mp-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:14px 0 20px}.mp-rule{border-bottom:1px solid #d8dce0;padding-bottom:10px}.mp-rule h3{font-size:15px;margin:0 0 6px}.mp-rule p{font-size:14px;margin:0}.feedback-flow{color:#626a73;font-size:14px}.table-scroll{overflow-x:auto}.trial-table{min-width:650px}@media(max-width:640px){.mp-rules{grid-template-columns:1fr}body{margin:18px auto;padding:0 16px}}.plot-pair{display:grid;grid-template-columns:1fr;gap:14px}.plot-pair h2{font-size:16px;margin:12px 0 4px}.plot-pair p{font-size:14px;margin:4px 0 10px}.result-method{font-size:14px;color:#626a73}.result-view h2{margin-top:18px}@media(max-width:640px){.plot-pair{grid-template-columns:1fr}}.result-view svg{width:100%}.result-view svg text{font-size:14px}.plot-legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;margin:4px 0}.plot-unit{font-size:14px;margin:0 0 10px}.plot-swatch{display:inline-block;width:24px;border-top:3px solid;vertical-align:middle;margin-right:6px}@media(max-width:640px){.result-view svg text{font-size:26px}}.pdf-legend{display:none}</style>
-<h1>Prepare and load</h1><article class="result-view" data-result="database"><p>639 records · 79 cell–quarter strata · 2000–2021.</p><div class="plot-legend"><span><i class="plot-swatch" style="color:#1378a3;border-top-style:solid"></i>Total removals</span></div><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 780 340" role="img" aria-label="Total annual catch (tonnes)"><g class="pdf-legend" font-family="sans-serif" font-size="13" fill="#293039"><path d="M100 19h24" fill="none" stroke="#1378a3" stroke-width="2.5" /><text x="131" y="23">Total removals</text></g><path d="M100 280.0H730" stroke="#e1e8ee" /><text x="90" y="284.0" text-anchor="end" fill="#607080" font-size="12">0</text><path d="M100 205.0H730" stroke="#e1e8ee" /><text x="90" y="209.0" text-anchor="end" fill="#607080" font-size="12">50000</text><path d="M100 130.0H730" stroke="#e1e8ee" /><text x="90" y="134.0" text-anchor="end" fill="#607080" font-size="12">100000</text><path d="M100 55.0H730" stroke="#e1e8ee" /><text x="90" y="59.0" text-anchor="end" fill="#607080" font-size="12">150000</text><text x="100.0" y="304" text-anchor="middle" fill="#607080" font-size="12">2000</text><text x="397.6" y="304" text-anchor="middle" fill="#607080" font-size="12">2010</text><text x="725.0" y="304" text-anchor="middle" fill="#607080" font-size="12">2021</text><polyline points="100.00,205.03 129.76,181.55 159.52,163.22 189.29,181.91 219.05,181.80 248.81,179.48 278.57,178.54 308.33,189.70 338.10,184.63 367.86,152.97 397.62,153.38 427.38,181.07 457.14,148.39 486.90,148.03 516.67,177.19 546.43,171.62 576.19,168.94 605.95,138.25 635.71,157.85 665.48,163.27 695.24,171.09 725.00,174.51" fill="none" stroke="#1378a3" stroke-width="2.5"></polyline></svg><p class="plot-unit">Total annual catch (tonnes)</p><p>Annual removals are saved separately from catch numbers in the CPUE rows.</p><h2>Sample of annual coverage</h2>
-<table class="caption-top">
+
+
+
+
+<style>
+body { max-width: 880px; margin: 24px auto; padding: 0 20px; font: 16px/1.45 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 27px; line-height: 1.2; }
+h2 { font-size: 20px; margin-top: 20px; }
+a { color: #1779a0; overflow-wrap: anywhere; }
+img, svg { max-width: 100%; height: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 6px; border-bottom: 1px solid #dde5eb; text-align: left; }
+.cell-output-display { overflow-x: auto; }
+</style>
+<h1 id="saved-database">Saved database</h1>
+<table>
 <thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th">Records</th>
-<th data-quarto-table-cell-role="th">Hooks</th>
-<th data-quarto-table-cell-role="th">Fish (number)</th>
-<th data-quarto-table-cell-role="th">Total catch (t)</th>
+<tr>
+<th style="text-align:left;">
+Records
+</th>
+<th style="text-align:left;">
+First year
+</th>
+<th style="text-align:left;">
+Last year
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td>2000</td>
-<td>15</td>
-<td>17411790</td>
-<td>308821</td>
-<td>49980</td>
-</tr>
-<tr class="even">
-<td>2001</td>
-<td>18</td>
-<td>24628386</td>
-<td>420309</td>
-<td>65636</td>
-</tr>
-<tr class="odd">
-<td>2002</td>
-<td>24</td>
-<td>29038337</td>
-<td>434332</td>
-<td>77856</td>
-</tr>
-<tr class="even">
-<td>2003</td>
-<td>23</td>
-<td>33041314</td>
-<td>361225</td>
-<td>65395</td>
-</tr>
-<tr class="odd">
-<td>2004</td>
-<td>29</td>
-<td>46209869</td>
-<td>634654</td>
-<td>65470</td>
-</tr>
-<tr class="even">
-<td>2005</td>
-<td>25</td>
-<td>39048167</td>
-<td>665272</td>
-<td>67016</td>
+<tr>
+<td style="text-align:left;">
+639
+</td>
+<td style="text-align:left;">
+2000
+</td>
+<td style="text-align:left;">
+2021
+</td>
 </tr>
 </tbody>
 </table>
-</article>
-
-
-
-
-<!-- Both bodies use the same saved result. No executable cells or model fitting. -->
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Year
+</th>
+<th style="text-align:left;">
+Records
+</th>
+<th style="text-align:left;">
+Hooks
+</th>
+<th style="text-align:left;">
+Fish (number)
+</th>
+<th style="text-align:left;">
+Removals (t)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2000
+</td>
+<td style="text-align:left;">
+15
+</td>
+<td style="text-align:left;">
+17410000
+</td>
+<td style="text-align:left;">
+308800
+</td>
+<td style="text-align:left;">
+49980
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2001
+</td>
+<td style="text-align:left;">
+18
+</td>
+<td style="text-align:left;">
+24630000
+</td>
+<td style="text-align:left;">
+420300
+</td>
+<td style="text-align:left;">
+65640
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020
+</td>
+<td style="text-align:left;">
+26
+</td>
+<td style="text-align:left;">
+32550000
+</td>
+<td style="text-align:left;">
+303900
+</td>
+<td style="text-align:left;">
+72600
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021
+</td>
+<td style="text-align:left;">
+25
+</td>
+<td style="text-align:left;">
+27920000
+</td>
+<td style="text-align:left;">
+321100
+</td>
+<td style="text-align:left;">
+70330
+</td>
+</tr>
+</tbody>
+</table>
+<p>First and last two annual rows; complete annual values are in Data. Fish numbers and removals are distinct inputs.</p>
+<hr>
+<p>Run <code>001</code>. <a href="report-data.json">Data &amp; full record</a> · <a href="https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/d4454fcfa9a23bd590344ad92940a13fa0a41c06">Code d4454fcf</a> · <a href="https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93">Workflow 9cb9e72e</a> · Image 9dea950a713b.</p>
+<p>Data: WCPFC/SPC public statistics. <a href="https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip">Source 1</a> · <a href="https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip">Source 2</a>.</p>
 
 
 
