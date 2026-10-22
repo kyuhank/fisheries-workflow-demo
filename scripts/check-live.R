@@ -201,6 +201,15 @@ live_record <- function(gate, key, record, records) {
       identical(input$signature, producer$signature) && live_equal(input$analysis_source, producer$analysis_source), paste("Producing input differs:", key, parent))
   }
 }
+live_catalogue_ids <- function(catalogue, records) {
+  fields <- c("image", "image_id", "platform", "rootfs_diff_ids")
+  identity <- function(image) json_encode(image[fields])
+  observed <- unique(vapply(records, function(record) identity(record$runtime), character(1)))
+  archived <- vapply(catalogue, identity, character(1))
+  live_assert(length(observed) > 0L && !anyDuplicated(archived) && setequal(archived, observed),
+    "Runtime catalogue has missing, extra or repeated images")
+  unname(unique(vapply(records, function(record) record$runtime$image_id, character(1))))
+}
 live_bundle <- function(gate, request, value) {
   publication <- live_request(gate, "/bundle")
   live_assert(identical(publication$request_id, request), "Bundle belongs to another request")
@@ -216,7 +225,6 @@ live_bundle <- function(gate, request, value) {
   live_assert(live_equal(json_read(file.path(directory, "settings.json")), value$settings), "Bundle settings differ")
   if (!is.null(value$records$submission)) live_assert(identical(manifest[["data/frozen-source.json"]], value$records$submission$execution$data_checksum), "Frozen source differs from the actual hosted input")
   catalogue <- json_read(file.path(directory, "runtime-catalogue.json"))$images
-  image_ids <- character()
   for (key in names(value$records)) {
     record <- value$records[[key]]; folder <- file.path(directory, "reference", key)
     for (name in names(record$outputs)) live_assert(identical(manifest[[paste0("reference/", key, "/", name)]], record$outputs[[name]]), "Bundle output checksum differs")
@@ -241,9 +249,8 @@ live_bundle <- function(gate, request, value) {
     live_assert(length(found) == 1L, "Runtime catalogue does not identify the producer/renderer")
     for (role in c("calculation", "rendering")) live_assert(any(vapply(found[[1L]]$uses, function(use)
       identical(use$job, key) && identical(use$role, role) && identical(use$run_id, record$run_id), logical(1))), "Runtime catalogue use differs")
-    image_ids <- union(image_ids, record$runtime$image_id)
   }
-  if (length(value$records) == length(gate$config$jobs)) live_assert(length(image_ids) >= 2L, "Full hosted workflow did not use distinct image configurations")
+  image_ids <- live_catalogue_ids(catalogue, value$records)
   list(sha256 = file_sha256(archive), files = length(manifest), image_config_ids = as.list(image_ids), reproduction = "separate gate")
 }
 live_execute <- function(gate, case, previous) {
