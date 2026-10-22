@@ -9,7 +9,7 @@ permissions:
   contents: read
 jobs:
   diagram:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -19,6 +19,8 @@ jobs:
         run: python3 scripts/refresh-interface.py
       - name: Install browser checks
         run: |
+          sudo sed -i 's|http://azure\.archive\.ubuntu\.com/ubuntu/|https://archive.ubuntu.com/ubuntu/|' /etc/apt/apt-mirrors.txt
+          printf '%s\n' 'Acquire::Retries "2";' 'Acquire::http::Timeout "20";' 'Acquire::https::Timeout "20";' | sudo tee /etc/apt/apt.conf.d/80-browser-checks > /dev/null
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends poppler-utils
           python3 -m venv .browser-check

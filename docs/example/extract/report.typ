@@ -420,29 +420,33 @@
   doc,
 )
 
-= Extracted data
-<extracted-data>
+= Extract data
+<extract-data>
+#strong[Data analyst] · Run 001 · Years 2000--2021
+
+Calculation finished (container exit 0).
+
 #table(
   columns: 4,
   align: (left,left,left,left,),
-  table.header([Records], [Years], [Fleets], [Catch years],),
+  table.header([Records], [Years], [Fleet], [Catch years],),
   table.hline(),
   [132], [2000--2021], [FJ], [2000--2021],
 )
+#box(image("report_files/figure-typst/unnamed-chunk-1-1.svg"))Selected fish counts and effort pass to CPUE; annual removals pass to assessment input preparation. The exact SQL and source-row identifiers are retained in Data.
+
+#strong[Inputs used]
+
 #table(
-  columns: 2,
-  align: (left,left,),
-  table.header([Year], [Removals (t)],),
+  columns: 3,
+  align: (left,left,left,),
+  table.header([Input], [Analyst], [Produced in],),
   table.hline(),
-  [2000], [49980],
-  [2001], [65640],
-  [2020], [72600],
-  [2021], [70330],
+  [Prepare and load], [Data curator], [Run 001],
 )
-Selected records → CPUE; annual removals → assessment. First and last two catch rows shown; joins use year.
 
 #horizontalrule
 
-Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/d4454fcfa9a23bd590344ad92940a13fa0a41c06")[Code d4454fcf] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
+Saved files: #NormalTok("report-data.json"); · #NormalTok("record.json"); · #link("https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/7d17fc5962466cdabc27d17e004bed87136b38bc")[Code 7d17fc59] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/2a8dc292696fa42866b1f28139c23510dc75f140")[Workflow 2a8dc292] · Image 9dea950a713b.
 
 Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].

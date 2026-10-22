@@ -422,25 +422,39 @@
 
 = Index rule
 <index-rule>
+#strong[MSE analyst] · Run 001 · Years 2022--2036
+
+Calculation finished (container exit 0).
+
 Scale catch by the three-year mean observed index.
 
 #box(image("report_files/figure-typst/unnamed-chunk-1-1.svg"))
 
 #table(
-  columns: (14.1%, 15.38%, 12.82%, 17.95%, 21.79%, 17.95%),
+  columns: (13.25%, 20.48%, 12.05%, 16.87%, 20.48%, 16.87%),
   align: (left,left,left,left,left,left,),
-  table.header([Rule], [Catch (t/y)], [Final B/K], [Below 0.2 (%)], [Catch change (%)], [Capped trials],),
+  table.header([Rule], [Mean catch (t/y)], [Final B/K], [Below 0.2 (%)], [Catch change (%)], [Capped trials],),
   table.hline(),
   [Index rule], [62660], [0.4239], [0], [6.707], [0],
 )
-Catch is the trial mean; final B/K is the trial median. Below-threshold means any year. Catch change includes the first change from reference catch; capped trials requested more than the guardrail allowed.
+Final B/K is the trial median; below-threshold counts trials with any low-biomass year. Catch change includes the first change from reference catch. Capped trials had requested catch above the biomass guardrail.
 
-15 years; 20 trials per case/scenario. Realised catch ≤ 40% of true starting biomass. Equal case/scenario weights; all comparisons are conditional on the shared guardrail. Toy lognormal errors and fixed fitted cases provide illustrative trial fractions, not calibrated risk.
+160 trials per rule; 15 future years; 4 fitted cases; 2 growth scenarios. All rules use the same saved errors and cases, with equal case/scenario weights. Realised catch is capped at 40% of starting biomass. Dotted line: B/K = 0.2.
 
-#strong[Scope:] selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.
+#strong[Scope:] these illustrative trials use simplified fitted cases and errors; trial fractions are not calibrated management risks.
+
+#strong[Inputs used]
+
+#table(
+  columns: 3,
+  align: (left,left,left,),
+  table.header([Input], [Analyst], [Produced in],),
+  table.hline(),
+  [Prepare MSE], [MSE analyst], [Run 001],
+)
 
 #horizontalrule
 
-Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-mse-demo/commit/7ae67f11217ef10ba8f4fb3a52707707377c1f32")[Code 7ae67f11] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
+Saved files: #NormalTok("report-data.json"); · #NormalTok("record.json"); · #link("https://github.com/kyuhank/fisheries-workflow-mse-demo/commit/bfd7066a5b7fad6bc302bf311d63b20e32dfa9a4")[Code bfd7066a] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/2a8dc292696fa42866b1f28139c23510dc75f140")[Workflow 2a8dc292] · Image 9dea950a713b.
 
 Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].

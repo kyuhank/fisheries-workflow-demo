@@ -19,9 +19,9 @@
   "job": "cpue_summary",
   "timeout_seconds": 300,
   "input_sha256": {
-    "report-data.json": "3c82056352387b3588d804fa250888f78a3d3b656a36ffbe81cfbf641e966dae"
+    "report-data.json": "fc3d69c1be6781c6a9995ef12aeb7b50b1b82c5dc44e8f23fcb390efd97c742d"
   },
-  "presentation_source_sha256": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
+  "presentation_source_sha256": "3cffb1488a9f45e2fae20fcb02212103fe96ce1949d8e358d1090ca0b040ff87",
   "software": {
     "R": "R version 4.6.0 (2026-04-24)",
     "Quarto": "1.9.37",
@@ -51,18 +51,18 @@
     "report-job.txt"
   ],
   "artifact_sha256": {
-    "report.html": "430a058f52315b75170bfc4823b82b437eeb431b6c14cd7f0ba230ffc7127714",
-    "report.pdf": "3368fb70b70fc72e0119c020b3c9403385399e3bb1fc78165095a3693c9a62e5",
-    "report.qmd": "2c0216a1663c6fad2aa96671125bff68f2e698fe0bb490ab6b6e4316487fa5e4",
-    "report-data.json": "3c82056352387b3588d804fa250888f78a3d3b656a36ffbe81cfbf641e966dae",
-    "report.typ": "6c998d3a877780058e5df1484914e5ca321ee3e50098cf293daa9af9a3bca230",
-    "report.html.md": "6def215c4635cf726d531f27c7709cc0f7f442c2109f418642963f1fb15fdfd3",
-    "report.typst.md": "681f11132ca775248fe92b76ec05ccb957e9d4a4abc94fff36e711f1b82073c0",
-    "report_files/figure-html/unnamed-chunk-1-1.svg": "c5e7029ec5559e94be0f6fc77388f129dac3fb683fe277e31c30c1399dc753e8",
-    "report_files/figure-typst/unnamed-chunk-1-1.svg": "c5e7029ec5559e94be0f6fc77388f129dac3fb683fe277e31c30c1399dc753e8",
+    "report.html": "894e8d3678cc01d5897929de54107242333dd4064f288c3b152292da4a6f117b",
+    "report.pdf": "8e37237281d895e09ceab9cba3723445a6950683d1427d212f5ff5d1d3317b67",
+    "report.qmd": "3cffb1488a9f45e2fae20fcb02212103fe96ce1949d8e358d1090ca0b040ff87",
+    "report-data.json": "fc3d69c1be6781c6a9995ef12aeb7b50b1b82c5dc44e8f23fcb390efd97c742d",
+    "report.typ": "21303f27c58b0f8d99af5ffd392ec82f83a623945adf16d69da79f4b7003d63e",
+    "report.html.md": "fffa0835de6633aa73e330a785f0f5b36c422d9209cdecf0200df5525c499b66",
+    "report.typst.md": "d02fff7b111c0aa0a108edfe301bbc4dc3fa08044dfdf18966ce85c537d89ea4",
+    "report_files/figure-html/unnamed-chunk-1-1.svg": "642213fedcf7fc2d2314a25ecd2014dbb0f3cd1af30ccdc6458d22b7ba369c29",
+    "report_files/figure-typst/unnamed-chunk-1-1.svg": "642213fedcf7fc2d2314a25ecd2014dbb0f3cd1af30ccdc6458d22b7ba369c29",
     "report-html.log": "c9626f9a58e7846ef8eabea6b27394219bdf89895677af49ed233519c01eaa14",
     "report-typst.log": "8993c836c1b877016f1684f3e9946a3600e262a91ec6e65f5a86e1c5d14a59ed",
-    "report-view.R": "ca56c3e303a7afebaed3455f6f0a7cfe123973cbb20d37819ae753e6ba22649e",
+    "report-view.R": "ed6f78e8e498254eb002b0807fc55c4182839bc34c4c6563fdd7a3e4800c41de",
     "report-job.txt": "840b54781350bbf0e4457d946d2938fd4c1a8e3f32da4285807589c339bf56dd"
   }
 }

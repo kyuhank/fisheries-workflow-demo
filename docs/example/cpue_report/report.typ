@@ -420,30 +420,40 @@
   doc,
 )
 
-= CPUE analysis
-<cpue-analysis>
+= CPUE report
+<cpue-report>
+#strong[CPUE analyst] · Run 001 · Years 2000--2021
+
+Calculation finished (container exit 0).
+
 #box(image("report_files/figure-typst/unnamed-chunk-1-1.svg"))
 
-Nominal = 1,000 × annual fish / annual hooks, using the same selected records as each standardised curve. Quasipoisson GLM: year + cell--quarter stratum; Quasipoisson GLM: year + quarter. Arithmetic mean of response-scale predictions with equal fixed stratum weights.
+#table(
+  columns: (12.68%, 7.04%, 12.68%, 14.08%, 15.49%, 21.13%, 16.9%),
+  align: (left,left,left,left,left,left,left,),
+  table.header([Analysis], [Rows], [Excluded], [Converged], [Dispersion], [Score residual], [Final index],),
+  table.hline(),
+  [A], [132], [0], [Yes], [1213], [4.241e-13], [0.5626],
+  [B], [132], [0], [Yes], [3011], [1.332e-15], [0.6146],
+)
+Quasipoisson GLM: year + cell--quarter stratum; Quasipoisson GLM: year + quarter. Nominal = 1,000 × annual fish / annual hooks; both curves use the same selected records. Arithmetic mean of response-scale predictions with equal fixed stratum weights. The relative index passed to assessment equals one in its first year.
 
-== Relative indices
-<relative-indices>
-#box(image("report_files/figure-typst/unnamed-chunk-1-2.svg"))
+Final index is the last standardised value relative to its first year. Dispersion is Pearson residual sum of squares / residual df; score residual checks the fitted aggregate totals.
+
+#strong[Scope:] Fiji fleet; six observed cell--quarter strata, 2000--2021; aggregate records without vessel effects or confidence intervals.
+
+#strong[Inputs used]
 
 #table(
-  columns: 6,
-  align: (left,left,left,left,left,left,),
-  table.header([Analysis], [Rows], [Excluded], [Min hooks], [Converged], [Dispersion],),
+  columns: 3,
+  align: (left,left,left,),
+  table.header([Input], [Analyst], [Produced in],),
   table.hline(),
-  [A], [132], [0], [0], [Yes], [1213],
-  [B], [132], [0], [0], [Yes], [3011],
+  [Compare CPUE results], [CPUE analyst], [Run 001],
 )
-Each index is scaled to its own first year (= 1). Dispersion is the Pearson residual sum of squares / residual df.
-
-#strong[Scope:] Fiji fleet; six observed cell--quarter strata, 2000--2022. Fleet--cell--quarter aggregates; vessel effects and confidence intervals are unavailable. Released zeros are retained; absent/suppressed values are excluded.
 
 #horizontalrule
 
-Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/d4454fcfa9a23bd590344ad92940a13fa0a41c06")[Code d4454fcf] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
+Saved files: #NormalTok("report-data.json"); · #NormalTok("record.json"); · #link("https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/7d17fc5962466cdabc27d17e004bed87136b38bc")[Code 7d17fc59] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/2a8dc292696fa42866b1f28139c23510dc75f140")[Workflow 2a8dc292] · Image 9dea950a713b.
 
 Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].

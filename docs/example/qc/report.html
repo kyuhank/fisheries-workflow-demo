@@ -35,24 +35,30 @@ margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 
 
 <style>
-body { max-width: 880px; margin: 24px auto; padding: 0 20px; font: 16px/1.45 system-ui, sans-serif; color: #243649; }
-h1 { font-size: 27px; line-height: 1.2; }
-h2 { font-size: 20px; margin-top: 20px; }
-a { color: #1779a0; overflow-wrap: anywhere; }
+body { max-width: 880px; margin: 28px auto; padding: 0 22px; font: 15px/1.4 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 26px; font-weight: 600; line-height: 1.2; margin: 0 0 10px; }
+h2 { font-size: 19px; margin: 20px 0 10px; }
+p { margin: 10px 0; }
+a { color: #17688a; overflow-wrap: anywhere; }
 img, svg { max-width: 100%; height: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 6px; border-bottom: 1px solid #dde5eb; text-align: left; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0 16px; }
+th, td { padding: 6px 8px; border-bottom: 1px solid #dce3e8; text-align: left; vertical-align: top; }
+th { font-weight: 600; color: #243649; }
+hr { border: 0; border-top: 1px solid #dce3e8; margin-top: 20px; }
 .cell-output-display { overflow-x: auto; }
+@media (max-width: 600px) { body { margin: 16px auto; padding: 0 14px; } th, td { padding: 5px; } }
 </style>
-<h1 id="data-checks">Data checks</h1>
+<h1 id="quality-check">Quality check</h1>
+<p><strong>Data curator</strong> · Run 001 · Data through 2021</p>
+<p>Calculation finished (container exit 0).</p>
 <table>
 <thead>
 <tr>
 <th style="text-align:left;">
-Check
+Data check
 </th>
 <th style="text-align:left;">
-Result
+Recorded result
 </th>
 </tr>
 </thead>
@@ -83,9 +89,60 @@ Pass
 </tr>
 </tbody>
 </table>
-<p>639 accepted records.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Accepted records
+</th>
+<th style="text-align:left;">
+Returned for correction
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+639
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<p>Accepted records pass to the database snapshot. Released zero catches remain observations; missing or suppressed values are not treated as zeros.</p>
+<p><strong>Inputs used</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Input
+</th>
+<th style="text-align:left;">
+Analyst
+</th>
+<th style="text-align:left;">
+Produced in
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Data submission
+</td>
+<td style="text-align:left;">
+Data provider
+</td>
+<td style="text-align:left;">
+Run 001
+</td>
+</tr>
+</tbody>
+</table>
 <hr>
-<p>Run <code>001</code>. <a href="report-data.json">Data &amp; full record</a> · <a href="https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/d4454fcfa9a23bd590344ad92940a13fa0a41c06">Code d4454fcf</a> · <a href="https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93">Workflow 9cb9e72e</a> · Image 9dea950a713b.</p>
+<p><a href="report-data.json">Saved results</a> · <a href="record.json">Run record</a> · <a href="https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/7d17fc5962466cdabc27d17e004bed87136b38bc">Code 7d17fc59</a> · <a href="https://github.com/kyuhank/fisheries-workflow-demo/commit/2a8dc292696fa42866b1f28139c23510dc75f140">Workflow 2a8dc292</a> · Image 9dea950a713b.</p>
 <p>Data: WCPFC/SPC public statistics. <a href="https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip">Source 1</a> · <a href="https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip">Source 2</a>.</p>
 
 

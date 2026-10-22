@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "version": "1.13.0",
+  "checked_date": "2026-10-22",
+  "status": "execution_and_archive_passed_final_browser_ci_pending",
+  "source": {
+    "coordinator_repository": "https://github.com/kyuhank/fisheries-workflow-demo",
+    "calculation_commit": "2a8dc292696fa42866b1f28139c23510dc75f140",
+    "packaging_commit": "1f3bb8740c5db464656918802f06c83fad67b15b",
+    "component_commits": {
+      "cpue": "7d17fc5962466cdabc27d17e004bed87136b38bc",
+      "assessment": "50412b29afff933601eb2c04ffa56b71702538ac",
+      "mse": "bfd7066a5b7fad6bc302bf311d63b20e32dfa9a4"
+    },
+    "packaging_scope": "The final archive adds the corrected QC card layout. Calculation records, recorded code closures and canonical reports/data are retained.",
+    "interface_and_check_sources_sha256": {
+      "app/app.js": "e2d1f46fcd249e44583450f8aadce990c83fc8647b83af7c37802ed2e38f888f",
+      "app/style.css": "3e08b3fd886dc1b05b7d1c0ed58f4bec806ceab2d2a3413d11188588a1d1bae0",
+      "app/diagram.json": "7a9487636df4cee26d5f9e05bb4d5bc78f8ebd43610d87c4f4055318308690c5",
+      "scripts/check-diagram.py": "158aea3151200f688c5b44806b867e63eddf6ffd7e879728c8de29ea25bf21b9",
+      "scripts/check-handover.py": "aae6809a9316eb35852432eb80a75a29b9847afe9cdaa1161594eed87dd0b066",
+      "app/cloud.js": "068bd261b84c032497a13c3359955369048bda5fb185f59c19b314b68e023a61"
+    },
+    "hosted_execution_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476"
+  },
+  "archive": {
+    "file": "fisheries-workflow-offline-1.13.0.zip",
+    "url": "../fisheries-workflow-offline-1.13.0.zip",
+    "sha256": "ed39e3c2811ff384d3986c4f6e98ff794a8e28e02f7d5e0b44943f5c3f6e43c5",
+    "bytes": 8972630,
+    "reference_unchanged_after_reproduction": true
+  },
+  "numerical_comparison_policy": {
+    "absolute": 1e-09,
+    "assessment_log_residual_absolute": 1e-08,
+    "near_zero_gradient": 1e-07,
+    "relative": 1e-08,
+    "schema_version": 1
+  },
+  "native_execution": {
+    "status": "passed",
+    "actual_jobs": 22,
+    "actual_quarto_pdfs": 22,
+    "elapsed_seconds": 105.40832626109477,
+    "numerical_outputs_compared_with_previous_public_example": 22,
+    "environment_inventory_containers": 3,
+    "calculation_and_rendering_containers_per_job": true,
+    "artifact_and_input_analyst_records_checked": true,
+    "timing_scope": "Actual local execution with cached images; not a hosted queue-time estimate."
+  },
+  "offline_reproduction": {
+    "status": "passed",
+    "command": "make reproduce",
+    "actual_jobs": 22,
+    "elapsed_seconds": 118.079,
+    "numerical_outputs_compared": 22,
+    "actual_quarto_pdfs": 22,
+    "environment_inventory_containers": 3,
+    "all_pdfs_one_page": true,
+    "pdf_analyst_and_run_identity_checked": true,
+    "input_analyst_and_run_links_checked": true,
+    "artifact_and_container_receipts_checked": true,
+    "archive_reference_and_manifest_unchanged": true,
+    "network": {
+      "interfaces": [
+        "lo"
+      ],
+      "external_routes": 0,
+      "external_connection_exit_code": 7
+    },
+    "host_resources": {
+      "cpu_affinity_count": 2,
+      "address_space_bytes_per_process": 4294967296,
+      "aggregate_memory_cgroup": false
+    },
+    "job_resources": {
+      "cpus": 1,
+      "memory": "2g",
+      "network": "none",
+      "image_pull": "never"
+    },
+    "scope": "Preserved installed host packages and a cached immutable image; fresh OS or Docker image import was not tested."
+  },
+  "archive_interface": {
+    "status": "passed",
+    "browser": "Chromium",
+    "mode": "standalone file",
+    "elapsed_seconds": 20.335733365966007,
+    "jobs_checked": 22,
+    "checks": [
+      "Actual PDF blobs match each producing record",
+      "Data and Inputs & versions tabs",
+      "PDF and JSON downloads",
+      "Archive remains unchanged"
+    ],
+    "page_errors": [],
+    "scope": "Saved archive viewing and downloads; this browser check does not execute models."
+  },
+  "layout_and_handover": {
+    "status": "passed",
+    "browser": "Chromium",
+    "viewport_widths": [
+      1440,
+      1024,
+      390
+    ],
+    "zoom_factors": [
+      1,
+      1.25
+    ],
+    "saved_layout_node_positions": 88,
+    "live_state_node_positions": 704,
+    "diagram_sha256": "7a9487636df4cee26d5f9e05bb4d5bc78f8ebd43610d87c4f4055318308690c5",
+    "chromium_followup_after_qc_height_correction": "passed",
+    "preceding_layout_diagram_sha256": "11eab04cd3b38918d88247332685797d35949eba5b869e5cf8abe4e20c2a9b07",
+    "live_states": [
+      "Rendering PDF",
+      "Calculating",
+      "Preparing",
+      "Status unavailable",
+      "Awaiting file",
+      "Inputs changed",
+      "Retained",
+      "Waiting"
+    ],
+    "checks": [
+      "Status text remains inside cards",
+      "Status text clears View",
+      "Table badges remain inside their cells",
+      "Page does not overflow",
+      "Saved PDF viewing and selection"
+    ],
+    "manual_and_connection_fixture_cases": 16,
+    "handover_checks": [
+      "Three manual boundaries",
+      "Connect and automatic transfer",
+      "Single-job and update paths",
+      "Frozen confirmation identity",
+      "Late callbacks",
+      "Timeout",
+      "Unknown dispatch stays locked"
+    ],
+    "scope": "Local HTTP fixtures and browser layouts; these checks do not establish hosted execution."
+  },
+  "continuous_integration": {
+    "calculation_server_database": {
+      "status": "passed",
+      "source_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39770082169"
+    },
+    "preceding_interface": {
+      "status": "failed",
+      "source_commit": "45657de670f0a30852cbf02e0689a4d2025140a4",
+      "chromium_layout": "passed",
+      "webkit_layout": "failed",
+      "reason": "QC Rendering PDF status overlapped View at desktop width.",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39764878403"
+    },
+    "final_interface": {
+      "status": "pending",
+      "source_commit": null,
+      "workflow_sha256": "e030df920fc84d5d41eb9c41385b0d505f25d4c98c143716bce212ee25e762f4",
+      "scope": "The reviewed workflow repair pins Ubuntu24.04, selects the official HTTPS archive and bounds APT retries/timeouts. Both browsers and all checks remain required."
+    },
+    "interface_f19": {
+      "status": "cancelled",
+      "source_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39770082139",
+      "reason": "The 10-minute job limit expired during APT browser-dependency downloads.",
+      "layout_and_handover_tests": "skipped",
+      "webkit_result": "not executed"
+    }
+  },
+  "native_publication_payload": {
+    "status": "passed",
+    "bytes": 15872233,
+    "limit_bytes": 16000000,
+    "sha256": "97745d7089bbfc0b5ea58e86deadf407793fc3e08b695b7b858e7fecc61b1066",
+    "scope": "Actual native artifacts encoded with a transport stub. Hosted metadata and publication are checked separately."
+  },
+  "hosted_execution": {
+    "status": "passed",
+    "source_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
+    "baseline_numerical_outputs_compared_with_native": 22,
+    "native_reference_source": "2a8dc292696fa42866b1f28139c23510dc75f140",
+    "original_runs": 3,
+    "replayed_runs": 0,
+    "normal_manual_acknowledgements": 1,
+    "checks": [
+      "Successful GitHub workflow conclusion",
+      "Accepted result publication",
+      "Actual PDF and bundle checksums",
+      "Recorded source/image/calculation/render identities",
+      "Retained input and result identities"
+    ],
+    "cases": [
+      {
+        "case": "baseline",
+        "status": "passed",
+        "github_run": "39771075527",
+        "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39771075527",
+        "run_jobs": 22,
+        "retained_jobs": 0,
+        "manual_boundaries": 0,
+        "bundle_sha256": "3bffc405e44cd572e2faf5aab9630c8d1eae073ee711c37afe6233ffd0061729",
+        "pdf_validation_sha256": "250734d77832661e2a0c2c85aa43690dc950a0faef4a466670a4ec64b85706e1",
+        "full_gate_seconds": 426.976,
+        "request_to_first_calculation_seconds": 73.1248738765717,
+        "github_preparation_step_seconds": 39,
+        "launch_through_last_completion_seconds": 231.496175289154
+      },
+      {
+        "case": "growthupdate",
+        "status": "passed",
+        "github_run": "39772164870",
+        "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39772164870",
+        "run_jobs": 10,
+        "retained_jobs": 12,
+        "manual_boundaries": 1,
+        "bundle_sha256": "ef6fb2d6389a853286cd13a3a91de452ee804887d5bcaff9bdb6035a25632b61",
+        "pdf_validation_sha256": "17539ea6a3956c3cce5c855ed27ffc3ee1e6b69a7b8cb4c26c4e4a9e3b13d08d",
+        "full_gate_seconds": 345.329,
+        "request_to_first_calculation_seconds": 73.1858279705048,
+        "github_preparation_step_seconds": 33,
+        "launch_through_last_completion_seconds": 150.273512363434
+      },
+      {
+        "case": "msebuffer",
+        "status": "passed",
+        "github_run": "39772944471",
+        "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39772944471",
+        "run_jobs": 3,
+        "retained_jobs": 19,
+        "manual_boundaries": 0,
+        "bundle_sha256": "da4c49bda7700ceeb07ee9ebff0744647740036a28a95f76041218cce6c8dfcb",
+        "pdf_validation_sha256": "0b6a04ae0448da5b938def1363d1bcca6861d29f5d2403553a15ff980ce4333e",
+        "full_gate_seconds": 251.173,
+        "request_to_first_calculation_seconds": 81.2411160469055,
+        "github_preparation_step_seconds": 37,
+        "launch_through_last_completion_seconds": 56.0935764312744
+      }
+    ],
+    "timing_scope": "Full gates include service polling, publication, downloads and validation. Preparation and calculation/PDF spans are reported separately; these are observed runs, not a controlled benchmark.",
+    "deployed_frontend_attachment": "pending",
+    "actual_publication_size_guard": "passed; exact final hosted wire byte count was not separately logged",
+    "backend": {
+      "source_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
+      "edge_version": 21,
+      "deployed_source_files_verified": 10,
+      "database_statement_timeout_seconds": 45,
+      "edge_database_attempt_timeout_seconds": 50,
+      "edge_database_attempts": 1
+    }
+  },
+  "saved_pdf_manifest": {
+    "assessment_a1": {
+      "sha256": "a4aad0f25715d98cb5a35309dda4a11c657e510283e4267267cb8cbcca1d80d7",
+      "pages": 1,
+      "bytes": 52268,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "assessment_a2": {
+      "sha256": "b1c9a5480d7f1c3648a706969596d632c5dc007c2457f64335cd2e253e909dc9",
+      "pages": 1,
+      "bytes": 52433,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "assessment_b1": {
+      "sha256": "a9c3cce2d29bcdc80f36785ec64b775a22ca44197a078e8d3b74741a459c8d38",
+      "pages": 1,
+      "bytes": 52493,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "assessment_b2": {
+      "sha256": "efe6fccc4ff4c9635f631af6540d5aa10eaca890d86546c84eb99b687955400d",
+      "pages": 1,
+      "bytes": 52578,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "assessment_report": {
+      "sha256": "6da1dd5b5d319ccb5f062dfbfa0c1dbd6c80e61bb655ce58833483b3f199decc",
+      "pages": 1,
+      "bytes": 51388,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "assessment_summary": {
+      "sha256": "43703a1f7d152a30ccff9a639968aa75c1bdae5f87eee3349a3263ba9b2beb56",
+      "pages": 1,
+      "bytes": 52842,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "cpue_a": {
+      "sha256": "3c23ef5591ead98002a57637259fad4b7caab79b335e7d8c05b3644cd160bc56",
+      "pages": 1,
+      "bytes": 48310,
+      "analyst": "CPUE analyst",
+      "run_id": "Run 001"
+    },
+    "cpue_b": {
+      "sha256": "67ce1c854a12b7b42948e5a5cdf066cfb22b38e6f5fe2bb0dead2f5aceb8383c",
+      "pages": 1,
+      "bytes": 48431,
+      "analyst": "CPUE analyst",
+      "run_id": "Run 001"
+    },
+    "cpue_report": {
+      "sha256": "713652e55f637d6f6d935749dc7c199decab245d248184822d409b4f8d159b6d",
+      "pages": 1,
+      "bytes": 59217,
+      "analyst": "CPUE analyst",
+      "run_id": "Run 001"
+    },
+    "cpue_summary": {
+      "sha256": "8e37237281d895e09ceab9cba3723445a6950683d1427d212f5ff5d1d3317b67",
+      "pages": 1,
+      "bytes": 50537,
+      "analyst": "CPUE analyst",
+      "run_id": "Run 001"
+    },
+    "database": {
+      "sha256": "2f9f63a5b844ca2252155464fe18e11a0392b6b6c799075e99c78df7a001e310",
+      "pages": 1,
+      "bytes": 47522,
+      "analyst": "Data curator",
+      "run_id": "Run 001"
+    },
+    "extract": {
+      "sha256": "d3cbc31c348fa7ac8db705d83e488f1bc9935dbd43de0ff3a7013d10e0fd55cd",
+      "pages": 1,
+      "bytes": 47932,
+      "analyst": "Data analyst",
+      "run_id": "Run 001"
+    },
+    "mse_buffered": {
+      "sha256": "71b5e956cfdf32fcd298025c38d0c12c23e4545d987aaceaeb0549bb71224c7e",
+      "pages": 1,
+      "bytes": 51494,
+      "analyst": "MSE analyst",
+      "run_id": "Run 001"
+    },
+    "mse_constant": {
+      "sha256": "67a39de505eb0952f5e3f17cc91b0fd1a741c2827952386b8d787d3c73b9764d",
+      "pages": 1,
+      "bytes": 51561,
+      "analyst": "MSE analyst",
+      "run_id": "Run 001"
+    },
+    "mse_index": {
+      "sha256": "3dfdead2a811aed0ab2ac67b10a2b4b59b8687c6ef22f3d706715911a10c623b",
+      "pages": 1,
+      "bytes": 50798,
+      "analyst": "MSE analyst",
+      "run_id": "Run 001"
+    },
+    "mse_prepare": {
+      "sha256": "ddb9af2902027d8b6bcd82e21af915d82cd76531564122edff93fb5666172f68",
+      "pages": 1,
+      "bytes": 44996,
+      "analyst": "MSE analyst",
+      "run_id": "Run 001"
+    },
+    "mse_report": {
+      "sha256": "f5702861a7dbac6b5f152c9e46042c0c417cfad008e6b8b037d906c62a098a30",
+      "pages": 1,
+      "bytes": 59680,
+      "analyst": "MSE analyst",
+      "run_id": "Run 001"
+    },
+    "mse_summary": {
+      "sha256": "f3df6adffa151a7d55548079174d95c1b3daa5d04c53c29d9cb30cd98a14cf4c",
+      "pages": 1,
+      "bytes": 60580,
+      "analyst": "MSE analyst",
+      "run_id": "Run 001"
+    },
+    "prepare_a": {
+      "sha256": "90a8e546e8d70d9fae2eeae7f19e0fd685b2a62d4dfb97f8fb4a720e4462980c",
+      "pages": 1,
+      "bytes": 49026,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "prepare_b": {
+      "sha256": "5692e848095cb57bca84e9ec96bc17259a0f1326c81043a02aeee754aedf5e05",
+      "pages": 1,
+      "bytes": 49339,
+      "analyst": "Assessment analyst",
+      "run_id": "Run 001"
+    },
+    "qc": {
+      "sha256": "c216f683f2ebf56333c3edce9aacdb9877e0ca46886b0cc589b1f5bde3d37896",
+      "pages": 1,
+      "bytes": 37746,
+      "analyst": "Data curator",
+      "run_id": "Run 001"
+    },
+    "submission": {
+      "sha256": "1497b268050b914ac83351bad484cf9c3fc831f42396f9efae42d81790e444cc",
+      "pages": 1,
+      "bytes": 43582,
+      "analyst": "Data provider",
+      "run_id": "Run 001"
+    }
+  },
+  "retained_negative_checks": [
+    {
+      "check": "Initial release-entry harness",
+      "status": "failed",
+      "reason": "The harness resolved the release entry point from the wrong working location.",
+      "resolution": "Used the script entry point; no calculation was repeated by the failed packaging check."
+    },
+    {
+      "check": "Existing component hydration",
+      "status": "stopped_before_calculation",
+      "reason": "Existing hydrated sources did not match the updated pinned component revisions.",
+      "resolution": "Preserved the earlier hydration and hydrated the declared revisions into a fresh location."
+    },
+    {
+      "check": "Initial native publication payload",
+      "status": "rejected_by_size_check",
+      "bytes": 16350421,
+      "limit_bytes": 16000000,
+      "external_post_sent": false,
+      "resolution": "Removed duplicate HTML from the archive interface payload. All canonical HTML, PDFs, records and numerical values remain; the final native payload is 15872233 bytes."
+    },
+    {
+      "check": "Initial archive-browser assertion",
+      "status": "failed_harness_assertion",
+      "reason": "The test expected a raw owner field in a panel that displays job and run identity.",
+      "resolution": "Checked the panel run identity and the analyst name in the actual PDF; no application change or job rerun."
+    },
+    {
+      "check": "Initial status layouts",
+      "status": "failed",
+      "reason": "Some multiword statuses collided with card content or View controls.",
+      "resolution": "Adjusted wrapping and spacing; final browser geometry checks pass across all listed layouts and states."
+    },
+    {
+      "check": "WebKit layout at the preceding source",
+      "status": "failed",
+      "source_commit": "45657de670f0a30852cbf02e0689a4d2025140a4",
+      "reason": "QC Rendering PDF status overlapped View.",
+      "resolution": "Increased QC card height and realigned its outgoing edge; corrected layout passes local Chromium. Final WebKit CI is pending."
+    },
+    {
+      "check": "Earlier hosted growth update",
+      "status": "strict_gate_failed",
+      "source_commit": "45657de670f0a30852cbf02e0689a4d2025140a4",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39766442006",
+      "github_conclusion": "cancelled",
+      "run_jobs": 10,
+      "retained_jobs": 12,
+      "publication": "validated separately by read-only retrieval",
+      "accepted_bundle_sha256": "fe330eae86cdd348d23fef4a7049f13e07261d9039fc70c4e89da411bf2258be",
+      "first_finish_operation_receipt": "unknown",
+      "last_logged_finish_error": "HTTP503: database connection interrupted",
+      "following_buffer_run_dispatched": false,
+      "scope": "The accepted archive does not change the original failed strict gate. Its exact first finish response and the cause of the later error were not established; the three new f19 gates above passed separately."
+    },
+    {
+      "check": "f19 interface dependency installation",
+      "status": "cancelled_job_timeout",
+      "source_commit": "f19cdb077778f675c4248973b71a2a9f3c1fd476",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39770082139",
+      "job_limit_minutes": 10,
+      "install_step_seconds": 597,
+      "reason": "APT dependency downloads from the Azure Ubuntu mirror stalled until the job timeout.",
+      "test_steps_executed": false,
+      "webkit_result": "not executed",
+      "resolution": "Prepared a workflow-only official-mirror/timeout repair; its next CI outcome is pending."
+    }
+  ],
+  "limits": [
+    "Execution and traceability checks support this worked example; they do not validate the simplified models for fisheries advice.",
+    "Offline execution requires prepared R/Make/Docker dependencies, preserved host packages and the recorded image.",
+    "Local timings do not include GitHub scheduling or image downloads.",
+    "Local browser checks used Chromium; no local WebKit result is claimed."
+  ],
+  "previous_checks": {
+    "version": "1.12.0",
+    "url": "../checks-1.12.0-20261022/README.md",
+    "scope": "Earlier evidence is retained separately."
+  },
+  "earlier_archive_checks": {
+    "archive_sha256": "d9c4a98f911def8a06257b3f418a49d3918ba514c95ea9bb360c83478ebb3bb8",
+    "coordinator_commit": "45657de670f0a30852cbf02e0689a4d2025140a4",
+    "offline_status": "passed",
+    "offline_elapsed_seconds": 103.002,
+    "offline_jobs": 22,
+    "standalone_browser_status": "passed",
+    "standalone_browser_elapsed_seconds": 14.4652220539283,
+    "scope": "The prior archive passed separately. The current archive above has its own fresh execution and browser evidence."
+  }
+}

@@ -9,7 +9,6 @@ report_scalar <- function(value) {
 }
 
 report_table <- function(rows, columns = NULL, limit = NULL) {
-  # Keep a preceding knitr figure outside the Markdown table.
   cat("\n\n")
   if (!length(rows)) { cat("No saved rows are available.\n\n"); return(invisible(NULL)) }
   if (is.null(columns)) {
@@ -41,53 +40,85 @@ report_has <- function(rows, field) {
   }, logical(1)))
 }
 
-report_plot <- function(series, field, label, points = character(), upper = NULL) {
+report_years <- function(rows) {
+  if (!report_has(rows, "year")) return("")
+  years <- range(vapply(rows, function(row) row$year, numeric(1)))
+  if (diff(years) == 0) as.character(years[1]) else paste(years, collapse = "–")
+}
+
+report_header <- function(title, record, rows = NULL) {
+  cat("# ", title, "\n\n", sep = "")
+  metadata <- character()
+  if (!is.null(record$owner)) metadata <- c(metadata, paste0("**", record$owner, "**"))
+  if (!is.null(record$run_id)) metadata <- c(metadata, record$run_id)
+  years <- report_years(rows)
+  if (nzchar(years)) metadata <- c(metadata, paste("Years", years)) else if (!is.null(record$snapshot)) {
+    metadata <- c(metadata, paste("Data through", record$snapshot))
+  }
+  if (length(metadata)) cat(paste(metadata, collapse = " · "), "\n\n", sep = "")
+  calculation <- record$execution$calculation
+  if (is.list(calculation) && isTRUE(calculation$exit_code == 0)) {
+    cat("Calculation finished (container exit 0).\n\n")
+  }
+}
+
+report_inputs <- function(record) {
+  inputs <- record$inputs
+  if (!length(inputs)) return(invisible(NULL))
+  rows <- lapply(names(inputs), function(key) {
+    input <- inputs[[key]]
+    title <- if (is.null(input$title)) gsub("_", " ", key) else input$title
+    owner <- if (is.null(input$owner)) "—" else input$owner
+    list(input = title, analyst = owner,
+         run = if (is.null(input$run_id)) "—" else input$run_id)
+  })
+  cat("**Inputs used**\n")
+  report_table(rows, c(input = "Input", analyst = "Analyst", run = "Produced in"))
+}
+
+report_plot <- function(series, field, label, points = character(), upper = NULL, reference = NULL) {
   panel_title <- attr(series, "panel_title")
   valid <- vapply(series, function(rows) report_has(rows, "year") && report_has(rows, field), logical(1))
   series <- series[valid]
   if (!length(series)) { cat("No saved values are available for this plot.\n\n"); return(invisible(NULL)) }
   years <- unlist(lapply(series, function(rows) vapply(rows, function(row) row$year, numeric(1))))
   values <- unlist(lapply(series, function(rows) vapply(rows, function(row) row[[field]], numeric(1))))
-  scale <- if (field == "catch_t" && max(abs(values)) >= 10000) 1000 else 1
+  scale <- if (field == "catch_t" && max(abs(c(values, upper))) >= 10000) 1000 else 1
   if (scale == 1000) label <- sub("t/y", "1,000 t/y", label, fixed = TRUE)
   values <- values / scale
   if (!is.null(upper)) upper <- upper / scale
-  palette <- c("#1378a3", "#b56435", "#7357a8", "#328363", "#a7526d", "#93761e")
-  fixed <- c("Constant catch" = "#1378a3", "Index rule" = "#b56435", "Buffered rule" = "#7357a8")
+  palette <- c("#17688a", "#b56536", "#786093", "#328363", "#a7526d", "#93761e")
+  fixed <- c("Constant catch" = "#17688a", "Index rule" = "#b56536", "Buffered rule" = "#786093")
   colours <- rep(palette, length.out = length(series))
   named <- names(series) %in% names(fixed)
   colours[named] <- fixed[names(series)[named]]
   line_types <- ifelse(grepl("Nominal", names(series), fixed = TRUE), 2, 1)
   symbols <- ifelse(grepl("Nominal", names(series), fixed = TRUE), 1, 16)
-  margins <- if (!is.null(panel_title)) c(3.7, 4.6, 3.9, 1.6) else c(3.7, 4.4, 3.1, 0.7)
-  old <- par(mar = margins, mgp = c(2.8, 0.7, 0), las = 1, cex = 0.88)
+  old <- par(mar = c(3.7, 4.4, if (is.null(panel_title)) 2.7 else 3.5, 0.9),
+             mgp = c(2.8, 0.7, 0), las = 1, cex = 0.88,
+             col.axis = "#354655", col.lab = "#243649", fg = "#8e9ba5", bty = "l")
   on.exit(par(old))
   bounds <- range(c(0, values, upper), finite = TRUE)
   if (diff(bounds) == 0) bounds <- bounds + c(0, 1)
   years <- range(years)
   if (diff(years) == 0) years <- years + c(-0.5, 0.5)
-  plot(years, bounds, type = "n", xlab = "Year", ylab = label,
-       xaxt = if (is.null(panel_title)) "s" else "n")
-  if (!is.null(panel_title)) {
-    first_tick <- 5 * ceiling(years[1] / 5)
-    last_tick <- 5 * floor(years[2] / 5)
-    ticks <- if (first_tick <= last_tick) seq(first_tick, last_tick, by = 5) else
-      unique(round(pretty(years, n = 3)))
-    ticks <- ticks[ticks >= years[1] & ticks <= years[2]]
-    axis(1, at = ticks, labels = ticks)
-    mtext(panel_title, side = 3, line = 2.9, cex = 0.95, font = 2)
-  }
-  abline(h = axTicks(2), col = "#e4e9ee", lwd = 0.8)
+  plot(years, bounds, type = "n", xlab = "Year", ylab = label, xaxt = "n")
+  ticks <- pretty(years, n = 4)
+  ticks <- ticks[ticks >= years[1] & ticks <= years[2] & ticks == floor(ticks)]
+  axis(1, at = ticks, labels = ticks)
+  abline(h = axTicks(2), col = "#e7ebee", lwd = 0.8)
+  if (!is.null(reference)) abline(h = reference / scale, col = "#89949d", lty = 3)
   for (i in seq_along(series)) {
     rows <- series[[i]]
     lines(vapply(rows, function(row) row$year, numeric(1)),
           vapply(rows, function(row) row[[field]], numeric(1)) / scale,
           type = if (names(series)[i] %in% points) "p" else "o",
-          pch = symbols[i], cex = 0.6, col = colours[i], lty = line_types[i], lwd = 2)
+          pch = symbols[i], cex = 0.5, col = colours[i], lty = line_types[i], lwd = 1.8)
   }
+  if (!is.null(panel_title)) mtext(panel_title, side = 3, line = 2.6, cex = 0.95, font = 2)
   legend("top", names(series), col = colours, lty = ifelse(names(series) %in% points, NA, line_types),
-         pch = symbols, lwd = 2, ncol = min(2, length(series)), inset = c(0, -0.24),
-         bty = "n", xpd = NA, cex = 0.83)
+         pch = symbols, lwd = 1.8, ncol = min(2, length(series)), inset = c(0, -0.20),
+         bty = "n", xpd = NA, cex = 0.80)
 }
 
 report_panels <- function(code) {
@@ -96,72 +127,103 @@ report_panels <- function(code) {
   eval(substitute(code), parent.frame())
 }
 
-report_end_rows <- function(rows) {
-  rows[unique(c(seq_len(min(2L, length(rows))), tail(seq_along(rows), 2L)))]
-}
-
-report_years <- function(rows) {
-  if (!report_has(rows, "year")) return("")
-  years <- range(vapply(rows, function(row) row$year, numeric(1)))
-  paste(years, collapse = "–")
+report_annual <- function(rows) {
+  if (!report_has(rows, "year")) return(list())
+  years <- sort(unique(vapply(rows, function(row) row$year, numeric(1))))
+  lapply(years, function(year) {
+    selected <- Filter(function(row) row$year == year, rows)
+    list(year = year, observations = length(selected),
+         hooks = sum(vapply(selected, function(row) row$hooks, numeric(1))),
+         catch_n = sum(vapply(selected, function(row) row$catch_n, numeric(1))))
+  })
 }
 
 report_coverage <- function(rows, catch = NULL) {
-  fields <- c(records = "Records", years = "Years", fleets = "Fleets", strata = "Strata", catch_years = "Catch years")
   value <- list(records = length(rows), years = report_years(rows))
-  for (field in c("fleet", "stratum")) {
+  for (field in c("fleet", "stratum", "vessel")) {
     present <- unique(unlist(lapply(rows, `[[`, field)))
     if (length(present)) value[[paste0(field, "s")]] <- if (field == "fleet") paste(present, collapse = ", ") else length(present)
   }
   if (length(catch)) value$catch_years <- report_years(catch)
+  fields <- c(records = "Records", years = "Years", fleets = "Fleet", strata = "Strata",
+              vessels = "Vessels", catch_years = "Catch years")
   report_table(list(value), fields[names(fields) %in% names(value)])
+}
+
+report_data_plot <- function(rows, catch = NULL, field = "hooks") {
+  annual <- report_annual(rows)
+  if (field == "hooks") {
+    annual <- lapply(annual, function(row) { row$effort <- row$hooks / 1e6; row })
+    first <- list(Effort = annual)
+    label <- "Effort (million hooks)"
+    field <- "effort"
+  } else {
+    first <- list(Records = annual)
+    label <- "Released records"
+  }
+  report_panels({
+    report_plot(first, field, label)
+    if (length(catch)) report_plot(list(Removals = catch), "catch_t", "Catch (t/y)") else {
+      report_plot(list(Fish = annual), "catch_n", "Catch (fish)")
+    }
+  })
+}
+
+report_pairs_check <- function(rows) {
+  years <- if (report_has(rows, "year")) vapply(rows, function(row) row$year, numeric(1)) else numeric()
+  unique_years <- length(years) > 0L && !anyDuplicated(years)
+  consecutive <- length(years) > 0L && all(diff(years) == 1)
+  positive <- report_has(rows, "index") && all(vapply(rows, function(row) row$index > 0, logical(1)))
+  catch <- report_has(rows, "catch_t") && all(vapply(rows, function(row) row$catch_t >= 0, logical(1)))
+  report_table(list(list(years = if (unique_years && consecutive) "Unique, consecutive" else "Review",
+                         index = if (positive) "Positive, finite" else "Review",
+                         catch = if (catch) "Non-negative, finite" else "Review")),
+               c(years = "Annual join", index = "Index values", catch = "Catch values"))
 }
 
 report_rate_series <- function(rows) {
   rates <- lapply(c("standardised_cpue", "nominal_cpue"), function(field) {
     lapply(rows, function(row) list(year = row$year, cpue = row[[field]]))
   })
-  setNames(rates, c("Standardised", "Nominal: same records"))
+  setNames(rates, c("Standardised", "Nominal"))
 }
 
-report_rate_plot <- function(rows, label = NULL) {
+report_rate_plot <- function(rows, label = NULL, upper = NULL) {
   if (report_has(rows, "standardised_cpue") && report_has(rows, "nominal_cpue")) {
     rates <- report_rate_series(rows)
-    if (!is.null(label)) {
-      names(rates) <- c("Standardised", "Nominal")
-      attr(rates, "panel_title") <- label
-    }
-    report_plot(rates, "cpue", "Fish per 1,000 hooks")
+    if (!is.null(label)) attr(rates, "panel_title") <- label
+    report_plot(rates, "cpue", "Fish per 1,000 hooks", upper = upper)
   } else {
     report_plot(setNames(list(rows), if (is.null(label)) "Saved index" else label), "index", "Relative CPUE")
-    cat("\n\nSaved relative indices only; absolute rates are unavailable.\n\n")
   }
 }
 
-report_cpue_checks <- function(analyses) {
+report_cpue_checks <- function(analyses, series = NULL) {
   rows <- lapply(seq_along(analyses), function(i) {
     x <- analyses[[i]]
+    values <- if (!is.null(series) && length(series) >= i) series[[i]] else x$series
     list(analysis = sub("CPUE analysis ", "", names(analyses)[i], fixed = TRUE),
-      used = x$sets_used, excluded = x$sets_excluded, min_hooks = x$min_hooks,
+      used = x$sets_used, excluded = x$sets_excluded,
       converged = if (is.null(x$converged)) NULL else if (isTRUE(x$converged)) "Yes" else "No",
-      dispersion = x$dispersion)
+      dispersion = x$dispersion, score = x$score_residual,
+      final_index = if (report_has(values, "index")) tail(values, 1)[[1]]$index else NULL)
   })
-  columns <- c(analysis = "Analysis", used = "Rows", excluded = "Excluded", min_hooks = "Min hooks",
-               converged = "Converged", dispersion = "Dispersion")
+  columns <- c(analysis = "Analysis", used = "Rows", excluded = "Excluded", converged = "Converged",
+               dispersion = "Dispersion", score = "Score residual", final_index = "Final index")
   columns <- columns[vapply(names(columns), function(field) any(vapply(rows, function(row) !is.null(row[[field]]), logical(1))), logical(1))]
   report_table(rows, columns)
 }
 
 report_cpue_note <- function(analyses, record) {
-  cat("\n\nNominal = 1,000 × annual fish / annual hooks, using the same selected records as each standardised curve. ")
   methods <- unique(unlist(lapply(analyses, `[[`, "method")))
   if (length(methods)) cat(paste(methods, collapse = "; "), ". ", sep = "")
+  cat("Nominal = 1,000 × annual fish / annual hooks; both curves use the same selected records. ")
   targets <- unique(unlist(lapply(analyses, `[[`, "standardisation")))
   if (length(targets)) cat(paste(targets, collapse = "; "), ". ", sep = "")
-  if (any(vapply(analyses, function(x) isTRUE(x$min_hooks > 0), logical(1)))) {
-    cat("Each effort threshold applies to both curves; omitted cells may require model predictions. ")
-  }
-  cat("\n\n")
+  thresholds <- vapply(analyses, function(x) if (is.null(x$min_hooks)) 0 else x$min_hooks, numeric(1))
+  if (any(thresholds > 0)) cat("Minimum hooks: ",
+    paste(paste(names(analyses), thresholds, sep = " = "), collapse = "; "), ". ", sep = "")
+  cat("The relative index passed to assessment equals one in its first year.\n\n")
 }
 
 report_fit_status <- function(row) {
@@ -186,15 +248,21 @@ report_assessment <- function(result, individual = FALSE) {
     names(fit) <- c("Observed CPUE", "Fitted CPUE")
     report_panels({
       report_plot(fit, "index", "Relative CPUE", points = "Observed CPUE")
-      report_plot(list(Biomass = rows), "B_over_K", "Start-of-year B/K")
+      report_plot(list(Biomass = rows), "B_over_K", "Start-of-year B/K", upper = 1)
     })
     value <- result[c("r", "K", "q")]
-    value$final_B_over_K <- tail(rows, 1)[[1]]$B_over_K
-    value$checks <- report_fit_status(result)
+    value$final_B_over_K <- if (length(rows)) tail(rows, 1)[[1]]$B_over_K else NULL
     report_table(list(value), c(r = "Fixed r (/y)", K = "Capacity K (t)", q = "Catchability q",
-                               final_B_over_K = "Final B/K", checks = "Fit checks"))
+                               final_B_over_K = "Final B/K"))
+    cat("**Numerical checks:** ", report_fit_status(result), ". ", sep = "")
+    if (!is.null(result$balance_residual_t)) cat("Maximum balance residual ", report_scalar(result$balance_residual_t), " t", sep = "")
+    if (!is.null(result$balance_tolerance_t)) cat(" (tolerance ", report_scalar(result$balance_tolerance_t), " t)", sep = "")
+    if (!is.null(result$projected_gradient_logK)) cat("; projected gradient ", report_scalar(result$projected_gradient_logK), sep = "")
+    if (!is.null(result$gradient_tolerance)) cat(" (tolerance ", report_scalar(result$gradient_tolerance), ")", sep = "")
+    if (!is.null(result$active_bound)) cat("; active bound: ", result$active_bound, sep = "")
+    cat(".\n\n")
   } else {
-    report_plot(result$series, "B_over_K", "Start-of-year B/K")
+    report_plot(result$series, "B_over_K", "Start-of-year B/K", upper = 1)
     rows <- lapply(result$diagnostics, function(row) {
       series <- result$series[[row$case]]
       list(case = row$case, r = row$r, K = row$K,
@@ -202,19 +270,18 @@ report_assessment <- function(result, individual = FALSE) {
            checks = report_fit_status(row))
     })
     report_table(rows, c(case = "Case", r = "Fixed r (/y)", K = "Capacity K (t)",
-                         final_B_over_K = "Final B/K", checks = "Fit checks"))
+                         final_B_over_K = "Final B/K", checks = "Numerical checks"))
   }
-  cat("B/K uses each case's carrying capacity. Checks cover balance, positive biomass, gradient, convergence and boundaries. ",
-      "Case differences are fixed-assumption sensitivities; they do not form an uncertainty interval.\n\n", sep = "")
+  cat("B/K uses each case's carrying capacity. Fitted parameters and next-year biomass pass to management trial preparation.\n\n")
 }
 
 report_mse_metrics <- function(metrics, assumptions = list()) {
   threshold <- if (is.null(assumptions$depletion_threshold)) "threshold" else report_scalar(assumptions$depletion_threshold)
-  report_table(metrics, c(name = "Rule", mean_catch_t = "Catch (t/y)", final_B_over_K = "Final B/K",
+  report_table(metrics, c(name = "Rule", mean_catch_t = "Mean catch (t/y)", final_B_over_K = "Final B/K",
     below_threshold_percent = paste0("Below ", threshold, " (%)"),
     catch_change_percent = "Catch change (%)", shortfall_trials = "Capped trials"))
-  cat("Catch is the trial mean; final B/K is the trial median. Below-threshold means any year. ",
-      "Catch change includes the first change from reference catch; capped trials requested more than the guardrail allowed.\n\n", sep = "")
+  cat("Final B/K is the trial median; below-threshold counts trials with any low-biomass year. ",
+      "Catch change includes the first change from reference catch. Capped trials had requested catch above the biomass guardrail.\n\n", sep = "")
 }
 
 report_mse <- function(result, individual = FALSE) {
@@ -223,37 +290,59 @@ report_mse <- function(result, individual = FALSE) {
   rule_names <- vapply(metrics, function(row) row$name, character(1))
   if (all(rule_names %in% names(series))) series <- series[rule_names]
   if (individual && !is.null(result$description)) cat(result$description, "\n\n")
+  models <- result$operating_models
+  catches <- unlist(lapply(models, `[[`, "reference_catch_t"))
+  catch_upper <- if (length(catches) && !is.null(result$assumptions$maximum_catch_multiple)) {
+    max(catches) * result$assumptions$maximum_catch_multiple
+  } else NULL
   report_panels({
-    report_plot(series, "B_over_K", "Median end-year B/K")
-    report_plot(series, "catch_t", "Median catch (t/y)")
+    report_plot(series, "B_over_K", "Median end-year B/K", upper = 1,
+                reference = result$assumptions$depletion_threshold)
+    report_plot(series, "catch_t", "Median catch (t/y)", upper = catch_upper)
   })
   report_mse_metrics(metrics, result$assumptions)
   assumptions <- result$assumptions
-  if (!is.null(assumptions$years)) cat(assumptions$years, " years; ", assumptions$replicates,
-    " trials per case/scenario. ", sep = "")
-  if (!is.null(assumptions$maximum_harvest_rate)) cat("Realised catch ≤ ",
-    100 * assumptions$maximum_harvest_rate, "% of true starting biomass. ", sep = "")
-  cat("Equal case/scenario weights; all comparisons are conditional on the shared guardrail. ",
-      "Toy lognormal errors and fixed fitted cases provide illustrative trial fractions, not calibrated risk.\n\n", sep = "")
-  if (length(result$boundary_cases)) cat("**Review:** assessment search boundaries: ",
+  counts <- unique(unlist(lapply(metrics, `[[`, "trials")))
+  if (length(counts) == 1L) cat(counts, " trials per rule; ", sep = "")
+  if (!is.null(assumptions$years)) cat(assumptions$years, " future years; ", sep = "")
+  if (length(models)) cat(length(models), " fitted cases; ", sep = "")
+  if (length(assumptions$scenarios)) cat(length(assumptions$scenarios), " growth scenarios. ", sep = "")
+  cat("All rules use the same saved errors and cases, with equal case/scenario weights. ")
+  if (!is.null(assumptions$maximum_harvest_rate)) cat("Realised catch is capped at ",
+    100 * assumptions$maximum_harvest_rate, "% of starting biomass. ", sep = "")
+  if (!is.null(assumptions$depletion_threshold)) cat("Dotted line: B/K = ", report_scalar(assumptions$depletion_threshold), ". ", sep = "")
+  cat("\n\n")
+  if (length(result$boundary_cases)) cat("**Review:** assessment cases on search boundaries: ",
     paste(unlist(result$boundary_cases), collapse = ", "), ".\n\n", sep = "")
 }
 
 report_scope <- function(job, result, record) {
   public <- !is.null(record$data_source) && (!is.null(record$data_source$cpue_scope) || identical(result$data_kind, "public-wcpfc"))
   if (public && grepl("^cpue", job)) {
-    cat("**Scope:** ", record$data_source$cpue_scope, ". Fleet–cell–quarter aggregates; vessel effects and confidence intervals are unavailable. ",
-        "Released zeros are retained; absent/suppressed values are excluded.\n\n", sep = "")
-  } else if (public && grepl("^(assessment|mse|prepare)", job)) {
-    cat("**Scope:** selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.\n\n")
+    # Source coverage can extend beyond this run's saved annual series.
+    scope <- sub("[[:space:]]*[,;]?[[:space:]]*[0-9]{4}[[:space:]]*[–—-][[:space:]]*[0-9]{4}[[:space:]]*$",
+                 "", record$data_source$cpue_scope)
+    rows <- result$series
+    if (!report_has(rows, "year")) rows <- unlist(rows, recursive = FALSE, use.names = FALSE)
+    years <- report_years(rows)
+    scope <- c(scope, years)
+    cat("**Scope:** ", paste(scope[nzchar(scope)], collapse = ", "),
+        "; aggregate records without vessel effects or confidence intervals.\n\n", sep = "")
+  } else if (public && grepl("^mse", job)) {
+    cat("**Scope:** these illustrative trials use simplified fitted cases and errors; trial fractions are not calibrated management risks.\n\n")
+  } else if (public && grepl("^(assessment|prepare)", job)) {
+    cat("**Scope:** selected-fleet CPUE and stock-wide catches are combined only to illustrate the workflow.\n\n")
   } else if (grepl("^(cpue|assessment|mse)", job)) {
-    cat("**Scope:** demonstration results under the saved data and model assumptions.\n\n")
+    cat("**Scope:** illustrative results under the saved data and model assumptions.\n\n")
   }
 }
 
 report_record <- function(record) {
+  report_inputs(record)
   cat("---\n\n")
-  links <- c("[Data & full record](report-data.json)")
+  links <- if (knitr::is_html_output()) {
+    c("[Saved results](report-data.json)", "[Run record](record.json)")
+  } else "Saved files: `report-data.json` · `record.json`"
   for (field in c("analysis_source", "source")) {
     source <- record[[field]]
     if (!is.null(source$repository) && !is.null(source$commit)) {
@@ -271,7 +360,6 @@ report_record <- function(record) {
     label <- paste0("Image ", substr(digest, 1, 12))
     links <- c(links, if (!is.null(image_url)) paste0("[", label, "](", image_url, ")") else label)
   }
-  if (!is.null(record$run_id)) cat("Run `", sub("^Run[[:space:]]+", "", record$run_id), "`. ", sep = "")
   cat(paste(links, collapse = " · "), ".\n\n", sep = "")
   sources <- record$data_source$sources
   if (length(sources)) {
@@ -285,55 +373,69 @@ report_record <- function(record) {
 }
 
 report_result_view <- function(job, result, record) {
-  titles <- c(submission = "Submitted data", qc = "Data checks", database = "Saved database",
-    extract = "Extracted data", cpue_a = "CPUE A", cpue_b = "CPUE B", cpue_summary = "CPUE comparison",
+  titles <- c(submission = "Submitted data", qc = "Data checks", database = "Database snapshot",
+    extract = "Extracted analysis data", cpue_a = "CPUE analysis A", cpue_b = "CPUE analysis B", cpue_summary = "CPUE comparison",
     prepare_a = "Assessment inputs A", prepare_b = "Assessment inputs B", assessment_a1 = "Assessment A1",
     assessment_a2 = "Assessment A2", assessment_b1 = "Assessment B1", assessment_b2 = "Assessment B2",
     assessment_summary = "Assessment comparison", mse_prepare = "Management trial inputs",
     mse_constant = "Constant catch", mse_index = "Index rule", mse_buffered = "Buffered rule", mse_summary = "Management comparison")
   if (!job %in% names(titles)) stop("No saved-result presentation for job: ", job)
-  cat("# ", titles[[job]], "\n\n", sep = "")
+  title <- if (is.null(record$title)) titles[[job]] else record$title
+  rows <- if (!is.null(result$sets)) result$sets else if (!is.null(result$rows) && is.list(result$rows)) result$rows else result$annual
+  if (is.null(rows) && !is.null(result$series)) rows <- if (report_has(result$series, "year")) result$series else result$series[[1]]
+  report_header(title, record, rows)
   if (job == "submission") {
     report_coverage(result$sets, result$catch)
-    cat("Original observations and annual removals are preserved for quality checks. Fish numbers support CPUE; removals in tonnes support assessment.\n\n")
+    report_data_plot(result$sets, field = "hooks")
+    cat("Released fish counts and fishing effort enter data checks. Annual removals in tonnes are retained separately for assessment.\n\n")
   } else if (job == "qc") {
-    report_table(result$checks, c(check = "Check", result = "Result"))
-    if (!is.null(result$rows)) cat(result$rows, " accepted records. ")
-    if (length(result$returned)) cat("The correction record preserves returned and replaced rows. ")
-    cat("\n\n")
+    report_table(result$checks, c(check = "Data check", result = "Recorded result"))
+    report_table(list(list(rows = result$rows, returned = length(result$returned))),
+                 c(rows = "Accepted records", returned = "Returned for correction"))
+    cat("Accepted records pass to the database snapshot. Released zero catches remain observations; missing or suppressed values are not treated as zeros.\n\n")
   } else if (job == "database") {
     report_table(list(result), c(rows = "Records", first_year = "First year", last_year = "Last year"))
-    report_table(report_end_rows(result$annual), c(year = "Year", observations = "Records", hooks = "Hooks",
-      catch_n = "Fish (number)", catch_t = "Removals (t)"))
-    cat("First and last two annual rows; complete annual values are in Data. Fish numbers and removals are distinct inputs.\n\n")
+    report_panels({
+      report_plot(list(Records = result$annual), "observations", "Released records")
+      report_plot(list(Removals = result$annual), "catch_t", "Catch (t/y)")
+    })
+    cat("The saved SQLite snapshot contains fishing records and annual removals. Extraction selects the CPUE records; removals remain a separate annual series.\n\n")
   } else if (job == "extract") {
     report_coverage(result$sets, result$catch)
-    report_table(report_end_rows(result$catch), c(year = "Year", catch_t = "Removals (t)"))
-    cat("Selected records → CPUE; annual removals → assessment. First and last two catch rows shown; joins use year.\n\n")
+    report_data_plot(result$sets, result$catch)
+    cat("Selected fish counts and effort pass to CPUE; annual removals pass to assessment input preparation. The exact SQL and source-row identifiers are retained in Data.\n\n")
   } else if (job %in% c("cpue_a", "cpue_b")) {
-    cat(report_years(result$series), " · ", result$sets_used, " selected records.\n\n", sep = "")
     report_rate_plot(result$series)
     analyses <- setNames(list(result), toupper(sub("cpue_", "", job)))
     report_cpue_checks(analyses)
     report_cpue_note(analyses, record)
   } else if (job == "cpue_summary") {
     report_plot(result$series, "index", "CPUE relative to first year")
-    report_cpue_checks(result$analyses)
-    cat("Each index equals one in its own first year. Record selection and adjustment may differ between A and B.\n\n")
+    report_cpue_checks(result$analyses, result$series)
+    cat("Both indices equal one in their own first year. A and B use their recorded adjustments and effort filters; each passes independently to assessment input preparation.\n\n")
   } else if (job %in% c("prepare_a", "prepare_b")) {
     rows <- if (!is.null(result$rows)) result$rows else result$series
-    cat(length(rows), " annual index/catch pairs, ", report_years(rows), ".\n\n", sep = "")
-    report_table(report_end_rows(rows), c(year = "Year", index = "Relative CPUE", catch_t = "Removals (t)"))
-    cat("Joined by year. First and last two rows shown; complete input pairs are in Data.\n\n")
+    cat(length(rows), " annual index/catch pairs, joined by year.\n\n", sep = "")
+    report_panels({
+      report_plot(list(Index = rows), "index", "Relative CPUE")
+      report_plot(list(Removals = rows), "catch_t", "Catch (t/y)")
+    })
+    report_pairs_check(rows)
+    cat("These paired annual values are the inputs to the two fixed-growth assessment cases.\n\n")
   } else if (grepl("^assessment_", job)) {
     report_assessment(result, individual = job != "assessment_summary")
   } else if (job == "mse_prepare") {
     models <- lapply(result$operating_models, function(model) { model$starting_depletion <- model$B / model$K; model })
     report_table(models, c(name = "Case", first_year = "First future year", starting_depletion = "Starting B/K", reference_catch_t = "Reference catch (t/y)"))
-    report_table(list(result$assumptions), c(years = "Future years", replicates = "Trials/case/scenario", growth_cv = "Growth CV", observation_cv = "Observation CV"))
-    cat("Start after the final historical catch. Rules share saved scenarios and paired errors. ")
-    if (!is.null(result$assumptions$maximum_harvest_rate)) cat("Realised catch is capped at ", 100 * result$assumptions$maximum_harvest_rate, "% of true starting biomass. ", sep = "")
-    cat("Fixed fitted cases and toy errors define conditional demonstrations.\n\n")
+    assumptions <- result$assumptions
+    report_table(list(assumptions), c(years = "Future years", replicates = "Trials/case/scenario", growth_cv = "Growth CV", observation_cv = "Observation CV"))
+    streams <- length(result$error_streams)
+    expected <- length(models) * length(assumptions$scenarios) * assumptions$replicates
+    cat(streams, " saved error streams for ", length(models), " cases × ", length(assumptions$scenarios),
+        " scenarios × ", assumptions$replicates, " trials", if (streams == expected) "; count matches the trial design. " else "; review the trial count. ", sep = "")
+    if (!is.null(assumptions$seed)) cat("Seed: ", assumptions$seed, ". ", sep = "")
+    cat("Each rule receives the same cases and errors, starting after the final historical catch.\n\n")
+    if (any(vapply(models, function(model) isTRUE(model$boundary_fit), logical(1)))) cat("**Review:** one or more fitted cases are on an assessment search boundary.\n\n")
   } else {
     report_mse(result, individual = job != "mse_summary")
   }
@@ -343,35 +445,30 @@ report_result_view <- function(job, result, record) {
 }
 
 report_full_view <- function(job, result, record) {
+  titles <- c(cpue_report = "CPUE analysis", assessment_report = "Assessment results", mse_report = "Management trial results")
+  if (!job %in% names(titles)) stop("No formal saved-result presentation for job: ", job)
+  rows <- if (length(result$series)) result$series[[1]] else NULL
+  report_header(if (is.null(record$title)) titles[[job]] else record$title, record, rows)
   if (job == "cpue_report") {
-    cat("# CPUE analysis\n\n")
+    rates <- unlist(lapply(result$series, function(rows) {
+      unlist(lapply(rows, function(row) c(row$nominal_cpue, row$standardised_cpue)))
+    }))
+    upper <- if (length(rates)) max(rates) else NULL
     if (length(result$series) >= 2L) report_panels({
-      report_rate_plot(result$series[[1]], "Analysis A")
-      report_rate_plot(result$series[[2]], "Analysis B")
+      report_rate_plot(result$series[[1]], "Analysis A", upper)
+      report_rate_plot(result$series[[2]], "Analysis B", upper)
     }) else report_rate_plot(result$series[[1]])
+    report_cpue_checks(result$analyses, result$series)
     report_cpue_note(result$analyses, record)
-    cat("## Relative indices\n\n")
-    report_plot(result$series, "index", "CPUE relative to first year")
-    report_cpue_checks(result$analyses)
-    cat("Each index is scaled to its own first year (= 1). Dispersion is the Pearson residual sum of squares / residual df.\n\n")
-    report_scope("cpue_report", result, record)
+    cat("Final index is the last standardised value relative to its first year. Dispersion is Pearson residual sum of squares / residual df; score residual checks the fitted aggregate totals.\n\n")
   } else if (job == "assessment_report") {
-    cat("# Surplus-production assessment\n\n")
     report_assessment(result)
-    cat("Fixed-growth Schaefer fits start biomass at K and fit K/q to annual log indices using catches in tonnes. ",
-        "Calculation checks do not establish biological adequacy.\n\n", sep = "")
-    report_scope(job, result, record)
-  } else if (job == "mse_report") {
-    cat("# Management strategy comparison\n\n")
+    cat("Schaefer fits start biomass at K and fit K/q to annual log indices, with r fixed in each case and catches in tonnes. Numerical checks test the fit and declared biomass recurrence.\n\n")
+  } else {
     report_mse(result)
-    assumptions <- result$assumptions
-    cat("Constant catch holds the reference catch; the index rule follows the recent observed index; the buffered rule adds step changes and annual change limits. ",
-        "All use paired growth/observation errors; no assessment is refitted. ", sep = "")
-    if (!is.null(assumptions$growth_cv)) cat("Growth/observation CV: ", assumptions$growth_cv, "/", assumptions$observation_cv, ". ", sep = "")
-    if (!is.null(assumptions$maximum_growth_rate)) cat("Annual growth cap: ", assumptions$maximum_growth_rate, ". ", sep = "")
-    cat("Scenario details and rule settings are in Data.\n\n")
-    report_scope(job, result, record)
-  } else stop("No formal saved-result presentation for job: ", job)
+    cat("Constant catch holds the reference catch; the index rule follows recent observed CPUE; the buffered rule adds its saved step, buffer and annual change limit. No assessment is refitted during the trials.\n\n")
+  }
+  report_scope(job, result, record)
   report_record(record)
 }
 

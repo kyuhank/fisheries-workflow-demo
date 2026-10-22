@@ -22,21 +22,29 @@ execute:
   warning: false
   message: false
   fig-width: 8
-  fig-height: 3.2
+  fig-height: 2.9
 ---
 
 <style>
-body { max-width: 880px; margin: 24px auto; padding: 0 20px; font: 16px/1.45 system-ui, sans-serif; color: #243649; }
-h1 { font-size: 27px; line-height: 1.2; }
-h2 { font-size: 20px; margin-top: 20px; }
-a { color: #1779a0; overflow-wrap: anywhere; }
+body { max-width: 880px; margin: 28px auto; padding: 0 22px; font: 15px/1.4 system-ui, sans-serif; color: #243649; }
+h1 { font-size: 26px; font-weight: 600; line-height: 1.2; margin: 0 0 10px; }
+h2 { font-size: 19px; margin: 20px 0 10px; }
+p { margin: 10px 0; }
+a { color: #17688a; overflow-wrap: anywhere; }
 img, svg { max-width: 100%; height: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 6px; border-bottom: 1px solid #dde5eb; text-align: left; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0 16px; }
+th, td { padding: 6px 8px; border-bottom: 1px solid #dce3e8; text-align: left; vertical-align: top; }
+th { font-weight: 600; color: #243649; }
+hr { border: 0; border-top: 1px solid #dce3e8; margin-top: 20px; }
 .cell-output-display { overflow-x: auto; }
+@media (max-width: 600px) { body { margin: 16px auto; padding: 0 14px; } th, td { padding: 5px; } }
 </style>
 
-# Saved database
+# Prepare and load
+
+**Data curator** · Run 001 · Years 2000–2021
+
+Calculation finished (container exit 0).
 
 
 
@@ -58,55 +66,31 @@ th, td { padding: 6px; border-bottom: 1px solid #dde5eb; text-align: left; }
 </table>
 
 
+![](report_files/figure-html/unnamed-chunk-1-1.svg)The saved SQLite snapshot contains fishing records and annual removals. Extraction selects the CPUE records; removals remain a separate annual series.
+
+**Inputs used**
 
 
 <table>
  <thead>
   <tr>
-   <th style="text-align:left;"> Year </th>
-   <th style="text-align:left;"> Records </th>
-   <th style="text-align:left;"> Hooks </th>
-   <th style="text-align:left;"> Fish (number) </th>
-   <th style="text-align:left;"> Removals (t) </th>
+   <th style="text-align:left;"> Input </th>
+   <th style="text-align:left;"> Analyst </th>
+   <th style="text-align:left;"> Produced in </th>
   </tr>
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:left;"> 2000 </td>
-   <td style="text-align:left;"> 15 </td>
-   <td style="text-align:left;"> 17410000 </td>
-   <td style="text-align:left;"> 308800 </td>
-   <td style="text-align:left;"> 49980 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> 2001 </td>
-   <td style="text-align:left;"> 18 </td>
-   <td style="text-align:left;"> 24630000 </td>
-   <td style="text-align:left;"> 420300 </td>
-   <td style="text-align:left;"> 65640 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> 2020 </td>
-   <td style="text-align:left;"> 26 </td>
-   <td style="text-align:left;"> 32550000 </td>
-   <td style="text-align:left;"> 303900 </td>
-   <td style="text-align:left;"> 72600 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> 2021 </td>
-   <td style="text-align:left;"> 25 </td>
-   <td style="text-align:left;"> 27920000 </td>
-   <td style="text-align:left;"> 321100 </td>
-   <td style="text-align:left;"> 70330 </td>
+   <td style="text-align:left;"> Quality check </td>
+   <td style="text-align:left;"> Data curator </td>
+   <td style="text-align:left;"> Run 001 </td>
   </tr>
 </tbody>
 </table>
 
 
-First and last two annual rows; complete annual values are in Data. Fish numbers and removals are distinct inputs.
-
 ---
 
-Run `001`. [Data & full record](report-data.json) · [Code d4454fcf](https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/d4454fcfa9a23bd590344ad92940a13fa0a41c06) · [Workflow 9cb9e72e](https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93) · Image 9dea950a713b.
+[Saved results](report-data.json) · [Run record](record.json) · [Code 7d17fc59](https://github.com/kyuhank/fisheries-workflow-cpue-demo/commit/7d17fc5962466cdabc27d17e004bed87136b38bc) · [Workflow 2a8dc292](https://github.com/kyuhank/fisheries-workflow-demo/commit/2a8dc292696fa42866b1f28139c23510dc75f140) · Image 9dea950a713b.
 
 Data: WCPFC/SPC public statistics. [Source 1](https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip) · [Source 2](https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip).

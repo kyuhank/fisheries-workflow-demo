@@ -420,8 +420,12 @@
   doc,
 )
 
-= Management trial inputs
-<management-trial-inputs>
+= Prepare MSE
+<prepare-mse>
+#strong[MSE analyst] · Run 001 · Data through 2021
+
+Calculation finished (container exit 0).
+
 #table(
   columns: 4,
   align: (left,left,left,left,),
@@ -439,12 +443,25 @@
   table.hline(),
   [15], [20], [0.2], [0.15],
 )
-Start after the final historical catch. Rules share saved scenarios and paired errors. Realised catch is capped at 40% of true starting biomass. Fixed fitted cases and toy errors define conditional demonstrations.
+160 saved error streams for 4 cases × 2 scenarios × 20 trials; count matches the trial design. Seed: 20260915. Each rule receives the same cases and errors, starting after the final historical catch.
 
-#strong[Scope:] selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.
+#strong[Scope:] these illustrative trials use simplified fitted cases and errors; trial fractions are not calibrated management risks.
+
+#strong[Inputs used]
+
+#table(
+  columns: 3,
+  align: (left,left,left,),
+  table.header([Input], [Analyst], [Produced in],),
+  table.hline(),
+  [Assessment A1], [Assessment analyst], [Run 001],
+  [Assessment A2], [Assessment analyst], [Run 001],
+  [Assessment B1], [Assessment analyst], [Run 001],
+  [Assessment B2], [Assessment analyst], [Run 001],
+)
 
 #horizontalrule
 
-Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-mse-demo/commit/7ae67f11217ef10ba8f4fb3a52707707377c1f32")[Code 7ae67f11] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
+Saved files: #NormalTok("report-data.json"); · #NormalTok("record.json"); · #link("https://github.com/kyuhank/fisheries-workflow-mse-demo/commit/bfd7066a5b7fad6bc302bf311d63b20e32dfa9a4")[Code bfd7066a] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/2a8dc292696fa42866b1f28139c23510dc75f140")[Workflow 2a8dc292] · Image 9dea950a713b.
 
 Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].

@@ -420,28 +420,42 @@
   doc,
 )
 
-= Surplus-production assessment
-<surplus-production-assessment>
+= Assessment report
+<assessment-report>
+#strong[Assessment analyst] · Run 001 · Years 2000--2021
+
+Calculation finished (container exit 0).
+
 #box(image("report_files/figure-typst/unnamed-chunk-1-1.svg"))
 
 #table(
-  columns: 5,
+  columns: (20.29%, 18.84%, 21.74%, 14.49%, 24.64%),
   align: (left,left,left,left,left,),
-  table.header([Case], [Fixed r (/y)], [Capacity K (t)], [Final B/K], [Fit checks],),
+  table.header([Case], [Fixed r (/y)], [Capacity K (t)], [Final B/K], [Numerical checks],),
   table.hline(),
   [Assessment A1], [0.25], [1029000], [0.5011], [Pass],
   [Assessment A2], [0.3], [890200], [0.4949], [Pass],
   [Assessment B1], [0.25], [1012000], [0.4845], [Pass],
   [Assessment B2], [0.3], [877700], [0.4792], [Pass],
 )
-B/K uses each case's carrying capacity. Checks cover balance, positive biomass, gradient, convergence and boundaries. Case differences are fixed-assumption sensitivities; they do not form an uncertainty interval.
+B/K uses each case's carrying capacity. Fitted parameters and next-year biomass pass to management trial preparation.
 
-Fixed-growth Schaefer fits start biomass at K and fit K/q to annual log indices using catches in tonnes. Calculation checks do not establish biological adequacy.
+Schaefer fits start biomass at K and fit K/q to annual log indices, with r fixed in each case and catches in tonnes. Numerical checks test the fit and declared biomass recurrence.
 
-#strong[Scope:] selected Fiji fleet index with stock-wide catches is a teaching assumption; the index is not validated as stock-wide abundance.
+#strong[Scope:] selected-fleet CPUE and stock-wide catches are combined only to illustrate the workflow.
+
+#strong[Inputs used]
+
+#table(
+  columns: 3,
+  align: (left,left,left,),
+  table.header([Input], [Analyst], [Produced in],),
+  table.hline(),
+  [Compare assessments], [Assessment analyst], [Run 001],
+)
 
 #horizontalrule
 
-Run #NormalTok("001");. #link("report-data.json")[Data & full record] · #link("https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/0b7071600b636b17edacd00ed216af2aff19090a")[Code 0b707160] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/9cb9e72ec890e86e1f268a23d829e7c2ab8bde93")[Workflow 9cb9e72e] · Image 9dea950a713b.
+Saved files: #NormalTok("report-data.json"); · #NormalTok("record.json"); · #link("https://github.com/kyuhank/fisheries-workflow-assessment-demo/commit/50412b29afff933601eb2c04ffa56b71702538ac")[Code 50412b29] · #link("https://github.com/kyuhank/fisheries-workflow-demo/commit/2a8dc292696fa42866b1f28139c23510dc75f140")[Workflow 2a8dc292] · Image 9dea950a713b.
 
 Data: WCPFC/SPC public statistics. #link("https://www.wcpfc.int/sites/default/files/2026-04/WCPFC_L_PUBLIC_BY_YY_QTR_FLAG.zip")[Source 1] · #link("https://www.wcpfc.int/sites/default/files/2026-03/YB_WCPFC_2026-02-25.zip")[Source 2].
