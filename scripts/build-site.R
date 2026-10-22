@@ -67,7 +67,7 @@ build_site <- function(root, output, docs) {
   json_write(interface$receipt, file.path(docs, "INTERFACE.json"))
   file.create(file.path(docs, ".nojekyll"))
   source <- input_source(workflow)
-  if (input_public(source)) release_data_page(source, root, docs)
+  if (input_public(source)) release_data_page(input_public_source(workflow), root, docs)
   json_write(list(schema_version = 2L, type = "saved-example-build", workflow_schema = state$schema_version,
     settings = state$settings, producing_runs = as.list(unique(vapply(state$records, function(record) record$run_id, character(1)))),
     jobs = as.list(names(jobs)), source_lock_sha256 = file_sha256(workflow$sources$lock_path),
