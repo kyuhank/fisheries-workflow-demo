@@ -602,5 +602,213 @@
   "finish_transport_scope": "Serializer check with real artifacts and HTTP double; not a hosted dispatch",
   "host_packages_preserved_and_installed": 24,
   "limits": "2 CPUs/4 GiB coordinator; each job container 1 CPU/2 GiB and network none; timings exclude image retrieval and GitHub queue",
-  "scope": "Technical execution, artifact custody and reproduction; no stock-assessment performance claim"
+  "scope": "Technical execution, artifact custody and reproduction; no stock-assessment performance claim",
+  "hosted_checks": [
+    {
+      "case": "baseline",
+      "status": "passed",
+      "source_commit": "5d8f5331c5a02a2752161342e55815b689debfb1",
+      "github_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39721592508",
+      "request_id": "d159c2ad-5f1a-4ed0-9d74-5e8d86315a73",
+      "executed": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [],
+      "confirmed_boundaries": [],
+      "bundle": {
+        "files": 605,
+        "image_config_ids": [
+          "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158"
+        ],
+        "reproduction": "separate gate",
+        "sha256": "5a6525e6669461810a45d3243891d19553535ff5533ef9334e78bc27234171b0"
+      },
+      "gate_elapsed_seconds": 440.721,
+      "report_sha256": "cebcfd5643efe617428a0b8ef296342ee176a65636af33647b1d288a38c2e995"
+    },
+    {
+      "case": "growthupdate",
+      "status": "passed",
+      "source_commit": "5d8f5331c5a02a2752161342e55815b689debfb1",
+      "github_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39722394440",
+      "request_id": "4d0486ce-3b28-4d7c-88a0-bc2e7f96dbef",
+      "executed": [
+        "assessment_a2",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index",
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_b1"
+      ],
+      "confirmed_boundaries": [
+        "assessment"
+      ],
+      "bundle": {
+        "files": 605,
+        "image_config_ids": [
+          "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158"
+        ],
+        "reproduction": "separate gate",
+        "sha256": "b490e07745e8709446ea87c3405bac55dcb591d2d3a6cc3dfe68a72aa5cfc909"
+      },
+      "gate_elapsed_seconds": 436.558,
+      "report_sha256": "f9da47763813ba515d89b9443453f29ec701a083ed7c077d385182f5868846bb"
+    },
+    {
+      "case": "msebuffer",
+      "status": "passed",
+      "source_commit": "5d8f5331c5a02a2752161342e55815b689debfb1",
+      "github_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39723185087",
+      "request_id": "b22c6ed7-2418-483c-bd86-113dc852ffcd",
+      "executed": [
+        "mse_buffered",
+        "mse_summary",
+        "mse_report"
+      ],
+      "retained": [
+        "submission",
+        "qc",
+        "database",
+        "extract",
+        "cpue_a",
+        "cpue_b",
+        "cpue_summary",
+        "cpue_report",
+        "prepare_a",
+        "prepare_b",
+        "assessment_a1",
+        "assessment_a2",
+        "assessment_b1",
+        "assessment_b2",
+        "assessment_summary",
+        "assessment_report",
+        "mse_prepare",
+        "mse_constant",
+        "mse_index"
+      ],
+      "confirmed_boundaries": [],
+      "bundle": {
+        "files": 605,
+        "image_config_ids": [
+          "sha256:3f2b5d1eccea99114d3e089f281bdd531cbd2f1cfd8405d4f3b68722136c0158"
+        ],
+        "reproduction": "separate gate",
+        "sha256": "71aba0e749aacf95f315073861c53bee176a1c4ed953aabb2e2e087ce9f8f135"
+      },
+      "gate_elapsed_seconds": 313.637,
+      "report_sha256": "195708a0e38340ddba007901ff64d77221e26260d5979cf97c74c8c0c4197982"
+    }
+  ],
+  "hosted_prior_attempt": {
+    "source_commit": "c9a0ea7bd25b9d120e2b25db31dcc549949c0c68",
+    "request_id": "3b9c2da7-0c10-4632-b868-437e97bf5950",
+    "github_url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39719059384",
+    "api_status": "expired",
+    "github_conclusion": "cancelled",
+    "completed_jobs": 22,
+    "accepted_publication": false
+  },
+  "hosted_result_consumer": {
+    "scope": "Production consumer attached to original completed request: session/dispatch acknowledgement doubles only; state, outputs, PDF bytes and bundle fetched from actual service; no POST reaches any service",
+    "request_id": "b22c6ed7-2418-483c-bd86-113dc852ffcd",
+    "expected_commit": "5d8f5331c5a02a2752161342e55815b689debfb1",
+    "status": "passed",
+    "intercepted_posts": [
+      {
+        "path": "/session",
+        "purpose": "existing reader attachment"
+      },
+      {
+        "path": "/run",
+        "purpose": "existing acknowledged request attachment"
+      }
+    ],
+    "real_get_paths": [
+      "/info",
+      "/state",
+      "/output",
+      "/output",
+      "/output",
+      "/bundle"
+    ],
+    "page_errors": [],
+    "pdfs": {
+      "cpue_b": {
+        "run_id": "Run 001",
+        "sha256": "7770f13f82d70e1cbffd50c6b697d45f33a7d6e65376e18706c5ea011860d3db",
+        "native_quarto": true
+      },
+      "assessment_report": {
+        "run_id": "Run 002",
+        "sha256": "71d435eddde43f30c65ac935fcd092bf33c65d6db0cf3677b75f0ae0a802c77b",
+        "native_quarto": true
+      },
+      "mse_report": {
+        "run_id": "Run 003",
+        "sha256": "9d0ba44329bf7116a6f92b5d78cd95d02920de2b0f963cb69d6247381b001f53",
+        "native_quarto": true
+      }
+    },
+    "completion_text": "3 completed \u00b7 19 retained",
+    "github_link": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39723185087",
+    "bundle_sha256": "71aba0e749aacf95f315073861c53bee176a1c4ed953aabb2e2e087ce9f8f135",
+    "bundle_bytes": 8859553,
+    "elapsed_seconds": 15.515780544956215
+  },
+  "github_checks": [
+    {
+      "id": "39721307587",
+      "source_commit": "5d8f5331c5a02a2752161342e55815b689debfb1",
+      "name": "Check calculations",
+      "conclusion": "success",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39721307587"
+    },
+    {
+      "id": "39718423531",
+      "source_commit": "b4a90892d9129e8397bd806696b4c2dedda0aaf5",
+      "name": "Check diagram and reader controls",
+      "conclusion": "success",
+      "url": "https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39718423531"
+    }
+  ],
+  "updated_utc": "2026-10-22T04:41:14.567777+00:00"
 }

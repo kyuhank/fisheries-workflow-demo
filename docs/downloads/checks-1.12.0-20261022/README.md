@@ -29,3 +29,20 @@ preserved during reader updates.
 To repeat or prepare independent storage, use the release's `OFFLINE.md` and
 `make reproduce`. `make portable` preserves the separate images and host package
 sources; R, a suitable compiler, Make and Docker are prerequisites.
+
+## Hosted execution
+
+Actual Live requests used standard `ubuntu-latest` GitHub runners at `5d8f533`. Each case required a successful workflow, accepted publication, matching producing records and real PDF/archive bytes.
+
+| Case | Executed / retained | Confirmed handovers |
+| --- | --- | --- |
+| [baseline](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39721592508) | 22 / 0 | 0 |
+| [growthupdate](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39722394440) | 10 / 12 | 1 |
+| [msebuffer](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39723185087) | 3 / 19 | 0 |
+
+The browser attachment read the final real service state, PDFs and bundle. Only session and dispatch acknowledgements were intercepted to attach the existing reader/request; it sent no service POST and did not start another run. CPUE, assessment and MSE PDFs retained three different producing runs.
+
+The earlier [attempt](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39719059384) completed the calculations but expired before publication. It remains a failed run. The successful sequence followed a reduction in repeated progress/state writes; this is not a controlled hardware performance comparison. The separate host-package change avoids source compilation in CI.
+
+Current [calculation/server/database CI](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39721307587) and [Chromium/WebKit reader checks](https://github.com/kyuhank/fisheries-workflow-demo/actions/runs/39718423531) passed. The latter uses the same application bytes as this reader. Source pins, archive/PDF hashes and test scopes are recorded in `validation.json`.
+
