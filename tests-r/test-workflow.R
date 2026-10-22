@@ -42,13 +42,25 @@ backend <- list(
     list(descriptor = descriptor, software = list(container = effective$image, image_id = descriptor$image_id, R = "test-double"))
   },
   calculate = function(job, context, folder, runtime) {
-    json_write(list(start = as.numeric(Sys.time())), file.path(folder, "test-start.json"))
-    Sys.sleep(0.15)
     key <- job$key
+    json_write(list(start = as.numeric(Sys.time()), run_id = context$run_id, pid = Sys.getpid()), file.path(folder, "test-start.json"))
+    # Neither calculation may finish before its ready peer starts, even on one CPU.
+    # Match the run ID so a previous run's marker cannot release this barrier.
+    if (dirname(folder) == output && key %in% c("cpue_a", "cpue_b")) {
+      peer <- setdiff(c("cpue_a", "cpue_b"), key)
+      marker <- file.path(output, peer, "test-start.json")
+      deadline <- proc.time()[["elapsed"]] + 15
+      repeat {
+        ready <- tryCatch(json_read(marker), error = function(error) NULL)
+        if (identical(ready$run_id, context$run_id)) break
+        if (proc.time()[["elapsed"]] >= deadline) stop("Concurrent peer did not start: ", peer, " in ", context$run_id)
+        Sys.sleep(0.01)
+      }
+    }
     annual <- lapply(2021:2023, function(year) list(year = year, index = 1, catch_t = 100, observed_index = 1))
     result <- if (key == "submission") list(sets = rows, catch = catches) else if (key == "extract") context$extracted else
       if (key %in% c("cpue_a", "cpue_b")) list(series = annual) else if (key %in% c("assessment_a1", "assessment_a2", "assessment_b1", "assessment_b2")) list(K = 10000, r = 0.25, q = 0.01, next_biomass_t = 5000, series = annual) else list(job = key)
-    json_write(list(end = as.numeric(Sys.time())), file.path(folder, "test-end.json"))
+    json_write(list(end = as.numeric(Sys.time()), run_id = context$run_id), file.path(folder, "test-end.json"))
     list(result = result, effects = json_object())
   },
   render = function(job, result, record, folder, runtime, sources) {
@@ -84,11 +96,12 @@ stopifnot(report_event < receipt_event)
 workflow$handover <- NULL
 
 # Two ready calculations must overlap when more than one worker is permitted.
-start_a <- json_read(file.path(output, "cpue_a/test-start.json"))$start
-end_a <- json_read(file.path(output, "cpue_a/test-end.json"))$end
-start_b <- json_read(file.path(output, "cpue_b/test-start.json"))$start
-end_b <- json_read(file.path(output, "cpue_b/test-end.json"))$end
-stopifnot(max(start_a, start_b) < min(end_a, end_b))
+start_a <- json_read(file.path(output, "cpue_a/test-start.json"))
+end_a <- json_read(file.path(output, "cpue_a/test-end.json"))
+start_b <- json_read(file.path(output, "cpue_b/test-start.json"))
+end_b <- json_read(file.path(output, "cpue_b/test-end.json"))
+stopifnot(all(vapply(list(start_a, start_b, end_a, end_b), function(marker) identical(marker$run_id, manual$run_id), logical(1))),
+          start_a$pid != start_b$pid, max(start_a$start, start_b$start) < min(end_a$end, end_b$end))
 # Restore a new-schema checkpoint without replacing its producer records.
 restored <- new_workflow(output, runtime_backend = backend, handover = NULL)
 stopifnot(identical(json_encode(restored$records), json_encode(workflow$records)))
