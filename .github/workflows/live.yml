@@ -20,28 +20,24 @@ jobs:
     timeout-minutes: 8
     env:
       PAPER_REQUEST_ID: ${{ inputs.request_id }}
-      IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
     steps:
       - name: Retrieve the analysis code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Verify and assemble pinned analysis repositories
-        run: python3 scripts/hydrate-sources.py
-      - name: Download the preserved Docker image
+      - name: Report runner setup
+        run: sh scripts/announce.sh
+      - name: Set up the host R coordinator
+        uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: '4.5.1'
+          Ncpus: '2'
+          use-public-rspm: 'true'
+      - name: Install the four host packages
+        run: Rscript scripts/setup-host.R
+      - name: Prepare the pinned analysis repositories
         run: |
-          python3 cloud/announce.py
-          docker pull "$IMAGE"
-      - name: Run the analysis and save its results
-        env:
-          PAPER_REQUEST_ID: ${{ inputs.request_id }}
-        run: |
-          docker run --rm \
-            --env PAPER_REQUEST_ID \
-            --env PAPER_RUNTIME_IMAGE="$IMAGE" \
-            --env PAPER_RUNTIME_IMAGE_URL=https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow \
-            --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID --env GITHUB_RUN_ATTEMPT \
-            --env ACTIONS_ID_TOKEN_REQUEST_URL \
-            --env ACTIONS_ID_TOKEN_REQUEST_TOKEN \
-            --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
-            --entrypoint make "$IMAGE" --no-print-directory --silent inside-live
+          Rscript scripts/run-live.R --announce
+          Rscript scripts/run-workflow.R hydrate
+      - name: Run component Makefiles in their assigned images and save results
+        run: Rscript scripts/run-live.R

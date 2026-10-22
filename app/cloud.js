@@ -5,6 +5,10 @@ class CloudRun {
     this.repository = config.repository;
     this.dataKind = config.data_kind;
     this.sourceSha256 = config.source_sha256;
+    this.local = config.provider === "local";
+    if (this.local && !["localhost", "127.0.0.1", "[::1]"].includes(new URL(this.url).hostname)) {
+      throw Error("The local runner must use a loopback address.");
+    }
     this.jobs = jobs;
     this.onEvent = onEvent;
     this.onPhase = onPhase;
@@ -185,7 +189,7 @@ class CloudRun {
       // Keep the selected job, settings and handover mode unchanged.
       request = await this.dispatch(input);
     }
-    let cursor = 0, failures = 0, holdUntil = 0, shownGroup = "";
+    let cursor = 0, failures = 0;
     const deadline = Date.now() + 10 * 60 * 1000;
     while (Date.now() < deadline) {
       let update;
@@ -213,33 +217,16 @@ class CloudRun {
         });
       }
       this.run = update.run;
-      if (this.run.github_run) this.onPhase(null, null, this.run.github_run);
+      if (!this.local && this.run.github_run) this.onPhase(null, null, this.run.github_run);
       for (const row of update.events) {
         cursor = row.id;
         const event = row.event;
-        const group = event.state === "running" && event.group?.length > 1
-          ? event.group.join(",")
-          : "";
-        if (!group || group !== shownGroup) {
-          const remaining = holdUntil - performance.now();
-          if (remaining > 0) {
-            await new Promise((resolve) => setTimeout(resolve, remaining));
-          }
-        }
         if (event.state === "phase") {
-          this.onPhase(event.title, event.message, this.run.github_run);
+          this.onPhase(event.title, event.message, this.local ? null : this.run.github_run);
         } else {
-          if (event.record) this.records[event.job] = event.record;
+          if (event.state !== "activity" && event.record) this.records[event.job] = event.record;
           this.onEvent(event);
         }
-        // Keep observed activity readable even when a poll returns several events.
-        if (!group || group !== shownGroup) {
-          holdUntil = performance.now() +
-            (["running", "failed", "returned"].includes(event.state)
-              ? 1000
-              : 0);
-        }
-        shownGroup = group;
       }
       if (["complete", "failed", "expired"].includes(this.run.status)) {
         if (update.state?.records) this.records = update.state.records;
@@ -252,9 +239,11 @@ class CloudRun {
       }
       if (!cursor) {
         this.onPhase(
-          "Waiting for the runner",
-          "GitHub is preparing a free runner. Calculations begin when it is ready.",
-          this.run.github_run,
+          "Queued",
+          this.local
+            ? "Waiting for the local R/Make runner."
+            : "GitHub is preparing a free runner. Calculations begin when it is ready.",
+          this.local ? null : this.run.github_run,
         );
       }
       await new Promise((resolve) => setTimeout(resolve, 1000));

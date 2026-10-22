@@ -333,7 +333,7 @@ try:
         assert page.locator('#status-title').inner_text() == 'Saved results'
         assert page.evaluate("selected === 'cpue_a' && Object.keys(records).length === 22 && !busy")
         assert page.locator('#run').is_hidden()
-        assert page.locator('#mode option').count() == 2
+        assert page.locator('#mode option').count() == 3
         assert state['runtime_requests'] == 0
         page.locator('#dismiss-mode-notice').click()
         page.evaluate('render()')

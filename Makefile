@@ -1,134 +1,80 @@
 .DEFAULT_GOAL := run
-.PHONY: hydrate-sources run container job reproduce compare check html inside-run inside-job inside-reproduce inside-compare inside-check inside-science-check inside-synthetic-check inside-public-check inside-public-source-check inside-public-baseline-check inside-public-update-check inside-public-reproduction-check inside-component-check inside-component-synthetic-check inside-component-public-check inside-html inside-live
-
-IMAGE := ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
-IMAGE_URL := https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow
-PAPER_SOURCE_MODE ?= multi-repository
-PAPER_DATA_MODE ?= public
-PAPER_TEST_EVIDENCE ?=
-export PAPER_SOURCE_MODE PAPER_DATA_MODE PAPER_TEST_EVIDENCE
+.PHONY: help setup setup-local hydrate-sources run job plan bundle reproduce compare check site release portable live local
 OUTPUT ?= runs
 SETTINGS ?=
-JOB ?=
 START ?= submission
 SCOPE ?= workflow
+JOB ?=
 REFERENCE ?= reference
-RESULT ?= reproduced
-REPRO_SETTINGS := $(or $(SETTINGS),settings.json)
+BUNDLE ?= workflow.zip
+PORT ?= 8765
+WORKSPACE ?=
+ARCHIVE ?=
+PACKAGE_SOURCES ?=
+export OUTPUT SETTINGS START SCOPE JOB REFERENCE BUNDLE PORT WORKSPACE ARCHIVE PACKAGE_SOURCES
 
-export OUTPUT
-export SETTINGS
-export START
-export SCOPE
-export JOB
-export REFERENCE
-export RESULT
+help:
+	@printf '%s\n' 'make run' 'make job JOB=cpue_a' 'make plan START=assessment_a2' 'make check' 'make reproduce' 'make portable ARCHIVE=release.zip OUTPUT=portable-workflow PACKAGE_SOURCES=/path/to/R-sources'
 
-job inside-job: export START = $(JOB)
-job inside-job: export SCOPE = job
-reproduce inside-reproduce: export OUTPUT = $(RESULT)
-reproduce inside-reproduce: export SETTINGS = $(REPRO_SETTINGS)
-reproduce inside-reproduce: export START = $(or $(JOB),submission)
-reproduce inside-reproduce: export SCOPE = $(if $(JOB),job,workflow)
+setup:
+	@Rscript --vanilla scripts/setup-host.R
+
+setup-local:
+	@Rscript --vanilla scripts/setup-host.R --local
 
 hydrate-sources:
-	@if [ "$$PAPER_SOURCE_MODE" != monorepo ]; then python3 scripts/hydrate-sources.py --if-needed; fi
+	@Rscript --vanilla scripts/run-workflow.R hydrate
 
-run container job reproduce: hydrate-sources
-	@if [ "$$SCOPE" = job ] && [ -z "$$START" ]; then echo 'Use make job JOB=cpue_a' >&2; exit 1; fi
-	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
-	@set -e; mkdir -p "$$OUTPUT"; \
-	output=$$(cd "$$OUTPUT" && pwd); \
-	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env PAPER_SOURCE_MODE --env PAPER_DATA_MODE --env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
-		--env SETTINGS --env START --env SCOPE \
-		-v "$(CURDIR):/workspace:ro" -v "$$output:/outputs" -w /workspace \
-		$(IMAGE) make --no-print-directory --silent inside-run OUTPUT=/outputs
-
-compare: hydrate-sources
-	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
-	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env PAPER_SOURCE_MODE --env PAPER_DATA_MODE --env REFERENCE --env RESULT --env JOB \
-		-v "$(CURDIR):/workspace:ro" -w /workspace \
-		$(IMAGE) make --no-print-directory --silent inside-compare
-
-check: hydrate-sources
-	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
-	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env PAPER_SOURCE_MODE --env PAPER_DATA_MODE --env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
-		--env PAPER_NATIVE_INTEGRATION=1 -v "$(CURDIR):/workspace:ro" -w /workspace \
-		$(IMAGE) make --no-print-directory --silent inside-check
-
-html: hydrate-sources
-	@docker image inspect $(IMAGE) >/dev/null 2>&1 || docker pull --platform linux/amd64 $(IMAGE)
-	docker run --rm --platform linux/amd64 --network none --user "$$(id -u):$$(id -g)" \
-		--env PAPER_SOURCE_MODE --env PAPER_DATA_MODE --env PAPER_RUNTIME_IMAGE=$(IMAGE) --env PAPER_RUNTIME_IMAGE_URL=$(IMAGE_URL) \
-		-v "$(CURDIR):/workspace" -w /workspace \
-		$(IMAGE) make --no-print-directory --silent inside-html
-
-inside-run inside-job inside-reproduce:
-	@set -- --output "$$OUTPUT" --from "$$START" --scope "$$SCOPE"; \
+run: hydrate-sources
+	@set -- run --output "$$OUTPUT" --start "$$START" --scope "$$SCOPE"; \
 	if [ -n "$$SETTINGS" ]; then set -- "$$@" --settings "$$SETTINGS"; fi; \
-	if [ -n "$$PAPER_TEST_EVIDENCE" ]; then exec python3 -m tests.native_evidence "$$@"; fi; \
-	exec python3 run.py "$$@"
+	exec Rscript --vanilla scripts/run-workflow.R "$$@"
 
-inside-compare:
-	@set -- "$$REFERENCE" "$$RESULT"; \
-	if [ -n "$$JOB" ]; then set -- "$$@" --job "$$JOB"; fi; \
-	exec python3 verify.py "$$@"
+job: export START = $(JOB)
+job: export SCOPE = job
+job:
+	@test -n "$$JOB" || { echo 'Use make job JOB=cpue_a' >&2; exit 1; }
+	@$(MAKE) --no-print-directory --silent run
 
-inside-check:
-	@$(MAKE) --no-print-directory --silent inside-science-check
-	@$(MAKE) --no-print-directory --silent inside-synthetic-check
-	@$(MAKE) --no-print-directory --silent inside-public-check
-	@$(MAKE) --no-print-directory --silent inside-component-check
+plan: hydrate-sources
+	@set -- plan --output "$$OUTPUT" --start "$$START" --scope "$$SCOPE"; \
+	if [ -n "$$SETTINGS" ]; then set -- "$$@" --settings "$$SETTINGS"; fi; \
+	exec Rscript --vanilla scripts/run-workflow.R "$$@"
 
-inside-science-check:
-	@command -v make && make --version | head -n 1
-	@Rscript --vanilla tests/test-r-models.R
+bundle:
+	@Rscript --vanilla scripts/run-workflow.R bundle --output "$$OUTPUT" --bundle "$$BUNDLE"
 
-# Legacy fixtures retain their declared synthetic defaults in a fresh process.
-inside-synthetic-check:
-	@PAPER_SOURCE_MODE=monorepo PAPER_DATA_MODE=synthetic python3 -m unittest discover -s tests -v
+reproduce:
+	@set -- reproduce; if [ -n "$$JOB" ]; then set -- "$$@" "$$JOB"; fi; \
+	exec Rscript --vanilla scripts/offline.R "$$@"
 
-inside-public-check:
-	@PAPER_SOURCE_MODE=monorepo PAPER_DATA_MODE=public python3 -m unittest discover -s tests -p 'test_public*.py' -v
+compare:
+	@set -- compare --reference "$$REFERENCE" --output "$$OUTPUT"; \
+	if [ -n "$$JOB" ]; then set -- "$$@" --start "$$JOB" --scope job; fi; \
+	exec Rscript --vanilla scripts/run-workflow.R "$$@"
 
-# Finite native batches for a registered Local run with an outer wall limit.
-# Reference paths, when supplied, must be verified current-source checkpoints.
-inside-public-source-check:
-	@PAPER_DATA_MODE=public python3 -m unittest tests.test_public_data -v
+check:
+	@Rscript --vanilla tests-r/test-workflow.R
+	@Rscript --vanilla tests-r/test-inputs.R
+	@Rscript --vanilla tests-r/test-cloud.R
+	@Rscript --vanilla tests-r/test-local.R
+	@Rscript --vanilla tests-r/test-release.R
 
-inside-public-baseline-check:
-	@PAPER_DATA_MODE=public python3 -m unittest -v \
-		tests.test_public_integration.PublicNativeIntegrationTest.test_1_default_public_workflow_has_22_jobs_and_actual_fixed_support \
-		tests.test_public_integration.PublicNativeIntegrationTest.test_2_2022_data_update_matches_a_fresh_full_workflow
+site:
+	@Rscript --vanilla scripts/build-site.R --output "$$OUTPUT"
 
-inside-public-update-check:
-	@PAPER_DATA_MODE=public python3 -m unittest tests.test_public_integration.PublicReaderUpdateIntegrationTest -v
+release:
+	@Rscript --vanilla scripts/release.R --docs docs
 
-inside-public-reproduction-check:
-	@PAPER_DATA_MODE=public python3 -m unittest -v \
-		tests.test_public_integration.PublicNativeIntegrationTest.test_4_download_reproduces_the_explicit_22_job_public_workflow \
-		tests.test_public_integration.PublicNativeIntegrationTest.test_5_derived_public_input_fixture_is_frozen_for_single_job_reproduction
+portable: OUTPUT = portable-workflow
+portable:
+	@test -n "$$ARCHIVE" && test -n "$$PACKAGE_SOURCES" || { \
+	printf '%s\n' 'Use make portable ARCHIVE=release.zip OUTPUT=new-share PACKAGE_SOURCES=/path/to/R-sources' >&2; exit 1; }
+	@exec Rscript --vanilla scripts/prepare-offline.R --bundle "$$ARCHIVE" --output "$$OUTPUT" --package-sources "$$PACKAGE_SOURCES"
 
-# Exercise the actual pinned repositories as well as the local source tree.
-# Missing or incompatible pins fail this gate; monorepo success cannot replace it.
-inside-component-check:
-	@$(MAKE) --no-print-directory --silent inside-component-synthetic-check
-	@$(MAKE) --no-print-directory --silent inside-component-public-check
+live:
+	@Rscript --vanilla scripts/run-live.R
 
-inside-component-synthetic-check:
-	@PAPER_SOURCE_MODE=multi-repository PAPER_DATA_MODE=synthetic python3 -m unittest -v \
-		tests.test_native_integration.NativeIntegrationTest.test_1_fresh_R_results_and_genuine_Quarto_custody \
-		tests.test_native_integration.NativeIntegrationTest.test_6_download_reproduces_actual_results_inside_same_container
-
-inside-component-public-check:
-	@PAPER_SOURCE_MODE=multi-repository PAPER_DATA_MODE=public python3 -m unittest tests.test_public_integration -v
-
-inside-html:
-	@python3 scripts/build.py
-	@python3 scripts/release.py
-
-inside-live:
-	@exec python3 cloud/run.py
+local:
+	@set -- --port "$$PORT"; if [ -n "$$WORKSPACE" ]; then set -- "$$@" --workspace "$$WORKSPACE"; fi; \
+	exec sh scripts/local.sh "$$@"

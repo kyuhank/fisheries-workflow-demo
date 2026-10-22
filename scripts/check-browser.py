@@ -114,7 +114,7 @@ def main():
         page.on('request', lambda request: requests.append(request.url) if request.url.startswith('http') else None)
         page.goto((ROOT / 'docs/offline.html').as_uri())
         page.wait_for_function("mode === 'saved'")
-        assert page.locator('#mode option').count() == 2
+        assert page.locator('#mode option').count() == 3
         # Inspect the option directly; Playwright follows the enclosing label.
         assert page.locator('#mode option[value="cloud"]').evaluate(
             "option => option.disabled && option.hasAttribute('disabled')")

@@ -1,112 +1,48 @@
 # Fisheries workflow demonstration
 
-[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Code by job](jobs/README.md) · [Preserved releases](https://github.com/kyuhank/fisheries-workflow-demo/releases)
+[Open the demo](https://kyuhank.github.io/fisheries-workflow-demo/) · [Downloads](https://github.com/kyuhank/fisheries-workflow-demo/releases)
 
-Follow public catch and effort data through CPUE standardisation, stock
-assessment and management strategy evaluation (MSE). Change an input or setting
-to see which analyses need to run again and which results can be retained.
-Each result links to its inputs, code, settings and software. The models
-demonstrate the workflow and provide no advice for South Pacific albacore.
+Follow public catch and effort data through CPUE standardisation, assessment and
+management strategy evaluation. R coordinates the jobs; each analysis repository
+owns its Makefile and R calculations. Jobs can use different immutable Docker
+images. Changing one input, setting or job image reruns its dependent branch;
+retained results keep their original producing records.
 
-## Use the demo
-
-Choose **Run mode → View example** to inspect saved results, or **Live run**
-to calculate them on GitHub Actions. CPUE plots show nominal and standardised
-rates together. **View** in the diagram or **Output** in the tool opens a job's
-PDF; **Inputs & versions** traces its sources.
-The plots and tables use saved numerical results; opening a PDF does not repeat
-the calculations. The three report jobs contain the methods and checks.
-
-**Run full workflow** starts with data through 2021. Selecting 2022 adds the
-final available year. After a setting changes, **Update workflow** reruns the
-affected analyses and retains unchanged results with their original records.
-**Run** prepares the selected job's required inputs and stops at that job.
-
-**Manual handover** pauses receiving jobs until **Confirm file transfer**;
-other ready jobs continue. In **Live run**, **Reproduce & compare** restores the
-recorded settings, runs the current code and compares its new numerical output
-with the selected run's saved output. Repeating an older analysis requires its
-original code and container image. **Execution** opens
-its GitHub Actions run. **Download this run** preserves
-source, inputs, records and outputs before live results expire after about
-ten minutes.
-
-## Data and methods
-
-The default input contains released WCPFC longline records for the FJ fleet,
-2000–2022, in six fixed cell–quarter strata. A row aggregates a fleet, year,
-five-degree cell and quarter; it is not an individual fishing set. Vessel IDs
-are unavailable. `hooks` is reported effort (`HHOOKS × 100`) and `catch_n` is
-albacore catch in numbers (`ALB_N`). The legacy `set_id` field identifies an
-aggregate source row. See [data/public-source.json](data/public-source.json) for
-the supplied rows and source metadata, and [data/public-data.json](data/public-data.json)
-for the extraction record.
-
-Recorded SQL extracts the CPUE rows from a SQLite snapshot. Annual South Pacific
-albacore catches, in tonnes, come from a separate yearbook series; they are not
-a sum of the selected fleet's catch numbers. They are the diagram's other
-inputs in this example.
-
-CPUE A fits a quasipoisson GLM with year and cell–quarter effects and a
-`log(hooks / 1000)` offset. It predicts fish per 1,000 hooks in each stratum and
-averages those predictions with equal fixed weights. CPUE B uses year and quarter
-effects. Both indices are divided by their first-year value. The outputs preserve
-nominal and standardised CPUE, prediction support, weights and model checks.
-Quarter effects remain partly confounded with spatial differences within the
-six cell–quarter strata.
-These selected released strata do not represent the whole stock; the example
-supplies no confidence intervals. The selected Fiji fleet index is not a validated
-stock-wide abundance measure. Synthetic vessel records remain available as
-regression fixtures.
-
-The four Schaefer assessment cases combine these indices with fixed growth
-assumptions. Seeded MSE trials compare constant catch, an index rule and a
-buffered rule under shared simulated conditions. Results depend on the fitted
-assessment cases and simulation assumptions. The low-biomass percentage counts
-trials in which biomass falls below 20% of carrying capacity at the start or end
-of any simulated year, including the initial state. It is not a calibrated risk
-estimate.
-All rules share a simulator catch cap of 40% of true starting biomass; the
-low-biomass results are conditional on that guardrail.
-
-## Run or adapt the code
-
-The [22 job guides](jobs/README.md) show each input → method → output path.
-The coordinator loads code from [pinned component repositories](jobs/README.md#separate-repositories)
-and records each producing run and file checksum.
-
-From a checkout, with Docker, Make, Python 3 and Git available:
+With R (`jsonlite`, `digest`, `DBI`, `RSQLite`), Make, Docker, Git and a POSIX shell:
 
 ```sh
-make run                 # all jobs
-make job JOB=cpue_a       # CPUE A and required inputs
+make run                    # all jobs; results in runs/
+make job JOB=cpue_a          # one job and required inputs
+make check                  # declared source and interface checks
 ```
 
-These commands run the pinned component revisions. To run local job or model
-edits in this checkout, use `PAPER_SOURCE_MODE=monorepo make job JOB=cpue_a`.
+From an extracted saved-run download, after restoring its images:
 
-To use another fishery, start with the source mapping and saved SQL, then
-choose the CPUE covariates and prediction support explicitly. Review annual
-catch units, assessment assumptions and the receiving file contracts before
-running later jobs. [ADAPT.md](ADAPT.md) describes the connections and source
-pins; [cloud/README.md](cloud/README.md) covers hosting.
+```sh
+make reproduce              # repeat its saved scope and compare numerical outputs
+```
 
-For an existing-analysis example, the [MQMF adaptation](EXISTING-ANALYSIS.md)
-preserves an abalone prediction routine and compares direct and mapped inputs.
+| Read | Location |
+| --- | --- |
+| Job graph and input connections | [22 job guides](jobs/README.md), [declarations](workflow/jobs.json) |
+| R calculations and their own Make commands | [CPUE](https://github.com/kyuhank/fisheries-workflow-cpue-demo), [assessment](https://github.com/kyuhank/fisheries-workflow-assessment-demo), [MSE](https://github.com/kyuhank/fisheries-workflow-mse-demo) |
+| Saved results and producing records | [result browser](https://kyuhank.github.io/fisheries-workflow-demo/example/); locally `runs/<job>/output.json`, `record.json` |
+| Reports | [CPUE](https://kyuhank.github.io/fisheries-workflow-demo/example/cpue_report/report.pdf), [assessment](https://kyuhank.github.io/fisheries-workflow-demo/example/assessment_report/report.pdf), [MSE](https://kyuhank.github.io/fisheries-workflow-demo/example/mse_report/report.pdf) |
+| Adapt or preserve a run | [ADAPT.md](ADAPT.md), [OFFLINE.md](OFFLINE.md) |
 
-## Preserve a run
+The browser opens saved Quarto PDFs. Live requests use the configured GitHub
+Actions service; manual handovers pause receiving jobs while other ready jobs
+continue. Download a completed run to retain its source, inputs, software
+identities, outputs and records. Preserve the separate image archives too.
+`make portable ARCHIVE=release.zip OUTPUT=portable-workflow PACKAGE_SOURCES=/path/to/R-sources`
+collects a completed release, its local images and matching host R package sources
+for independent storage or sharing. See [offline preparation](OFFLINE.md#prepare-an-offline-share).
 
-Keep a downloaded run and its recorded execution image together. Follow the
-bundle's `REPRODUCE.txt` to repeat its declared scope. The
-[public-data example](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.6.zip)
-includes local result and code pages, source archives, extraction SQL and all
-22 reference outputs; its
-[checksum](https://kyuhank.github.io/fisheries-workflow-demo/downloads/fisheries-workflow-offline-1.11.6.zip.sha256)
-identifies the download. Open `START-HERE.html`, then follow `OFFLINE.md`.
-The archived
-[v1.9.1 release](https://github.com/kyuhank/fisheries-workflow-demo/releases/tag/v1.9.1)
-preserves the earlier synthetic example and its separate image archive.
-[OFFLINE.md](OFFLINE.md) explains restoration and offline comparison; current
-source changes do not alter that preserved release.
-
-Software attribution and licences are in [THIRD_PARTY.md](THIRD_PARTY.md).
+The example uses released WCPFC/SPC Fiji fleet–quarter–5° cell aggregates,
+2000–2022. Rows are not individual sets; vessel IDs are unavailable. Hooks are
+`HHOOKS × 100`, catch numbers are `ALB_N`, and annual South Pacific stock catch
+is a separate series in tonnes. Masked cells are excluded; their zeros are not
+observed zero catches. CPUE uses six fixed cell–quarter strata; this small fleet
+index is not validated as stock-wide abundance. Fixed-growth Schaefer cases and
+seeded management trials illustrate the workflow and provide no stock advice.
+Keep the [data notices](data/public/README.md) and [software licences](THIRD_PARTY.md).

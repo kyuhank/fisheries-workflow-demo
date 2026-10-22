@@ -1,72 +1,67 @@
 name: Check calculations
 on:
   push:
-    paths: ['source-lock.template.json', 'source-files.sha256.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['R/**', 'scripts/**', 'tests-r/**', 'source-lock.template.json', 'source-files.sha256.json', 'runtime-overrides.json', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'build-info.json', '.github/workflows/check.yml']
   pull_request:
-    paths: ['source-lock.template.json', 'source-files.sha256.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'run.py', 'verify.py', 'Dockerfile', '.github/workflows/check.yml']
+    paths: ['R/**', 'scripts/**', 'tests-r/**', 'source-lock.template.json', 'source-files.sha256.json', 'runtime-overrides.json', 'Makefile', 'jobs/**', 'workflow/**', 'cloud/**', 'supabase/functions/**', 'data/**', 'tests/**', 'build-info.json', '.github/workflows/check.yml']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - lane: monorepo-synthetic
-            target: inside-synthetic-check
-          - lane: monorepo-public
-            target: inside-public-check
-          - lane: components-synthetic
-            target: inside-component-synthetic-check
-          - lane: components-public
-            target: inside-component-public-check
+    timeout-minutes: 20
+    env:
+      PAPER_DATA_MODE: public
+      PAPER_JOB_CPUS: '1'
+      PAPER_JOB_MEMORY: 2g
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Check public source transport and archive integrity
-        run: python3 -m unittest discover -s tests -p test_source_hydration.py -v
-      - name: Verify and assemble pinned analysis repositories
-        run: python3 scripts/hydrate-sources.py
-      - name: Check ${{ matrix.lane }} R/Quarto runs
-        env:
-          IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
-          PAPER_RUNTIME_IMAGE_URL: https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow
-          PAPER_CHECK_TARGET: ${{ matrix.target }}
-        run: |
-          mkdir -p "$RUNNER_TEMP/fisheries-native-evidence"
-          docker pull "$IMAGE"
-          docker run --rm --network none \
-            --user "$(id -u):$(id -g)" \
-            --env PAPER_RUNTIME_IMAGE="$IMAGE" --env PAPER_RUNTIME_IMAGE_URL \
-            --env PAPER_NATIVE_INTEGRATION=1 \
-            --env PAPER_SOURCE_MODE=multi-repository --env PAPER_DATA_MODE=public \
-            --env PAPER_TEST_EVIDENCE=/evidence \
-            --env PAPER_CHECK_TARGET \
-            --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID \
-            --volume "$RUNNER_TEMP/fisheries-native-evidence:/evidence" \
-            --volume "$GITHUB_WORKSPACE:/workspace:ro" --workdir /workspace \
-            "$IMAGE" sh -eu -c '
-              if [ "$PAPER_CHECK_TARGET" = inside-synthetic-check ]; then
-                make --no-print-directory --silent inside-science-check
-              fi
-              exec make --no-print-directory --silent "$PAPER_CHECK_TARGET"
-            '
-      - name: Preserve native outputs, failed attempts and timing receipts
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: native-check-evidence-${{ matrix.lane }}
-          path: ${{ runner.temp }}/fisheries-native-evidence
-          if-no-files-found: warn
+          persist-credentials: false
+      - name: Set up the host R coordinator
+        uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: '4.5.1'
+          Ncpus: '2'
+          use-public-rspm: 'true'
+      - name: Install and record host package versions
+        run: Rscript --vanilla scripts/setup-host.R
+      - name: Verify and assemble pinned analysis repositories
+        run: make hydrate-sources
+      - name: Check R coordination and input contracts
+        run: make check
+      - name: Run all public-data jobs through their component Makefiles
+        run: make run OUTPUT=runs
+      - name: Verify all 22 results and calculation/rendering image receipts
+        run: |
+          Rscript --vanilla - <<'RSCRIPT'
+          source("R/sources.R")
+          state <- json_read("runs/state.json")
+          expected <- vapply(json_read("workflow/jobs.json")$jobs, function(job) job$key, character(1))
+          stopifnot(length(expected) == 22L, setequal(names(state$records), expected))
+          for (key in expected) {
+            record <- state$records[[key]]
+            stopifnot(isTRUE(record$report_rendering$quarto_executed))
+            for (name in names(record$outputs)) {
+              stopifnot(identical(file_sha256(source_path(file.path("runs", key), name)), record$outputs[[name]]))
+            }
+            calculation <- json_read(file.path("runs", key, "container-inside-job.json"))
+            rendering <- json_read(file.path("runs", key, "container-render.json"))
+            stopifnot(identical(calculation$image_id, record$runtime$image_id),
+              identical(rendering$image_id, record$report_rendering$runtime$image_id),
+              calculation$exit_code == 0L, rendering$exit_code == 0L,
+              !calculation$running, !rendering$running)
+          }
+          cat("Verified 22 public-data results, artifact hashes and actual image receipts.\n")
+          RSCRIPT
   server:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Verify and assemble pinned analysis repositories
-        run: python3 scripts/hydrate-sources.py
+        with:
+          persist-credentials: false
       - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
         with:
           deno-version: v2.9.6
@@ -82,8 +77,8 @@ jobs:
       POSTGRES_IMAGE: postgres:17-alpine@sha256:aa90e97ee862e558111d34cfb8b2c4bec768c2b039fb791341686928560263b3
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Verify and assemble pinned analysis repositories
-        run: python3 scripts/hydrate-sources.py
+        with:
+          persist-credentials: false
       - name: Start an isolated disposable PostgreSQL fixture
         run: |
           docker run --detach --name "$PAPER_TEST_POSTGRES_CONTAINER" \

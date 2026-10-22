@@ -1,6 +1,13 @@
 const payload = JSON.parse(document.getElementById("demo-payload").textContent);
 const $ = (id) => document.getElementById(id);
-const publicExample = !!payload.saved?.outputs?.extract?.output?.sets?.[0]?.stratum;
+const localBackend = payload.cloud?.provider === "local";
+const runModeLabel = localBackend ? "Local run" : "Live run";
+if (localBackend) $("source-code").href = "/code.html";
+$("mode").querySelector('[value="cloud"]').textContent = runModeLabel;
+$("mode").querySelector('[value="local"]').hidden = localBackend;
+$("mode").querySelector('[value="local"]').disabled = localBackend;
+const publicExample = payload.cloud?.data_kind === "public-wcpfc-albacore" ||
+  !!payload.saved?.outputs?.extract?.output?.sets?.[0]?.stratum;
 $("filter").closest("label").hidden = publicExample;
 if (publicExample) {
   document.querySelector(".intro").textContent =
@@ -29,6 +36,10 @@ let completedRun = null, modeVersion = 0;
 let publishedBundle = null;
 let correctionPending = false;
 let activities = {}, dispatchPending = false;
+let runStartedAt = null, runFinishedAt = null, runClock = null, runPhase = "";
+const activityLabels = Object.freeze({
+  preparing: "Preparing", calculating: "Calculating", rendering: "Rendering PDF", resubmit: "Resubmit",
+});
 let workspaceView = "tasks", jobStatusFilter = "";
 // Dependency browsing is independent of the starting job and its execution plan.
 let dependencySelection = "prepare_a";
@@ -52,8 +63,11 @@ const cloud = new CloudRun(
   jobs,
   handleEvent,
   (title, message, id) => {
-    if (title) status("running", title, message);
-    if (id) {
+    if (title) {
+      if (busy) runPhase = title;
+      status("running", title, message);
+    }
+    if (id && !localBackend) {
       $("github-run").href = "https://github.com/" + payload.cloud.repository +
         "/actions/runs/" + id;
       liveExecutionLink = $("github-run").href;
@@ -62,9 +76,9 @@ const cloud = new CloudRun(
   },
 );
 function call(type, data = {}) {
-  if (mode !== "cloud") throw Error("Choose Live run for a new container execution.");
+  if (mode !== "cloud") throw Error("Choose " + runModeLabel + " for a new container execution.");
   if (unresolvedLive && ["run", "reset"].includes(type)) {
-    throw Object.assign(Error("The previous live run has an unresolved outcome."), {
+    throw Object.assign(Error("The previous " + runModeLabel.toLowerCase() + " has an unresolved outcome."), {
       executionUnknown: true,
     });
   }
@@ -168,6 +182,35 @@ function status(kind, title, message) {
       ),
     );
   }
+  updateRunProgress();
+}
+
+function updateRunProgress() {
+  $("run-progress").hidden = !runStartedAt || mode === "saved";
+  if (!runStartedAt || mode === "saved") return;
+  const selectedRun = completedRun || plan;
+  const completed = (selectedRun?.run || []).filter((key) => states[key] === "complete").length;
+  const seconds = Math.max(0, Math.floor(((runFinishedAt || Date.now()) - runStartedAt) / 1000));
+  const elapsed = seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, "0")}s`;
+  $("run-phase").textContent = runPhase;
+  $("run-completed").textContent = selectedRun ? `${completed} / ${selectedRun.run.length} jobs complete` : `${completed} jobs complete`;
+  $("run-elapsed").textContent = `Elapsed ${elapsed}`;
+}
+
+function startRunProgress() {
+  clearInterval(runClock);
+  runStartedAt = Date.now();
+  runFinishedAt = null;
+  runPhase = "Queued";
+  runClock = setInterval(updateRunProgress, 1000);
+}
+
+function finishRunProgress(phase) {
+  clearInterval(runClock);
+  runClock = null;
+  if (runStartedAt) runFinishedAt = Date.now();
+  runPhase = phase;
+  updateRunProgress();
 }
 
 function affectedByChange(key) {
@@ -219,8 +262,8 @@ function statusSymbol(state) {
 }
 
 function statusLabel(key) {
-  return activities[key] === "resubmit" && stageStatus(key) === "running"
-    ? "Resubmit"
+  return activityLabels[activities[key]] && stageStatus(key) === "running"
+    ? activityLabels[activities[key]]
     : labels[stageStatus(key)];
 }
 
@@ -834,7 +877,7 @@ function jobProgress(job) {
     : state === "retained" ? "Earlier result kept unchanged"
     : state === "outdated" ? "Rerun with the updated inputs"
     : state === "failed" ? "Open the execution log"
-    : state === "unconfirmed" ? "Check Execution before starting another run"
+    : state === "unconfirmed" ? localBackend ? "Check the local service before another run" : "Check Execution before starting another run"
     : state === "waiting" && pendingInputs.length
     ? "After " + byKey[pendingInputs[0]].title + (pendingInputs.length > 1 ? ` + ${pendingInputs.length - 1} more` : "")
     : state === "waiting" ? (busy ? "Inputs available · queued" : "Inputs available")
@@ -1108,6 +1151,7 @@ function render() {
   } else if (plan) {
     $("completion").textContent = completedRun
       ? `${completedRun.run.length} completed · ${completedRun.retained.length} retained`
+      : busy ? `${plan.run.filter((key) => states[key] === "complete").length} / ${plan.run.length} complete · ${plan.retained.length} retained`
       : `${plan.run.length} jobs to run · ${plan.retained.length} retained`;
     const parentNames = byKey[start].parents.filter((key) =>
       plan.retained.includes(key)
@@ -1122,6 +1166,7 @@ function render() {
         " Missing or changed inputs rerun first.";
     }
   }
+  updateRunProgress();
 }
 
 async function refreshPlan() {
@@ -1164,13 +1209,14 @@ function showError(error) {
   dispatchPending = false;
   waitingTransfer = null;
   confirmingTransfer = false;
+  finishRunProgress(error.executionUnknown ? "Status unavailable" : "Stopped");
   if (error.executionUnknown && mode === "cloud") {
     ready = false;
     unresolvedLive = true;
   }
-  status("failed", error.executionUnknown ? "Live run status unavailable" : "The analysis stopped",
+  status("failed", error.executionUnknown ? runModeLabel + " status unavailable" : "The analysis stopped",
     error.executionUnknown
-      ? "The live run may still be active. " +
+      ? "The " + runModeLabel.toLowerCase() + " may still be active. " +
         ($("github-run").hidden ? "" : "Open Execution to check it. ") +
         "Keep this page open. Check the execution before starting another run. You can inspect the saved example meanwhile."
       : String(error));
@@ -1186,6 +1232,16 @@ function log(event) {
 }
 
 function handleEvent(event) {
+  if (event.state === "activity") {
+    if (!byKey[event.job] || !["preparing", "calculating", "rendering"].includes(event.activity)) return;
+    activities[event.job] = event.activity;
+    runPhase = activityLabels[event.activity];
+    log(event);
+    if (!waitingTransfer) status("running", event.title || runPhase + " · " + byKey[event.job].title,
+      event.message || "");
+    render();
+    return;
+  }
   if (event.state === "session_expired") {
     // Only the live session loses its files; settings and job selection survive.
     if (modeStates.cloud) Object.assign(modeStates.cloud, {
@@ -1222,7 +1278,7 @@ function handleEvent(event) {
     states = runStates(plan.run, "waiting");
   } else {
     dispatchPending = false;
-    if (["running", "handover", "received"].includes(event.state) && event.group) {
+    if (["handover", "received"].includes(event.state) && event.group) {
       for (const key of event.group) {
         states[key] = event.state;
         activities[key] = "";
@@ -1254,6 +1310,8 @@ function handleEvent(event) {
     if (event.record) records[event.job] = event.record;
     log(event);
     const active = jobs.filter((job) => states[job.key] === "running");
+    runPhase = waitingTransfer ? "Awaiting file" : active.length
+      ? activityLabels[activities[active[0].key]] || "Running" : "Finalising";
     const groupTitle = active.length > 1
       ? `${active.length} jobs running together`
       : "";
@@ -1294,6 +1352,7 @@ $("run").onclick = async () => {
   settingsIntent = false;
   ++planVersion;
   busy = true;
+  startRunProgress();
   dispatchPending = true;
   correctionPending = false;
   activities = {};
@@ -1322,6 +1381,7 @@ $("run").onclick = async () => {
     completedRun = { run: result.run, retained: result.retained };
     dispatchPending = false;
     busy = false;
+    finishRunProgress("Complete");
     latestRun = result.run_id;
     publishedBundle = publishedRunBundle();
     status(
@@ -1421,6 +1481,9 @@ $("reset").onclick = async () => {
     messages.length = 0;
     $("execution-log").textContent = "No execution yet.";
     busy = false;
+    runStartedAt = null;
+    runFinishedAt = null;
+    finishRunProgress("");
     status(
       "",
       "Ready to run",
@@ -1546,6 +1609,12 @@ $("download").onclick = async () => {
         (mode === "cloud" && publishedBundle?.request_id !== publication?.request_id)) return;
     status("failed", "Download unavailable", error.message);
   }
+};
+$("local-run-download").disabled = !payload.saved.bundle;
+$("local-run-download").onclick = () => {
+  if (!payload.saved.bundle) return;
+  download("fisheries-workflow-example.zip",
+    Uint8Array.from(atob(payload.saved.bundle), (char) => char.charCodeAt(0)), "application/zip");
 };
 function clearOutputPdf() {
   if (outputPdfUrl) {
@@ -1683,19 +1752,20 @@ function renderOutputRun() {
   $("output-run").title = "Run only this job. Prepare missing or changed inputs first.";
 }
 $("output-run").onclick = () => runFromJob(currentOutput?.record?.job || currentOutput?.job);
-$("cpue-results").onclick = () => records.cpue_summary
-  ? openOutput("cpue_summary")
-  : displayPreservedOutput("Compare CPUE results", {
-      html: payload.saved.outputs.cpue_summary.html,
-      pdf_base64: payload.saved.outputs.cpue_summary.pdf_base64,
-      pdf_sha256: payload.saved.outputs.cpue_summary.record.outputs["report.pdf"],
-    });
-$("example").onclick = () =>
-  displayPreservedOutput(
-    "Assessment report",
-    { html: payload.example, pdf_base64: payload.example_pdf_base64,
-      pdf_sha256: payload.example_pdf_sha256 },
-  );
+function openHeaderReport(key, title) {
+  if (records[key]) return openOutput(key);
+  const saved = payload.saved?.outputs?.[key];
+  if (!saved) {
+    status("ready", "No saved report", `${title} is not included in this download. Run its job in Local run to create it.`);
+    return;
+  }
+  return displayPreservedOutput(title, {
+    html: saved.html, pdf_base64: saved.pdf_base64,
+    pdf_sha256: saved.record.outputs["report.pdf"],
+  });
+}
+$("cpue-results").onclick = () => openHeaderReport("cpue_summary", "Compare CPUE results");
+$("example").onclick = () => openHeaderReport("assessment_report", "Assessment report");
 $("licences").onclick = () => {
   const pre = document.createElement("pre");
   pre.textContent = payload.notices;
@@ -1756,12 +1826,18 @@ $("save-output").onclick = () => {
 
 function explainMode() {
   $("mode-help").textContent = mode === "cloud"
-    ? "Run analyses on GitHub Actions."
+    ? localBackend ? "Run this computer's R/Make containers offline." : "Run analyses on GitHub Actions."
     : "View saved results without rerunning the analyses.";
 }
 
 async function activateMode(next, { fallbackReason = "", preserveSelection = false } = {}) {
+  if (next === "local") {
+    await activateMode("saved", { preserveSelection: true });
+    $("local-run-help").hidden = false;
+    return;
+  }
   if (!["cloud", "saved"].includes(next)) throw Error("Choose Live run or View example.");
+  $("local-run-help").hidden = true;
   if (location.protocol === "file:" && next === "cloud") next = "saved";
   const version = ++modeVersion;
   ++planVersion;
@@ -1772,8 +1848,10 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   modeStates[mode] = {
     records, states, latestRun, selected, executionScope, settingsIntent,
     completedRun, publishedBundle, messages: [...messages], settings: settings(),
-    handover: $("handover").value,
+    handover: $("handover").value, runStartedAt, runFinishedAt, runPhase,
   };
+  clearInterval(runClock);
+  runClock = null;
   mode = next;
   explainMode();
   ready = false;
@@ -1784,7 +1862,7 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   activities = {};
   dispatchPending = false;
   $("mode").value = mode;
-  $("github-run").hidden = mode !== "cloud" || !liveExecutionLink;
+  $("github-run").hidden = localBackend || mode !== "cloud" || !liveExecutionLink;
   if (liveExecutionLink) $("github-run").href = liveExecutionLink;
   const saved = modeStates[mode];
   records = saved?.records || {};
@@ -1796,6 +1874,9 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   $("handover").value = saved?.handover || "connected";
   completedRun = saved?.completedRun || null;
   publishedBundle = saved?.publishedBundle || null;
+  runStartedAt = saved?.runStartedAt || null;
+  runFinishedAt = saved?.runFinishedAt || null;
+  runPhase = saved?.runPhase || "";
   messages.splice(0, messages.length, ...(saved?.messages || []));
   $("execution-log").textContent = messages.join("\n") || "No execution yet.";
   const values = mode === "saved" ? payload.saved.settings : saved?.settings;
@@ -1813,18 +1894,18 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
     payload.saved.events.forEach(log);
     status("", "Saved results", location.protocol === "file:"
       ? `${Object.keys(records).length} completed jobs. Available offline.`
-      : `${Object.keys(records).length} completed jobs. Live run repeats or updates them.`);
+      : `${Object.keys(records).length} completed jobs. ${runModeLabel} repeats or updates them.`);
   } else if (unresolvedLive) {
-    showError(Object.assign(Error("The previous live run has an unresolved outcome."), {
+    showError(Object.assign(Error("The previous " + runModeLabel.toLowerCase() + " has an unresolved outcome."), {
       executionUnknown: true,
     }));
   } else {
-    status("running", "Connecting to the live run",
-      "Checking the live service. The saved example opens if the service is unavailable.");
+    status("running", localBackend ? "Connecting to the local runner" : "Connecting to the live run",
+      "Checking the service. The saved example opens if the service is unavailable.");
     $("saved-fallback").hidden = false;
     const slowConnection = setTimeout(() => {
       if (version !== modeVersion || ready) return;
-      status("running", "Waiting for the live service",
+      status("running", localBackend ? "Waiting for the local service" : "Waiting for the live service",
         "No analysis has started. You can inspect the saved example while waiting.");
       $("saved-fallback").hidden = false;
     }, 3000);
@@ -1844,12 +1925,14 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
       ready = true;
       explainMode();
       status("", Object.keys(records).length ? "Results available" : "Ready to run",
-        "New runs use the current code and configured container image.");
+        localBackend ? "Runs execute this computer's R/Make containers without network access."
+          : "New runs use the current code and configured container image.");
       await refreshPlan();
     } catch (error) {
       if (version !== modeVersion) return;
+      const service = localBackend ? "The local service" : "The live service";
       const reason = /8 seconds/.test(error.message)
-        ? "The live service did not respond." : "The live service is unavailable.";
+        ? service + " did not respond." : service + " is unavailable.";
       await activateMode("saved", { fallbackReason: reason, preserveSelection: true });
       return;
     } finally {
@@ -1858,8 +1941,9 @@ async function activateMode(next, { fallbackReason = "", preserveSelection = fal
   }
   $("run-id").textContent = latestRun;
   $("execution-note").textContent = mode === "cloud"
-    ? "Live results expire after 10 minutes. Download this run to keep them."
-    : "This file contains the saved results and run records. Use the live website to calculate new results.";
+    ? localBackend ? "Local results stay in your workspace. Download a completed run to keep its outputs and producing records."
+      : "Live results expire after 10 minutes. Download this run to keep them."
+    : "Saved results and run records are available here. Local run explains how to calculate new results on this computer.";
   render();
 }
 $("mode").onchange = () => activateMode($("mode").value);

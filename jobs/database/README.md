@@ -16,15 +16,15 @@ From the repository root, run this job and prepare any required inputs:
 make job JOB=database
 ```
 
-[run.R](run.R) is the entry point. It receives the coordinator’s named
+[run.R](https://github.com/kyuhank/fisheries-workflow-cpue-demo/blob/d4454fcfa9a23bd590344ad92940a13fa0a41c06/jobs/database/run.R) is the entry point. It receives the coordinator’s named
 `context` and uses the recorded shared libraries; a copied script is not standalone.
-See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
+See the [job guide](../README.md) for container and output options.
 
 | Saved file | Contents |
 | --- | --- |
 | `runs/database/output.json` | saved calculation result |
 | `runs/database/report.pdf` | compiled Quarto result PDF |
-| `runs/database/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/database/report.html` | result page from [component renderer](https://github.com/kyuhank/fisheries-workflow-cpue-demo/blob/d4454fcfa9a23bd590344ad92940a13fa0a41c06/R/render.R) |
 | `runs/database/record.json` | producing inputs, settings, exact code and software |
 | `runs/database/snapshot.sqlite` | accepted fixed database snapshot |
 

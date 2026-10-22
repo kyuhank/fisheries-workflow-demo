@@ -164,16 +164,16 @@ stopifnot(description$grouping_field == "stratum", length(description$strata) ==
           !any(rows_values(description$fields, "name") == "vessel"),
           all(rows_values(description$annual, "observations") == 4))
 submission_job <- new.env(parent = globalenv())
-source("jobs/submission/run.R", local = submission_job)
+source("components/cpue/jobs/submission/run.R", local = submission_job)
 submitted <- submission_job$calculate(list(
   source = list(sets = aggregates, catch = aggregate_catches), settings = list(last_year = 2003)))
 stopifnot(identical(submitted$sets, aggregates))
 qc_job <- new.env(parent = globalenv())
-source("jobs/qc/run.R", local = qc_job)
+source("components/cpue/jobs/qc/run.R", local = qc_job)
 quality <- qc_job$calculate(list(parents = list(submission = submitted)))
 stopifnot(length(quality$returned) == 0, is.null(attr(quality, "workflow_effects")))
 summary_job <- new.env(parent = globalenv())
-source("jobs/cpue_summary/run.R", local = summary_job)
+source("components/cpue/jobs/cpue_summary/run.R", local = summary_job)
 comparison <- summary_job$calculate(list(parents = list(cpue_a = public_a, cpue_b = public_b)))
 stopifnot(comparison$data_kind == "public-wcpfc", length(comparison$analyses) == 2,
           identical(comparison$analyses[[1]]$weights, public_a$weights))

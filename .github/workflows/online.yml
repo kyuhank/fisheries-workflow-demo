@@ -12,33 +12,25 @@ jobs:
     if: github.repository == 'kyuhank/fisheries-workflow-demo' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    env:
-      IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
     steps:
-      - name: Retrieve the checked demonstration source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Verify and assemble pinned analysis repositories
-        run: python3 scripts/hydrate-sources.py
-      - name: Check real hosted execution and downloaded reproduction
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: '4.5.1'
+          Ncpus: '2'
+          use-public-rspm: 'true'
+      - name: Prepare the coordinator and source pins
+        run: |
+          make setup
+          make hydrate-sources
+      - name: Check new hosted runs and retained producing records
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          docker pull "$IMAGE"
-          docker run --rm --user "$(id -u):$(id -g)" \
-            --env GITHUB_TOKEN \
-            --env PAPER_EXPECTED_COMMIT="$GITHUB_SHA" \
-            --env PAPER_RUNTIME_IMAGE="$IMAGE" \
-            --env PAPER_RUNTIME_IMAGE_URL=https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow \
-            --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
-            --entrypoint python "$IMAGE" scripts/check-online.py
-      - name: Preserve the non-secret acceptance report
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: hosted-demonstration-checks
-          path: .test-output/online-checks.json
-          if-no-files-found: warn
-          include-hidden-files: true
-          retention-days: 14
+          session_file="$RUNNER_TEMP/paper-reader.json"
+          Rscript --vanilla scripts/check-live.R --mode create --case baseline --evidence .test-output/live/create --expected-commit "$GITHUB_SHA" --session-file "$session_file"
+          for live_case in baseline growthupdate msebuffer; do
+            Rscript --vanilla scripts/check-live.R --mode execute --case "$live_case" --evidence ".test-output/live/$live_case" --expected-commit "$GITHUB_SHA" --session-file "$session_file"
+          done

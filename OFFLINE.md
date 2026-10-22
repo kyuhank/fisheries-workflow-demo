@@ -1,100 +1,119 @@
-# Repeat and preserve the analyses
+# Repeat a saved run
 
-Keep the offline ZIP and the execution-image archive together. The ZIP contains
-the saved run's exact inputs, settings, source snapshots, outputs and
-execution records. The image contains its R packages, Python, Make and Quarto.
-The offline tools are supplied with these older analysis sources so that a new
-tool release does not replace the code used to produce the saved results.
+## Local run
 
-## Read the example
+The local runner performs the same jobs as Live run, using your computer's Docker
+engine. It supports the same data-year, growth and catch-buffer settings, job or
+workflow execution, and manual input transfers. It uses no GitHub or Supabase
+service. The current public demo remains available separately.
 
-Unpack the versioned offline ZIP and open `START-HERE.html`. Follow
-the links from a result to its input records, job script and calculation library.
-`code.html` displays the preserved sources. These pages use local files and need
-no login or internet connection. The interactive page opens saved Quarto result PDFs;
-new calculations use the commands below.
-
-## Restore the software
-
-Install Docker and start its engine. Use a POSIX shell, available on Linux and
-macOS or through WSL on Windows. The image is for Linux AMD64; ARM hosts need
-Docker's AMD64 emulation. Docker and a compatible operating system must remain
-available even when the saved software is kept.
-
-Place `fisheries-workflow-runtime.tar.gz`, `runtime-archive.json` and
-`SHA256SUMS.json` in a folder named `runtime` next to the extracted analysis
-folder. From the analysis folder:
+Install R, Make and Docker, then prepare the five host R packages once while online:
 
 ```sh
-sh scripts/preserve-runtime.sh load ../runtime
+Rscript --vanilla scripts/setup-host.R --local
 ```
 
-This loads your preserved archive, then checks its checksum and the restored
-image's configuration and software layers before running an analysis. Use an
-archive from a trusted copy of the release. A restored image can lose its registry
-digest label; the tools therefore check the recorded local image identity and
-layers before launching it. They record that identity alongside the original
-SPC registry reference. The checks identify the preserved software, not the
-scientific validity of its results.
-
-If the recorded image is already present, loading the archive is unnecessary.
-The offline runner checks it before use and stops if it is missing. It never
-pulls an image or retrieves source repositories.
-
-## Repeat and compare
-
-From the extracted analysis folder:
+After unpacking the saved source ZIP and restoring its saved images, start:
 
 ```sh
-sh scripts/offline.sh reproduce
-sh scripts/offline.sh compare
+sh scripts/local.sh --port 8765 --workspace /absolute/local-runs
 ```
 
-The first command repeats the saved workflow using its recorded settings. The
-second compares the numerical results with `reference/`, using the unchanged
-comparison rules in `verify.py`. New reports and records are in `offline-runs/`.
-The calculations run with network access disabled; the source folder is mounted
-read-only. The runner verifies packaged files and the component source snapshots
-before starting an analysis.
+Open `http://127.0.0.1:8765`. Change settings and run jobs from the same diagram.
+The workspace holds new results; the archived source and reference results stay
+available for comparison. Stop the local service with Ctrl+C. Linux or a POSIX
+environment such as WSL is required; the supplied images use Linux AMD64.
+The prepared package and images can be kept on local storage and shared together
+through a research archive. Starting this local runner requires no internet access.
 
-To run one job and prepare its required inputs:
+## Prepare an offline share
+
+With a completed release ZIP, its recorded images available in Docker and a cache
+of the installed host packages' source archives, run:
 
 ```sh
-sh scripts/offline.sh job cpue_a
+make portable ARCHIVE=/path/to/release.zip OUTPUT=/path/to/new-share PACKAGE_SOURCES=/path/to/R-sources
 ```
 
-For a single-job run download, use the job named in `REPRODUCE.txt`:
+The source cache must contain the exact installed versions and their dependencies
+as `package_version.tar.gz`. Preparation checks these identities, preserves the
+images and writes checksums. It retrieves nothing from CRAN, GitHub or a registry.
+Choose a new output directory; its `workflow/` retains the release and manifest,
+with image archives and host package sources alongside it.
+
+On another computer with R development headers, Make, Docker and a suitable C/C++
+compiler, use the prepared directory without online services:
 
 ```sh
-sh scripts/offline.sh reproduce cpue_a
-sh scripts/offline.sh compare cpue_a
+Rscript offline-host-install.R --library /absolute/offline-R-library
+R_LIBS_USER=/absolute/offline-R-library Rscript workflow/scripts/offline.R archive-load runtime-copy
+R_LIBS_USER=/absolute/offline-R-library make -C workflow local
 ```
 
-These commands compare that job only. Other saved results keep their original
-records. An earlier download without the offline tools retains its original
-instructions and requires the host tools listed there.
+Use `make -C workflow reproduce` with the same `R_LIBS_USER` to compare the archived
+calculation. Keep the directory's source, reference results, receipts and checksums
+together when copying it to independent storage or a research archive. New local
+results retain their own producing records in a separate workspace.
 
-## Continue an analysis
+## Repeat the archived calculation
 
-`sh scripts/offline.sh run` starts the workflow with the example's default
-settings. Use the same output folder to continue from its saved state; the
-coordinator checks which results require recalculation. Keep original downloads
-and write changes into a separate working copy. For code or input changes, use
-the development route in [ADAPT.md](ADAPT.md): the preservation runner deliberately
-rejects changes to packaged files.
+Unpack the offline ZIP and open `START-HERE.html`. Its table links each result
+to the PDF, numerical output, producing record and R source. `code.html` lists
+the preserved coordinator and component sources. Reading uses local files.
 
-## Keep an independent copy
+The ZIP preserves source, inputs, settings, reference outputs and runtime
+identities. Docker image bytes are separate: keep the ZIP and an archive of
+every image in `runtime-catalogue.json` on independent storage.
 
-If you already have the recorded image, save it for later use:
+Use R with `jsonlite`, `digest`, `DBI` and `RSQLite`, Make, Docker and a POSIX
+shell (Linux, macOS or Windows with WSL). The supplied images use Linux AMD64;
+ARM hosts require compatible Docker emulation.
+
+From the extracted folder, restore your saved images:
 
 ```sh
-sh scripts/preserve-runtime.sh ../runtime
-sh scripts/preserve-runtime.sh verify ../runtime
+sh scripts/preserve-runtime.sh load /absolute/runtime-copy
+make reproduce
 ```
 
-Keep the ZIP, runtime files, licences and checksums on storage independent of
-the GitHub account. Their contents can be copied to a code or data archive;
-GitHub release links alone do not provide an independent deposit. Each software
-component retains its own licence, as described in [THIRD_PARTY.md](THIRD_PARTY.md).
-Preserved copies do not require this website or the original image registry to
-remain online. They still require a Docker-compatible computer.
+The loader checks archive checksums before loading, then verifies every restored
+image's config ID, platform and ordered software layers. Reproduction verifies
+the packaged file manifest, uses the preserved source snapshots and recorded
+settings, disables image pulls and container networking, and compares new
+numerical outputs with `reference/`. Results go to `offline-runs/`.
+A restored image need not retain its registry digest label: its exact config and
+layers must still match the preserved catalogue.
+
+A single-job download repeats its declared job by default. To select a saved job
+explicitly, or compare an existing reproduction:
+
+```sh
+make reproduce JOB=cpue_a
+Rscript --vanilla scripts/offline.R compare cpue_a
+```
+
+Its required inputs are checked or prepared; unrelated saved results retain
+their producing records. Set `PAPER_OFFLINE_OUTPUT=/absolute/results` to choose
+a separate result folder. Keep `reference/` unchanged.
+
+`comparison-policy.json` declares relative tolerance `1e-8` and absolute tolerance
+`1e-9`. Assessment log residuals permit absolute `1e-8` after consistency checks;
+near-zero gradients have magnitude and difference caps of `1e-7` conditional on
+matching successful fit diagnostics. Copied assessment fields must equal their
+own source output. JSON structure and nonnumerical values must match. These are
+reproduction comparison rules, not model-accuracy guarantees.
+
+If all recorded images are available locally, preserve them before archiving:
+
+```sh
+sh scripts/preserve-runtime.sh save /absolute/runtime-copy
+sh scripts/preserve-runtime.sh verify /absolute/runtime-copy
+```
+
+This writes one `runtime-images/<config>.tar` per distinct image, archive
+checksums and a catalogue receipt. Mixed images used by retained jobs are
+included. Save, verify and load never pull software or retrieve source.
+
+For development, work in a separate source checkout and follow [ADAPT.md](ADAPT.md).
+The preservation runner rejects changes to packaged files. Historical releases
+keep their original execution tools and instructions.

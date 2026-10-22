@@ -1,32 +1,22 @@
-name: Check diagram
+name: Check diagram and reader controls
 on:
   push:
-    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', 'scripts/pdf_checks.py', '.github/workflows/interface.yml']
+    paths: ['app/**', 'docs/**', 'scripts/check-*.py', 'scripts/pdf_checks.py', 'scripts/refresh-interface.py', '.github/workflows/interface.yml']
   pull_request:
-    paths: ['source-lock.template.json', 'scripts/hydrate-sources.py', 'Makefile', 'jobs/**', 'workflow/**', 'app/**', 'docs/**', 'scripts/build.py', 'scripts/check-*.py', 'scripts/pdf_checks.py', '.github/workflows/interface.yml']
+    paths: ['app/**', 'docs/**', 'scripts/check-*.py', 'scripts/pdf_checks.py', 'scripts/refresh-interface.py', '.github/workflows/interface.yml']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   diagram:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Verify and assemble pinned analysis repositories
-        run: python3 scripts/hydrate-sources.py
-      - name: Build the current pages in the preserved runtime
-        env:
-          IMAGE: ghcr.io/pacificcommunity/fisheries-workflow@sha256:9dea950a713b87daad728517138bcb664a151f0f5b44a1d5370623734a5bca9d
-        run: |
-          docker pull "$IMAGE"
-          docker run --rm --network none \
-            --env PAPER_RUNTIME_IMAGE="$IMAGE" \
-            --env PAPER_RUNTIME_IMAGE_URL=https://github.com/PacificCommunity/ofp-sam-docker-images/pkgs/container/fisheries-workflow \
-            --env GITHUB_SHA --env GITHUB_REPOSITORY --env GITHUB_RUN_ID --env GITHUB_RUN_ATTEMPT \
-            --user "$(id -u):$(id -g)" \
-            --volume "$GITHUB_WORKSPACE:/workspace" --workdir /workspace \
-            "$IMAGE" make --no-print-directory --silent inside-html
+        with:
+          persist-credentials: false
+      - name: Assemble current interface with saved results
+        run: python3 scripts/refresh-interface.py
       - name: Install browser checks
         run: |
           sudo apt-get update
@@ -34,25 +24,12 @@ jobs:
           python3 -m venv .browser-check
           .browser-check/bin/pip install playwright==1.60.0
           .browser-check/bin/python -m playwright install --with-deps chromium webkit
-      - name: Check layout and controls
+      - name: Check layouts, results and handovers
         run: |
           .browser-check/bin/python scripts/check-diagram.py --engine chromium
           .browser-check/bin/python scripts/check-diagram.py --engine webkit
           check_status=0
-          for check_file in records connection browser settings plans reports orchestration mse; do
+          for check_file in records connection browser settings reports orchestration mse handover; do
             .browser-check/bin/python "scripts/check-${check_file}.py" || check_status=1
           done
           exit "$check_status"
-      - name: Preserve genuine Saved views for the paper
-        run: .browser-check/bin/python scripts/capture-publication.py
-      - name: Preserve the checked pages and download files
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: demo-release-${{ github.sha }}
-          path: |
-            docs/
-            dist/
-            .test-output/publication/
-          if-no-files-found: error
-          include-hidden-files: true
-          retention-days: 7

@@ -18,15 +18,15 @@ From the repository root, run this job and prepare any required inputs:
 make job JOB=mse_prepare
 ```
 
-[run.R](run.R) is the entry point. It receives the coordinator’s named
+[run.R](https://github.com/kyuhank/fisheries-workflow-mse-demo/blob/7ae67f11217ef10ba8f4fb3a52707707377c1f32/jobs/mse_prepare/run.R) is the entry point. It receives the coordinator’s named
 `context` and uses the recorded shared libraries; a copied script is not standalone.
-See the [job guide](../README.md#run-and-inspect-a-job) for container and output options.
+See the [job guide](../README.md) for container and output options.
 
 | Saved file | Contents |
 | --- | --- |
 | `runs/mse_prepare/output.json` | saved calculation result |
 | `runs/mse_prepare/report.pdf` | compiled Quarto result PDF |
-| `runs/mse_prepare/report.html` | result page from [shared renderer](../../workflow/reports.py) |
+| `runs/mse_prepare/report.html` | result page from [component renderer](https://github.com/kyuhank/fisheries-workflow-mse-demo/blob/7ae67f11217ef10ba8f4fb3a52707707377c1f32/R/render.R) |
 | `runs/mse_prepare/record.json` | producing inputs, settings, exact code and software |
 
 **Used by:** [Constant catch (`mse_constant`)](../mse_constant/README.md), [Index rule (`mse_index`)](../mse_index/README.md), [Buffered rule (`mse_buffered`)](../mse_buffered/README.md).
