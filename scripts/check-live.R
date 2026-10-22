@@ -76,6 +76,26 @@ live_create <- function(gate, path) {
   gate$session <- live_session(path)
   live_save(gate, list(status = "created", private_session_file = path), "session.receipt.json")
 }
+live_previous <- function(update, session_id) {
+  previous <- update$state; run <- update$run
+  if (is.null(run)) return(previous)
+  live_assert(identical(run$session_id, session_id) &&
+    grepl("^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$", run$id %||% ""),
+    "Previous request/session identity differs")
+  for (row in update$events) live_assert(identical(row$request_id, run$id), "Previous events belong to another request")
+  if (identical(run$status, "complete")) {
+    result <- run$result
+    if (!is.null(result$records)) {
+      live_assert(is.list(result$records) && is.list(result$settings) && identical(result$schema_version, 2L),
+        "Completed previous run lacks records/settings identity")
+      previous <- previous %||% list()
+      previous$schema_version <- result$schema_version
+      previous$records <- result$records
+    }
+    if (!is.null(result$settings)) { previous <- previous %||% list(); previous$settings <- result$settings }
+  }
+  previous
+}
 live_case <- function(name, config, previous = NULL, connect = FALSE) {
   jobs <- config$jobs; keys <- names(jobs); fresh <- name %in% c("baseline", "jobscope")
   records <- previous$records %||% list()
@@ -349,7 +369,7 @@ live_main <- function(args = commandArgs(TRUE)) {
       if (!is.null(gate$session)) {
         before <- live_request(gate, "/state?after=0"); live_save(gate, before, "before.json")
         live_assert(is.null(before$run) || !before$run$status %in% c("queued", "running", "handover"), "Reader already has an active request")
-        previous <- before$state
+        previous <- live_previous(before, gate$session$id)
       }
       case <- live_case(options$case, gate$config, previous, options$connect); live_save(gate, case, "case.json")
       report$expected_jobs <- length(case$run); report$expected_boundaries <- case$boundaries
